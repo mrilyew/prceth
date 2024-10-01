@@ -14,6 +14,8 @@ class BaseModel(Model):
         database = db
 
 class Collection(BaseModel):
+    self_name = 'collection'
+
     id = AutoField()
     name = TextField(default='...')
     description = TextField(null=True)
@@ -145,7 +147,7 @@ class Collection(BaseModel):
     
     def addItem(self, entity):
         if(self.hasItem(entity)):
-            raise ValueError
+            raise ValueError('Collection has that item')
 
         rel = Relation()
         rel.parent_collection = self.id
@@ -199,6 +201,8 @@ class Collection(BaseModel):
             return current_desc
     
 class Entity(BaseModel):
+    self_name = 'entity'
+    
     id = AutoField()
     format = TextField(null=True)
     original_name = TextField(default='N/A',null=False)
@@ -258,12 +262,6 @@ class Entity(BaseModel):
             coll_path.mkdir(parents=True, exist_ok=True)
 
         return collection_path
-
-    def getAdditionalFilesPath(self):
-        storage = consts['cwd'] + '\\storage\\additional_files'
-        final_path = storage + '\\' + str(self.id)
-
-        return final_path
 
     @staticmethod
     def getTempPath():

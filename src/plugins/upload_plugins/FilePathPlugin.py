@@ -8,6 +8,7 @@ class FilePathPlugin(BaseUploadPlugin):
     name = 'FilePath'
     format = 'path=%&type=%'
     works = 'entity'
+    category = 'base'
     
     def run(self, input_data=None):
         pars = utils.parse_json(input_data)

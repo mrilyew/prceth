@@ -2,7 +2,6 @@ import time
 import platform
 from pathlib import Path
 from components.utils import utils
-from components.logger import logger
 from components.db import db, Collection, Entity, Relation
 from components.settings import settings
 from components.file_manager import file_manager
@@ -308,19 +307,17 @@ match args.get('act'):
         if entity == None:
             print('Invalid entity')
         
-        old_collection = Collection.get(entity.collection_id)
-        old_collection.removeItem(entity=entity,delete_entity=False)
+        Relation.delete().where(Relation.child_entity == entity.id).execute()
         collection.addItem(entity)
-
-        entity.save()
-
+    
     # PLUGINS
 
-    case 'plugins.getActions':
-        plugins = load_plugins('action_plugins')
+    case 'plugins.get':
+        folder = args.get('folder')
+        plugins = load_plugins(folder)
         for plugin in plugins:
-            plugin_class = plugins[plugin]
-            print(plugin_class.name + '|' + plugin_class.action + '|' + str(plugin_class.allow_extensions))
+            plugin_class = plugins[plugin]()
+            print(plugin_class.getDesc())
     case 'plugins.getActionsForEntity':
         if 'mid' not in args:
             print('Pass "mid" like "[type]_[id]"')
@@ -341,17 +338,11 @@ match args.get('act'):
         final_plugins = []
         for plug in plugins:
             plugin = plugins[plug]()
-            if plugin.allow_type != type:
-                continue
-
-            if '*' in plugin.allow_extensions:
+            if plugin.canRun(entity):
                 final_plugins.append(plugin)
-            else:
-                if entity.format in plugin.allow_extensions:
-                    final_plugins.append(plugin)
 
         for plugin in final_plugins: 
-            print(plugin.name + '|' + str(plugin.allow_extensions) + '|' + plugin.allow_type + '|' + plugin.action)
+            print(plugin.getDesc())
     case 'plugins.runAction':
         if 'mid' not in args:
             print('Pass "mid" like "[type]_[id]"')
@@ -377,7 +368,35 @@ match args.get('act'):
             exit()
 
         class_plugin_ex = class_plugin()
+        if class_plugin_ex.canRun() == False:
+            print('Plugin cannot be runned on this')
+            exit()
+        
         print(class_plugin_ex.run(input_entity=entity,input_data=args.get('input_data')))
+    case 'plugins.runBase':
+        if 'plugin' not in args:
+            print('"plugin" was not passed')
+            exit()
+
+        if 'input_data' not in args:
+            print('"input_data" was not passed')
+            exit()
+        
+        plugin = args.get('plugin')
+        plugins = load_plugins('base_plugins')
+        class_plugin = plugins.get(plugin)
+        if class_plugin == None:
+            print("Plugin was not found")
+            exit()
+
+        class_plugin_ex = class_plugin()
+        res = class_plugin_ex.run(input_data=args.get('input_data'))
+
+        if hasattr(res, '__len__'):
+            for item in res:
+                print(str(item) + '\n')
+        else:
+            print(res)
     case 'plugins.runService':
         if 'service' not in args:
             print('"service" was not passed')
@@ -399,17 +418,8 @@ match args.get('act'):
         except KeyboardInterrupt:
             service_ex.stop()
         pass
-    case 'plugins.getServices':
-        plugins = load_plugins('services_plugins')
-        for plugin in plugins:
-            plugin_class = plugins[plugin]
-            print(plugin_class.name + '|' + str(plugin_class.interval))
-    case 'plugins.getUpload':
-        plugins = load_plugins('upload_plugins')
-        for plugin in plugins:
-            plugin_class = plugins[plugin]
-            print(plugin_class.name + '|' + plugin_class.format)
     case 'log':
+        from components.logger import logger
         logger.log(args.get('section'), args.get('name'), args.get('message'))
     case _:
         print('Unknown "--act" passed')

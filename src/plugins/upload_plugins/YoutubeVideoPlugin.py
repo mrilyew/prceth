@@ -1,0 +1,62 @@
+from plugins.BasePlugins import BaseUploadPlugin
+from components.utils import utils
+from components.db import Entity
+import json
+import yt_dlp
+
+class YoutubeVideo(BaseUploadPlugin):
+    name = 'YoutubeVideo'
+    format = 'url=%'
+    works = 'all'
+    category = 'youtube'
+
+    def run(self, input_data=None):
+        pars = utils.parse_json(input_data)
+        url = pars.get('url')
+        format_id = pars.get('format_id')
+
+        if url == None:
+            print('No "url" or "format_id"')
+            exit()
+
+        if format_id == None:
+            format_id = 'bestvideo+bestaudio/best'
+        
+        cached_content = {}
+        opts = {
+            'format': format_id,
+            'noplaylist': True,
+            'outtmpl': f"{Entity.getTempPath()}\\%(id)s.%(ext)s",
+            'noplaylist': True,
+            'postprocessors': [{
+                'key': 'FFmpegMerger',
+            }],
+        }
+
+        dlp = yt_dlp.YoutubeDL(opts)
+        info_dict_uns = dlp.extract_info(url, download=True)
+        info_dict = dlp.sanitize_info(info_dict_uns)
+        info_dict.pop('formats')
+        info_dict.pop('requested_downloads')
+        info_dict.pop('http_headers')
+        info_dict.pop('_format_sort_fields')
+        info_dict.pop('_version')
+        info_dict.pop('_has_drm')
+        info_dict.pop('_type')
+
+        if pars.get('save_automatic_captions') == None:
+            info_dict.pop('automatic_captions')
+
+        orig_name = info_dict.get('id') + '.' + info_dict['ext']
+
+        cached_content = info_dict
+        
+        entity = Entity()
+        entity.format = info_dict.get('ext')
+        entity.original_name = orig_name
+        entity.description = info_dict.get('description')
+        entity.display_name = info_dict.get('fulltitle')
+        entity.source = info_dict.get('webpage_url')
+        entity.cached_content = json.dumps(cached_content, separators=(',', ':'))
+
+        return entity

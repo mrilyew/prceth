@@ -6,6 +6,7 @@ class BlankFilePlugin(BaseUploadPlugin):
     name = 'BlankFile'
     format = 'format=%&text=%'
     works = 'all'
+    category = 'base'
 
     def run(self, input_data=None):
         pars = utils.parse_json(input_data)

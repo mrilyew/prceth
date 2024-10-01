@@ -10,6 +10,7 @@ class LinkPlugin(BaseUploadPlugin):
     name = 'Link'
     format = 'url=%'
     works = 'all'
+    category = 'base'
 
     def run(self, input_data=None):
         pars = utils.parse_json(input_data)
