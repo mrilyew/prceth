@@ -1,15 +1,14 @@
 from plugins.BasePlugins import BasePlugin
-from components.utils import utils
-from components.db import Entity
+from core.utils import utils
+from db.db import Entity
 import json
 import yt_dlp
 
 class ExtractYoutubeVideoStreamsPlugin(BasePlugin):
     name = 'ExtractYoutubeStreams'
 
-    def run(self, input_data=None):
-        pars = utils.parse_json(input_data)
-        url = pars.get('url')
+    def run(self, args=None):
+        url = args.get('url')
 
         dlp = yt_dlp.YoutubeDL({
             'listformats': True,

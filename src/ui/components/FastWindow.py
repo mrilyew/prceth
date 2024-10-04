@@ -1,9 +1,9 @@
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtGui import QCursor
 from PyQt6.QtCore import QPoint
-from components.locale import _
-from components.db import Collection, Entity, Relation
-from components.settings import settings
+from localization.locale import _
+from db.db import Collection, Entity, Relation
+from core.settings import settings
 import keyboard
 
 class FastWindowThread(QtCore.QThread):

@@ -1,11 +1,11 @@
 import time
 import platform
 from pathlib import Path
-from components.utils import utils
-from components.db import db, Collection, Entity, Relation
-from components.settings import settings
-from components.file_manager import file_manager
-from components.consts import consts
+from core.utils import utils
+from db.db import db, Collection, Entity, Relation
+from core.settings import settings
+from core.file_manager import file_manager
+from resources.consts import consts
 from plugins import load_plugins
 
 args = utils.parse_args()
@@ -246,12 +246,7 @@ match args.get('act'):
             print('"--method" not passed')
             exit()
         
-        if 'input_data' not in args:
-            print('"--input_data" not passed')
-            exit()
-        
         method = args.get('method')
-        input_data = args.get('input_data')
         plugins = load_plugins('upload_plugins')
         instance = None
         try:
@@ -260,19 +255,13 @@ match args.get('act'):
             print('Plugin not found')
             exit()
         
-        entity = instance.run(input_data=input_data)
+        entity = instance.run(args=args)
         if 'display_name' in args:
             entity.display_name = args.get('display_name')
         
         entity.save()
 
-        # Renaming moved file
-        entity_path = entity.getDirPath()
-
-        file_final_path = Path(Entity.getTempPath() + '\\' + entity.original_name)
-        file_final_path_replace = str(entity_path) + '\\' + str((str(entity.id) + '.' + entity.format))
-        file_final_path.rename(file_final_path_replace)
-
+        instance.moveFromTemp(entity=entity)
         collection.addItem(entity)
         print(entity.takeInfo())
     case 'entities.edit':
@@ -314,7 +303,7 @@ match args.get('act'):
 
     case 'plugins.get':
         folder = args.get('folder')
-        plugins = load_plugins(folder)
+        plugins = load_plugins(folder=folder)
         for plugin in plugins:
             plugin_class = plugins[plugin]()
             print(plugin_class.getDesc())
@@ -377,10 +366,6 @@ match args.get('act'):
         if 'plugin' not in args:
             print('"plugin" was not passed')
             exit()
-
-        if 'input_data' not in args:
-            print('"input_data" was not passed')
-            exit()
         
         plugin = args.get('plugin')
         plugins = load_plugins('base_plugins')
@@ -390,7 +375,7 @@ match args.get('act'):
             exit()
 
         class_plugin_ex = class_plugin()
-        res = class_plugin_ex.run(input_data=args.get('input_data'))
+        res = class_plugin_ex.run(args=args)
 
         if hasattr(res, '__len__'):
             for item in res:
@@ -419,7 +404,7 @@ match args.get('act'):
             service_ex.stop()
         pass
     case 'log':
-        from components.logger import logger
+        from core.logger import logger
         logger.log(args.get('section'), args.get('name'), args.get('message'))
     case _:
         print('Unknown "--act" passed')

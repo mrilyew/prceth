@@ -1,5 +1,5 @@
 from plugins.BasePlugins import BaseActionPlugin
-from components.utils import utils
+from core.utils import utils
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 
@@ -9,9 +9,8 @@ class ExtractMetaDataPlugin(BaseActionPlugin):
     allow_type = 'entity'
     action = 'r'
 
-    def run(self, input_entity=None, input_data=None):
-        pars = utils.parse_json(input_data)
-        type = pars.get('type')
+    def run(self, input_entity=None, args=None):
+        type = args.get('type')
         path = input_entity.getPath()
         parser = createParser(path)
 

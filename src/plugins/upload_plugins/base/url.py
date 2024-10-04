@@ -1,20 +1,19 @@
 from plugins.BasePlugins import BaseUploadPlugin
 from pathlib import Path
-from components.db import Entity
-from components.utils import utils
+from db.db import Entity
+from core.utils import utils
 import requests
 import mimetypes
 from urllib.parse import urlparse
 
-class LinkPlugin(BaseUploadPlugin):
-    name = 'Link'
+class url(BaseUploadPlugin):
+    name = 'base.url'
     format = 'url=%'
     works = 'all'
     category = 'base'
 
-    def run(self, input_data=None):
-        pars = utils.parse_json(input_data)
-        url = pars.get('url')
+    def run(self, args=None):
+        url = args.get('url')
 
         if url == None:
             raise AttributeError("URL was not passed")
@@ -31,18 +30,23 @@ class LinkPlugin(BaseUploadPlugin):
         if len(file_name_splitted) > 1:
             ext = file_name_splitted[1]
         
-        full_file_name = ''.join([file_name, ext])
-
-        save_path = Path(Entity.getTempPath() + '\\' + full_file_name)
+        full_file_name = ''
         response = requests.get(url, allow_redirects=True)
         
         if response.status_code == 200:
+            if file_name == '':
+                file_name = requests.utils.quote(parsed_url.hostname) + '.'
+            
             if ext == '':
                 content_type = response.headers.get('Content-Type', '').lower()
                 t_extension = mimetypes.guess_extension(content_type)
                 if t_extension:
                     ext = t_extension[1:]
+                else:
+                    ext = 'html'
             
+            full_file_name = ''.join([file_name, ext])
+            save_path = Path(Entity.getTempPath() + '\\' + full_file_name)
             out_file = open(save_path, 'wb')
             out_file.write(response.content)
             out_file.close()

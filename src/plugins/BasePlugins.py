@@ -1,12 +1,14 @@
 import time
 import threading
-from components.settings import settings
+from core.settings import settings
+from pathlib import Path
+from db.db import Entity
 
 class BasePlugin():
     inner_type = 'base'
     name = 'BasePlugin'
 
-    def run(self, input_data=None):
+    def run(self, args=None):
         pass
     
     def getDesc(self):
@@ -20,10 +22,10 @@ class BaseUploadPlugin(BasePlugin):
     works = 'all'
     category = 'base'
 
-    def run(self, input_data=None):
+    def run(self, args=None):
         pass
 
-    def run_file(self, input_data=None):
+    def run_file(self, args=None):
         pass
 
     def getDesc(self):
@@ -31,6 +33,13 @@ class BaseUploadPlugin(BasePlugin):
             'name': self.name,
             'format': self.format
         }
+    
+    def moveFromTemp(self, entity):
+        entity_path = entity.getDirPath()
+
+        file_final_path = Path(Entity.getTempPath() + '\\' + entity.original_name)
+        file_final_path_replace = str(entity_path) + '\\' + str((str(entity.id) + '.' + entity.format))
+        file_final_path.rename(file_final_path_replace)
 
 class BaseActionPlugin(BasePlugin):
     inner_type = 'action'
@@ -62,45 +71,6 @@ class BaseActionPlugin(BasePlugin):
             'exts': str(self.allow_extensions)
         }
 
-class BaseDisplayPlugin(BasePlugin):
-    inner_type = 'display'
-    name = 'Base'
-    works = 'all'
-
-    def getDesc(self):
-        return {
-            'name': self.name
-        }
-
-class BaseEditPlugin(BasePlugin):
-    inner_type = 'edit'
-    name = 'Base'
-    works = 'all'
-
-    def getDesc(self):
-        return {
-            'name': self.name
-        }
-
-class BaseThumbnailPlugin(BasePlugin):
-    inner_type = 'thumbnail'
-    name = 'Base'
-    works = 'all'
-
-    def getDesc(self):
-        return {
-            'name': self.name
-        }
-
-class BaseSearchPlugin(BasePlugin):
-    inner_type = 'search'
-    name = 'Base'
-
-    def getDesc(self):
-        return {
-            'name': self.name
-        }
-
 class BaseService(BasePlugin):
     inner_type = 'service'
     name = 'BaseService'
@@ -111,8 +81,8 @@ class BaseService(BasePlugin):
         self.start_time = time.time()
         self.thread = None
     
-    def start(self, input_data=None):
-        self.input_data = input_data
+    def start(self, args=None):
+        self.args = args
         if self.thread is None:
             self.thread = threading.Thread(target=self.action_wrapper)
             self.thread.start()

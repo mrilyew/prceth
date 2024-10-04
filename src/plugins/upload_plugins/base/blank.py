@@ -1,17 +1,19 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from components.utils import utils
-from components.db import Entity
+from core.utils import utils
+from db.db import Entity
 
-class BlankFilePlugin(BaseUploadPlugin):
-    name = 'BlankFile'
-    format = 'format=%&text=%'
+class blank(BaseUploadPlugin):
+    name = 'base.blank'
+    format = 'format=%;text=%'
     works = 'all'
     category = 'base'
 
-    def run(self, input_data=None):
-        pars = utils.parse_json(input_data)
-        format = pars.get('format')
-        text = pars.get('text')
+    def run(self, args=None):
+        format = args.get('format')
+        if format == None:
+            format = 'txt'
+        
+        text = args.get('text')
         
         # Creating entity
 

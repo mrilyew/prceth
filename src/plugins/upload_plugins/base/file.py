@@ -1,20 +1,19 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from components.utils import utils
+from core.utils import utils
 from pathlib import Path
-from components.db import Entity
+from db.db import Entity
 import shutil
 
-class FilePathPlugin(BaseUploadPlugin):
-    name = 'FilePath'
-    format = 'path=%&type=%'
+class file(BaseUploadPlugin):
+    name = 'base.file'
+    format = 'path=%;type=%'
     works = 'entity'
     category = 'base'
     
-    def run(self, input_data=None):
-        pars = utils.parse_json(input_data)
-        path = pars.get('path')
-        type = pars.get('type') # copy || move
-        overwrite = pars.get('overwrite')
+    def run(self, args=None):
+        path = args.get('path')
+        type = args.get('type') # copy || move
+        overwrite = args.get('overwrite')
         if path == None:
             raise AttributeError("Path was not passed")
         

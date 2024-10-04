@@ -2,10 +2,10 @@ import time
 from functools import reduce
 import operator
 from peewee import *
-from components.consts import consts
+from resources.consts import consts
 from playhouse.shortcuts import model_to_dict
 from pathlib import Path
-from components.locale import _
+from localization.locale import _
 
 db = SqliteDatabase('storage/main.db')
 
@@ -17,8 +17,8 @@ class Collection(BaseModel):
     self_name = 'collection'
 
     id = AutoField()
-    name = TextField(default='...')
-    description = TextField(null=True)
+    name = TextField(index=True,default='...')
+    description = TextField(index=True,null=True)
     order = IntegerField(null=True,default=0)
     author = TextField(null=True,default=consts['pc_fullname'])
     innertype = TextField(default='def',null=False)
@@ -206,11 +206,12 @@ class Entity(BaseModel):
     id = AutoField()
     format = TextField(null=True)
     original_name = TextField(default='N/A',null=False)
-    display_name = TextField(default='N/A')
-    description = TextField(null=True)
+    display_name = TextField(index=True,default='N/A')
+    description = TextField(index=True,null=True)
     source = TextField(null=True)
     filesize = BigIntegerField(default=0)
     cached_content = TextField(null=True)
+    index_info = TextField(index=True,null=True)
     color = TextField(null=True,default='fff')
     pinned = BooleanField(default=0)
     hidden = BooleanField(default=0)
@@ -237,6 +238,7 @@ class Entity(BaseModel):
             "description": self.description,
             "filesize": self.filesize,
             "cached_content": self.cached_content,
+            "index_info": self.index_info,
             "color": self.color,
             "pinned": self.pinned,
             "created": self.created_at,
@@ -265,7 +267,9 @@ class Entity(BaseModel):
 
     @staticmethod
     def getTempPath():
-        return consts['cwd'] + '\\storage\\collections\\temp'
+        dir = Path(consts['cwd'] + '\\storage\\collections\\temp')
+        
+        return str(dir)
     
     @staticmethod
     def search(page= None, query_options = None):
@@ -335,9 +339,9 @@ if Collection.select().count() == 0:
     Collection.create(name='_collections.saved_images',description='_collections.saved_images_description',innertype='gallery',icon_hash='gallery_icon',order=i+1)
     Collection.create(name='_collections.videos',description='_collections.videos_description',innertype='videoslist',icon_hash='videos_icon',order=i+2)
     Collection.create(name='_collections.notes',description='_collections.notes_description',innertype='noteslist',icon_hash='notes_icon',order=i+3)
-    Collection.create(name='_collections.audios',description='_collections.audios_description',innertype='audios_list',icon_hash='audio_icon',order=i+4)
     Collection.create(name='_collections.saved_pages',description='_collections.saved_pages_description',innertype='websites_list',icon_hash='web_icon',order=i+5)
     Collection.create(name='_collections.saved_links',description='_collections.saved_links_description',innertype='links_list',icon_hash='links_list',order=i+6)
+    Collection.create(name='_collections.audios',description='_collections.audios_description',innertype='audios_list',icon_hash='audio_icon',order=i+7)
     print('Default collections created')
 
 db.close()

@@ -1,19 +1,18 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from components.utils import utils
-from components.db import Entity
+from core.utils import utils
+from db.db import Entity
 import json
 import yt_dlp
 
-class YoutubeVideo(BaseUploadPlugin):
-    name = 'YoutubeVideo'
+class video(BaseUploadPlugin):
+    name = 'youtube.video'
     format = 'url=%'
     works = 'all'
     category = 'youtube'
 
-    def run(self, input_data=None):
-        pars = utils.parse_json(input_data)
-        url = pars.get('url')
-        format_id = pars.get('format_id')
+    def run(self, args=None):
+        url = args.get('url')
+        format_id = args.get('format_id')
 
         if url == None:
             print('No "url" or "format_id"')
@@ -57,6 +56,6 @@ class YoutubeVideo(BaseUploadPlugin):
         entity.description = info_dict.get('description')
         entity.display_name = info_dict.get('fulltitle')
         entity.source = info_dict.get('webpage_url')
-        entity.cached_content = json.dumps(cached_content, separators=(',', ':'))
+        entity.cached_info = json.dumps(cached_content, separators=(',', ':'))
 
         return entity
