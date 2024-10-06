@@ -13,7 +13,7 @@ class file(BaseUploadPlugin):
     def run(self, args=None):
         path = args.get('path')
         type = args.get('type') # copy || move
-        overwrite = args.get('overwrite')
+
         if path == None:
             raise AttributeError("Path was not passed")
         
@@ -26,16 +26,10 @@ class file(BaseUploadPlugin):
         
         input_file_name = input_path.name
         input_file_ext = input_path.suffix[1:] # remove dot
-        collection_dir = Entity.getTempPath()
+        collection_dir = self.temp_dir
         move_result_path = Path(collection_dir + '\\' + input_file_name)
 
         # Creating entity
-
-        entity = Entity()
-        entity.format = input_file_ext
-        entity.original_name = input_file_name
-        entity.display_name = input_file_name
-        entity.filesize = input_path.stat().st_size
         
         if type == 'copy':
             print('Copied file')
@@ -44,4 +38,8 @@ class file(BaseUploadPlugin):
             print('Moved file')
             shutil.move(input_path, move_result_path)
         
-        return entity
+        return {
+            'format': str(input_file_ext),
+            'original_name': input_file_name,
+            'filesize': input_path.stat().st_size
+        }

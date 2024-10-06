@@ -1,6 +1,8 @@
 import time
 import threading
 from core.settings import settings
+from core.utils import utils
+from resources.consts import consts
 from pathlib import Path
 from db.db import Entity
 
@@ -22,6 +24,20 @@ class BaseUploadPlugin(BasePlugin):
     works = 'all'
     category = 'base'
 
+    def __init__(self, temp_dir=None):
+        self.temp_dir = temp_dir
+
+    def cleanup(self, entity):
+        entity_dir = f'{consts['cwd']}\\storage\\collections\\{str(entity.id)}'
+        Path(self.temp_dir).rename(entity_dir)
+
+        entity_file_path = Path(entity_dir + '\\' + entity.original_name)
+        entity_file_path_replace = f'{entity_dir}\\{str((str(entity.id) + '.' + entity.format))}'
+        entity_file_path.rename(entity_file_path_replace)
+
+    def cleanup_fail(self):
+        utils.rmdir(self.temp_dir)
+
     def run(self, args=None):
         pass
 
@@ -33,13 +49,6 @@ class BaseUploadPlugin(BasePlugin):
             'name': self.name,
             'format': self.format
         }
-    
-    def moveFromTemp(self, entity):
-        entity_path = entity.getDirPath()
-
-        file_final_path = Path(Entity.getTempPath() + '\\' + entity.original_name)
-        file_final_path_replace = str(entity_path) + '\\' + str((str(entity.id) + '.' + entity.format))
-        file_final_path.rename(file_final_path_replace)
 
 class BaseActionPlugin(BasePlugin):
     inner_type = 'action'

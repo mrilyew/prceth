@@ -46,18 +46,16 @@ class url(BaseUploadPlugin):
                     ext = 'html'
             
             full_file_name = ''.join([file_name, ext])
-            save_path = Path(Entity.getTempPath() + '\\' + full_file_name)
+            save_path = Path(self.temp_dir + '\\' + full_file_name)
             out_file = open(save_path, 'wb')
             out_file.write(response.content)
             out_file.close()
         else:
             raise FileNotFoundError('File not found')
 
-        entity = Entity()
-        entity.format = ext
-        entity.original_name = full_file_name
-        entity.display_name = full_file_name
-        entity.filesize = save_path.stat().st_size
-        entity.source = url
-
-        return entity
+        return {
+            'format': ext,
+            'original_name': full_file_name,
+            'filesize': save_path.stat().st_size,
+            'source': url,
+        }

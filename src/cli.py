@@ -1,5 +1,6 @@
 import time
 import platform
+import traceback
 from pathlib import Path
 from core.utils import utils
 from db.db import db, Collection, Entity, Relation
@@ -123,8 +124,10 @@ match args.get('act'):
                 if 'description' in args:
                     collection.description = args.get('description')
                 
+                '''
                 if 'order' in args:
                     collection.order = args.get('order')
+                '''
                                     
                 if 'innertype' in args:
                     collection.innertype = args.get('innertype')
@@ -249,20 +252,61 @@ match args.get('act'):
         method = args.get('method')
         plugins = load_plugins('upload_plugins')
         instance = None
+        temp_dir = utils.generate_temp_entity_dir()
+
         try:
-            instance = plugins[method]()
+            instance = plugins[method](temp_dir=temp_dir)
         except KeyError:
             print('Plugin not found')
             exit()
+
+        try:
+            results = instance.run(args=args)
+        except Exception as e:
+            traceback.print_exc()
+            instance.cleanup_fail()
+            exit()
         
-        entity = instance.run(args=args)
+        entity = Entity()
+
+        entity.format = str(results.get('format'))
+        entity.original_name = results.get('original_name')
+        entity.filesize = results.get('filesize')
+
+        if 'source' in results:
+            entity.source = results.get('source')
+        
+        if 'cached_content' in results:
+            entity.cached_content = results.get('cached_content')
+
+        if 'index_info' in results:
+            entity.index_info = results.get('index_info')
+
+        if 'color' in args:
+            entity.color = str(args.get('color'))
+        else:
+            if 'color' in results:
+                entity.color = str(results.get('color'))
+        
+        if 'pinned' in args:
+            pinned = 0
+            if int(args.get('pinned')) == 1:
+                pinned = 1
+            
+            entity.pinned = pinned
+        
         if 'display_name' in args:
             entity.display_name = args.get('display_name')
+        else:
+            entity.display_name = entity.original_name
+
+        if 'description' in args:
+            entity.description = args.get('description')
         
         entity.save()
-
-        instance.moveFromTemp(entity=entity)
+        instance.cleanup(entity=entity)
         collection.addItem(entity)
+
         print(entity.takeInfo())
     case 'entities.edit':
         if 'id' not in args:

@@ -43,7 +43,7 @@ class video(BaseUploadPlugin):
         info_dict.pop('_has_drm')
         info_dict.pop('_type')
 
-        if pars.get('save_automatic_captions') == None:
+        if args.get('save_automatic_captions') == None:
             info_dict.pop('automatic_captions')
 
         orig_name = info_dict.get('id') + '.' + info_dict['ext']
@@ -53,7 +53,6 @@ class video(BaseUploadPlugin):
         entity = Entity()
         entity.format = info_dict.get('ext')
         entity.original_name = orig_name
-        entity.description = info_dict.get('description')
         entity.display_name = info_dict.get('fulltitle')
         entity.source = info_dict.get('webpage_url')
         entity.cached_info = json.dumps(cached_content, separators=(',', ':'))

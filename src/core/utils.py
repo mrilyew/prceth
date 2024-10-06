@@ -1,6 +1,8 @@
 import sys
 import random
 import json
+from resources.consts import consts
+from pathlib import Path
 
 class Utils():
     def parse_args(self):
@@ -47,5 +49,23 @@ class Utils():
             return json.loads(text)
         except:
             return {}
+        
+    def generate_temp_entity_dir(self):
+        rand = self.random_int(1, 1000000) * -1
+        path = Path(f'{consts['cwd']}\\storage\\collections\\{rand}')
+        path.mkdir(exist_ok=True)
+
+        return str(path)
+        
+    def rmdir(self, str_path):
+        path = Path(str_path)
+
+        for sub in path.iterdir():
+            if sub.is_dir():
+                self.rmdir(sub)
+            else:
+                sub.unlink()
+
+        path.rmdir()
 
 utils = Utils()

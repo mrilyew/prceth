@@ -10,24 +10,23 @@ class blank(BaseUploadPlugin):
 
     def run(self, args=None):
         format = args.get('format')
+        text = args.get('text')
         if format == None:
             format = 'txt'
         
-        text = args.get('text')
-        
-        # Creating entity
+        original_name = 'blank.' + str(format)
+        path = self.temp_dir + '\\' + original_name
 
-        entity = Entity()
-        entity.format = str(format)
-        entity.original_name = 'blank.' + str(format)
-        entity.display_name = 'blank'
-        entity.filesize = 0
-
-        path = Entity.getTempPath() + '\\' + entity.original_name
         stream = open(path, 'w', encoding='utf-8')
         if text != None:
             stream.write(text)
         
         stream.close()
+        if text == None:
+            text = ''
         
-        return entity
+        return {
+            'format': str(format),
+            'original_name': original_name,
+            'filesize': len(text.encode('utf-8')),
+        }
