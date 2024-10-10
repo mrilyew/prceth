@@ -14,12 +14,12 @@ class Utils():
                 if key:
                     parsed_args[key] = True
                 key = arg[2:]
-                parsed_args[key] = True 
-            elif arg.startswith('-'):
-                if key:
-                    parsed_args[key] = True
-                key = arg[1:]
                 parsed_args[key] = True
+            #elif arg.startswith('-'):
+            #    if key:
+            #        parsed_args[key] = True
+            #    key = arg[1:]
+            #    parsed_args[key] = True
             else:
                 if key:
                     parsed_args[key] = arg
@@ -56,6 +56,9 @@ class Utils():
         path.mkdir(exist_ok=True)
 
         return str(path)
+    
+    def str_to_path(self, path):
+        return Path(path)
         
     def rmdir(self, str_path):
         path = Path(str_path)
@@ -67,5 +70,16 @@ class Utils():
                 sub.unlink()
 
         path.rmdir()
+
+    def find_owner(self, id, profiles, groups):
+        search_array = profiles
+        if id < 0:
+            search_array = groups
+        
+        for item in search_array:
+            if item.get('id') == abs(int(id)):
+                return item
+            
+        return None
 
 utils = Utils()
