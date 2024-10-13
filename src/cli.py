@@ -272,6 +272,7 @@ match args.get('act'):
         entity.format = str(results.get('format'))
         entity.original_name = results.get('original_name')
         entity.filesize = results.get('filesize')
+        entity.saved_via = instance.name
 
         if 'source' in results:
             entity.source = results.get('source')
@@ -280,7 +281,7 @@ match args.get('act'):
             entity.cached_content = results.get('cached_content')
 
         if 'index_info' in results:
-            entity.index_info = results.get('index_info')
+            entity.index_info = results.get('index_info').replace('None', '').replace('  ', ' ')
 
         if 'color' in args:
             entity.color = str(args.get('color'))

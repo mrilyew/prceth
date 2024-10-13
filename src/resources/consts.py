@@ -13,3 +13,4 @@ consts['vk.group_fields'] = 'activity,addresses,age_limits,ban_info,can_create_t
 consts['vk.group_mini_fields'] = 'activity,photo_100,photo_200,photo_50,is_member,is_closed,description,members_count,is_subscribed'
 consts['vk.user_group_fields'] = consts['vk.user_fields'] + ',' + consts['vk.group_fields']
 consts['vk.cool_useragent'] = 'секретная инфа'
+consts['vk.version'] = '5.238'

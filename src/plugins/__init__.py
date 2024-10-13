@@ -24,7 +24,7 @@ def load_plugins(folder = 'upload_plugins'):
                         module = importlib.import_module(module_name)
                         for item_name in dir(module):
                             item = getattr(module, item_name)
-                            if isinstance(item, type) and issubclass(item, BasePlugin) and item.name.find('Base') == -1:
+                            if isinstance(item, type) and issubclass(item, BasePlugin) and item.name.find('base') == -1 and item.name.find('Base') == -1:
                                 plugins[item.name] = item
                     except ImportError as e:
                         print(f"Error importing {module_name}: {e}")

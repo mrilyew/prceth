@@ -213,6 +213,7 @@ class Entity(BaseModel):
     cached_content = TextField(null=True)
     index_info = TextField(index=True,null=True)
     color = TextField(null=True,default='fff')
+    saved_via = TextField(null=True,default='base')
     pinned = BooleanField(default=0)
     hidden = BooleanField(default=0)
     author = TextField(null=True,default=consts['pc_fullname'])
@@ -260,7 +261,6 @@ class Entity(BaseModel):
         coll_path = Path(collection_path)
 
         if need_check == True and coll_path.exists() == False:
-            print('Created entity folder.')
             coll_path.mkdir(parents=True, exist_ok=True)
 
         return collection_path
@@ -336,6 +336,5 @@ if Collection.select().count() == 0:
     Collection.create(name='_collections.saved_pages',description='_collections.saved_pages_description',innertype='websites_list',icon_hash='web_icon',order=i+4)
     Collection.create(name='_collections.saved_links',description='_collections.saved_links_description',innertype='links_list',icon_hash='links_list',order=i+5)
     Collection.create(name='_collections.audios',description='_collections.audios_description',innertype='audios_list',icon_hash='audio_icon',order=i+6)
-    print('Default collections created')
 
 db.close()
