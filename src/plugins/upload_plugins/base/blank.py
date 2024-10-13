@@ -1,6 +1,4 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from core.utils import utils
-from db.db import Entity
 
 class blank(BaseUploadPlugin):
     name = 'base.blank'

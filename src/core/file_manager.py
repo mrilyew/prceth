@@ -1,6 +1,4 @@
-import os
-import win32api
-import win32file
+from resources.globals import win32file, win32api, os
 
 class FileInfo():
     def __init__(self, entry, extended = False):

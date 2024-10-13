@@ -1,10 +1,5 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from pathlib import Path
-from db.db import Entity
-from core.utils import utils
-import requests
-import mimetypes
-from urllib.parse import urlparse
+from resources.globals import Path, urlparse, mimetypes, requests
 
 class url(BaseUploadPlugin):
     name = 'base.url'

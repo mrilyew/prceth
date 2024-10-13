@@ -1,11 +1,8 @@
 from plugins.BasePlugins import BasePlugin
-from core.utils import utils
-from db.db import Entity
-import json
-import yt_dlp
+from resources.globals import yt_dlp, json, utils
 
-class ExtractYoutubeVideoStreamsPlugin(BasePlugin):
-    name = 'ExtractYoutubeStreams'
+class extract_streams(BasePlugin):
+    name = 'extract_streams'
 
     def run(self, args=None):
         url = args.get('url')

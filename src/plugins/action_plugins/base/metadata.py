@@ -1,10 +1,8 @@
 from plugins.BasePlugins import BaseActionPlugin
-from core.utils import utils
-from hachoir.parser import createParser
-from hachoir.metadata import extractMetadata
+from resources.globals import utils, createParser, extractMetadata
 
-class ExtractMetaDataPlugin(BaseActionPlugin):
-    name = 'ExtractMetaData'
+class metadata(BaseActionPlugin):
+    name = 'base.metadata'
     allow_extensions = ['*']
     allow_type = 'entity'
     action = 'r'
@@ -15,8 +13,8 @@ class ExtractMetaDataPlugin(BaseActionPlugin):
         parser = createParser(path)
 
         if not parser:
-            print("Parser was not created")
-            return None
+            print("No metadata")
+            return ''
         
         metadata = extractMetadata(parser)
         if metadata:

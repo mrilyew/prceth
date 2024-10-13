@@ -1,8 +1,4 @@
-import sys
-import random
-import json
-from resources.consts import consts
-from pathlib import Path
+from resources.globals import sys, random, json, consts, Path, requests
 
 class Utils():
     def parse_args(self):
@@ -81,5 +77,15 @@ class Utils():
                 return item
             
         return None
+    
+    def fast_get_request(self, url='', user_agent=''):
+        result = requests.get(url, headers={
+            'User-Agent': user_agent
+        })
+        parsed_result = None
+        if result.headers.get('content-type').index('application/json') != -1:
+            parsed_result = json.loads(result.content)
+
+        return parsed_result
 
 utils = Utils()

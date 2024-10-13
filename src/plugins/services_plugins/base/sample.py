@@ -1,8 +1,8 @@
-import time
 from plugins.BasePlugins import BaseService
+from resources.globals import time
 
-class SampleService(BaseService):
-    name = 'SampleService'
+class sample(BaseService):
+    name = 'sample'
     interval = 10
     format = ''
 

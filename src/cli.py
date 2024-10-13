@@ -1,13 +1,4 @@
-import time
-import platform
-import traceback
-from pathlib import Path
-from core.utils import utils
-from db.db import db, Collection, Entity, Relation
-from core.settings import settings
-from core.file_manager import file_manager
-from resources.consts import consts
-from plugins import load_plugins
+from resources.globals import time, platform, traceback, Path, utils, db, Collection, Entity, Relation, settings, file_manager, consts, load_plugins
 
 args = utils.parse_args()
 
@@ -15,57 +6,20 @@ match args.get('act'):
     case None:
         print('"--act" not passed.')
     
-    # FILES
-
-    case 'files.get':
-        if 'path' not in args:
-            print('"--path" is not passed.')
-        else:
-            path = args.get('path')
-            offset = args.get('offset')
-            if args.get('offset') is None:
-                offset = 0
-            
-            limit = args.get('limit')
-            if args.get('limit') is None:
-                limit = 10
-
-            only_path = True
-            if 'extended' not in args or args.get('extended') == "0":
-                only_path = False
-
-            try:
-                files, total_count, return_count, has_more = file_manager.getFolderItems(path, offset=int(offset), limit=int(limit), extended=only_path)
-                print('Offset: {0}'.format(offset))
-                print('Limit: {0}'.format(limit))
-                print('Total count: {0}'.format(total_count))
-                print('Count: {0}'.format(return_count))
-                print('Has more files: {0}'.format(has_more))
-                print('Files:\n')
-                for file in files:
-                    print(file.takeInfo())
-            except FileNotFoundError:
-                print("Dir not found")
-            except NotADirectoryError:
-                print("Not a dir.")
-    case 'files.getDrives':
-        drives = file_manager.getPartitions()
-        for drive in drives:
-            print(drive.takeInfo())
-        
     # SETTINGS
 
     case "settings.get":
         if 'param' in args:
             print(settings.get(args['param']))
         else:
-            print('Pass \'--param\' arg.')
+            print('\'--param\' not passed.')
+    
     case "settings.set":
         if 'param' in args and 'value' in args:
             settings.set(args.get('param'), args['value'])
-            print('Setting "{0}" was changed to "{1}"'.format(args['param'], args['value']))
         else:
-            print('Pass \'--param\' and \'--value\' to change setting.')
+            print('\'--param\' and \'--value\' are not passed.')
+    
     case "settings.reset":
         settings.reset()
         print('Settings was reset.')
@@ -74,7 +28,7 @@ match args.get('act'):
 
     case "collections.get":
         for col in Collection.getAll():
-            print(str(col.takeInfo()) + '\n---')
+            print(str(col.takeInfo()))
     case "collections.getCount":
         print(Collection.getAllCount())
     case 'collections.create':
@@ -100,144 +54,175 @@ match args.get('act'):
 
         if args.get('add_after') != None:
             to_add = Collection.get(args.get('add_after'))
+            if to_add == None:
+                print('Invalid collection')
+                exit(-1)
+            
             to_add.addItem(col)
         
         print(col.takeInfo())
     case 'collections.getById':
         if 'id' not in args:
             print('Error: "--id" not passed')
+            exit()
+
+        collection = Collection.get(args.get('id'))
+        if collection != None:
+            print(collection.takeInfo())
         else:
-            collection = Collection.get(args.get('id'))
-            if collection != None:
-                print(collection.takeInfo())
-            else:
-                print("Not found")
+            print("Not found")
     case 'collections.edit':
         if 'id' not in args:
             print('Error: "--id" not passed')
+            exit()
+
+        collection = Collection.get(args.get('id'))
+        if collection != None:
+            if 'name' in args:
+                collection.name = args.get('name')
+
+            if 'description' in args:
+                collection.description = args.get('description')
+                                
+            if 'innertype' in args:
+                collection.innertype = args.get('innertype')
+                                                        
+            if 'icon_hash' in args:
+                collection.icon_hash = args.get('icon_hash')
+
+            collection.edited_at = time.time()
+            collection.save()
+            print(collection.takeInfo())
         else:
-            collection = Collection.get(args.get('id'))
-            if collection != None:
-                if 'name' in args:
-                    collection.name = args.get('name')
-
-                if 'description' in args:
-                    collection.description = args.get('description')
-                
-                '''
-                if 'order' in args:
-                    collection.order = args.get('order')
-                '''
-                                    
-                if 'innertype' in args:
-                    collection.innertype = args.get('innertype')
-                                                            
-                if 'icon_hash' in args:
-                    collection.icon_hash = args.get('icon_hash')
-
-                collection.edited_at = time.time()
-                collection.save()
-                print(collection.takeInfo())
-            else:
-                print("Not found")
+            print("Not found")
     case 'collections.delete':
         if 'id' not in args:
             print('Error: "--id" not passed')
+            exit()
+
+        collection = Collection.get(args.get('id'))
+        if collection != None:
+            collection.delete_instance(recursive=True)
         else:
-            collection = Collection.get(args.get('id'))
-            if collection != None:
-                collection.delete_instance(recursive=True)
-                print('Deleted')
-            else:
-                print("Not found")        
+            print("Not found")        
     case 'collections.switch':
         if 'id1' not in args and 'id2' not in args:
             print('Error: "--id1" and "--id2" are not passed')
-        else:
-            collection_1 = Collection.get(args.get('id1'))
-            collection_2 = Collection.get(args.get('id2'))
+            exit()
 
-            if collection_1 != None and collection_2 != None:
-                collection_1.switch(collection_2)
-                print('Switched')
-            else:
-                print("Not found")
+        collection_1 = Collection.get(args.get('id1'))
+        collection_2 = Collection.get(args.get('id2'))
+
+        if collection_1 != None and collection_2 != None:
+            collection_1.switch(collection_2)
+        else:
+            print("Not found")
     case 'collections.getItems':
         if 'id' not in args:
             print('Error: "--id" not passed')
-        else:
-            collection = Collection.get(args.get('id'))
-            if collection != None:
-                search_options = {
-                    "query": args.get('query'),
-                    "name_search": int(args.get('name_search') if args.get('name_search') else 0),
-                    "description_search": int(args.get('description_search') if args.get('description_search') else 0)
-                }
+            exit()
 
-                for col in collection.getItems(page=args.get('page'), query_options=search_options):
-                    print(str(col.takeInfo()) + '\n---')
-            else:
-                print("Not found")
+        collection = Collection.get(args.get('id'))
+        if collection != None:
+            columns_search = ['original_name', 'display_name']
+            if int(args.get('search_by_description') or 0) == 1:
+                columns_search.append('description')
+            
+            if int(args.get('search_by_source') or 0) == 1:
+                columns_search.append('source')
+            
+            if int(args.get('search_by_index_info') or 0) == 1:
+                columns_search.append('index_info')
+
+            if int(args.get('search_by_saved_via') or 0) == 1:
+                columns_search.append('saved_via')
+
+            if int(args.get('search_by_author') or 0) == 1:
+                columns_search.append('author')
+
+            items = collection.getItems(page=args.get('page'), query=args.get('query'), columns_search=columns_search)
+
+            for col in items:
+                print(str(col.takeInfo()))
+        else:
+            print("Not found")
+    
     case 'collections.getItemsCount':
         if 'id' not in args:
             print('Error: "--id" not passed')
-        else:
-            collection = Collection.get(args.get('id'))
-            if collection != None:
-                search_options = {
-                    "query": args.get('query'),
-                    "name_search": int(args.get('name_search') if args.get('name_search') else 0),
-                    "description_search": int(args.get('description_search') if args.get('description_search') else 0)
-                }
+            exit()
 
-                print(collection.getItemsCount(query_options=search_options))
-            else:
-                print("Not found")
-    case 'collections.append':
-        if 'collection_id' not in args and 'entity_id' not in args:
-            print('Error: "--collection_id" and "--entity_id" are not passed')
-        else:
-            id = args.get('entity_id')
-            collection = Collection.get(args.get('collection_id'))
-            entity = Entity.get(id)
-
-            if collection == None or entity == None:
-                print("Not found")
-                exit()
-
-            try:
-                collection.addItem(entity)
-            except ValueError:
-                print("Error: Entity does not belows to collection")
-    
-    # ENTITIES
-
-    case 'entities.globalSearch':
-        if 'query' not in args:
-            print('Error: "--query" not passed')
-        else:
+        collection = Collection.get(args.get('id'))
+        if collection != None:
             search_options = {
                 "query": args.get('query'),
                 "name_search": int(args.get('name_search') if args.get('name_search') else 0),
                 "description_search": int(args.get('description_search') if args.get('description_search') else 0)
             }
 
-            for col in Entity.search(page=args.get('page'), query_options=search_options):
-                print(str(col.takeInfo()) + '\n---')
+            print(collection.getItemsCount(query_options=search_options))
+        else:
+            print("Not found")
+    
+    case 'collections.append':
+        if 'collection_id' not in args and 'entity_id' not in args:
+            print('Error: "--collection_id" and "--entity_id" are not passed')
+            exit()
+
+        id = args.get('entity_id')
+        collection = Collection.get(args.get('collection_id'))
+        entity = Entity.get(id)
+
+        if collection == None or entity == None:
+            print("Not found")
+            exit()
+
+        try:
+            collection.addItem(entity)
+        except ValueError:
+            print("Error: Entity does not belows to collection")
+    
+    # ENTITIES
+
+    case 'entities.globalSearch':
+        if 'query' not in args:
+            print('Error: "--query" not passed')
+            exit()
+        
+        columns_search = ['original_name', 'display_name']
+        if int(args.get('search_by_description') or 0) == 1:
+            columns_search.append('description')
+        
+        if int(args.get('search_by_source') or 0) == 1:
+            columns_search.append('source')
+        
+        if int(args.get('search_by_index_info') or 0) == 1:
+            columns_search.append('index_info')
+
+        if int(args.get('search_by_saved_via') or 0) == 1:
+            columns_search.append('saved_via')
+
+        if int(args.get('search_by_author') or 0) == 1:
+            columns_search.append('author')
+        
+        search = Entity.search(page=args.get('page'), query=args.get('query'), columns_search=columns_search)
+        for col in search:
+            print(str(col.takeInfo()))
     case 'entities.remove':
         if 'collection_id' not in args or 'entity_id' not in args:
             print('Error: "--collection_id" and "--entity_id" are not passed')
-        else:
-            collection = Collection.get(args.get('collection_id'))
-            entity = Entity.get(args.get('entity_id'))
+            exit()
 
-            if collection != None and entity != None:
-                try:
-                    collection.removeItem(entity=entity,delete_entity=True)
-                except ValueError as e:
-                    print(e)
-            else:
-                print("Not found")
+        collection = Collection.get(args.get('collection_id'))
+        entity = Entity.get(args.get('entity_id'))
+
+        if collection != None and entity != None:
+            try:
+                collection.removeItem(entity=entity,delete_entity=True)
+            except ValueError as e:
+                print(e)
+        else:
+            print("Not found")
 
     case 'entities.create':
         if 'collection_id' not in args:
@@ -329,7 +314,7 @@ match args.get('act'):
 
         entity.edited_at = time.time()
         entity.save()
-    case 'entity.changeCollection':
+    case 'entities.changeCollection':
         if 'new_collection_id' not in args or 'entity_id' not in args:
             print('"new_collection_id" and "entity_id" are not passed')
             exit()
@@ -337,9 +322,12 @@ match args.get('act'):
         collection = Collection.get(args.get('new_collection_id'))
         if collection == None:
             print('Invalid collection')
+            exit(-1)
+        
         entity = Entity.get(args.get('entity_id'))
         if entity == None:
             print('Invalid entity')
+            exit(-1)
         
         Relation.delete().where(Relation.child_entity == entity.id).execute()
         collection.addItem(entity)
@@ -350,8 +338,9 @@ match args.get('act'):
         folder = args.get('folder')
         plugins = load_plugins(folder=folder)
         for plugin in plugins:
-            plugin_class = plugins[plugin]()
+            plugin_class = plugins.get(plugin)()
             print(plugin_class.getDesc())
+    
     case 'plugins.getActionsForEntity':
         if 'mid' not in args:
             print('Pass "mid" like "[type]_[id]"')
@@ -377,6 +366,7 @@ match args.get('act'):
 
         for plugin in final_plugins: 
             print(plugin.getDesc())
+    
     case 'plugins.runAction':
         if 'mid' not in args:
             print('Pass "mid" like "[type]_[id]"')
@@ -402,11 +392,12 @@ match args.get('act'):
             exit()
 
         class_plugin_ex = class_plugin()
-        if class_plugin_ex.canRun() == False:
+        if class_plugin_ex.canRun(input_entity=entity) == False:
             print('Plugin cannot be runned on this')
             exit()
         
-        print(class_plugin_ex.run(input_entity=entity,input_data=args.get('input_data')))
+        print(class_plugin_ex.run(input_entity=entity,args=args))
+    
     case 'plugins.runBase':
         if 'plugin' not in args:
             print('"plugin" was not passed')
@@ -441,7 +432,7 @@ match args.get('act'):
             exit()
 
         service_ex = service()
-        service_ex.start(input_data=input_data)
+        service_ex.start(args=args)
         try:
             while True:
                 time.sleep(1)

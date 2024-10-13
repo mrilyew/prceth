@@ -1,6 +1,4 @@
-from resources.consts import consts
-from core.settings import settings
-import i18n
+from resources.globals import i18n, settings, consts
 
 localedir = consts['cwd'] + '\\localization\\langs'
 

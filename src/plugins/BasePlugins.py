@@ -1,10 +1,4 @@
-import time
-import threading
-from core.settings import settings
-from core.utils import utils
-from resources.consts import consts
-from pathlib import Path
-from db.db import Entity
+from resources.globals import threading, Entity, Path, consts, settings, utils, time
 
 class BasePlugin():
     inner_type = 'base'
@@ -15,7 +9,8 @@ class BasePlugin():
     
     def getDesc(self):
         return {
-            'name': self.name
+            'name': self.name,
+            'category': self.category
         }
 
 class BaseUploadPlugin(BasePlugin):
@@ -47,7 +42,8 @@ class BaseUploadPlugin(BasePlugin):
     def getDesc(self):
         return {
             'name': self.name,
-            'format': self.format
+            'format': self.format,
+            'category': self.category
         }
 
 class BaseActionPlugin(BasePlugin):
@@ -70,14 +66,15 @@ class BaseActionPlugin(BasePlugin):
         
         return False
     
-    def run(self, input_entity=None):
+    def run(self, input_entity=None,args=None):
         pass
 
     def getDesc(self):
         return {
             'name': self.name,
             'action': self.action,
-            'exts': str(self.allow_extensions)
+            'exts': self.allow_extensions,
+            'category': self.category
         }
 
 class BaseService(BasePlugin):
@@ -117,5 +114,6 @@ class BaseService(BasePlugin):
     def getDesc(self):
         return {
             'name': self.name,
-            'interval': str(self.interval)
+            'interval': str(self.interval),
+            'category': self.category
         }

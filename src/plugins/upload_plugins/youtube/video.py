@@ -1,8 +1,5 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from core.utils import utils
-from db.db import Entity
-import json
-import yt_dlp
+from resources.globals import yt_dlp, json, Entity, utils
 
 class video(BaseUploadPlugin):
     name = 'youtube.video'

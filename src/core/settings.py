@@ -1,5 +1,4 @@
-import json
-import os
+from resources.globals import json, os
 
 class Settings():
     def __init__(self, file_name = 'main.json'):

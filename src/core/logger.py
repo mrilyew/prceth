@@ -1,5 +1,4 @@
-from datetime import datetime
-import os
+from resources.globals import datetime, os
 
 class Logger():
     def __init__(self, keep=False):

@@ -1,12 +1,7 @@
 from core.settings import settings
-from resources.consts import consts
-from core.utils import utils
-from resources.exceptions import ApiException
 from plugins.upload_plugins.vk.vk import base_vk
 from plugins.upload_plugins.vk.photo import photo
-from urllib.parse import urlencode
-import requests
-import json
+from resources.globals import ApiException, json, requests, urlencode, utils, consts
 
 class post(base_vk):
     name = 'vk.post'

@@ -1,11 +1,6 @@
-import time
-from functools import reduce
-import operator
 from peewee import *
-from resources.consts import consts
-from playhouse.shortcuts import model_to_dict
+from resources.globals import consts, model_to_dict, _, time, operator, reduce
 from pathlib import Path
-from localization.locale import _
 
 db = SqliteDatabase('storage/main.db')
 
@@ -71,35 +66,65 @@ class Collection(BaseModel):
         self.save()
         to_switch.save()
 
-    def getItems(self, page = None, query_options = None):
+    def __fetchItems(self, query = None, columns_search = []):
         items = (Relation
              .select(Relation, Collection, Entity)
              .where(Relation.parent_collection == self.id)
              .join(Collection, on=(Relation.child_collection == Collection.id), join_type=JOIN.LEFT_OUTER)
              .switch(Relation)
              .join(Entity, on=(Relation.child_entity == Entity.id), join_type=JOIN.LEFT_OUTER)
-             .order_by(Relation.order))
+             .order_by(Relation.order)
+             .where(Entity.hidden == 0))
         
-        if query_options != None:
-            query = query_options.get('query')
+        if query != None:
+            query = query
             conditions = []
 
-            if query_options.get('name_search') == 1:
+            if 'original_name' in columns_search:
                 conditions.append(
                     (Entity.original_name.contains(query)) | 
-                    (Entity.display_name.contains(query)) | 
                     (Collection.name.contains(query))
                 )
 
-            if query_options.get('description_search') == 1:
+            if 'display_name' in columns_search:
+                conditions.append(
+                    (Entity.display_name.contains(query))
+                )
+
+            if 'description' in columns_search:
                 conditions.append(
                     (Collection.description.contains(query)) |
                     (Entity.description.contains(query))
+                )
+
+            if 'source' in columns_search:
+                conditions.append(
+                    (Entity.source.contains(query))
+                )    
+
+            if 'index_info' in columns_search:
+                conditions.append(
+                    (Entity.index_info.contains(query))
+                )
+            
+            if 'saved_via' in columns_search:
+                conditions.append(
+                    (Entity.saved_via.contains(query))
+                )   
+                     
+            if 'author' in columns_search:
+                conditions.append(
+                    (Entity.author.contains(query)) |
+                    (Collection.author.contains(query))
                 )
             
             if conditions:
                 items = items.where(reduce(operator.or_, conditions))
 
+        return items
+
+    def getItems(self, page = None, query = None, columns_search = []):
+        items = self.__fetchItems(query=query,columns_search=columns_search)
         if page != None:
             items = items.paginate(page, 10)
         
@@ -113,35 +138,8 @@ class Collection(BaseModel):
         
         return results
 
-    def getItemsCount(self, query_options = None):
-        items = (Relation
-             .select(Relation, Collection, Entity)
-             .where(Relation.parent_collection == self.id)
-             .join(Collection, on=(Relation.child_collection == Collection.id), join_type=JOIN.LEFT_OUTER)
-             .switch(Relation)
-             .join(Entity, on=(Relation.child_entity == Entity.id), join_type=JOIN.LEFT_OUTER)
-             .order_by(Relation.order)
-             .where(Entity.hidden == 0))
-        
-        if query_options != None:
-            query_str = query_options.get('query')
-            conditions = []
-
-            if query_options.get('name_search') == 1:
-                conditions.append(
-                    (Entity.original_name.contains(query_str)) | 
-                    (Entity.display_name.contains(query_str)) | 
-                    (Collection.name.contains(query_str))
-                )
-
-            if query_options.get('description_search') == 1:
-                conditions.append(
-                    (Collection.description.contains(query_str)) |
-                    (Entity.description.contains(query_str))
-                )
-            
-            if conditions:
-                items = items.where(reduce(operator.or_, conditions))
+    def getItemsCount(self, query = None, columns_search = []):
+        items = self.__fetchItems(query=query,columns_search=columns_search)
         
         return items.count()
     
@@ -171,7 +169,6 @@ class Collection(BaseModel):
         rel.execute()
         if delete_entity == True:
             entity.delete()
-
 
     def hasItem(self, entity):
         rel = Relation.select().where(Relation.parent_collection == self.id)
@@ -266,25 +263,48 @@ class Entity(BaseModel):
         return collection_path
     
     @staticmethod
-    def search(page= None, query_options = None):
+    def search(page=None, query = None, columns_search = []):
         items = Entity.select().where(Entity.hidden == 0)
-        query_str = query_options.get('query')
         conditions = []
 
-        if query_options.get('name_search') == 1:
+        if 'original_name' in columns_search:
             conditions.append(
-                (Entity.original_name.contains(query_str)) | 
-                (Entity.display_name.contains(query_str))
+                (Entity.original_name ** f'%{query}%')
             )
 
-        if query_options.get('description_search') == 1:
+        if 'display_name' in columns_search:
             conditions.append(
-                (Entity.description.contains(query_str))
+                (Entity.display_name ** f'%{query}%')
             )
 
+        if 'description' in columns_search:
+            conditions.append(
+                (Entity.description ** f'%{query}%')
+            )
+
+        if 'source' in columns_search:
+            conditions.append(
+                (Entity.source ** f'%{query}%')
+            )    
+
+        if 'index_info' in columns_search:
+            conditions.append(
+                (Entity.index_info ** f'%{query}%')
+            )
+        
+        if 'saved_via' in columns_search:
+            conditions.append(
+                (Entity.saved_via ** f'%{query}%')
+            )   
+                    
+        if 'author' in columns_search:
+            conditions.append(
+                (Entity.author ** f'%{query}%')
+            )
+        
         if conditions:
             items = items.where(reduce(operator.or_, conditions))
-
+        
         if page != None:
             items = items.paginate(page, 10)
         

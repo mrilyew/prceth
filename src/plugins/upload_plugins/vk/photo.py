@@ -1,10 +1,5 @@
-from resources.consts import consts
-from core.utils import utils
-from resources.exceptions import ApiException
 from plugins.upload_plugins.vk.vk import base_vk
-from urllib.parse import urlencode
-import requests
-import json
+from resources.globals import json, requests, urlencode, utils, consts, ApiException
 
 class photo(base_vk):
     name = 'vk.photo'

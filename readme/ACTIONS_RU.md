@@ -1,7 +1,3 @@
-#### files.get, files.getDrives
-
-Не помню, зачем это добавил, но тут про файлы.
-
 #### settings.get
 
 |||

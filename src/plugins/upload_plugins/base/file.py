@@ -1,8 +1,5 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from core.utils import utils
-from pathlib import Path
-from db.db import Entity
-import shutil
+from resources.globals import shutil, Path
 
 class file(BaseUploadPlugin):
     name = 'base.file'
@@ -31,15 +28,14 @@ class file(BaseUploadPlugin):
 
         # Creating entity
         
+        filesize = input_path.stat().st_size
         if type == 'copy':
-            print('Copied file')
             shutil.copy2(input_path, move_result_path)
         else:
-            print('Moved file')
             shutil.move(input_path, move_result_path)
         
         return {
             'format': str(input_file_ext),
             'original_name': input_file_name,
-            'filesize': input_path.stat().st_size
+            'filesize': filesize
         }

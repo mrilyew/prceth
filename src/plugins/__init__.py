@@ -1,6 +1,5 @@
-import os
-import importlib
 from plugins.BasePlugins import BasePlugin
+from resources.globals import os, importlib
 
 def load_plugins(folder = 'upload_plugins'):
     if folder == None:
@@ -24,7 +23,8 @@ def load_plugins(folder = 'upload_plugins'):
                         module = importlib.import_module(module_name)
                         for item_name in dir(module):
                             item = getattr(module, item_name)
-                            if isinstance(item, type) and issubclass(item, BasePlugin) and item.name.find('base') == -1 and item.name.find('Base') == -1:
+                            if isinstance(item, type) and issubclass(item, BasePlugin) and item.name.find('base_template') == -1 and item.name.find('Base') == -1:
+                                item.category = sub_folder
                                 plugins[item.name] = item
                     except ImportError as e:
                         print(f"Error importing {module_name}: {e}")

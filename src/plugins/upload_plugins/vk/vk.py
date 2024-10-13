@@ -1,9 +1,8 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from core.settings import settings
-from resources.consts import consts
+from resources.globals import consts, settings
 
 class base_vk(BaseUploadPlugin):
-    name = 'vk.base'
+    name = 'vk.base_template'
     short_name = 'base'
     format = '%'
     works = 'all'
@@ -14,8 +13,9 @@ class base_vk(BaseUploadPlugin):
         if self.id == None:
             raise AttributeError("Id was not passed")
 
-        if self.id.find(self.short_name) != -1:
-            self.id = self.id.replace(self.short_name, '')
+        if self.short_name:
+            if self.id.find(self.short_name) != -1:
+                self.id = self.id.replace(self.short_name, '')
 
         self.vk_token = args.get('vk_token')
         if self.vk_token == None:
@@ -26,7 +26,10 @@ class base_vk(BaseUploadPlugin):
 
         self.user_agent = args.get('user_agent')
         if self.user_agent == None:
-            self.user_agent = consts.get('vk.cool_useragent')
+            self.user_agent = settings.get('vk.useragent')
+
+            if self.user_agent == None:
+                self.user_agent = consts.get('vk.cool_useragent')
         
         self.vk_url = args.get('vk_url')
         self.vk_web_url = args.get('vk_web_url')
