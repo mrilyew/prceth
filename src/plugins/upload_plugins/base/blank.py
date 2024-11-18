@@ -1,4 +1,5 @@
 from plugins.BasePlugins import BaseUploadPlugin
+from resources.globals import files_utils
 
 class blank(BaseUploadPlugin):
     name = 'base.blank'
@@ -13,13 +14,7 @@ class blank(BaseUploadPlugin):
             format = 'txt'
         
         original_name = 'blank.' + str(format)
-        path = self.temp_dir + '\\' + original_name
-
-        stream = open(path, 'w', encoding='utf-8')
-        if text != None:
-            stream.write(text)
-        
-        stream.close()
+        files_utils.createFile(filename=original_name,dir=self.temp_dir,content=text)
         if text == None:
             text = ''
         

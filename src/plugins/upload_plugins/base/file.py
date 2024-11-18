@@ -1,5 +1,5 @@
 from plugins.BasePlugins import BaseUploadPlugin
-from resources.globals import shutil, Path
+from resources.globals import shutil, Path, files_utils
 
 class file(BaseUploadPlugin):
     name = 'base.file'
@@ -10,7 +10,6 @@ class file(BaseUploadPlugin):
     def run(self, args=None):
         path = args.get('path')
         type = args.get('type') # copy || move
-
         if path == None:
             raise AttributeError("Path was not passed")
         
@@ -21,21 +20,21 @@ class file(BaseUploadPlugin):
         if input_path.is_dir() == True:
             raise ValueError("Path is directory")
         
-        input_file_name = input_path.name
-        input_file_ext = input_path.suffix[1:] # remove dot
-        collection_dir = self.temp_dir
+        input_file_name  = input_path.name
+        input_file_ext   = input_path.suffix[1:] # remove dot
+        collection_dir   = self.temp_dir
         move_result_path = Path(collection_dir + '\\' + input_file_name)
 
         # Creating entity
         
-        filesize = input_path.stat().st_size
+        file_action = None
         if type == 'copy':
-            shutil.copy2(input_path, move_result_path)
+            file_action = files_utils.copyFile(input_path, move_result_path)
         else:
-            shutil.move(input_path, move_result_path)
+            file_action = files_utils.moveFile(input_path, move_result_path)
         
         return {
             'format': str(input_file_ext),
             'original_name': input_file_name,
-            'filesize': filesize
+            'filesize': file_action.get('filesize')
         }

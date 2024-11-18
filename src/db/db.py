@@ -1,5 +1,5 @@
 from peewee import *
-from resources.globals import consts, model_to_dict, _, time, operator, reduce
+from resources.globals import consts, model_to_dict, time, operator, reduce, logger
 from pathlib import Path
 
 db = SqliteDatabase('storage/main.db')
@@ -46,8 +46,8 @@ class Collection(BaseModel):
     def takeInfo(self):
         return {
             "id": self.id,
-            "name": self.getCorrectName(),
-            "description": self.getCorrectDescription(),
+            "name": self.name,
+            "description": self.description,
             "order": self.order,
             "inner_type": self.innertype,
             "icon_hash": self.icon_hash,
@@ -178,24 +178,6 @@ class Collection(BaseModel):
             rel = rel.where(Relation.child_entity == entity.id)
         
         return rel.count() > 0
-    
-    def getCorrectName(self):
-        current_name = self.name
-        if current_name.startswith('_'):
-            return _(current_name[1:])
-        else:
-            return current_name    
-    
-    def getCorrectDescription(self):
-        current_desc = self.description
-
-        if(current_desc == None):
-            return '...'
-        
-        if current_desc.startswith('_'):
-            return _(current_desc[1:])
-        else:
-            return current_desc
     
 class Entity(BaseModel):
     self_name = 'entity'
@@ -348,6 +330,8 @@ class TagRelation(BaseModel):
 db.connect()
 db.create_tables([Collection, Entity, Relation, Stat], safe=True)
 if Collection.select().count() == 0:
+    logger.log(section='DB',name='DB Creation',message='Default tables was created')
+    
     i = Collection.getAllCount()
     Collection.create(name='_collections.saved_gifs',description='_collections.saved_gifs_description',innertype='gallery',icon_hash='gifs_icon',order=i)
     Collection.create(name='_collections.saved_images',description='_collections.saved_images_description',innertype='gallery',icon_hash='gallery_icon',order=i+1)
