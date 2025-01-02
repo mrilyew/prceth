@@ -1,4 +1,4 @@
-from resources.globals import win32file, win32api, os
+from resources.globals import win32file, win32api, os, shutil, Path
 
 class FileInfo():
     def __init__(self, entry, extended = False):
@@ -41,34 +41,6 @@ class FileInfo():
 
         return base
 
-class PartitionInfo():
-    def __init__(self, drive_name = ""):
-        drive_type = win32file.GetDriveType(drive_name)
-        if drive_type in [win32file.DRIVE_REMOVABLE, win32file.DRIVE_FIXED]:
-            volume_info = win32api.GetVolumeInformation(drive_name)
-            free_bytes, total_bytes, _ = win32file.GetDiskFreeSpaceEx(drive_name)
-
-            self.name = volume_info[0]
-            self.fs = volume_info[4]
-            self.device = drive_name
-            self.mount_point = drive_name
-            self.total = total_bytes
-            self.free = free_bytes
-            self.used = total_bytes - free_bytes
-
-    def takeInfo(self):
-        return {
-            'device': self.device,
-            'mount_point': self.mount_point,
-            'fs': self.fs,
-            'usage': {
-                'total': self.total,
-                'used': self.used,
-                'free': self.free,
-                'ratio': round((self.used / self.total) * 100, 3),
-            }
-        }
-
 class FileManager():
     def __init__(self):
         pass
@@ -85,13 +57,29 @@ class FileManager():
                 return_array.append(FileInfo(entry, extended))
             
             return return_array, total_count, len(return_array), offset + limit < total_count
-    
-    def getPartitions(self):
-        return_array = []
-        drive_names = win32api.GetLogicalDriveStrings().split('\000')[:-1]
-        for drive_name in drive_names:
-            return_array.append(PartitionInfo(drive_name))
+        
+    def createFile(self, filename, dir, content=None):
+        path = dir + '\\' + filename
+        stream = open(path, 'w', encoding='utf-8')
+        if content != None:
+            stream.write(content)
+        
+        stream.close()
 
-        return return_array
+    def moveFile(self, input_path, output_path):
+        file_size = input_path.stat()
+        shutil.move(str(input_path), str(output_path))
+
+        return {
+            'filesize': int(file_size.st_size)
+        }
+    
+    def copyFile(self, input_path, output_path):
+        file_size = input_path.stat()
+        shutil.copy2(str(input_path), str(output_path))
+
+        return {
+            'filesize': int(file_size.st_size)
+        }
     
 file_manager = FileManager()

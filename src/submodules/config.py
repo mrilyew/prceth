@@ -1,6 +1,6 @@
 from resources.globals import json, os
 
-class Settings():
+class Config():
     def __init__(self, file_name = 'main.json'):
         self.default_settings = {
             "ui.lang": {
@@ -15,7 +15,7 @@ class Settings():
             json.dump({}, temp_stream)
             temp_stream.close()
             
-            print('Settings | Created settings file')
+            # print('Settings | Created settings file')
 
         self.file = open(self.settings_path, 'r+', encoding='utf-8')
         try:
@@ -24,7 +24,7 @@ class Settings():
             self.file.write("{}")
             self.data = dict()
 
-            print('Settings | Error opening settings file')
+            # print('Settings | Error opening settings file')
     
     def __del__(self):
         try:
@@ -61,4 +61,4 @@ class Settings():
         self.file.truncate()
         self.data = {}
 
-settings = Settings()
+config = Config()
