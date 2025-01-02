@@ -25,10 +25,10 @@ from playhouse.shortcuts import model_to_dict
 from datetime import datetime
 from functools import reduce
 from resources.consts import consts
-from core.settings import settings
-from core.logger import logger
-from core.file_manager import file_manager 
-from core.utils import utils
+from submodules.settings import settings
+from submodules.logger import logger
+from submodules.file_manager import file_manager 
+from submodules.utils import utils
 from db.db import db, Collection, Entity, Relation, Stat
 from plugins import load_plugins
-from core.helpful.files import files_utils
+from submodules.fs import files_utils
