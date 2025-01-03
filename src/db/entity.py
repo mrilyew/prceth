@@ -32,7 +32,7 @@ class Entity(BaseModel):
         self.hidden = 1
         self.save()
 
-    def takeInfo(self):
+    def getApiStructure(self):
         return {
             "id": self.id,
             "format": self.format,
@@ -40,9 +40,9 @@ class Entity(BaseModel):
             "display_name": self.display_name,
             "description": self.description,
             "filesize": self.filesize,
-            "cached_content": self.cached_content,
-            "index_info": self.index_info,
-            "color": self.color,
+            "index_content": self.index_content,
+            "json_info": self.json_info,
+            "frontend_data": self.frontend_data,
             "pinned": self.pinned,
             "created": self.created_at,
             "edited": self.edited_at,
