@@ -35,20 +35,40 @@ match args.get('act'):
         final_params["name"] = args.get("name")
         final_params["description"] = args.get("description")
 
-        if args.get('innertype') != None:
-            final_params.innertype = args.get('innertype')
+        if args.get('frontend_type') != None:
+            final_params['frontend_type'] = args.get('frontend_type')
         
         if args.get('icon_hash') != None:
-            final_params.icon_hash = args.get('icon_hash')
-
-        final_params.order = Collection.getAllCount()
+            final_params['icon_hash'] = args.get('icon_hash')
+        
         if args.get('add_after') != None:
-            final_params.hidden = 1
+            final_params['hidden'] = 1
             to_add = Collection.get(args.get('add_after'))
             if to_add == None:
                 print('Invalid collection')
                 exit(-1)
             
-            final_params.to_add = to_add
+            final_params['to_add'] = to_add
         
         api.createCollection(final_params)
+    case 'collections.edit':
+        if 'id' not in args:
+            print('Error: "--id" not passed')
+            exit(-1)
+        
+        if 'name' not in args:
+            print('Error: "--name" not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["collection_id"] = args.get('id')
+        if 'name' in args:
+            final_params['name'] = args.get('name')
+        if 'description' in args:
+            final_params['description'] = args.get('description')      
+        if 'frontend_type' in args:
+            final_params['frontend_type'] = args.get('frontend_type')                      
+        if 'icon_hash' in args:
+            final_params['icon_hash'] = args.get('icon_hash')
+
+        api.editCollection(final_params)

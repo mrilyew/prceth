@@ -10,12 +10,12 @@ class Entity(BaseModel):
     original_name = TextField(default='N/A',null=False)
     display_name = TextField(index=True,default='N/A')
     description = TextField(index=True,null=True)
-    source = TextField(null=True)
+    source = TextField(null=True) # Source of content
     filesize = BigIntegerField(default=0)
-    cached_content = TextField(null=True)
-    index_info = TextField(index=True,null=True)
-    color = TextField(null=True,default='fff')
-    saved_via = TextField(null=True,default='base')
+    index_content = TextField(null=True) # Content for search
+    json_info = TextField(index=True,null=True)
+    frontend_data = TextField(null=True)
+    extractor_name = TextField(null=True,default='base')
     pinned = BooleanField(default=0)
     hidden = BooleanField(default=0)
     author = TextField(null=True,default=consts['pc_fullname'])
