@@ -1,4 +1,5 @@
 from resources.globals import config
+from db.collection import Collection
 
 class Api():
     def __init__(self):
@@ -17,5 +18,9 @@ class Api():
     
     def getAllOptions(self):
         return config.data
+    
+    def createCollection(self, params):
+        print(params)
+        return
 
 api = Api()

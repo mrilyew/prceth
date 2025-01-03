@@ -1,8 +1,5 @@
 from peewee import TextField, IntegerField, AutoField, BooleanField, TimestampField, JOIN
-from resources.globals import consts, model_to_dict, time, operator, reduce, logger
-from base import BaseModel
-from relation import Relation
-from entity import Entity
+from resources.globals import BaseModel, consts, time
 
 class Collection(BaseModel):
     self_name = 'collection'
@@ -63,14 +60,15 @@ class Collection(BaseModel):
         to_switch.save()
 
     def __fetchItems(self, query = None, columns_search = []):
-        items = (Relation
-             .select(Relation, Collection, Entity)
-             .where(Relation.parent_collection == self.id)
-             .join(Collection, on=(Relation.child_collection == Collection.id), join_type=JOIN.LEFT_OUTER)
-             .switch(Relation)
-             .join(Entity, on=(Relation.child_entity == Entity.id), join_type=JOIN.LEFT_OUTER)
-             .order_by(Relation.order)
-             .where(Entity.hidden == 0))
+        items = ('Relation'
+             .select('Relation', 'Collection', 'Entity')
+             .where('Relation'.parent_collection == self.id)
+             .join('Collection', on=('Relation.child_collection == Collection.id'), join_type=JOIN.LEFT_OUTER)
+             .switch('Relation')
+             .join('Entity', on=('Relation.child_entity == Entity.id'), join_type=JOIN.LEFT_OUTER)
+             .order_by('Relation.order')
+             .where('Entity.hidden == 0')
+            )
         
         if query != None:
             query = query

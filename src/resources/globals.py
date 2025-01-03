@@ -14,7 +14,7 @@ import shutil
 import requests
 import mimetypes
 import importlib
-from playhouse import model_to_dict
+from playhouse.shortcuts import model_to_dict
 from resources.exceptions import ApiException
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
@@ -28,7 +28,4 @@ from submodules.config import config
 from submodules.logger import logger
 from submodules.file_manager import file_manager 
 from submodules.utils import utils
-from db.base import Base, db as DB_CONNECTION
-from db.collection import Collection
-from db.entity import Entity
-from db.relation import Relation
+from db.base import db, BaseModel

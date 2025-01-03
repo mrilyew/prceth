@@ -1,6 +1,5 @@
 from peewee import TextField, TimestampField, BigIntegerField, AutoField
-from base import BaseModel
-from resources.globals import time
+from resources.globals import time, BaseModel
 
 class Stat(BaseModel):
     id = AutoField()

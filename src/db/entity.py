@@ -1,6 +1,6 @@
-from base import BaseModel
 from resources.globals import consts, time, operator, reduce, Path
 from peewee import TextField, BigIntegerField, AutoField, BooleanField, TimestampField
+from resources.globals import BaseModel
 
 class Entity(BaseModel):
     self_name = 'entity'
