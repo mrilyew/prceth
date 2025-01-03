@@ -14,5 +14,8 @@ class Api():
     
     def resetOptions(self):
         return config.reset()
+    
+    def getAllOptions(self):
+        return config.data
 
 api = Api()

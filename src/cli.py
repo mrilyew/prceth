@@ -15,3 +15,9 @@ match args.get('act'):
             api.setOption(args.get('param'), args['value'])
         else:
             print('\'--param\' and \'--value\' are not passed.')
+    case "config.reset":
+        api.resetOptions()
+    case "config.all":
+        options = api.getAllOptions()
+        for option in options:
+            print("|" + option + "|" + options[option] + "|")
