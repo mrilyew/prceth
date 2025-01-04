@@ -26,4 +26,7 @@ class Logger():
         self.file.seek(0, os.SEEK_END)
         self.file.write(f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] [{name}] {message}\n")
 
+    def logException(self, exc):
+        self.log("App", type(exc).__name__, str(exc))
+
 logger = Logger()

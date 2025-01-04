@@ -11,7 +11,7 @@ class Collection(BaseModel):
     author = TextField(null=True,default=consts['pc_fullname'])
     frontend_type = TextField(default='list',null=False)
     json_info = TextField(index=True,null=True)
-    icon_hash = TextField(null=True)
+    preview_id = TextField(null=True)
     hidden = BooleanField(default=0)
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True, default=0)
@@ -44,7 +44,7 @@ class Collection(BaseModel):
             "description": self.description,
             "order": self.order,
             "frontend_type": self.frontend_type,
-            "icon_hash": self.icon_hash,
+            "preview": self.preview_id,
             "created": self.created_at,
             "edited": self.edited_at,
             "count": self.getItemsCount(),

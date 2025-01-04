@@ -1,7 +1,8 @@
-from resources.globals import config, time
+from resources.globals import config, time, utils, logger
 from resources.exceptions import NotFoundException
 from db.collection import Collection
 from db.entity import Entity
+from core.extractor_wheel import extractor_wheel
 
 class Api():
     def __init__(self):
@@ -174,5 +175,44 @@ class Api():
         count = fetch.count()
 
         return items, count
+    def uploadEntity(self, params):
+        collection_id = params.get("collection_id", None)
+        extractor = params.get("extractor")
+        display_name = params.get("display_name")
+        description = params.get("description")
+
+        temp_dir = utils.generate_temp_entity_dir()
+        instance, results = extractor_wheel(args=params,entity_dir=temp_dir,extractor_name=extractor)
+        
+        entity = Entity()
+
+        entity.format = str(results.get('format'))
+        entity.original_name = results.get('original_name')
+        entity.filesize = results.get('filesize')
+        entity.extractor_name = results.get('extractor_name')
+        if display_name != None:
+            entity.display_name = display_name
+        if description != None:
+            entity.description = description
+        if 'source' in results:
+            entity.source = results.get('source')
+        if 'json_info' in results:
+            entity.json_info = results.get('json_info')
+        if 'index_content' in results:
+            entity.index_content = results.get('index_content').replace('None', '').replace('  ', ' ')
+        if 'preview' in results:
+            entity.preview = results.get('preview').replace('None', '').replace('  ', ' ')
+        
+        entity.save()
+        instance.cleanup(entity=entity)
+
+        if collection_id != None:
+            collection = Collection.get(collection_id)
+            if collection == None:
+                logger.log("App", "Entity Uploader", "Collection not found, not adding.")
+            else:
+                collection.addItem(entity)
+
+        return entity
 
 api = Api()

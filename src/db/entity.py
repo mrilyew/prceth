@@ -16,6 +16,7 @@ class Entity(BaseModel):
     json_info = TextField(index=True,null=True)
     frontend_data = TextField(null=True)
     extractor_name = TextField(null=True,default='base')
+    preview = TextField(null=True)
     pinned = BooleanField(default=0)
     hidden = BooleanField(default=0)
     author = TextField(null=True,default=consts['pc_fullname'])

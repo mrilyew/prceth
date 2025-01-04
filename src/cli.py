@@ -192,7 +192,14 @@ match args.get('act'):
         final_params["description"] = args.get("description")
 
         act = api.editEntity(final_params)
+    case 'entities.new':
+        if 'extractor' not in args:
+            print('"--extractor" not passed')
+            exit()
 
+        act = api.uploadEntity(args)
+        print(act.getApiStructure())
+    
     # Entities get actions
 
     case 'entities.getById':
