@@ -28,7 +28,10 @@ match args.get('act'):
         options = api.getAllOptions()
         for option in options:
             print("|" + option + "|" + options[option] + "|")
-
+    case 'logger.log':
+        from submodules.logger import logger
+        logger.log(args.get('section'), args.get('name'), args.get('message'))
+    
     # Collections write actions
     
     case "collections.create":
@@ -96,7 +99,27 @@ match args.get('act'):
         final_params["id1"] = args.get('id1')
         final_params["id2"] = args.get('id2')
         api.switchCollections(final_params)
-    
+    case 'collections.appendItem':
+        if 'collection_id' not in args and 'entity_id' not in args:
+            print('Error: "--collection_id" and "--entity_id" are not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["collection_id"] = args.get('collection_id')
+        final_params["entity_id"] = args.get('entity_id')
+
+        api.addItemToCollection(final_params)
+    case 'collections.removeItem':
+        if 'collection_id' not in args and 'entity_id' not in args:
+            print('Error: "--collection_id" and "--entity_id" are not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["collection_id"] = args.get('collection_id')
+        final_params["entity_id"] = args.get('entity_id')
+
+        api.removeItemFromCollection(final_params)
+
     # Collections get actions
 
     case 'collections.getItems':
@@ -108,7 +131,7 @@ match args.get('act'):
         final_params["collection_id"] = args.get('id')
         final_params["query"] = args.get("query")
         final_params["offset"] = args.get("offset")
-        final_params["limit"] = args.get("count")
+        final_params["count"] = args.get("count")
         columns_search = ['original_name', 'display_name']
         for column in ['description', 'source', 'index', 'saved', 'author']:
             if args.get("search_by_" + column) != None:
@@ -135,3 +158,69 @@ match args.get('act'):
 
         final_params["columns_search"] = columns_search
         print(api.getItemsCountInCollection(final_params))
+    case 'collections.getById':
+        if 'id' not in args:
+            print('Error: "--id" not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["collection_id"] = args.get('id')
+        
+        collection = api.getCollectionById(final_params)
+        print(collection.getApiStructure())
+
+    # Entities write actions
+
+    case 'entities.remove':
+        if 'id' not in args:
+            print('Error: "--id" not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["entity_id"] = args.get('id')
+        final_params["delete_file"] = args.get('delete_file') == "1"
+
+        act = api.removeEntity(final_params)
+    case 'entities.edit':
+        if 'id' not in args:
+            print('Error: "--id" not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["entity_id"] = args.get("id")
+        final_params["display_name"] = args.get("name")
+        final_params["description"] = args.get("description")
+
+        act = api.editEntity(final_params)
+
+    # Entities get actions
+
+    case 'entities.getById':
+        if 'id' not in args:
+            print('Error: "--id" not passed')
+            exit(-1)
+
+        final_params = dict()
+        final_params["entity_id"] = args.get("id")
+        entity = api.getEntityById(final_params)
+
+        print(entity.getApiStructure())
+    case 'entities.get':
+        final_params = dict()
+        final_params["query"] = args.get("query")
+        final_params["offset"] = args.get("offset")
+        final_params["count"] = args.get("count")
+        columns_search = ['original_name', 'display_name']
+        for column in ['description', 'source', 'index', 'saved', 'author']:
+            if args.get("search_by_" + column) != None:
+                columns_search.append(column)
+
+        final_params["columns_search"] = columns_search
+        items, count = api.getGlobalEntities(final_params)
+
+        print("Total {0} items\n".format(count))
+        for item in items:
+            print(str(item.getApiStructure()) + "\n")
+    case _:
+        print('Unknown "--act" passed')
+        exit(-14)

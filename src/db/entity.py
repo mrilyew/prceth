@@ -68,60 +68,35 @@ class Entity(BaseModel):
         return collection_path
     
     @staticmethod
-    def search(page=None, query = None, columns_search = []):
+    def fetchItems(query = None, columns_search = []):
         items = Entity.select().where(Entity.hidden == 0)
         conditions = []
 
-        if 'original_name' in columns_search:
-            conditions.append(
-                (Entity.original_name ** f'%{query}%')
-            )
-
-        if 'display_name' in columns_search:
-            conditions.append(
-                (Entity.display_name ** f'%{query}%')
-            )
-
-        if 'description' in columns_search:
-            conditions.append(
-                (Entity.description ** f'%{query}%')
-            )
-
-        if 'source' in columns_search:
-            conditions.append(
-                (Entity.source ** f'%{query}%')
-            )    
-
-        if 'index_info' in columns_search:
-            conditions.append(
-                (Entity.index_info ** f'%{query}%')
-            )
-        
-        if 'saved_via' in columns_search:
-            conditions.append(
-                (Entity.saved_via ** f'%{query}%')
-            )   
-                    
-        if 'author' in columns_search:
-            conditions.append(
-                (Entity.author ** f'%{query}%')
-            )
+        for column in columns_search:
+            match column:
+                case "original_name":
+                    conditions.append((Entity.original_name.contains(query)))
+                case "display_name":
+                    conditions.append((Entity.display_name.contains(query)))
+                case "description":
+                    conditions.append((Entity.description.contains(query)))
+                case "source":
+                    conditions.append((Entity.source.contains(query)))
+                case "index":
+                    conditions.append((Entity.index_content.contains(query)))
+                case "saved":
+                    conditions.append((Entity.extractor_name.contains(query)))
+                case "author":
+                    conditions.append((Entity.author.contains(query)))
         
         if conditions:
             items = items.where(reduce(operator.or_, conditions))
-        
-        if page != None:
-            items = items.paginate(page, 10)
-        
-        results = []
-        for item in items:
-            results.append(item)
-        
-        return results
+
+        return items
     
     @staticmethod
     def get(id):
         try:
-            return Entity.select().where(Entity.id == id).get()
+            return Entity.select().where(Entity.id == id).where(Entity.hidden == 0).get()
         except:
             return None

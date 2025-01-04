@@ -103,11 +103,11 @@ class Collection(BaseModel):
                         )
                     case "index":
                         conditions.append(
-                            (Entity.json_info.contains(query))
+                            (Entity.index_content.contains(query))
                         )
                     case "saved":
                         conditions.append(
-                            (Entity.saved_via.contains(query))
+                            (Entity.extractor_name.contains(query))
                         )
                     case "author":
                         conditions.append(
@@ -139,3 +139,45 @@ class Collection(BaseModel):
         items = self.__fetchItems(query=query,columns_search=columns_search)
         
         return items.count()
+
+    def addItem(self, entity):
+        from db.relation import Relation
+
+        if(self.hasItem(entity)):
+            raise ValueError('Collection has that item')
+
+        rel = Relation()
+        rel.parent_collection_id = self.id
+        if entity.__class__.__name__ == 'Collection':
+            rel.child_collection_id = entity.id
+        if entity.__class__.__name__ == 'Entity':
+            rel.child_entity_id = entity.id
+
+        rel.save()
+
+    def removeItem(self, entity, delete_entity=True):
+        from db.relation import Relation
+
+        if(not self.hasItem(entity)):
+            raise ValueError("Error: entity does not belows to collection")
+
+        rel = Relation.delete().where(Relation.parent_collection_id == self.id)
+        if entity.__class__.__name__ == 'Collection':
+            rel = rel.where(Relation.child_collection_id == entity.id)
+        if entity.__class__.__name__ == 'Entity':
+            rel = rel.where(Relation.child_entity_id == entity.id)
+
+        rel.execute()
+        if delete_entity == True:
+            entity.delete()
+
+    def hasItem(self, entity):
+        from db.relation import Relation
+
+        rel = Relation.select().where(Relation.parent_collection_id == self.id)
+        if entity.__class__.__name__ == 'Collection':
+            rel = rel.where(Relation.child_collection_id == entity.id)
+        if entity.__class__.__name__ == 'Entity':
+            rel = rel.where(Relation.child_entity_id == entity.id)
+        
+        return rel.count() > 0

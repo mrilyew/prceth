@@ -1,6 +1,7 @@
 from resources.globals import config, time
 from resources.exceptions import NotFoundException
 from db.collection import Collection
+from db.entity import Entity
 
 class Api():
     def __init__(self):
@@ -67,11 +68,18 @@ class Api():
             collection_1.switch(collection_2)
         else:
             raise NotFoundException("Collections not found")
+    def getCollectionById(self, params):
+        collection_id = params.get("collection_id")
+        collection = Collection.get(collection_id)
+        if collection == None:
+            raise NotFoundException("Collection not found")
+        
+        return collection
     def getItemsInCollection(self, params):
-        collection_id = params["collection_id"]
+        collection_id = params.get("collection_id")
         query = params.get("query")
-        offset = params.get("offset")
-        count = params.get("count")
+        offset = params.get("offset", 0)
+        count = params.get("count", 10)
         columns_search = params.get("columns_search")
 
         collection = Collection.get(collection_id)
@@ -82,7 +90,7 @@ class Api():
         
         return items
     def getItemsCountInCollection(self, params):
-        collection_id = params["collection_id"]
+        collection_id = params.get("collection_id")
         query = params.get("query")
         columns_search = params.get("columns_search")
 
@@ -91,5 +99,80 @@ class Api():
             raise NotFoundException("Collection not found")
         
         return collection.getItemsCount(query=query,columns_search=columns_search)
+    def addItemToCollection(self, params):
+        collection_id = params.get("collection_id")
+        entity_id = params.get("entity_id")
+
+        collection = Collection.get(collection_id)
+        entity = Entity.get(entity_id)
+        if collection == None:
+            raise NotFoundException("Collection not found")
+        if entity == None:
+            raise NotFoundException("Entity not found")
+        
+        collection.addItem(entity)
+    def removeItemFromCollection(self, params):
+        collection_id = params.get("collection_id")
+        entity_id = params.get("entity_id")
+        delete_entity = params.get("delete_entity")
+        if delete_entity == None:
+            delete_entity = False
+        
+        collection = Collection.get(collection_id)
+        entity = Entity.get(entity_id)
+        if collection == None:
+            raise NotFoundException("Collection not found")
+        if entity == None:
+            raise NotFoundException("Entity not found")
+        
+        collection.removeItem(entity, delete_entity=delete_entity)
+    def removeEntity(self, params):
+        entity_id = params.get("entity_id")
+        delete_file = params.get("delete_file")
+        if delete_file == None:
+            delete_file = False
+        
+        entity = Entity.get(entity_id)
+        if entity == None:
+            raise NotFoundException("Entity not found")
+        
+        entity.delete(delete_file=delete_file)
+    def editEntity(self, params):
+        entity_id = params.get("entity_id")
+        display_name = params.get("display_name")
+        description = params.get("description")
+
+        entity = Entity.get(entity_id)
+        if entity == None:
+            raise NotFoundException("Entity not found")
+
+        if display_name != None:
+            entity.display_name = display_name
+        if description != None:
+            entity.description = description
+
+        entity.edited_at = time.time()
+        entity.save()
+    def getEntityById(self, params):
+        entity_id = params.get("entity_id")
+        entity = Entity.get(entity_id)
+        if entity == None:
+            raise NotFoundException("Entity not found")
+        
+        return entity
+    def getGlobalEntities(self, params):
+        query = params.get("query")
+        if query == None:
+            query = ""
+        
+        offset = params.get("offset", 0)
+        count = params.get("count", 10)
+        columns_search = params.get("columns_search")
+
+        fetch = Entity.fetchItems(query=query,columns_search=columns_search)
+        items = fetch.offset(offset).limit(count)
+        count = fetch.count()
+
+        return items, count
 
 api = Api()
