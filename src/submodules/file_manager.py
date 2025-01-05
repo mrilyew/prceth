@@ -82,4 +82,12 @@ class FileManager():
             'filesize': int(file_size.st_size)
         }
     
+    def symlinkFile(self, input_path, output_path):
+        file_size = input_path.stat()
+        os.symlink(str(input_path), str(output_path))
+
+        return {
+            'filesize': int(file_size.st_size)
+        }
+    
 file_manager = FileManager()

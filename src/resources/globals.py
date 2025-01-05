@@ -14,6 +14,7 @@ import shutil
 import requests
 import mimetypes
 import importlib
+import json5
 from playhouse.shortcuts import model_to_dict
 from resources.exceptions import ApiException
 from hachoir.parser import createParser

@@ -87,5 +87,10 @@ class Utils():
             parsed_result = json.loads(result.content)
 
         return parsed_result
+    
+    def proc_strtr(self, text, length = 0):
+        newString = text[:length]
+
+        return newString + ("..." if text != newString else "")
 
 utils = Utils()

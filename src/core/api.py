@@ -2,7 +2,7 @@ from resources.globals import config, time, utils, logger
 from resources.exceptions import NotFoundException
 from db.collection import Collection
 from db.entity import Entity
-from core.extractor_wheel import extractor_wheel
+from core.extractor_wheel import extractor_wheel, extractor_list
 
 class Api():
     def __init__(self):
@@ -192,16 +192,18 @@ class Api():
         entity.extractor_name = results.get('extractor_name')
         if display_name != None:
             entity.display_name = display_name
+        else:
+            entity.display_name = results.get('original_name')
         if description != None:
             entity.description = description
         if 'source' in results:
             entity.source = results.get('source')
         if 'json_info' in results:
-            entity.json_info = results.get('json_info')
-        if 'index_content' in results:
-            entity.index_content = results.get('index_content').replace('None', '').replace('  ', ' ')
+            json = results.get('json_info')
+            entity.json_info = str(json)
+            entity.index_content = str(" ".join(list(json.values()))).replace('None', '').replace('  ', ' ')
         if 'preview' in results:
-            entity.preview = results.get('preview').replace('None', '').replace('  ', ' ')
+            entity.preview = str(results.get('preview'))
         
         entity.save()
         instance.cleanup(entity=entity)
@@ -214,5 +216,9 @@ class Api():
                 collection.addItem(entity)
 
         return entity
+    def getExtractors(self, params):
+        extractors = extractor_list(show_hidden=params.get("show_hidden", False))
+
+        return extractors
 
 api = Api()

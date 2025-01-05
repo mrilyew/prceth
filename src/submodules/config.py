@@ -6,6 +6,10 @@ class Config():
             "ui.lang": {
                 "type": "string",
                 "default_value": 'ru',
+            },
+            "net.useragent": {
+                "type": "string",
+                "default_value": 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
             }
         }
 

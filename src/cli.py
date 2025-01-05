@@ -215,8 +215,8 @@ match args.get('act'):
     case 'entities.get':
         final_params = dict()
         final_params["query"] = args.get("query")
-        final_params["offset"] = args.get("offset")
-        final_params["count"] = args.get("count")
+        final_params["offset"] = args.get("offset", 0)
+        final_params["count"] = args.get("count", 10)
         columns_search = ['original_name', 'display_name']
         for column in ['description', 'source', 'index', 'saved', 'author']:
             if args.get("search_by_" + column) != None:
@@ -228,6 +228,16 @@ match args.get('act'):
         print("Total {0} items\n".format(count))
         for item in items:
             print(str(item.getApiStructure()) + "\n")
+
+    # Extractors
+
+    case 'extractors.get':
+        final_params = dict()
+        final_params["show_hidden"] = args.get("show_hidden", None) != None
+
+        items = api.getExtractors(final_params)
+        for item in items:
+            print(str(item.describe()) + "\n")
     case _:
         print('Unknown "--act" passed')
         exit(-14)

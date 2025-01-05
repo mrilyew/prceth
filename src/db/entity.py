@@ -1,25 +1,25 @@
 from resources.globals import consts, time, operator, reduce, Path
 from peewee import TextField, BigIntegerField, AutoField, BooleanField, TimestampField
-from resources.globals import BaseModel
+from resources.globals import BaseModel, json5
 
 class Entity(BaseModel):
     self_name = 'entity'
     
-    id = AutoField()
-    format = TextField(null=True)
-    original_name = TextField(default='N/A',null=False)
-    display_name = TextField(index=True,default='N/A')
-    description = TextField(index=True,null=True)
-    source = TextField(null=True) # Source of content
-    filesize = BigIntegerField(default=0)
-    index_content = TextField(null=True) # Content for search
-    json_info = TextField(index=True,null=True)
-    frontend_data = TextField(null=True)
-    extractor_name = TextField(null=True,default='base')
-    preview = TextField(null=True)
-    pinned = BooleanField(default=0)
-    hidden = BooleanField(default=0)
-    author = TextField(null=True,default=consts['pc_fullname'])
+    id = AutoField() # Absolute id
+    format = TextField(null=True) # File extension
+    original_name = TextField(default='N/A',null=False) # Name of file that been uploaded, hidden. Set by extractor
+    display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
+    description = TextField(index=True,null=True) # Description of entity. Set by api
+    source = TextField(null=True) # Source of content (URL or path). Set by extractor
+    filesize = BigIntegerField(default=0) # Size of file in bytes. Set by api
+    index_content = TextField(null=True) # Content that will be used for search. Set by extractor. Duplicates "json_info" but without keys.
+    json_info = TextField(index=True,null=True) # Additional info in json (ex. video name)
+    frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
+    extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
+    preview = TextField(null=True) # Preview in format photo:{path}
+    pinned = BooleanField(default=0) # Unused
+    hidden = BooleanField(default=0) # Is softly deleted
+    author = TextField(null=True,default=consts['pc_fullname']) # Author of entity 🤫
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True, default=0)
 
@@ -34,6 +34,10 @@ class Entity(BaseModel):
         self.save()
 
     def getApiStructure(self):
+        json_info = getattr(self, "json_info", "{}")
+        if json_info == None:
+            json_info = "{}"
+        
         return {
             "id": self.id,
             "format": self.format,
@@ -41,8 +45,9 @@ class Entity(BaseModel):
             "display_name": self.display_name,
             "description": self.description,
             "filesize": self.filesize,
+            "source": self.source,
             "index_content": self.index_content,
-            "json_info": self.json_info,
+            "json_info": json5.loads(json_info),
             "frontend_data": self.frontend_data,
             "pinned": self.pinned,
             "created": self.created_at,
@@ -92,8 +97,8 @@ class Entity(BaseModel):
         
         if conditions:
             items = items.where(reduce(operator.or_, conditions))
-
-        return items
+        
+        return items.order_by(Entity.id.desc())
     
     @staticmethod
     def get(id):

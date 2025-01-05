@@ -1,15 +1,17 @@
 from extractors.Base import BaseExtractor
-from resources.globals import file_manager
+from resources.globals import file_manager, utils
 
 class blank(BaseExtractor):
     name = 'blank'
+    name_key = "extractor_key_name_blank"
+    desc_key = "extractor_key_desc_blank"
     category = 'base'
     hidden = True
     params = {
         "format": {
             "desc_key": "extractor_key_desc_blank_format",
             "type": "string",
-            "maxlength": 3
+            "maxlength": 6
         },
         "text": {
             "desc_key": "extractor_key_desc_blank_text",
@@ -32,5 +34,10 @@ class blank(BaseExtractor):
         return {
             'format': str(format),
             'original_name': original_name,
+            'source': "api:blank",
             'filesize': len(text.encode('utf-8')),
+            'json_info': {
+                "format": str(format),
+                "text": utils.proc_strtr(text, 100),
+            }
         }
