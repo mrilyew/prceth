@@ -55,17 +55,6 @@ class Utils():
     
     def str_to_path(self, path):
         return Path(path)
-        
-    def rmdir(self, str_path):
-        path = Path(str_path)
-
-        for sub in path.iterdir():
-            if sub.is_dir():
-                self.rmdir(sub)
-            else:
-                sub.unlink()
-
-        path.rmdir()
 
     def find_owner(self, id, profiles, groups):
         search_array = profiles
@@ -92,5 +81,19 @@ class Utils():
         newString = text[:length]
 
         return newString + ("..." if text != newString else "")
+    
+    def parse_entity(self, input_string):
+        from db.entity import Entity
+        from db.collection import Collection
+
+        elements = input_string.split('entity')
+        if len(elements) > 1 and elements[0] == "":
+            entity_id = elements[1]
+            return Entity.get(entity_id)
+        elif 'collection' in input_string:
+            collection_id = input_string.split('collection')[1]
+            return Collection.get(collection_id)
+        else:
+            return None
 
 utils = Utils()

@@ -90,4 +90,15 @@ class FileManager():
             'filesize': int(file_size.st_size)
         }
     
+    def rmdir(self, str_path):
+        path = Path(str_path)
+
+        for sub in path.iterdir():
+            if sub.is_dir():
+                self.rmdir(sub)
+            else:
+                sub.unlink()
+
+        path.rmdir()
+    
 file_manager = FileManager()

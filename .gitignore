@@ -5,4 +5,5 @@ src/storage/settings/main.json
 env/
 venv/
 src/storage/collections/*
+!src/storage/collections/.gitkeep
 src/storage/logs/*.log

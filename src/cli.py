@@ -238,6 +238,35 @@ match args.get('act'):
         items = api.getExtractors(final_params)
         for item in items:
             print(str(item.describe()) + "\n")
+    case 'acts.get':
+        final_params = dict()
+        final_params["show_hidden"] = args.get("show_hidden", None) != None
+        final_params["search_type"] = args.get("search_type", "all")
+
+        items = api.getActs(final_params)
+        for item in items:
+            print(str(item.describe()) + "\n")
+    case 'acts.run':
+        if 'act_name' not in args:
+            print('"--act_name" not passed')
+            exit()
+
+        print(api.runAct(args))
+    case 'services.get':
+        final_params = dict()
+        final_params["show_hidden"] = args.get("show_hidden", None) != None
+        final_params["search_type"] = args.get("search_type", "all")
+
+        items = api.getServices(final_params)
+        for item in items:
+            print(str(item.describe()) + "\n")
+    case 'services.run':
+        if 'service_name' not in args:
+            print('"--service_name" not passed')
+            exit()
+
+        print("Started service")
+        api.runService(args)
     case _:
         print('Unknown "--act" passed')
         exit(-14)

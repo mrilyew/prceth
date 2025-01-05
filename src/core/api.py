@@ -3,6 +3,8 @@ from resources.exceptions import NotFoundException
 from db.collection import Collection
 from db.entity import Entity
 from core.extractor_wheel import extractor_wheel, extractor_list
+from core.acts_wheel import acts_wheel, acts_list
+from core.service_wheel import service_wheel, services_list
 
 class Api():
     def __init__(self):
@@ -220,5 +222,26 @@ class Api():
         extractors = extractor_list(show_hidden=params.get("show_hidden", False))
 
         return extractors
+    def getActs(self, params):
+        acts = acts_list(search_type=params.get("search_type", 'all'),show_hidden=params.get("show_hidden", False))
+
+        return acts
+    def runAct(self, params):
+        act_name = params.get("act_name")
+        instance, results = acts_wheel(args=params,entity_dir="",act_name=act_name)
+
+        return results
+    def getServices(self, params):
+        services = services_list(show_hidden=params.get("show_hidden", False))
+
+        return services
+    def runService(self, params):
+        service_name = params.get("service_name")
+        if service_name == None:
+            raise ValueError("--service_name is not passed")
+
+        service_wheel(args=params,service_name=service_name)
+
+        return True
 
 api = Api()

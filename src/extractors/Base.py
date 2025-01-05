@@ -1,4 +1,4 @@
-from resources.globals import consts, Path, utils
+from resources.globals import consts, Path, utils, file_manager
 
 class BaseExtractor:
     name = 'base'
@@ -17,7 +17,7 @@ class BaseExtractor:
         entity_file_path.rename(entity_file_path_replace)
 
     def cleanup_fail(self):
-        utils.rmdir(self.temp_dir)
+        file_manager.rmdir(self.temp_dir)
     
     def execute(self, args):
         pass
@@ -26,6 +26,7 @@ class BaseExtractor:
         return {
             "id": self.name,
             "name": getattr(self, "name_key", "_"),
+            "description": getattr(self, "desc_key", "_"),
             "category": self.category,
             "hidden": getattr(self, "hidden", False),
             "params": getattr(self, "params", {})
