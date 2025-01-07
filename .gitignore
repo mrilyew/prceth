@@ -7,3 +7,5 @@ venv/
 src/storage/collections/*
 !src/storage/collections/.gitkeep
 src/storage/logs/*.log
+src/web/static/js/node_modules
+src/web/static/js/package-lock.json

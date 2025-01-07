@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/page.css') }}">
+    <title>{{ site_name }}</title>
+
+    <script src="{{ url_for('static', filename='js/node_modules/umbrellajs/umbrella.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/node_modules/page/index.js') }}"></script>
+</head>
+<body>
+    <script>
+        window.pre_consts = {
+            title: "{{ site_name }}"
+        }
+    </script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
