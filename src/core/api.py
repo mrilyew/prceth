@@ -1,10 +1,8 @@
-from resources.globals import config, time, utils, logger
+from resources.globals import config, time, utils, logger, json
 from resources.exceptions import NotFoundException
 from db.collection import Collection
 from db.entity import Entity
-from core.extractor_wheel import extractor_wheel, extractor_list
-from core.acts_wheel import acts_wheel, acts_list
-from core.service_wheel import service_wheel, services_list
+from core.wheels import extractor_wheel, extractor_list, acts_wheel, acts_list, service_wheel, services_list
 
 class Api():
     def __init__(self):
@@ -78,6 +76,11 @@ class Api():
             raise NotFoundException("Collection not found")
         
         return collection
+    def getItems(self, params):
+        collections = Collection.getAll()
+        collections = collections.limit(params.get("count", 10)).offset(params.get("offset", 0))
+
+        return collections, Collection.getAllCount()
     def getItemsInCollection(self, params):
         collection_id = params.get("collection_id")
         query = params.get("query")
@@ -201,9 +204,9 @@ class Api():
         if 'source' in results:
             entity.source = results.get('source')
         if 'json_info' in results:
-            json = results.get('json_info')
-            entity.json_info = str(json)
-            entity.index_content = str(" ".join(list(json.values()))).replace('None', '').replace('  ', ' ')
+            json_ = results.get('json_info')
+            entity.json_info = json.dumps(json_)
+            entity.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
         if 'preview' in results:
             entity.preview = str(results.get('preview'))
         

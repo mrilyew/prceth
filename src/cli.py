@@ -122,6 +122,17 @@ match args.get('act'):
 
     # Collections get actions
 
+    case 'collections.get':
+        final_params = dict()
+        final_params["query"] = args.get("query")
+        final_params["offset"] = args.get("offset")
+        final_params["count"] = args.get("count")
+
+        items, count = api.getItems(final_params)
+
+        print("Total {0} items".format(count))
+        for item in items:
+            print(str(item.getApiStructure()) + "\n")
     case 'collections.getItems':
         if 'id' not in args:
             print('Error: "--id" not passed')

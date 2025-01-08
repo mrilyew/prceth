@@ -3,8 +3,6 @@ from resources.globals import file_manager, utils
 
 class blank(BaseExtractor):
     name = 'blank'
-    name_key = "extractor_key_name_blank"
-    desc_key = "extractor_key_desc_blank"
     category = 'base'
     hidden = True
     params = {

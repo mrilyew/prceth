@@ -3,8 +3,6 @@ from resources.globals import yt_dlp, json, utils
 
 class extract_youtube_streams(BaseAct):
     name = 'extract_youtube_streams'
-    name_key = "act_key_name_extract_youtube_streams"
-    desc_key = "act_key_desc_extract_youtube_streams"
     allow_type = 'all'
     type = 'string'
 

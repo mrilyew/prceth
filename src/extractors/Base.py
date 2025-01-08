@@ -2,7 +2,6 @@ from resources.globals import consts, Path, utils, file_manager
 
 class BaseExtractor:
     name = 'base'
-    name_key = "_"
     category = 'base'
 
     def __init__(self, temp_dir=None):
@@ -25,8 +24,6 @@ class BaseExtractor:
     def describe(self):
         return {
             "id": self.name,
-            "name": getattr(self, "name_key", "_"),
-            "description": getattr(self, "desc_key", "_"),
             "category": self.category,
             "hidden": getattr(self, "hidden", False),
             "params": getattr(self, "params", {})

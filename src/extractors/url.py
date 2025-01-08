@@ -4,8 +4,6 @@ from resources.exceptions import InvalidPassedParam
 
 class url(BaseExtractor):
     name = 'url'
-    name_key = "extractor_key_name_url"
-    desc_key = "extractor_key_desc_url"
     category = 'base'
     params = {
         "path": {

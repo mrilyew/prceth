@@ -2,8 +2,6 @@ from resources.globals import consts, Path, utils
 
 class BaseAct:
     name = 'base'
-    name_key = "_"
-    desc_key = "_"
     category = 'base'
     allow_type = 'entity'
     type = 'string'
@@ -23,8 +21,6 @@ class BaseAct:
     def describe(self):
         return {
             "id": self.name,
-            "name": getattr(self, "name_key", "_"),
-            "description": getattr(self, "desc_key", "_"),
             "category": self.category,
             "allow": self.allow_type,
         }

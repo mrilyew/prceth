@@ -2,8 +2,6 @@ from resources.globals import time, threading
 
 class BaseService:
     name = 'base'
-    name_key = "_"
-    desc_key = "_"
     interval = 10 # in seconds, can be set by 
 
     def __init__(self, args=None):
@@ -40,7 +38,5 @@ class BaseService:
     def describe(self):
         return {
             "id": self.name,
-            "name": getattr(self, "name_key", "_"),
-            "description": getattr(self, "desc_key", "_"),
             "interval": self.interval,
         }

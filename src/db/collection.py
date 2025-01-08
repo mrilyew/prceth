@@ -18,13 +18,7 @@ class Collection(BaseModel):
 
     @staticmethod
     def getAll():
-        results = Collection.select().where(Collection.hidden == 0).order_by(Collection.order).dicts()
-        result_entities = []
-
-        for entity in results:
-            result_entities.append(Collection(**entity))
-        
-        return result_entities
+        return Collection.select().where(Collection.hidden == 0).order_by(Collection.order)
     
     @staticmethod
     def getAllCount():

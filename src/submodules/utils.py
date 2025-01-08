@@ -1,4 +1,5 @@
-from resources.globals import sys, random, json, consts, Path, requests
+from resources.globals import sys, random, json, consts, Path, requests, mimetypes
+from collections import defaultdict
 
 class Utils():
     def parse_args(self):
@@ -82,18 +83,51 @@ class Utils():
 
         return newString + ("..." if text != newString else "")
     
-    def parse_entity(self, input_string):
+    def parse_entity(self, input_string, allowed_entities = ["entity", "collection"]):
         from db.entity import Entity
         from db.collection import Collection
 
         elements = input_string.split('entity')
         if len(elements) > 1 and elements[0] == "":
-            entity_id = elements[1]
-            return Entity.get(entity_id)
+            if "entity" in allowed_entities:
+                entity_id = elements[1]
+                return Entity.get(entity_id)
         elif 'collection' in input_string:
-            collection_id = input_string.split('collection')[1]
-            return Collection.get(collection_id)
+            if "collection" in allowed_entities:
+                collection_id = input_string.split('collection')[1]
+                return Collection.get(collection_id)
         else:
             return None
+
+    def extract_metadata_to_dict(self, mtdd):
+        metadata_dict = defaultdict(list)
+
+        for line in mtdd:
+            key_value = line.split(": ", 1)
+            if key_value[0].startswith('- '):
+                key = key_value[0][2:]
+                metadata_dict[key].append(key_value[1])
+
+        return dict(metadata_dict)
+    
+    def json_values_to_string(self, data):
+        result = []
+
+        if isinstance(data, dict):
+            for value in data.values():
+                result.append(self.json_values_to_string(value))
+
+        elif isinstance(data, list):
+            for item in data:
+                result.append(self.json_values_to_string(item))
+
+        else:
+            return str(data)
+        
+        return ' '.join(filter(None, result))
+    
+    def get_mime_type(self, filename):
+        mime_type, _ = mimetypes.guess_type(filename)
+        return mime_type
 
 utils = Utils()
