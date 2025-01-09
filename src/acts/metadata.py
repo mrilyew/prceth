@@ -25,18 +25,17 @@ class metadata(BaseAct):
             
             path = input_entity.getPath()
         
-        try:
-            parser = createParser(path)
-            if not parser:
-                return ''
-            
-            metadata = extractMetadata(parser)
-            if metadata:
-                if type == 'arr':
-                    return metadata.exportPlaintext()
-                else:
-                    return metadata
-            else:
-                raise ValueError("_error_extracting_metadata")
-        except Exception:
+        parser = createParser(path)
+        _metadata = None
+        if not parser:
             return []
+        
+        with parser:
+            try:
+                _metadata = extractMetadata(parser)
+                if _metadata == None:
+                    raise ValueError
+
+                return _metadata.exportPlaintext()
+            except Exception as err:
+                return []

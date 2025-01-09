@@ -86,3 +86,7 @@ u(document).on('mouseout', '.header_wrapper .nav_element, .horizontal_slider_tab
         }
     }, 1000)
 })
+
+u(document).on('click', '.header_wrapper .logo_wrap .logo', (e) => {
+    window.scrollTo(0, 0)
+})
