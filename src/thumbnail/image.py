@@ -1,9 +1,21 @@
-class image:
+from thumbnail.Base import BaseThumbnail
+from resources.globals import Image
+
+class image(BaseThumbnail):
     name = 'image'
     accept = ["jpg", "png", "jpeg", "bmp", "gif", "tiff"]
 
-    def __init__(self, input_file=None):
-        self.input_file = input_file
-
-    def run(self, params):
-        pass
+    def run(self, entity, params=[]):
+        size = (200, 200)
+        with Image.open(entity.getPath()) as img:
+            img.thumbnail(size, Image.LANCZOS)
+            new_img = Image.new('RGB', size, (0, 0, 0))
+            new_img.paste(
+                img, 
+                ((size[0] - img.size[0]) // 2, (size[1] - img.size[1]) // 2)
+            )
+            new_img.save(entity.getDirPath() + "/thumbnail_photo_0.jpg")
+        
+        return {
+            "previews": "photo_0"
+        }

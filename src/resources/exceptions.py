@@ -9,3 +9,7 @@ class NotFoundException(Exception):
 class InvalidPassedParam(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+class NotPassedException(Exception):
+    def __init__(self, message):
+        super().__init__(message)

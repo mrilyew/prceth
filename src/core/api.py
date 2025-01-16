@@ -185,10 +185,18 @@ class Api():
         extractor = params.get("extractor")
         display_name = params.get("display_name")
         description = params.get("description")
+        export_as_entity = params.get("export_to_folder", None) == None
+        temp_dir = None
 
-        temp_dir = utils.generate_temp_entity_dir()
+        if export_as_entity == True:
+            temp_dir = utils.generate_temp_entity_dir()
+        else:
+            temp_dir = params.get("export_to_folder")
+
         instance, results = extractor_wheel(args=params,entity_dir=temp_dir,extractor_name=extractor)
-        
+        if export_as_entity == False: 
+            return temp_dir
+
         entity = Entity()
 
         entity.format = str(results.get('format'))
@@ -207,11 +215,12 @@ class Api():
             json_ = results.get('json_info')
             entity.json_info = json.dumps(json_)
             entity.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
-        if 'preview' in results:
-            entity.preview = str(results.get('preview'))
         
         entity.save()
         instance.cleanup(entity=entity)
+        thumb_result = instance.thumbnail(entity=entity)
+        if thumb_result != None:
+            entity.preview = ",".join(thumb_result["previews"])
 
         if collection_id != None:
             collection = Collection.get(collection_id)

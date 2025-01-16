@@ -15,6 +15,9 @@ import requests
 import mimetypes
 import importlib
 import json5
+import math
+from PIL import Image, ImageOps
+from moviepy import VideoFileClip
 from playhouse.shortcuts import model_to_dict
 from resources.exceptions import ApiException
 from hachoir.parser import createParser

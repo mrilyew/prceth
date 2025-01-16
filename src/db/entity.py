@@ -1,5 +1,5 @@
 from resources.globals import consts, time, operator, reduce, Path
-from peewee import TextField, BigIntegerField, AutoField, BooleanField, TimestampField
+from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 from resources.globals import BaseModel, json5
 
 class Entity(BaseModel):
@@ -7,7 +7,7 @@ class Entity(BaseModel):
     
     id = AutoField() # Absolute id
     format = TextField(null=True) # File extension
-    original_name = TextField(default='N/A',null=False) # Name of file that been uploaded, hidden. Set by extractor
+    original_name = TextField(index=True,default='N/A',null=False) # Name of file that been uploaded, hidden. Set by extractor
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
@@ -16,10 +16,11 @@ class Entity(BaseModel):
     json_info = TextField(index=True,null=True) # Additional info in json (ex. video name)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
     extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
-    preview = TextField(null=True) # Preview in format photo:{path}
-    pinned = BooleanField(default=0) # Unused
+    tags = TextField(index=True,null=True) # csv tags
+    preview = TextField(null=True) # Preview in format photo,video
+    flags = IntegerField(default=0) # Flags.
     hidden = BooleanField(default=0) # Is softly deleted
-    author = TextField(null=True,default=consts['pc_fullname']) # Author of entity 🤫
+    author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True, default=0)
 
@@ -35,6 +36,10 @@ class Entity(BaseModel):
 
     def getApiStructure(self):
         json_info = getattr(self, "json_info", "{}")
+        tags = ",".split(self.tags)
+        if tags[0] == ",":
+            tags = []
+        
         if json_info == None:
             json_info = "{}"
         
@@ -49,7 +54,8 @@ class Entity(BaseModel):
             "index_content": self.index_content,
             "json_info": json5.loads(json_info),
             "frontend_data": self.frontend_data,
-            "pinned": self.pinned,
+            "tags": tags,
+            "flags": self.flags,
             "created": self.created_at,
             "edited": self.edited_at,
             "author": self.author,

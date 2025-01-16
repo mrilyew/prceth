@@ -209,7 +209,10 @@ match args.get('act'):
             exit()
 
         act = api.uploadEntity(args)
-        print(act.getApiStructure())
+        if type(act) == str:
+            print(act)
+        else:
+            print(act.getApiStructure())
     
     # Entities get actions
 

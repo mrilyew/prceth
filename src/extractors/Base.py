@@ -20,7 +20,19 @@ class BaseExtractor:
     
     def execute(self, args):
         pass
+    
+    # Typical preview
+    def thumbnail(self, entity, args=[]):
+        from core.wheels import thumbnail_wheel
 
+        ext   = entity.format
+        thumb = thumbnail_wheel(ext)
+        if thumb == None:
+            return None
+        
+        thumb_class = thumb(save_dir=entity.getDirPath())
+        return thumb_class.run(entity=entity)
+    
     def describe(self):
         return {
             "id": self.name,

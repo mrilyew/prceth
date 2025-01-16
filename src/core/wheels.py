@@ -2,6 +2,7 @@ from resources.globals import importlib, traceback, logger, consts, os, time
 from services.Base import BaseService
 from extractors.Base import BaseExtractor
 from acts.Base import BaseAct
+from thumbnail.Base import BaseThumbnail
 from acts.metadata import metadata
 from acts.additional_metadata import additional_metadata
 
@@ -129,6 +130,30 @@ def metadata_wheel(input_file):
     res = md.execute(args=ps)
 
     return res
+
+def thumbnail_wheel(input_format):
+    current_dir = consts["cwd"] + "\\thumbnail"
+    for plugin in os.listdir(current_dir):
+        if plugin == '__init__.py' or plugin == '__pycache__':
+            continue
+
+        if plugin.endswith('.py'):
+            module_name = f"thumbnail.{plugin[:-3]}"
+            try:
+                module = importlib.import_module(module_name)
+                for item_name in dir(module):
+                    item = getattr(module, item_name)
+                    if isinstance(item, type) and issubclass(item, BaseThumbnail) and item.name.find('base') == -1:
+                        if getattr(item, "hidden", False) == True:
+                            continue
+                        
+                        itemer = item()
+                        if itemer.acceptsFormat(input_format):
+                            return item
+            except ImportError as e:
+                print(f"Error importing {module_name}: {e}")
+
+    return None
 
 def additional_metadata_wheel(input_file):
     ps = dict()
