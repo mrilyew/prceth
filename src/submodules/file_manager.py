@@ -66,6 +66,13 @@ class FileManager():
         
         stream.close()
 
+    def newFile(self, path, content=None, write_mode = "wb"):
+        stream = open(str(path), write_mode)
+        if content != None:
+            stream.write(content)
+        
+        stream.close()
+
     def moveFile(self, input_path, output_path):
         file_size = input_path.stat()
         shutil.move(str(input_path), str(output_path))

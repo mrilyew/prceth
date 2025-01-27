@@ -1,4 +1,4 @@
-from resources.globals import sys, random, json, consts, Path, requests, mimetypes
+from resources.globals import os, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
 
 class Utils():
@@ -129,5 +129,24 @@ class Utils():
     def get_mime_type(self, filename):
         mime_type, _ = mimetypes.guess_type(filename)
         return mime_type
+    
+    def is_generated_ext(self, ext):
+        return ext in ["php", "html"]
+    
+    def download_chrome_driver(self, endpoint = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"):
+        #current_version_response = requests.get(endpoint)
+        #version_number = current_version_response.text
+
+        #download_url  = "https://chromedriver.storage.googleapis.com/" + version_number +"/chromedriver_win32.zip"
+        download_url  = "https://storage.googleapis.com/chrome-for-testing-public/132.0.6834.110/win64/chromedriver-win64.zip"
+        download_path = consts["tmp"] + '/chrome/chromedriver.zip'
+        print(download_path)
+        latest_driver_zip = wget.download(download_url, download_path)
+        with zipfile.ZipFile(latest_driver_zip, 'r') as zip_ref:
+            zip_ref.extractall(consts["tmp"] + "/chrome")
+
+        os.remove(latest_driver_zip)
+
+        return consts["tmp"] + "/chrome/chromedriver.exe"
 
 utils = Utils()

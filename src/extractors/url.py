@@ -1,8 +1,9 @@
 from extractors.Base import BaseExtractor
-from resources.globals import Path, utils, urlparse, requests, mimetypes, config
-from resources.exceptions import InvalidPassedParam
+from resources.globals import Path, utils, urlparse, requests, mimetypes, config, file_manager
+from resources.exceptions import NotPassedException
 from core.wheels import metadata_wheel, additional_metadata_wheel
 
+# Base URL downloader. Downloads single file, without styles, images or something.
 class url(BaseExtractor):
     name = 'url'
     category = 'base'
@@ -20,62 +21,59 @@ class url(BaseExtractor):
     }
 
     def execute(self, args):
+        # Getting params
         url = args.get('url')
-        if url == None:
-            raise AttributeError("URL was not passed")
-        
-        parsed_url = urlparse(url)
-        file_name = url
+        if url == None or url == "":
+            raise NotPassedException("URL was not passed")
+        __parsed_url = urlparse(url)
+        file_output_name = url
         if url.find('/'):
-            file_name = parsed_url.path.split('/')[-1].split('?')[0]
+            file_output_name = __parsed_url.path.split('/')[-1].split('?')[0]
         
-        file_name_splitted = file_name.split('.')
-        file_name = file_name_splitted[0]
-        ext = ''
-        if len(file_name_splitted) > 1:
-            ext = file_name_splitted[1]
+        file_splitted_array = file_output_name.split('.')
+        file_output_name = file_splitted_array[0]
+        file_output_ext = ''
+        if len(file_splitted_array) > 1:
+            file_output_ext = file_splitted_array[-1]
 
         # making request
-        full_file_name = ''
-        response = requests.get(url, allow_redirects=True, headers={
+        HTTP_REQUEST = requests.get(url, allow_redirects=True, headers={
             "User-Agent": config.get("net.useragent")
         })
-        if response.status_code != 200:
+        HTTP_REQUEST_STATUS = HTTP_REQUEST.status_code
+        if HTTP_REQUEST_STATUS == 404 or HTTP_REQUEST_STATUS == 403:
             raise FileNotFoundError('File not found')
+        if file_output_name == '':
+            file_output_name = requests.utils.quote(__parsed_url.hostname) + '.'
         
-        if file_name == '':
-            file_name = requests.utils.quote(parsed_url.hostname) + '.'
-        
-        content_type = None
-        t_extension  = None
-        if ext == '':
-            content_type = response.headers.get('Content-Type', '').lower()
-            t_extension = mimetypes.guess_extension(content_type)
-            if t_extension:
-                ext = t_extension[1:]
+        CONTENT_TYPE = HTTP_REQUEST.headers.get('Content-Type', '').lower()
+        MIME_EXT     = None
+        if file_output_ext == '' or utils.is_generated_ext(file_output_ext):
+            CONTENT_TYPE = CONTENT_TYPE
+            MIME_EXT = mimetypes.guess_extension(CONTENT_TYPE)
+            if MIME_EXT:
+                file_output_ext = MIME_EXT[1:]
             else:
-                ext = 'html'
+                file_output_ext = 'html'
         
-        full_file_name = '.'.join([file_name, ext])
-        save_path = Path(self.temp_dir + '\\' + full_file_name)
-
-        out_file = open(save_path, 'wb')
-        out_file.write(response.content)
-        out_file.close()
+        final_file_name = '.'.join([file_output_name, file_output_ext])
+        save_path = Path(self.temp_dir + '\\' + final_file_name)
+        file_manager.newFile(path=save_path, content=HTTP_REQUEST.content)
+        file_size = save_path.stat().st_size
         
         metadata_resp = metadata_wheel(input_file=str(save_path))
         output_metadata = {
             "int_q_url": str(url), 
-            "int_q_mime": str(t_extension),
-            "full_name": str(full_file_name),
+            "int_q_mime": str(MIME_EXT),
+            "full_name": str(final_file_name),
             "metadata": utils.extract_metadata_to_dict(metadata_resp),
         }
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
 
         return {
-            'format': ext,
-            'original_name': full_file_name,
-            'filesize': save_path.stat().st_size,
+            'format': file_output_ext,
+            'original_name': final_file_name,
+            'filesize': file_size,
             'source': "url:"+url,
             'json_info': output_metadata
         }

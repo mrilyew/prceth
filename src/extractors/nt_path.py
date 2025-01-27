@@ -5,8 +5,6 @@ from core.wheels import metadata_wheel, additional_metadata_wheel
 
 class nt_path(BaseExtractor):
     name = 'nt_path'
-    name_key = "extractor_key_name_nt_path"
-    desc_key = "extractor_key_desc_nt_path"
     category = 'base'
     params = {
         "path": {

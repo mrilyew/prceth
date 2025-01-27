@@ -16,6 +16,8 @@ import mimetypes
 import importlib
 import json5
 import math
+import wget
+import zipfile
 from PIL import Image, ImageOps
 from moviepy import VideoFileClip
 from playhouse.shortcuts import model_to_dict
@@ -32,4 +34,5 @@ from submodules.config import config
 from submodules.logger import logger
 from submodules.file_manager import file_manager 
 from submodules.utils import utils
+from submodules.crawler import Crawler
 from db.base import db, BaseModel

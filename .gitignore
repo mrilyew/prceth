@@ -1,5 +1,9 @@
 src/dev
 *__pycache__
+src/storage/tmp/chrome/chromedriver.exe
+src/storage/tmp/chrome/LICENSE.chromedriver
+src/storage/tmp/chrome/chromium/*
+!src/storage/tmp/chrome/chromium/.gitkeep
 src/storage/main.db
 src/storage/settings/main.json
 env/

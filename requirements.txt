@@ -16,5 +16,8 @@ youtube-dl==2021.12.17
 yt-dlp==2024.9.27
 json5==0.10.0
 Flask==3.1.0
-pillow==11.1.0
+pillow<11.0
 moviepy==2.1.2
+selenium==4.28.1
+beautifulsoup4==4.12.3 
+wget==3.2

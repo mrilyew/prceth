@@ -13,3 +13,7 @@ class InvalidPassedParam(Exception):
 class NotPassedException(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+class NotInstalledLibrary(Exception):
+    def __init__(self, message):
+        super().__init__(message)
