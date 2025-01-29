@@ -18,7 +18,7 @@ class web_crawler(BaseExtractor):
         if site_url == None:
             raise NotPassedException("URL was not passed")
         
-        crawler = Crawler(save_dir=self.temp_dir)
+        crawler = Crawler(save_dir=self.temp_dir,args=args)
         crawler.start_crawl(url=site_url)
         crawler.print_screenshot()
         html = crawler.print_html()
@@ -26,7 +26,7 @@ class web_crawler(BaseExtractor):
         page_title = crawler.driver.title
         original_name = "site.html"
         
-        file_manager.newFile(path=self.temp_dir + "\\" + original_name,content=html)
+        file_manager.createFile(dir=self.temp_dir,filename=original_name,content=html)
         output_metadata = {
             "title": page_title
         }
