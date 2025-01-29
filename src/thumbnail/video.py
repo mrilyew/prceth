@@ -5,10 +5,14 @@ class video(BaseThumbnail):
     name = 'video'
     accept = ["mp4", "mov"]
 
-    def run(self, entity, params=[]):
+    def run(self, entity, params={}):
         size = (200, 200)
         returns = []
-        with VideoFileClip(entity.getPath()) as video:
+        path = entity.getPath()
+        if "another_file" in params:
+            path = params.get("another_file")
+        
+        with VideoFileClip(path) as video:
             duration = video.duration
             frag_len = (duration / 10)
             for i in range(0, 10):

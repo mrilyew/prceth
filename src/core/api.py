@@ -218,7 +218,7 @@ class Api():
         
         entity.save()
         instance.cleanup(entity=entity)
-        thumb_result = instance.thumbnail(entity=entity)
+        thumb_result = instance.thumbnail(entity=entity,args=results)
         if thumb_result != None:
             entity.preview = ",".join(thumb_result["previews"])
 

@@ -5,9 +5,13 @@ class image(BaseThumbnail):
     name = 'image'
     accept = ["jpg", "png", "jpeg", "bmp", "gif", "tiff"]
 
-    def run(self, entity, params=[]):
+    def run(self, entity, params={}):
         size = (200, 200)
-        with Image.open(entity.getPath()) as img:
+        path = entity.getPath()
+        if "another_file" in params:
+            path = entity.getDirPath() + "/" + params.get("another_file")
+        
+        with Image.open(path) as img:
             img.thumbnail(size, Image.LANCZOS)
             new_img = Image.new('RGB', size, (0, 0, 0))
             new_img.paste(
