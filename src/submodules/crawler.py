@@ -17,7 +17,7 @@ class Crawler():
 
         self.p_scroll_cycles   = int(self.args.get("scroll_cycles", 10))
         self.p_scroll_timeout  = int(self.args.get("scroll_timeout", 0))
-        self.p_download_resources_js = int(self.args.get("download_resources_js", 1))
+        self.p_download_resources_js = int(self.args.get("download_resources_js", 0))
         self.p_download_resources = int(self.args.get("download_resources", 1))
         self.p_download_resources_from_css = int(self.args.get("download_resources_from_css", 0))
         self.p_fullsize_page_screenshot    = int(self.args.get("fullsize_page_screenshot", 0))
@@ -78,8 +78,11 @@ class Crawler():
             scroll_iter += 1 
     
     # Save resource to asset
-    @staticmethod
-    def download_resource(url, folder_path):
+    def download_resource(self, url, folder_path):
+        if url in self.downloaded_assets:
+            print(f"&Crawler | File \"{url}\" already downloaded!!! Skipping.")
+            return None
+        
         try:
             response = requests.get(url, stream=True)
             response.raise_for_status()
@@ -92,6 +95,7 @@ class Crawler():
                     f.write(chunk)
 
             print(f"&Crawler | Downloaded file {url}.")
+            self.downloaded_assets.append(url)
             return basename
         except Exception as e:
             print(f"&Crawler | Error when downloading file {url} ({e}).")
@@ -99,18 +103,18 @@ class Crawler():
     
     # Format html (download assets, format links)
     def parse_html(self, html):
+        self.downloaded_assets = []
         soup = BeautifulSoup(html, 'html.parser')
         if self.p_download_resources == 0:
             return soup.prettify()
-        
-        # TODO ADD CHECK IF FILE ALREADY DOWNLOADED
-        
+
         # Finding images
         for img in soup.find_all('img', src=True):
             img_url = img.get('src')
             if not img_url.startswith('http'):
                 img_url = self.base_url + img_url
-            filename = Crawler.download_resource(img_url, os.path.join(self.save_dir, 'assets'))
+            
+            filename = self.download_resource(img_url, os.path.join(self.save_dir, 'assets'))
             if filename:
                 img['data-orig'] = img_url
                 img['src'] = f"assets/{filename}"
@@ -122,13 +126,10 @@ class Crawler():
                 if script_url != "":
                     if not script_url.startswith('http'):
                         script_url = self.base_url + script_url
-                    filename = Crawler.download_resource(script_url, os.path.join(self.save_dir, 'scripts'))
+                    filename = self.download_resource(script_url, os.path.join(self.save_dir, 'scripts'))
                     if filename:
                         script['data-orig'] = script_url
                         script['src'] = f"scripts/{filename}"
-            else:
-                # Todo make remover js calls on another tags
-                script.decompose()
 
         for a in soup.find_all('a', href=True):
             a_url = a.get('href')
@@ -146,7 +147,8 @@ class Crawler():
                     link['data-orig'] = css_url
                     if not css_url.startswith('http'):
                         css_url = self.base_url + css_url
-                    filename = Crawler.download_resource(css_url, os.path.join(self.save_dir, 'css'))
+                    
+                    filename = self.download_resource(css_url, os.path.join(self.save_dir, 'css'))
                     if filename:
                         link['href'] = f"css/{filename}"
                         url_pattern = re.compile(r'url\((.*?)\)')
@@ -163,7 +165,7 @@ class Crawler():
                                 __css_download_name  = os.path.basename(__css_asset_url_full)
                                 
                                 __css_modified = __css_modified.replace(__css_asset_url, "assets/" + __css_download_name)
-                                Crawler.download_resource(__css_asset_url_full, os.path.join(self.save_dir, 'assets'))
+                                self.download_resource(__css_asset_url_full, os.path.join(self.save_dir, 'assets'))
                                 print(f"&Crawler | Downloaded asset from {link} => {__css_asset_url}")
 
                             # Rewriting css with new values
@@ -176,13 +178,24 @@ class Crawler():
                     link['data-orig'] = favicon_url
                     if not favicon_url.startswith('http'):
                         favicon_url = self.base_url + favicon_url
-                    filename = Crawler.download_resource(favicon_url, os.path.join(self.save_dir, 'assets'))
+                    filename = self.download_resource(favicon_url, os.path.join(self.save_dir, 'assets'))
                     if filename:
                         link['href'] = f"assets/{filename}"
 
+        # Removing all inline attrs
+        if self.p_download_resources_js == 0:
+            for tag in soup.find_all(True):
+                js_attributes = [attr for attr in tag.attrs if attr.startswith('on')]
+                for attr in js_attributes:
+                    del tag[attr]
+        
+            for script_tag in soup.find_all('script'):
+                script_tag.decompose()
+        
         return soup.prettify()
     
     def parse_meta(self, html):
+        # TODO parse "article" "nav" tags or smthng
         final_meta = {"title": self.driver.title}
         soup = BeautifulSoup(html, 'html.parser')
         for meta in soup.find_all('meta'):
@@ -198,7 +211,8 @@ class Crawler():
     # Return parsed HTML
     def print_html(self):
         print("&Crawler | Printing html...")
-        self.__html = self.driver.page_source.encode("utf-8")
+        #self.__html = self.driver.page_source.encode("utf-8")
+        self.__html = self.driver.execute_script("return document.documentElement.outerHTML;")
         return self.parse_html(self.__html)
     
     # Make and write screenshot.
