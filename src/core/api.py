@@ -1,4 +1,4 @@
-from resources.globals import config, time, utils, logger, json
+from resources.globals import config, time, utils, logger, json, file_manager
 from resources.exceptions import NotFoundException
 from db.collection import Collection
 from db.entity import Entity
@@ -202,6 +202,7 @@ class Api():
         entity.format = str(results.get('format'))
         entity.original_name = results.get('original_name')
         entity.filesize = results.get('filesize')
+        entity.dir_filesize = file_manager.getFolderSize(temp_dir)
         entity.extractor_name = results.get('extractor_name')
         if display_name != None:
             entity.display_name = display_name

@@ -11,7 +11,8 @@ class Entity(BaseModel):
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
-    filesize = BigIntegerField(default=0) # Size of file in bytes. Set by api
+    filesize = BigIntegerField(default=0) # Size of main file in bytes. Set by api
+    dir_filesize = BigIntegerField(default=0) # Size of entity dir
     index_content = TextField(null=True) # Content that will be used for search. Set by extractor. Duplicates "json_info" but without keys.
     json_info = TextField(index=True,null=True) # Additional info in json (ex. video name)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.

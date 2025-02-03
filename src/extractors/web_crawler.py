@@ -23,13 +23,10 @@ class web_crawler(BaseExtractor):
         crawler.print_screenshot()
         html = crawler.print_html()
         
-        page_title = crawler.driver.title
-        original_name = "site.html"
+        original_name = "index.html"
         
         file_manager.createFile(dir=self.temp_dir,filename=original_name,content=html)
-        output_metadata = {
-            "title": page_title
-        }
+        output_metadata = crawler.print_meta()
         final = {
             'format': "html",
             'original_name': original_name,

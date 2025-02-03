@@ -58,6 +58,9 @@ class FileManager():
             
             return return_array, total_count, len(return_array), offset + limit < total_count
         
+    def getFolderSize(self, dir):
+        return sum(file.stat().st_size for file in Path(dir).rglob('*'))
+        
     def createFile(self, filename, dir, content=None):
         path = dir + '\\' + filename
         stream = open(path, 'w', encoding='utf-8')
