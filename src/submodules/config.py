@@ -9,7 +9,7 @@ class Config():
             },
             "ui.name": {
                 "type": "string",
-                "default_value": "Qollections",
+                "default_value": "LCM/S",
             },
             "net.useragent": {
                 "type": "string",
@@ -27,8 +27,17 @@ class Config():
                 "type": "int",
                 "default_value": 1,
             },
+            "extractor.cache_assets": {
+                "type": "int",
+                "default_value": 1,
+            },
+            "storage.path": {
+                "type": "string",
+                "default_value": "?cwd?/storage" # /src -> /storage
+            },
         }
 
+        # Cannot be moved.
         self.settings_path = os.getcwd() + '/storage/settings/' + file_name
         if not os.path.exists(self.settings_path):
             temp_stream = open(self.settings_path, 'w', encoding='utf-8')

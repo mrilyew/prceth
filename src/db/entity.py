@@ -13,17 +13,22 @@ class Entity(BaseModel):
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
     filesize = BigIntegerField(default=0) # Size of main file in bytes. Set by api
     dir_filesize = BigIntegerField(default=0) # Size of entity dir
-    index_content = TextField(null=True) # Content that will be used for search. Set by extractor. Duplicates "json_info" but without keys.
-    json_info = TextField(index=True,null=True) # Additional info in json (ex. video name)
+    index_content = TextField(index=True,null=True) # Content that will be used for search. Set by extractor. Duplicates "json_info" but without keys.
+    json_info = TextField(null=True) # Additional info in json (ex. video name)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
     extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
     tags = TextField(index=True,null=True) # csv tags
     preview = TextField(null=True) # Preview in format photo,video
     flags = IntegerField(default=0) # Flags.
+    type = IntegerField(default=0) # 0 - main is the first file from dir
+                                # 1 - main info is from "json_info" (jsonистый объект)
+                                # 2 - no info at all; is a link from "ref"
+    ref = TextField(null=True,default=None) # Just a link
     hidden = BooleanField(default=0) # Is softly deleted
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
     created_at = TimestampField(default=time.time())
-    edited_at = TimestampField(null=True, default=0)
+    edited_at = TimestampField(null=True, default=None)
+    bookmarked_at = TimestampField(null=True, default=None)
 
     def deleteFile(self):
         Path(self.getPath()).unlink()
@@ -64,14 +69,14 @@ class Entity(BaseModel):
         }
     
     def getPath(self):
-        storage = consts['cwd'] + '\\storage'
+        storage = consts['storage']
         collection_path = storage + '\\collections\\' + str(self.id)
         entity_path = collection_path + '\\' + str(self.id) + '.' + str(self.format)
 
         return entity_path
     
     def getDirPath(self, need_check = True):
-        storage_path = consts['cwd'] + '\\storage'
+        storage_path = consts['storage']
         collection_path = storage_path + '\\collections\\' + str(self.id)
         coll_path = Path(collection_path)
 

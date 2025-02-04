@@ -3,7 +3,7 @@ src/dev
 src/storage/tmp/chrome/chromedriver.exe
 src/storage/tmp/chrome/LICENSE.chromedriver
 src/storage/tmp/*
-!src/storage/tmp/*/.gitkeep
+src/storage/assets_originals/*
 src/storage/main.db
 src/storage/settings/main.json
 env/

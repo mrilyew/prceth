@@ -1,4 +1,4 @@
-from resources.globals import os, utils, consts, Path, time, requests
+from resources.globals import os, utils, consts, Path, time, requests, assets_cache_storage, file_manager, config
 from resources.exceptions import NotInstalledLibrary
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -89,26 +89,45 @@ class Crawler():
         print(self.driver.page_source)
 
     # Save resource to asset
-    # TODO add some type of caching? To not download one file a lot of times.
     def download_resource(self, url, folder_path):
         if url in self.downloaded_assets:
             print(f"&Crawler | File \"{url}\" already downloaded!!! Skipping.")
             return None
         
         try:
-            response = requests.get(url, stream=True)
-            response.raise_for_status()
             basename = os.path.basename(url.split("?")[0])
-            local_path = os.path.join(folder_path, basename)
+            basename_name = Path(basename)
+            basename_with_site = basename_name.name + "_" + utils.remove_protocol(self.base_url) + "." + basename_name.suffix
+            local_path = os.path.join(folder_path, basename_with_site)
+            cache_path = os.path.join(assets_cache_storage.path, basename_with_site)
 
-            # Writing file
-            with open(local_path, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
+            if int(config.get("extractor.cache_assets")) == 0:
+                # Writing file
+                response = requests.get(url, stream=True)
+                response.raise_for_status()
 
-            print(f"&Crawler | Downloaded file {url}.")
-            self.downloaded_assets.append(url)
-            return basename
+                with open(local_path, 'wb') as f:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        f.write(chunk)
+
+                print(f"&Crawler | Downloaded file {url}.")
+                self.downloaded_assets.append(url)
+
+                return basename_with_site
+            # Because of symlinks you need to start local server to load assets.
+            else:
+                contains = assets_cache_storage.contains(basename_with_site)
+                if contains == False:
+                    response = requests.get(url, stream=True)
+                    response.raise_for_status()
+
+                    with open(cache_path, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                
+                self.downloaded_assets.append(url)
+                assets_cache_storage.mklink_from_cache_to_dir(local_path)
+                return basename_with_site
         except Exception as e:
             print(f"&Crawler | Error when downloading file {url} ({e}).")
             return None
@@ -161,13 +180,14 @@ class Crawler():
                         script['data-orig'] = script_url
                         script['src'] = f"scripts/{filename}"
 
-        for a in soup.find_all('a', href=True):
+        for a in soup.find_all(True,href=True):
             a_url = a.get('href')
             if not a_url.startswith('http'):
                 a['data-orig'] = a_url
                 a['href'] = self.base_url + a_url
         
         # Finding links
+        # TODO add font downloader
         for link in soup.find_all('link', href=True):
             rel = link.get("rel")
             if rel:

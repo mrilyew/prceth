@@ -1,13 +1,13 @@
-from resources.globals import datetime, os
+from resources.globals import datetime, os, consts
 
 class Logger():
     def __init__(self, keep=False):
         now = datetime.now()
         
         if keep:
-            self.path = os.getcwd() + '/storage/logs/' + now.strftime("%d-%m-%Y_%H-%M-%S") + '.log'
+            self.path = consts['storage'] + '/logs/' + now.strftime("%d-%m-%Y_%H-%M-%S") + '.log'
         else:
-            self.path = os.getcwd() + '/storage/logs/' + now.strftime("%d-%m-%Y") + '.log'
+            self.path = consts['storage'] + '/logs/' + now.strftime("%d-%m-%Y") + '.log'
         
         if not os.path.exists(self.path):
             temp_stream = open(self.path, 'w', encoding='utf-8')

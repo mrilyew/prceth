@@ -243,6 +243,7 @@ class Api():
         act_name = params.get("act_name")
         instance, results = acts_wheel(args=params,entity_dir="",act_name=act_name)
 
+        instance.cleanup()
         return results
     def getServices(self, params):
         services = services_list(show_hidden=params.get("show_hidden", False))

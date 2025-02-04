@@ -49,13 +49,16 @@ class Utils():
         
     def generate_temp_entity_dir(self):
         rand = self.random_int(1, 1000000) * -1
-        path = Path(f'{consts['cwd']}\\storage\\collections\\{rand}')
+        path = Path(f'{consts['storage']}\\collections\\{rand}')
         path.mkdir(exist_ok=True)
 
         return str(path)
     
     def str_to_path(self, path):
         return Path(path)
+    
+    def remove_protocol(self, strr):
+        return strr.replace("https://", "").replace("http://", "").replace("ftp://", "")
 
     def find_owner(self, id, profiles, groups):
         search_array = profiles

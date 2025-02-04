@@ -29,10 +29,11 @@ from urllib.parse import urlencode
 from pathlib import Path
 from datetime import datetime
 from functools import reduce
-from resources.consts import consts
 from submodules.config import config
+from resources.consts import consts
 from submodules.logger import logger
 from submodules.file_manager import file_manager 
 from submodules.utils import utils
+from resources.assets_cache_storage import assets_cache_storage
 from submodules.crawler import Crawler
 from db.base import db, BaseModel
