@@ -19,11 +19,12 @@ class Crawler():
         self.p_scroll_timeout  = int(self.args.get("scroll_timeout", 0))
         self.p_download_resources_js = int(self.args.get("download_resources_js", 0))
         self.p_download_resources = int(self.args.get("download_resources", 1))
-        self.p_download_resources_from_css = int(self.args.get("download_resources_from_css", 0))
+        self.p_download_resources_from_css = int(self.args.get("download_resources_from_css", 1))
         self.p_fullsize_page_screenshot    = int(self.args.get("fullsize_page_screenshot", 0))
         self.p_fullsize_page_screenshot_value = int(self.args.get("fullsize_page_screenshot_value", 1000))
         self.p_scroll_screenshot_px        = int(self.args.get("screenshot_scroll", 0))
         self.p_implicitly_wait = int(self.args.get("implicitly_wait", 5))
+        self.p_print_html_to_console = int(self.args.get("print_html_to_console", 0))
 
         self.save_dir = save_dir
         self.__makeDirs()
@@ -77,7 +78,18 @@ class Crawler():
             last_height = new_height
             scroll_iter += 1 
     
+    # Creating page from raw HTML
+    def start_crawl_from_html(self, html, url_help = ""):
+        print("&Crawler | Capturing the page from HTML...")
+        self.url = "about:blank"
+        self.base_url = '/'.join(url_help.split('/')[:3]) # :3
+        self.driver.get(self.url)
+        self.driver.implicitly_wait(self.p_implicitly_wait)
+        self.driver.execute_script(f"document.write(`{html}`);")
+        print(self.driver.page_source)
+
     # Save resource to asset
+    # TODO add some type of caching? To not download one file a lot of times.
     def download_resource(self, url, folder_path):
         if url in self.downloaded_assets:
             print(f"&Crawler | File \"{url}\" already downloaded!!! Skipping.")
@@ -105,9 +117,27 @@ class Crawler():
     def parse_html(self, html):
         self.downloaded_assets = []
         soup = BeautifulSoup(html, 'html.parser')
+        # Removing all inline attrs
+        if self.p_download_resources_js == 0 or self.p_download_resources == 0:
+            for tag in soup.find_all(True):
+                js_attributes = [attr for attr in tag.attrs if attr.startswith('on')]
+                for attr in js_attributes:
+                    del tag[attr]
+        
+            for script_tag in soup.find_all('script'):
+                script_tag.decompose()
+        
+        # Allowing scroll
+        for tag in soup.find_all(style=True):
+            styles = tag['style'].split(';')
+            styles = [style for style in styles if not style.strip().startswith('overflow-y:')]
+            tag['style'] = '; '.join(styles).strip()
+        
         if self.p_download_resources == 0:
+            if self.p_print_html_to_console == 1:
+                print(html)
             return soup.prettify()
-
+        
         # Finding images
         for img in soup.find_all('img', src=True):
             img_url = img.get('src')
@@ -181,16 +211,9 @@ class Crawler():
                     filename = self.download_resource(favicon_url, os.path.join(self.save_dir, 'assets'))
                     if filename:
                         link['href'] = f"assets/{filename}"
-
-        # Removing all inline attrs
-        if self.p_download_resources_js == 0:
-            for tag in soup.find_all(True):
-                js_attributes = [attr for attr in tag.attrs if attr.startswith('on')]
-                for attr in js_attributes:
-                    del tag[attr]
         
-            for script_tag in soup.find_all('script'):
-                script_tag.decompose()
+        if self.p_print_html_to_console == 1:
+            print(html)
         
         return soup.prettify()
     
@@ -202,7 +225,8 @@ class Crawler():
             meta_name = meta.get('name')
             meta_content = meta.get('content')
             if meta_name == None:
-                continue
+                meta_name = meta.get('property') # HTML moment
+                # sgml better
 
             final_meta[meta_name] = meta_content
 
@@ -211,8 +235,8 @@ class Crawler():
     # Return parsed HTML
     def print_html(self):
         print("&Crawler | Printing html...")
-        #self.__html = self.driver.page_source.encode("utf-8")
-        self.__html = self.driver.execute_script("return document.documentElement.outerHTML;")
+        self.__html = self.driver.page_source.encode("utf-8")
+        #self.__html = self.driver.execute_script("return document.documentElement.outerHTML;")
         return self.parse_html(self.__html)
     
     # Make and write screenshot.
