@@ -1,14 +1,15 @@
 src/dev
 *__pycache__
+env/
+venv/
 src/storage/tmp/chrome/chromedriver.exe
 src/storage/tmp/chrome/LICENSE.chromedriver
 src/storage/tmp/*
 src/storage/assets_originals/*
 src/storage/main.db
 src/storage/settings/main.json
-env/
-venv/
 src/storage/collections/*
 src/storage/logs/*.log
 src/web/static/js/node_modules
 src/web/static/js/package-lock.json
+readme/plot_ru.md
