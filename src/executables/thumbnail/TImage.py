@@ -8,8 +8,8 @@ class TImage(BaseThumbnail):
     def run(self, entity, params={}):
         size = (200, 200)
         path = entity.getPath()
-        if "another_file" in params:
-            path = entity.getDirPath() + "/" + params.get("another_file")
+        if params.hasPreview():
+            path = entity.getDirPath() + "/" + params.another_file
         
         with Image.open(path) as img:
             img.thumbnail(size, Image.LANCZOS)

@@ -23,9 +23,6 @@ class ExecuteResponse():
     def get_json_info(self):
         return self.json_info
     
-    def get_preview(self):
-        return self.another_file
-    
     def hasSource(self):
         return self.source != None
     

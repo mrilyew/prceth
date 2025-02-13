@@ -19,6 +19,9 @@ import json5
 import math
 import wget
 import zipfile
+import asyncio
+import aiohttp
+from fake_useragent import UserAgent as FakeUserAgent
 from PIL import Image, ImageOps
 from moviepy import VideoFileClip
 from playhouse.shortcuts import model_to_dict
@@ -32,12 +35,16 @@ from functools import reduce
 
 # Internal classes
 
+loop = asyncio.get_event_loop()
+
 from resources.Exceptions import ApiException
 from resources.Consts import consts
 from submodules.Config import config
 from submodules.Logger import logger
 from submodules.FileManager import file_manager 
 from submodules.Utils import utils
+from submodules.HTMLFormatter import HTMLFormatter
+from core.DownloadManager import download_manager
 from resources.AssetsCacheStorage import assets_cache_storage
 from submodules.WebCrawler import Crawler
 from db.BaseModel import db, BaseModel

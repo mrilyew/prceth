@@ -49,12 +49,12 @@ def acts_list(search_type='all',show_hidden=False):
     
     return __exit
 
-def extractor_wheel(args, entity_dir, extractor_name):
+async def extractor_wheel(args, entity_dir, extractor_name):
     module = importlib.import_module(f'executables.extractors.{extractor_name}')
     instance = getattr(module, extractor_name)(temp_dir=entity_dir)
 
     try:
-        results = instance.execute(args=args)
+        results = await instance.execute(args=args)
 
         return instance, results
     except Exception as e:

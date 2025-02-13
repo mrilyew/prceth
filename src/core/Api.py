@@ -251,7 +251,9 @@ class Api():
         count = fetch.count()
 
         return items, count
-    def uploadEntity(self, params):
+    async def uploadEntity(self, params):
+        # TODO переписать превью в отдельную директорию с хешами
+        # + хеш для entity вместо id
         if 'extractor' not in params:
             raise NotPassedException('--extractor not passed')
 
@@ -274,7 +276,7 @@ class Api():
             if Path(temp_dir).is_dir() == False:
                 raise NotADirectoryError("Directory not found")
 
-        instance, results = extractor_wheel(args=params,entity_dir=temp_dir,extractor_name=extractor_input_name)
+        instance, results = await extractor_wheel(args=params,entity_dir=temp_dir,extractor_name=extractor_input_name)
         if export_as_entity == False: 
             return temp_dir
 

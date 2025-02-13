@@ -9,8 +9,8 @@ class TVideo(BaseThumbnail):
         size = (200, 200)
         returns = []
         path = entity.getPath()
-        if "another_file" in params:
-            path = params.get("another_file")
+        if params.hasPreview():
+            path = params.another_file
         
         with VideoFileClip(path) as video:
             duration = video.duration

@@ -1,4 +1,4 @@
-from resources.Globals import datetime, os, consts
+from resources.Globals import datetime, os, consts, traceback
 
 class Logger():
     def __init__(self, keep=False):
@@ -34,15 +34,17 @@ class Logger():
     
     def log(self, section = "App", name = "success", message = "Undefined"):
         # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS".
-        # Name can be "success" or "error".
+        # Name can be "success", "message" or "error".
         # In "message" you should describe what you want to write.
         self.__log_file_check()
         now = datetime.now()
 
+        message = message.replace("\n", "\\n")
         self.file.seek(0, os.SEEK_END)
         self.file.write(f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] [{name}] {message}\n")
 
     def logException(self, input_exception, section="App"):
-        self.log(section, type(input_exception).__name__, str(input_exception))
+        exp = str(input_exception) + traceback.format_exc()
+        self.log(section, type(input_exception).__name__, exp)
 
 logger = Logger()

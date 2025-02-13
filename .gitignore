@@ -7,7 +7,7 @@ src/storage/tmp/chrome/LICENSE.chromedriver
 src/storage/tmp/*
 src/storage/assets_originals/*
 src/storage/main.db
-src/storage/settings/main.json
+src/storage/settings/config.json
 src/storage/collections/*
 src/storage/logs/*.log
 src/web/static/js/node_modules

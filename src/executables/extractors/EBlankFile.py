@@ -19,7 +19,7 @@ class EBlankFile(BaseExtractor):
         }
     }
 
-    def execute(self, args):
+    async def execute(self, args):
         format = args.get("format", "txt")
         text = args.get("text", "")
         

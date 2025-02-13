@@ -19,7 +19,7 @@ class EPath(BaseExtractor):
         }
     }
 
-    def execute(self, args):
+    async def execute(self, args):
         input_path_text = args.get("path")
         export_type = args.get("type", "link") # As you will see: "copy", "move", "link"
         if input_path_text == None:

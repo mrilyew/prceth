@@ -18,7 +18,7 @@ class BaseExtractor:
     def cleanup_fail(self):
         file_manager.rmdir(self.temp_dir)
     
-    def execute(self, args):
+    async def execute(self, args):
         pass
     
     # Typical preview
@@ -27,7 +27,7 @@ class BaseExtractor:
 
         ext = entity.format
         if args.hasPreview():
-            ext = utils.get_ext(args.preview)
+            ext = utils.get_ext(args.another_file)
         
         thumb = thumbnail_wheel(ext)
         if thumb == None:

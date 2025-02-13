@@ -20,7 +20,7 @@ class EURL(BaseExtractor):
         }
     }
 
-    def execute(self, args):
+    async def execute(self, args):
         input_url = args.get("url", None)
         if input_url == None or input_url == "":
             raise NotPassedException("url was not passed")

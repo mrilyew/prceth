@@ -1,4 +1,4 @@
-from resources.Globals import os, utils, consts, Path, time, requests, assets_cache_storage, file_manager, config
+from resources.Globals import os, utils, consts, logger, Path, zipfile, wget, time, requests, assets_cache_storage, file_manager, config, HTMLFormatter, download_manager, FakeUserAgent
 from resources.Exceptions import NotInstalledException
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -8,56 +8,128 @@ import re
 
 class Crawler():
     def __makeDirs(self):
-        os.makedirs(os.path.join(self.save_dir, "assets"), exist_ok=True)
-        os.makedirs(os.path.join(self.save_dir, "css"), exist_ok=True)
-        os.makedirs(os.path.join(self.save_dir, "scripts"), exist_ok=True)
+        if self.p_download_resources == 1:
+            os.makedirs(os.path.join(self.save_dir, "assets"), exist_ok=True)
+            os.makedirs(os.path.join(self.save_dir, "css"), exist_ok=True)
+            os.makedirs(os.path.join(self.save_dir, "scripts"), exist_ok=True)
 
     def __init__(self, save_dir, args):
-        self.args     = args
+        self.args = args
+        self.tabs = []
+        self.save_dir = save_dir
+        self.downloaded_assets = []
 
-        self.p_scroll_cycles   = int(self.args.get("scroll_cycles", 10))
-        self.p_scroll_timeout  = int(self.args.get("scroll_timeout", 0))
+        self.p_scroll_cycles = int(self.args.get("scroll_cycles", 10))
+        self.p_scroll_timeout = int(self.args.get("scroll_timeout", 0))
         self.p_download_resources_js = int(self.args.get("download_resources_js", 0))
         self.p_download_resources = int(self.args.get("download_resources", 1))
+        self.p_download_img = 1
         self.p_download_resources_from_css = int(self.args.get("download_resources_from_css", 1))
-        self.p_fullsize_page_screenshot    = int(self.args.get("fullsize_page_screenshot", 0))
-        self.p_fullsize_page_screenshot_value = int(self.args.get("fullsize_page_screenshot_value", 1000))
-        self.p_scroll_screenshot_px        = int(self.args.get("screenshot_scroll", 0))
+        self.p_fullsize_page_screenshot = int(self.args.get("fullsize_page_screenshot", 0))
+        self.p_fullsize_page_screenshot_value = int(self.args.get("fullsize_page_screenshot_value", 1900))
+        self.p_scroll_screenshot_px = int(self.args.get("screenshot_scroll", 0))
         self.p_implicitly_wait = int(self.args.get("implicitly_wait", 5))
         self.p_print_html_to_console = int(self.args.get("print_html_to_console", 0))
 
-        self.save_dir = save_dir
         self.__makeDirs()
-        _chrome_path = consts["tmp"] +"\\chrome" # Main dir
-        _webdriver_path = _chrome_path  + "\\chromedriver-win64\\chromedriver.exe" # Chromedriver
-        _chrome_headless = _chrome_path + "\\chrome-headless"
-        if Path(_webdriver_path).is_file() == False:
-            _crawl = utils.download_chrome_driver()
 
-        if Path(_chrome_headless).is_dir() == False:
-            raise NotInstalledLibrary("Chromium headless is not installed at path /storage/tmp/chrome/chrome-headless (https://googlechromelabs.github.io/chrome-for-testing/)")
+    def __del__(self):
+        self.driver.quit()
+    
+    # didnt tested on other platforms
+    def checkWebDriver(self):
+        consts["__tmp_chrome_platform"] = utils.getChromishPlatform()
+
+        self.__chrome_path = consts["tmp"] +"\\chrome" # Main dir
+        self.__webdriver_dir = f"{self.__chrome_path}\\chromedriver"
+        self.__webdriver = f"{self.__webdriver_dir}\\chromedriver.exe"
+        self.__chrome_headless_dir = f"{self.__chrome_path}\\chrome-headless-shell"
+        self.__chrome_headless = f"{self.__chrome_headless_dir}\\chrome-headless-shell.exe"
+        if consts["__tmp_chrome_platform"].find("win") == -1:
+            self.__webdriver = f"{self.__webdriver_dir}\\chromedriver"
+            self.__chrome_headless = f"{self.__chrome_headless_dir}\\chrome-headless-shell"
         
+        if Path(self.__webdriver_dir).is_dir() == False:
+            return False
+        
+        return True
+
+    # 12.02.2025
+    def downloadChrome(self):
+        ____channel = "Stable"
+        CHROME_ENDPOINT_WEBDRIVER = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
+        __CHROME_ENDPOINT_TMP = requests.get(CHROME_ENDPOINT_WEBDRIVER)
+        __CHROME_ENDPOINT_TMP_JSON = __CHROME_ENDPOINT_TMP.json()
+        ___downloads = __CHROME_ENDPOINT_TMP_JSON["channels"][____channel]["downloads"]
+        ___chromedriver = ___downloads["chromedriver"]
+        ___chromedriver_headless = ___downloads["chrome-headless-shell"]
+        __chromedriver_url = ""
+        __chromedriver_headless_url = ""
+
+        for ____down in ___chromedriver:
+            if ____down["platform"] == consts["__tmp_chrome_platform"]:
+                __chromedriver_url = ____down["url"]
+                break
+
+        for ____down in ___chromedriver_headless:
+            if ____down["platform"] == consts["__tmp_chrome_platform"]:
+                __chromedriver_headless_url = ____down["url"]
+                break
+        
+        # TODO rewrite to asyncio
+        # Downloading chromedriver.
+
+        __download_path_chrome = consts["tmp"] + '/chrome/chromedriver.zip'
+        __download_path_head = consts["tmp"] + '/chrome/chrome-headless.zip'
+
+        logger.log(section="Extractors|Crawling",name="message",message=f"Downloading chromedriver ({__download_path_chrome}) and chrome headless ({__download_path_head})")
+        
+        __latest_driver_zip = wget.download(__chromedriver_url, __download_path_chrome)
+        with zipfile.ZipFile(__latest_driver_zip, 'r') as zip_ref: # Unzipping
+            zip_ref.extractall(consts["tmp"] + "/chrome")
+
+        os.remove(__latest_driver_zip) # Removing original file
+        Path(f"{consts["tmp"]}/chrome/chromedriver-{consts["__tmp_chrome_platform"]}").rename(self.__webdriver_dir)
+
+        # Downloading headless chrome
+        __latest_driver_head_zip = wget.download(__chromedriver_headless_url, __download_path_head)
+        with zipfile.ZipFile(__latest_driver_head_zip, 'r') as zip_ref:
+            zip_ref.extractall(consts["tmp"] + "/chrome")
+
+        os.remove(__latest_driver_head_zip)
+        Path(f"{consts["tmp"]}/chrome/chromedriver-headless-shell-{consts["__tmp_chrome_platform"]}").rename(self.__chrome_headless_dir)
+    
+    def startChrome(self):
+        ua = FakeUserAgent(platforms='desktop',min_version=120.0,os='Linux')
+        user_agent = ua.random
+
         _options = webdriver.ChromeOptions()
-        _options.binary_location = _chrome_headless + "\\chrome-headless-shell.exe"
+        _options.binary_location = self.__chrome_headless
         _options.add_argument('--start-maximized')
         _options.add_argument('--start-fullscreen')
         _options.add_argument('--headless')
         _options.add_argument('--no-sandbox')
         _options.add_argument('--window-size=1920,1200')
+        _options.add_argument(f'--user-agent={user_agent}')
 
-        self.service = ChromeService(executable_path=_webdriver_path,chrome_options=_options,log_path='NUL')
+        #consts["__chrome_service"] = ChromeService(executable_path=self.__webdriver,chrome_options=_options,log_path='NUL')
+        #consts["__chrome_executable"] = webdriver.Chrome(service=self.service,options=_options)
+        
+        self.service = ChromeService(executable_path=self.__webdriver,chrome_options=_options,log_path='NUL')
         self.driver  = webdriver.Chrome(service=self.service,options=_options)
 
-    def __del__(self):
-        self.driver.quit()
+        logger.log(section="Extractors|Crawling",name="message",message="Started Google Chrome tm.")
     
-    def start_crawl(self, url):
-        print("&Crawler | Capturing the page...")
-        self.url = url
+    def openURL(self, input_url):
+        self.url = input_url
         self.base_url = '/'.join(self.url.split('/')[:3]) # :3
-        self.driver.get(url)
-        self.driver.implicitly_wait(self.p_implicitly_wait)
+        self.driver.get(self.url)
 
+        logger.log(section="Extractors|Crawling",name="message",message=f"Opened URL {self.url}")
+
+        self.driver.implicitly_wait(self.p_implicitly_wait)
+    
+    def scrollAvailableContent(self):
         # Scrolling until end of page
         last_height   = self.driver.execute_script('return document.body.scrollHeight')
         scroll_cycles = self.p_scroll_cycles
@@ -73,44 +145,145 @@ class Crawler():
             if new_height == last_height:
                 break
 
-            print("&Crawler | Scrolled the page to the bottom. Current iterator: {0}, current height: {1}".format(scroll_iter, new_height))
+            logger.log(section="Extractors|Crawling",name="message",message=f"Scrolled page \"{self.url}\" to the bottom. Current iterator: {scroll_iter}, current height: {new_height}")
             
             last_height = new_height
             scroll_iter += 1 
     
+    def printHTML(self):
+        self.__html = self.driver.page_source.encode("utf-8")
+    
+    # TODO add archive.is mode AND REWRITE TO MORE CLEAN CODE
+    async def reworkHTML(self):
+        __relative_url = self.driver.execute_script(f"return document.querySelector(\"base\") ? document.querySelector(\"base\").href : null")
+        if __relative_url == None:
+            self.relative_url = "https://" + self.base_url
+        else:
+            self.relative_url = __relative_url
+
+        self.__soup = BeautifulSoup(self.__html, 'html.parser')
+        # Removing all inline attrs
+        if self.p_download_resources_js == 0 or self.p_download_resources == 0:
+            # It is by link, yeah?
+            HTMLFormatter.removeInlineJS(self.__soup)
+            HTMLFormatter.removeScriptTags(self.__soup)
+        
+        # Allowing scroll
+        HTMLFormatter.removeOverflowY(self.__soup)
+
+        self.__meta = HTMLFormatter.parseMeta(self.__soup)
+        self.__meta["title"] = self.driver.title
+        
+        if self.p_download_resources == 1:
+            if self.p_download_img == 1:
+                for img in HTMLFormatter.findAllIMG(self.__soup):
+                    # DownloadManager
+                    img_url = HTMLFormatter.srcToBase(img.get('src'), self.relative_url)
+                    
+                    filename = await self.downloadResource(img_url, os.path.join(self.save_dir, 'assets'))
+                    if filename:
+                        img['data-orig'] = img_url
+                        img['src'] = f"assets/{filename}"
+            
+                for script in HTMLFormatter.findAllScripts(self.__soup):
+                    script_url = script.get('src')
+                    if self.p_download_resources_js == 1:
+                        if script_url != "":
+                            script_url = HTMLFormatter.srcToBase(script_url, self.relative_url)
+                            filename = await self.downloadResource(script_url, os.path.join(self.save_dir, 'scripts'))
+                            if filename:
+                                script["data-orig"] = script_url
+                                script["src"] = f"scripts/{filename}"
+
+                for a in HTMLFormatter.findAllHrefs(self.__soup):
+                    a_url = a.get("href")
+                    if not a_url.startswith("http"):
+                        a['data-orig'] = a_url
+                        a['href'] = self.relative_url + a_url
+        
+                for link in HTMLFormatter.findAllLinks(self.__soup):
+                    rel = link.get("rel")
+                    if rel:
+                        # todo: move css processing to another function
+                        if 'stylesheet' in rel:
+                            css_url = link['href']
+                            link['data-orig'] = css_url
+                            if not css_url.startswith('http'):
+                                css_url = self.relative_url + css_url
+                            
+                            filename = await self.downloadResource(css_url, os.path.join(self.save_dir, 'css'))
+                            if filename:
+                                link['href'] = f"css/{filename}"
+                                url_pattern = re.compile(r'url\((.*?)\)')
+
+                                if self.p_download_resources_from_css == 1:
+                                    try:
+                                        # Downloading assets from css too.
+                                        async with open(os.path.join(self.save_dir, "css", filename), 'r') as css_stream:
+                                            css_text   = css_stream.read()
+                                            __css_modified = css_text
+                                            css_assets_urls = url_pattern.findall(css_text)
+                                            for __css_asset_url in css_assets_urls:
+                                                __css_asset_url = __css_asset_url.strip(' "\'')
+                                                __css_asset_url_full = urljoin(css_url, __css_asset_url)
+                                                __css_download_name  = os.path.basename(__css_asset_url_full)
+                                                
+                                                __css_modified = __css_modified.replace(__css_asset_url, "assets/" + __css_download_name)
+                                                await self.downloadResource(__css_asset_url_full, os.path.join(self.save_dir, 'assets'))
+                                                logger.log("Extractors|Crawling", "message", f"Downloaded asset from {link} => {__css_asset_url}")
+
+                                            # Rewriting css with new values
+                                            async with open(os.path.join(self.save_dir, 'css', filename), 'w') as css_stream_write:
+                                                css_stream_write.seek(0)
+                                                css_stream_write.write(__css_modified)
+                                                css_stream_write.truncate()
+                                    except Exception as exc:
+                                        logger.logException(exc, "Extractors|Crawling", "message")
+                        elif 'icon' in rel:
+                            favicon_url = link['href']
+                            link['data-orig'] = favicon_url
+                            if not favicon_url.startswith('http'):
+                                favicon_url = self.relative_url + favicon_url
+                            filename = await self.downloadResource(favicon_url, os.path.join(self.save_dir, 'assets'))
+                            if filename:
+                                link['href'] = f"assets/{filename}"
+        
+        return self.__soup.prettify()
+    
+    def writeDocumentHTML(self, html):
+        self.driver.execute_script(f"document.write(`{html}`);")
+
     # Creating page from raw HTML
-    def start_crawl_from_html(self, html, url_help = ""):
-        print("&Crawler | Capturing the page from HTML...")
+    def crawlPageFromRawHTML(self, html, url_help = ""):
+        logger.log("Extractors|Crawling", "message", f"Capturing the page from HTML")
+
         self.url = "about:blank"
         self.base_url = '/'.join(url_help.split('/')[:3]) # :3
+
         self.driver.get(self.url)
         self.driver.implicitly_wait(self.p_implicitly_wait)
-        self.driver.execute_script(f"document.write(`{html}`);")
-        print(self.driver.page_source)
+        self.writeDocumentHTML(html)
 
     # Save resource to asset
-    def download_resource(self, url, folder_path):
+    async def downloadResource(self, url, folder_path):
         if url in self.downloaded_assets:
-            print(f"&Crawler | File \"{url}\" already downloaded!!! Skipping.")
+            logger.log("Extractors|Crawling", "download", f"File \"{url}\" already downloaded!!! Skipping.")
             return None
         
         try:
             basename = os.path.basename(url.split("?")[0])
-            basename_name = Path(basename)
-            basename_with_site = basename_name.name + "_" + utils.remove_protocol(self.base_url) + "." + basename_name.suffix
+            basename_name_splitted = basename.split(".")
+            basename_format = basename_name_splitted[-1]
+            basename_name = basename.replace(f".{basename_format}", "")
+
+            basename_with_site = basename_name + "_" + utils.remove_protocol(self.base_url) + "." + basename_format
             local_path = os.path.join(folder_path, basename_with_site)
             cache_path = os.path.join(assets_cache_storage.path, basename_with_site)
 
             if int(config.get("extractor.cache_assets")) == 0:
                 # Writing file
-                response = requests.get(url, stream=True)
-                response.raise_for_status()
-
-                with open(local_path, 'wb') as f:
-                    for chunk in response.iter_content(chunk_size=8192):
-                        f.write(chunk)
-
-                print(f"&Crawler | Downloaded file {url}.")
+                logger.log("Extractors|Crawling", "download", f"Downloading URL {url} vid AsyncDownloadManager to original dir")
+                await download_manager.addDownload(end=url,dir=local_path)
                 self.downloaded_assets.append(url)
 
                 return basename_with_site
@@ -118,159 +291,34 @@ class Crawler():
             else:
                 contains = assets_cache_storage.contains(basename_with_site)
                 if contains == False:
-                    response = requests.get(url, stream=True)
-                    response.raise_for_status()
-
-                    with open(cache_path, 'wb') as f:
-                        for chunk in response.iter_content(chunk_size=8192):
-                            f.write(chunk)
+                    await download_manager.addDownload(end=url,dir=cache_path)
                 
                 self.downloaded_assets.append(url)
                 assets_cache_storage.mklink_from_cache_to_dir(local_path)
+
                 return basename_with_site
         except Exception as e:
-            print(f"&Crawler | Error when downloading file {url} ({e}).")
+            logger.log("Extractors|Crawling", "download", f"Error when downloading file {url} ({e}).")
+
             return None
     
-    # Format html (download assets, format links)
-    def parse_html(self, html):
-        self.downloaded_assets = []
-        soup = BeautifulSoup(html, 'html.parser')
-        # Removing all inline attrs
-        if self.p_download_resources_js == 0 or self.p_download_resources == 0:
-            for tag in soup.find_all(True):
-                js_attributes = [attr for attr in tag.attrs if attr.startswith('on')]
-                for attr in js_attributes:
-                    del tag[attr]
-        
-            for script_tag in soup.find_all('script'):
-                script_tag.decompose()
-        
-        # Allowing scroll
-        for tag in soup.find_all(style=True):
-            styles = tag['style'].split(';')
-            styles = [style for style in styles if not style.strip().startswith('overflow-y:')]
-            tag['style'] = '; '.join(styles).strip()
-        
-        if self.p_download_resources == 0:
-            if self.p_print_html_to_console == 1:
-                print(html)
-            return soup.prettify()
-        
-        # Finding images
-        for img in soup.find_all('img', src=True):
-            img_url = img.get('src')
-            if not img_url.startswith('http'):
-                img_url = self.base_url + img_url
-            
-            filename = self.download_resource(img_url, os.path.join(self.save_dir, 'assets'))
-            if filename:
-                img['data-orig'] = img_url
-                img['src'] = f"assets/{filename}"
-        
-        # Attempt to save scripts
-        for script in soup.find_all('script', src=True):
-            script_url = script.get('src')
-            if self.p_download_resources_js == 1:
-                if script_url != "":
-                    if not script_url.startswith('http'):
-                        script_url = self.base_url + script_url
-                    filename = self.download_resource(script_url, os.path.join(self.save_dir, 'scripts'))
-                    if filename:
-                        script['data-orig'] = script_url
-                        script['src'] = f"scripts/{filename}"
-
-        for a in soup.find_all(True,href=True):
-            a_url = a.get('href')
-            if not a_url.startswith('http'):
-                a['data-orig'] = a_url
-                a['href'] = self.base_url + a_url
-        
-        # Finding links
-        # TODO add font downloader
-        for link in soup.find_all('link', href=True):
-            rel = link.get("rel")
-            if rel:
-                # todo: move css processing to another function
-                if 'stylesheet' in rel:
-                    css_url = link['href']
-                    link['data-orig'] = css_url
-                    if not css_url.startswith('http'):
-                        css_url = self.base_url + css_url
-                    
-                    filename = self.download_resource(css_url, os.path.join(self.save_dir, 'css'))
-                    if filename:
-                        link['href'] = f"css/{filename}"
-                        url_pattern = re.compile(r'url\((.*?)\)')
-
-                        if self.p_download_resources_from_css == 1:
-                            # Downloading assets from css too.
-                            css_stream = open(os.path.join(self.save_dir, 'css', filename), 'r')
-                            css_text   = css_stream.read()
-                            __css_modified = css_text
-                            css_assets_urls = url_pattern.findall(css_text)
-                            for __css_asset_url in css_assets_urls:
-                                __css_asset_url = __css_asset_url.strip(' "\'')
-                                __css_asset_url_full = urljoin(css_url, __css_asset_url)
-                                __css_download_name  = os.path.basename(__css_asset_url_full)
-                                
-                                __css_modified = __css_modified.replace(__css_asset_url, "assets/" + __css_download_name)
-                                self.download_resource(__css_asset_url_full, os.path.join(self.save_dir, 'assets'))
-                                print(f"&Crawler | Downloaded asset from {link} => {__css_asset_url}")
-
-                            # Rewriting css with new values
-                            css_stream_write = open(os.path.join(self.save_dir, 'css', filename), 'w')
-                            css_stream_write.seek(0)
-                            css_stream_write.write(__css_modified)
-                            css_stream_write.truncate()
-                elif 'icon' in rel:
-                    favicon_url = link['href']
-                    link['data-orig'] = favicon_url
-                    if not favicon_url.startswith('http'):
-                        favicon_url = self.base_url + favicon_url
-                    filename = self.download_resource(favicon_url, os.path.join(self.save_dir, 'assets'))
-                    if filename:
-                        link['href'] = f"assets/{filename}"
-        
-        if self.p_print_html_to_console == 1:
-            print(html)
-        
-        return soup.prettify()
-    
-    def parse_meta(self, html):
-        # TODO parse "article" "nav" tags or smthng
-        final_meta = {"title": self.driver.title}
-        soup = BeautifulSoup(html, 'html.parser')
-        for meta in soup.find_all('meta'):
-            meta_name = meta.get('name')
-            meta_content = meta.get('content')
-            if meta_name == None:
-                meta_name = meta.get('property') # HTML moment
-                # sgml better
-
-            final_meta[meta_name] = meta_content
-
-        return final_meta
-
     # Return parsed HTML
-    def print_html(self):
-        print("&Crawler | Printing html...")
+    def printHTML(self):
         self.__html = self.driver.page_source.encode("utf-8")
         #self.__html = self.driver.execute_script("return document.documentElement.outerHTML;")
-        return self.parse_html(self.__html)
     
     # Make and write screenshot.
-    def print_screenshot(self):
+    def printScreenshot(self):
         page_width  = self.driver.execute_script('return document.body.scrollWidth')
         page_height = self.driver.execute_script('return document.body.scrollHeight')
         if self.p_fullsize_page_screenshot == 0:
             page_height = min(self.p_fullsize_page_screenshot_value, page_height)
 
-        print("&Crawler | Making screenshot with {0}x{1}.".format(page_width, page_height))
+        logger.log("Extractors|Crawling", "download", f"Making screenshot with {page_width}x{page_height}")
         self.driver.execute_script('window.scrollTo(0, {0});'.format(self.p_scroll_screenshot_px))
         self.driver.set_window_size(page_width, page_height)
         self.driver.save_screenshot(self.save_dir + "/screenshot.png")
     
-    def print_meta(self):
-        print("&Crawler | Taking metadata...")
-        return self.parse_meta(self.__html)
+    def printMeta(self):
+        logger.log("Extractors|Crawling", "message", f"Printing meta")
+        return self.__meta

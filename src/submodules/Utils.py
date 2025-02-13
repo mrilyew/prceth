@@ -1,4 +1,4 @@
-from resources.Globals import os, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
+from resources.Globals import os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
 
 class Utils():
@@ -87,8 +87,8 @@ class Utils():
         return newString + ("..." if text != newString else "")
     
     def parse_entity(self, input_string, allowed_entities = ["entity", "collection"]):
-        from db.entity import Entity
-        from db.collection import Collection
+        from db.Entity import Entity
+        from db.Collection import Collection
 
         elements = input_string.split('entity')
         if len(elements) > 1 and elements[0] == "":
@@ -144,20 +144,34 @@ class Utils():
     def is_generated_ext(self, ext):
         return ext in ["php", "html"]
     
-    def download_chrome_driver(self, endpoint = "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"):
-        #current_version_response = requests.get(endpoint)
-        #version_number = current_version_response.text
+    def getChromishPlatform(self):
+        arch = ""
+        system_arch = ""
+        system = platform.system().lower()
+        architecture = platform.machine().lower() 
 
-        #download_url  = "https://chromedriver.storage.googleapis.com/" + version_number +"/chromedriver_win32.zip"
-        # TODO: Add support for another platforms
-        download_url  = "https://storage.googleapis.com/chrome-for-testing-public/132.0.6834.110/win64/chromedriver-win64.zip"
-        download_path = consts["tmp"] + '/chrome/chromedriver.zip'
-        latest_driver_zip = wget.download(download_url, download_path)
-        with zipfile.ZipFile(latest_driver_zip, 'r') as zip_ref:
-            zip_ref.extractall(consts["tmp"] + "/chrome")
+        if architecture in ['x86_64', 'amd64']:
+            arch = '64'
+        elif architecture in ['i386', 'i686', 'x86']:
+            arch = '32'
+        elif architecture in ['arm64', 'aarch64']:
+            arch = 'arm64'
+        else:
+            arch = architecture
 
-        os.remove(latest_driver_zip)
-
-        return consts["tmp"] + "/chrome/chromedriver.exe"
+        match system:
+            case "darwin":
+                if architecture in ['arm64', 'aarch64']:
+                    architecture = "arm64"
+                else:
+                    architecture = "x64"
+                
+                system_arch = f"mac-{architecture}"
+            case "windows":
+                system_arch = f"win{arch}"
+            case _:
+                system_arch = f"{system}{arch}"
+        
+        return system_arch
 
 utils = Utils()
