@@ -1,4 +1,4 @@
-from resources.Globals import config, time, utils, logger, json, file_manager, Path
+from resources.Globals import config, time, utils, logger, json, file_manager, Path, storage
 from resources.Exceptions import NotFoundException, NotPassedException
 from db.Collection import Collection
 from db.Entity import Entity
@@ -244,7 +244,6 @@ class Api():
         
         offset = int(params.get("offset", 0))
         count = int(params.get("count", 10))
-        columns_search = params.get("columns_search")
 
         fetch = Entity.fetchItems(query=query,columns_search=columns_search)
         items = fetch.offset(offset).limit(count)
@@ -270,7 +269,7 @@ class Api():
         export_as_entity = params.get("export_to_folder", None) == None
         temp_dir = None
         if export_as_entity == True:
-            temp_dir = utils.generate_temp_entity_dir()
+            temp_dir = storage.makeTemporaryCollectionDir()
         else:
             temp_dir = params.get("export_to_folder")
             if Path(temp_dir).is_dir() == False:
@@ -283,6 +282,13 @@ class Api():
         entity = Entity()
 
         entity.format = results.format
+        # Hash
+        if results.hasHash() == False:
+            __hash = utils.getRandomHash(16)
+        else:
+            __hash = results.hash
+        
+        entity.hash = __hash
         entity.original_name = results.original_name
         entity.filesize = results.filesize
         entity.dir_filesize = file_manager.getFolderSize(temp_dir)
@@ -301,11 +307,12 @@ class Api():
             entity.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
         
         entity.save()
-        instance.cleanup(entity=entity)
+        instance.cleanup(entity=entity,hash=__hash)
         
         thumb_result = instance.thumbnail(entity=entity,args=results)
         if thumb_result != None:
-            entity.preview = ",".join(thumb_result["previews"])
+            entity.preview = json.dumps(thumb_result)
+            entity.save()
 
         if collection_id != None:
             collection = Collection.get(collection_id)

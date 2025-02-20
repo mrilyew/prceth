@@ -1,4 +1,4 @@
-from resources.Globals import consts, time, operator, reduce, Path
+from resources.Globals import consts, time, operator, reduce, Path, os
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 from resources.Globals import BaseModel, json5
 
@@ -7,6 +7,7 @@ class Entity(BaseModel):
     
     id = AutoField() # Absolute id
     format = TextField(null=True) # File extension
+    hash = TextField(null=True) # Entity hash
     original_name = TextField(index=True,default='N/A',null=False) # Name of file that been uploaded, hidden. Set by extractor
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
@@ -36,7 +37,7 @@ class Entity(BaseModel):
         if delete_file == True:
             self.deleteFile()
 
-        self.hidden = 1
+        self.deleted = 1
         self.save()
 
     def getApiStructure(self):
@@ -69,14 +70,18 @@ class Entity(BaseModel):
     
     def getPath(self):
         storage = consts['storage']
-        collection_path = storage + '\\collections\\' + str(self.id)
-        entity_path = collection_path + '\\' + str(self.id) + '.' + str(self.format)
+        hash = self.hash
+
+        collection_path = os.path.join(storage, "collections", hash[0:2])
+        entity_path = os.path.join(collection_path, hash, hash + '.' + str(self.format))
 
         return entity_path
     
     def getDirPath(self, need_check = True):
         storage_path = consts['storage']
-        collection_path = storage_path + '\\collections\\' + str(self.id)
+        hash = self.hash
+
+        collection_path = os.path.join(storage_path, "collections", str(hash[0:2]), hash)
         coll_path = Path(collection_path)
 
         if need_check == True and coll_path.exists() == False:
@@ -86,7 +91,7 @@ class Entity(BaseModel):
     
     @staticmethod
     def fetchItems(query = None, columns_search = []):
-        items = Entity.select().where(Entity.hidden == 0)
+        items = Entity.select().where(Entity.unlisted == 0).where(Entity.deleted == 0)
         conditions = []
 
         for column in columns_search:

@@ -1,5 +1,5 @@
 from executables.thumbnail.Base import BaseThumbnail
-from resources.Globals import VideoFileClip, Image, math
+from resources.Globals import VideoFileClip, Image, math, consts, utils, os
 
 class TVideo(BaseThumbnail):
     name = 'TVideo'
@@ -7,7 +7,10 @@ class TVideo(BaseThumbnail):
 
     def run(self, entity, params={}):
         size = (200, 200)
-        returns = []
+        __previews = {
+            "photo": []
+        }
+
         path = entity.getPath()
         if params.hasPreview():
             path = params.another_file
@@ -15,8 +18,16 @@ class TVideo(BaseThumbnail):
         with VideoFileClip(path) as video:
             duration = video.duration
             frag_len = (duration / 10)
+
             for i in range(0, 10):
-                returns.append("photo_{0}".format(i))
+                __hash = utils.getRandomHash(8)
+                __new_prev = os.path.join(entity.getDirPath(), f"{__hash}_thumb_{i}.jpg")
+                __previews["photo"].append({
+                    "path": __new_prev,
+                    "width": 200,
+                    "height": 200
+                })
+                
                 i_duration = i * frag_len
 
                 frame = video.get_frame(i_duration)
@@ -27,8 +38,6 @@ class TVideo(BaseThumbnail):
                     img,
                     ((size[0] - img.size[0]) // 2, (size[1] - img.size[1]) // 2)
                 )
-                new_img.save(entity.getDirPath() + "/thumbnail_photo_{0}.{1}".format(i, "jpg"))
+                new_img.save(__new_prev)
         
-        return {
-            "previews": returns
-        }
+        return __previews

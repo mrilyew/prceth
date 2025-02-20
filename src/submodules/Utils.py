@@ -1,4 +1,4 @@
-from resources.Globals import os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
+from resources.Globals import secrets, os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
 
 class Utils():
@@ -46,13 +46,6 @@ class Utils():
             return json.loads(text)
         except:
             return {}
-        
-    def generate_temp_entity_dir(self):
-        rand = self.random_int(1, 1000000) * -1
-        path = Path(f'{consts['storage']}\\collections\\{rand}')
-        path.mkdir(exist_ok=True)
-
-        return str(path)
     
     def str_to_path(self, path):
         return Path(path)
@@ -173,5 +166,8 @@ class Utils():
                 system_arch = f"{system}{arch}"
         
         return system_arch
+    
+    def getRandomHash(self, __bytes = 32):
+        return secrets.token_urlsafe(__bytes)
 
 utils = Utils()

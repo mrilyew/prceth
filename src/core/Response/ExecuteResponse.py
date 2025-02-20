@@ -7,6 +7,7 @@ class ExecuteResponse():
         self.json_info = json_info
         self.text = text
         self.another_file = another_file
+        self.hash = None
     
     def get_format(self):
         return str(self.format)
@@ -23,6 +24,9 @@ class ExecuteResponse():
     def get_json_info(self):
         return self.json_info
     
+    def get_hash(self):
+        return self.hash
+    
     def hasSource(self):
         return self.source != None
     
@@ -31,3 +35,6 @@ class ExecuteResponse():
     
     def hasPreview(self):
         return self.another_file != None
+
+    def hasHash(self):
+        return self.hash != None

@@ -21,6 +21,7 @@ import wget
 import zipfile
 import asyncio
 import aiohttp
+import secrets
 from fake_useragent import UserAgent as FakeUserAgent
 from PIL import Image, ImageOps
 from moviepy import VideoFileClip
@@ -49,3 +50,4 @@ from resources.AssetsCacheStorage import assets_cache_storage
 from submodules.WebCrawler import Crawler
 from db.BaseModel import db, BaseModel
 from core.Response.ExecuteResponse import ExecuteResponse
+from core.Storage import storage

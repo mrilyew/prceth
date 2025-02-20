@@ -7,12 +7,14 @@ class BaseExtractor:
     def __init__(self, temp_dir=None):
         self.temp_dir = temp_dir
 
-    def cleanup(self, entity):
-        entity_dir = f'{consts['cwd']}\\storage\\collections\\{str(entity.id)}'
-        Path(self.temp_dir).rename(entity_dir)
+    def cleanup(self, entity, hash):
+        from resources.Globals import storage
 
-        entity_file_path = Path(entity_dir + '\\' + entity.original_name)
-        entity_file_path_replace = f'{entity_dir}\\{str((str(entity.id) + '.' + entity.format))}'
+        __hash_dir = storage.makeHashDir(hash, only_return=True)
+        Path(self.temp_dir).rename(__hash_dir)
+        
+        entity_file_path = Path(__hash_dir + '\\' + entity.original_name)
+        entity_file_path_replace = f'{__hash_dir}\\{str((str(hash) + '.' + entity.format))}'
         entity_file_path.rename(entity_file_path_replace)
 
     def cleanup_fail(self):

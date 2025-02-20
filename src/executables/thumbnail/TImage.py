@@ -1,5 +1,5 @@
 from executables.thumbnail.Base import BaseThumbnail
-from resources.Globals import Image
+from resources.Globals import Image, consts, utils, os
 
 class TImage(BaseThumbnail):
     name = 'TImage'
@@ -8,18 +8,33 @@ class TImage(BaseThumbnail):
     def run(self, entity, params={}):
         size = (200, 200)
         path = entity.getPath()
+        __previews = {
+            "photo": []
+        }
+
         if params.hasPreview():
             path = entity.getDirPath() + "/" + params.another_file
         
         with Image.open(path) as img:
+            __hash = utils.getRandomHash(8)
+
             img.thumbnail(size, Image.LANCZOS)
             new_img = Image.new('RGB', size, (0, 0, 0))
+
+            img_width = (size[0] - img.size[0]) // 2
+            img_height = (size[1] - img.size[1]) // 2
             new_img.paste(
                 img, 
-                ((size[0] - img.size[0]) // 2, (size[1] - img.size[1]) // 2)
+                (img_width, img_height)
             )
-            new_img.save(entity.getDirPath() + "/thumbnail_photo_0.jpg")
+
+            __new_prev = os.path.join(entity.getDirPath(), f"{__hash}_thumb.jpg")
+            __previews["photo"].append({
+                "path": __new_prev,
+                "width": 200,
+                "height": 200
+            })
+
+            new_img.save(__new_prev)
         
-        return {
-            "previews": "photo_0"
-        }
+        return __previews
