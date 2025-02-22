@@ -22,7 +22,7 @@ class EWebPage(BaseExtractor):
         
         self.crawler = Crawler(save_dir=self.temp_dir,args=args)
         if self.crawler.checkWebDriver() == False:
-            self.crawler.downloadChrome()
+            await self.crawler.downloadChrome()
 
         self.crawler.startChrome()
 
@@ -37,7 +37,7 @@ class EWebPage(BaseExtractor):
         
         self.crawler.printHTML()
         __html = await self.crawler.reworkHTML()
-        if False:
+        if int(args.get("literally", 0)) == 1:
             self.crawler.writeDocumentHTML(__html)
 
         self.crawler.printScreenshot()
@@ -57,9 +57,9 @@ class EWebPage(BaseExtractor):
         
         return final
     
-    def cleanup(self, entity):
-        super().cleanup(entity=entity)
-        
+    def cleanup(self, entity, hash):
+        super().cleanup(entity=entity,hash=hash)
+
         del self.crawler
     
     def cleanup_fail(self):

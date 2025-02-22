@@ -1,4 +1,4 @@
-from resources.Globals import asyncio, aiohttp, os, time, logger
+from resources.Globals import asyncio, aiohttp, os, time, logger, Path, consts, config
 
 class DownloadManager():
     def __init__(self, max_concurrent_downloads=3, speed_limit_kbps=None):
@@ -6,6 +6,10 @@ class DownloadManager():
         self.max_concurrent_downloads = max_concurrent_downloads
         self.speed_limit_kbps = speed_limit_kbps
         self.semaphore = asyncio.Semaphore(self.max_concurrent_downloads)
+        self.__user_agent = {
+            "User-Agent": config.get("net.useragent")
+        }
+        self.__timeout = 10
     
     async def addDownload(self, end, dir):
         self.queue.append({
@@ -15,15 +19,16 @@ class DownloadManager():
             "task": None,
         })
 
-        await self.startDownload(self.queue[-1])
+        return await self.startDownload(self.queue[-1])
 
     async def startDownload(self, queue_element):
         if getattr(self, "__session", None) == None:
             self.__session = aiohttp.ClientSession()
 
         async with self.__session as session:
-            task = await asyncio.create_task(self.download(session, queue_element))
-            queue_element["task"] = task
+            queue_element["task"] = await asyncio.create_task(self.download(session, queue_element))
+            
+            return queue_element["task"]
             #asyncio.run(self.download(session, queue_element))
 
     async def download(self, session, queue_element):
@@ -31,29 +36,41 @@ class DownloadManager():
         DOWNLOAD_DIR = queue_element.get("dir")
 
         async with self.semaphore:
-            async with session.get(DOWNLOAD_URL) as response:
+            async with session.get(DOWNLOAD_URL, timeout=self.__timeout, allow_redirects=True, headers=self.__user_agent) as response:
                 logger.log("AsyncDownloadManager", "message", f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
-                if response.status != 200:
-                    logger.log("AsyncDownloadManager", "error", f"Error when downloading file {DOWNLOAD_URL}")
-                    return
+                HTTP_REQUEST_STATUS = response.status
+
+                #if HTTP_REQUEST_STATUS != 200:
+                #    logger.log("AsyncDownloadManager", "error", f"Error when downloading file {DOWNLOAD_URL}")
+                #    return None
+                if HTTP_REQUEST_STATUS == 404 or HTTP_REQUEST_STATUS == 403:
+                    raise FileNotFoundError('File not found')
                 
+                if Path(DOWNLOAD_DIR).is_file():
+                    return True
                 start_time = time.time()
                 queue_element["downloaded"] = 0
                 queue_element["size"] = int(response.headers.get("Content-Length", 0))
                 queue_element["start_time"] = start_time
                 with open(DOWNLOAD_DIR, 'wb') as f:
                     async for chunk in response.content.iter_chunked(1024):
-                        #await queue_element["pause_flag"].wait() TODO FIX
+                        #await queue_element["pause_flag"].wait() TODO FIX !!!!!!!!!!!
                         f.write(chunk)
 
+                        elapsed_time = time.time() - start_time
+                        expected_time = len(chunk)
+                        queue_element["downloaded"] += expected_time
+
+                        #if consts["context"] == "cli":
+                            #print(f"Downloaded {queue_element["downloaded"]} from {queue_element["size"]}")
+                        
                         if self.speed_limit_kbps:
-                            queue_element["downloaded"] += len(chunk)
-                            elapsed_time = time.time() - start_time
-                            expected_time = len(chunk) / (self.speed_limit_kbps * 1024)
+                            expected_time = expected_time / (self.speed_limit_kbps * 1024)
                             if expected_time > elapsed_time:
                                 await asyncio.sleep(expected_time - elapsed_time)
                 
                 logger.log("AsyncDownloadManager", "success", f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
+                return response
     
     def __findDownloadByURL(self, url):
         for item in self.queue:

@@ -23,7 +23,7 @@ class TVideo(BaseThumbnail):
                 __hash = utils.getRandomHash(8)
                 __new_prev = os.path.join(entity.getDirPath(), f"{__hash}_thumb_{i}.jpg")
                 __previews["photo"].append({
-                    "path": __new_prev,
+                    "path": f"{__hash}_thumb_{i}.jpg",
                     "width": 200,
                     "height": 200
                 })

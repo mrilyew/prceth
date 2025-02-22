@@ -77,7 +77,7 @@ class Entity(BaseModel):
 
         return entity_path
     
-    def getDirPath(self, need_check = True):
+    def getDirPath(self, need_check = False):
         storage_path = consts['storage']
         hash = self.hash
 

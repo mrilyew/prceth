@@ -30,7 +30,7 @@ class TImage(BaseThumbnail):
 
             __new_prev = os.path.join(entity.getDirPath(), f"{__hash}_thumb.jpg")
             __previews["photo"].append({
-                "path": __new_prev,
+                "path": f"{__hash}_thumb.jpg",
                 "width": 200,
                 "height": 200
             })

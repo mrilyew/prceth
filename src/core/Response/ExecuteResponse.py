@@ -1,5 +1,5 @@
 class ExecuteResponse():
-    def __init__(self, format, original_name, source, json_info, text = None, filesize = None, another_file = None):
+    def __init__(self, format, original_name, source, json_info, text = None, filesize = None, another_file = None, return_type = "entity"):
         self.format = format
         self.original_name = original_name
         self.source = source
@@ -8,6 +8,7 @@ class ExecuteResponse():
         self.text = text
         self.another_file = another_file
         self.hash = None
+        self.return_type = return_type
     
     def get_format(self):
         return str(self.format)
@@ -38,3 +39,6 @@ class ExecuteResponse():
 
     def hasHash(self):
         return self.hash != None
+    
+    def get_rt(self):
+        return self.return_type

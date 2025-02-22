@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import Path, utils, urlparse, requests, mimetypes, config, file_manager, ExecuteResponse
+from resources.Globals import os, download_manager, Path, utils, urlparse, requests, mimetypes, config, file_manager, ExecuteResponse
 from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 
@@ -38,14 +38,10 @@ class EURL(BaseExtractor):
             file_output_ext = file_output_name_split[-1]
 
         # Making HTTP request
-        # TODO rewrite to DownloadManager
-        # TODO rewrite
-        HTTP_REQUEST = requests.get(input_url, allow_redirects=True, headers={
-            "User-Agent": config.get("net.useragent")
-        })
-        HTTP_REQUEST_STATUS = HTTP_REQUEST.status_code
-        if HTTP_REQUEST_STATUS == 404 or HTTP_REQUEST_STATUS == 403:
-            raise FileNotFoundError('File not found')
+        final_file_name = '.'.join([file_output_name, file_output_ext])
+        save_path = Path(os.path.join(self.temp_dir, final_file_name))
+
+        HTTP_REQUEST = await download_manager.addDownload(end=input_url,dir=save_path)
         if file_output_name == '':
             file_output_name = requests.utils.quote(__parsed_url.hostname) + '.'
         
@@ -59,9 +55,6 @@ class EURL(BaseExtractor):
             else:
                 file_output_ext = 'html'
         
-        final_file_name = '.'.join([file_output_name, file_output_ext])
-        save_path = Path(self.temp_dir + '\\' + final_file_name)
-        file_manager.newFile(path=save_path, content=HTTP_REQUEST.content)
         file_size = save_path.stat().st_size
 
         output_metadata = {

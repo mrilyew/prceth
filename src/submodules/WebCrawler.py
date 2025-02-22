@@ -55,7 +55,7 @@ class Crawler():
         return True
 
     # 12.02.2025
-    def downloadChrome(self):
+    async def downloadChrome(self):
         ____channel = "Stable"
         CHROME_ENDPOINT_WEBDRIVER = "https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json"
         __CHROME_ENDPOINT_TMP = requests.get(CHROME_ENDPOINT_WEBDRIVER)
@@ -79,25 +79,25 @@ class Crawler():
         # TODO rewrite to asyncio
         # Downloading chromedriver.
 
-        __download_path_chrome = consts["tmp"] + '/chrome/chromedriver.zip'
-        __download_path_head = consts["tmp"] + '/chrome/chrome-headless.zip'
+        __download_path_chrome = os.path.join(consts["tmp"], "chrome", "chromedriver.zip")
+        __download_path_head = os.path.join(consts["tmp"], "chrome", "chrome-headless.zip")
 
         logger.log(section="Extractors|Crawling",name="message",message=f"Downloading chromedriver ({__download_path_chrome}) and chrome headless ({__download_path_head})")
         
-        __latest_driver_zip = wget.download(__chromedriver_url, __download_path_chrome)
-        with zipfile.ZipFile(__latest_driver_zip, 'r') as zip_ref: # Unzipping
-            zip_ref.extractall(consts["tmp"] + "/chrome")
+        __latest_driver_zip = await download_manager.addDownload(__chromedriver_url, __download_path_chrome)
+        with zipfile.ZipFile(__download_path_chrome, "r") as zip_ref: # Unzipping
+            zip_ref.extractall(os.path.join(consts["tmp"], "chrome"))
 
-        os.remove(__latest_driver_zip) # Removing original file
+        os.remove(__download_path_chrome) # Removing original file
         Path(f"{consts["tmp"]}/chrome/chromedriver-{consts["__tmp_chrome_platform"]}").rename(self.__webdriver_dir)
 
         # Downloading headless chrome
-        __latest_driver_head_zip = wget.download(__chromedriver_headless_url, __download_path_head)
-        with zipfile.ZipFile(__latest_driver_head_zip, 'r') as zip_ref:
-            zip_ref.extractall(consts["tmp"] + "/chrome")
+        __latest_driver_head_zip = await download_manager.addDownload(__chromedriver_headless_url, __download_path_head)
+        with zipfile.ZipFile(__download_path_head, "r") as zip_ref:
+            zip_ref.extractall(os.path.join(consts["tmp"], "chrome"))
 
-        os.remove(__latest_driver_head_zip)
-        Path(f"{consts["tmp"]}/chrome/chromedriver-headless-shell-{consts["__tmp_chrome_platform"]}").rename(self.__chrome_headless_dir)
+        os.remove(__download_path_head)
+        Path(f"{consts["tmp"]}/chrome/chrome-headless-shell-{consts["__tmp_chrome_platform"]}").rename(self.__chrome_headless_dir)
     
     def startChrome(self):
         ua = FakeUserAgent(platforms='desktop',min_version=120.0,os='Linux')
@@ -153,7 +153,6 @@ class Crawler():
     def printHTML(self):
         self.__html = self.driver.page_source.encode("utf-8")
     
-    # TODO add archive.is mode AND REWRITE TO MORE CLEAN CODE
     async def reworkHTML(self):
         __relative_url = self.driver.execute_script(f"return document.querySelector(\"base\") ? document.querySelector(\"base\").href : null")
         if __relative_url == None:
@@ -161,6 +160,8 @@ class Crawler():
         else:
             self.relative_url = __relative_url
 
+        # TODO: rewrite as in archive.is
+        # inline css options, js removing
         self.__soup = BeautifulSoup(self.__html, 'html.parser')
         # Removing all inline attrs
         if self.p_download_resources_js == 0 or self.p_download_resources == 0:
@@ -275,7 +276,7 @@ class Crawler():
             basename_name_splitted = basename.split(".")
             basename_format = basename_name_splitted[-1]
             basename_name = basename.replace(f".{basename_format}", "")
-
+            
             basename_with_site = basename_name + "_" + utils.remove_protocol(self.base_url) + "." + basename_format
             local_path = os.path.join(folder_path, basename_with_site)
             cache_path = os.path.join(assets_cache_storage.path, basename_with_site)
@@ -312,7 +313,7 @@ class Crawler():
         page_width  = self.driver.execute_script('return document.body.scrollWidth')
         page_height = self.driver.execute_script('return document.body.scrollHeight')
         if self.p_fullsize_page_screenshot == 0:
-            page_height = min(self.p_fullsize_page_screenshot_value, page_height)
+            page_height = min(self.p_fullsize_page_screenshot_value, max(page_height, 600))
 
         logger.log("Extractors|Crawling", "download", f"Making screenshot with {page_width}x{page_height}")
         self.driver.execute_script('window.scrollTo(0, {0});'.format(self.p_scroll_screenshot_px))
