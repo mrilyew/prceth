@@ -13,5 +13,6 @@ consts['pc_user'] = os.getlogin()
 consts['pc_fullname'] = consts['pc_name'] + ', ' + consts['pc_user']
 consts['cwd'] = os.getcwd()
 consts["executable"] = os.path.join(consts["cwd"], "executables")
+consts["net.global_timeout"] = 10
 #consts['storage'] = __get_storage_dir()
 #consts['tmp'] = __get_storage_dir() + "/tmp"

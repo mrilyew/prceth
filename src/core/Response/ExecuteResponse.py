@@ -28,6 +28,9 @@ class ExecuteResponse():
     def get_hash(self):
         return self.hash
     
+    def get_rt(self):
+        return self.return_type
+
     def hasSource(self):
         return self.source != None
     
@@ -39,6 +42,3 @@ class ExecuteResponse():
 
     def hasHash(self):
         return self.hash != None
-    
-    def get_rt(self):
-        return self.return_type

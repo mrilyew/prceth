@@ -40,8 +40,12 @@ class Logger():
         now = datetime.now()
 
         message = message.replace("\n", "\\n")
+        message_to_write = f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] [{name}] {message}\n"
         self.file.seek(0, os.SEEK_END)
-        self.file.write(f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] [{name}] {message}\n")
+        self.file.write(message_to_write)
+
+        if consts.get("context") == "cli":
+            print(message_to_write)
 
     def logException(self, input_exception, section="App"):
         exp = str(input_exception) + traceback.format_exc()

@@ -48,6 +48,7 @@ from submodules.HTMLFormatter import HTMLFormatter
 from core.DownloadManager import download_manager
 from resources.AssetsCacheStorage import assets_cache_storage
 from submodules.WebCrawler import Crawler
+from submodules.web_services.VkApi import VkApi
 from db.BaseModel import db, BaseModel
 from core.Response.ExecuteResponse import ExecuteResponse
 from core.Storage import storage

@@ -1,26 +1,69 @@
-from resources.Globals import consts, Path, utils, file_manager
+from resources.Globals import consts, Path, utils, file_manager, json
+from db.Entity import Entity
 
 class BaseExtractor:
     name = 'base'
-    category = 'base'
+    category = 'template'
+    passed_params = {}
 
     def __init__(self, temp_dir=None):
         self.temp_dir = temp_dir
 
-    def cleanup(self, entity, hash):
+    def passParams(self, args):
+        self.passed_params["display_name"] = args.get("display_name", None)
+        self.passed_params["description"] = args.get("description", None)
+
+    def saveAsEntity(self, __EXECUTE_RESULT):
+        FINAL_ENTITY = Entity()
+        FINAL_ENTITY.format = __EXECUTE_RESULT.format
+        if __EXECUTE_RESULT.hasHash() == False:
+            __hash = utils.getRandomHash(16)
+        else:
+            __hash = __EXECUTE_RESULT.hash
+        
+        FINAL_ENTITY.hash = __hash
+        FINAL_ENTITY.original_name = __EXECUTE_RESULT.original_name
+        FINAL_ENTITY.filesize = __EXECUTE_RESULT.filesize
+        FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
+        FINAL_ENTITY.extractor_name = self.name
+        if self.passed_params.get("display_name") != None:
+            FINAL_ENTITY.display_name = self.passed_params["display_name"]
+        else:
+            FINAL_ENTITY.display_name = __EXECUTE_RESULT.original_name
+        if self.passed_params.get("description") != None:
+            FINAL_ENTITY.description = self.passed_params["description"]
+        if __EXECUTE_RESULT.hasSource():
+            FINAL_ENTITY.source = __EXECUTE_RESULT.source
+        if __EXECUTE_RESULT.hasJsonInfo():
+            json_ = __EXECUTE_RESULT.json_info
+            FINAL_ENTITY.json_info = json.dumps(json_)
+            FINAL_ENTITY.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
+        
+        FINAL_ENTITY.save()
+
+        return FINAL_ENTITY
+
+    def moveDestinationDirectory(self, entity):
         from resources.Globals import storage
 
-        __hash_dir = storage.makeHashDir(hash, only_return=True)
+        __hash_dir = storage.makeHashDir(entity.hash, only_return=True)
         Path(self.temp_dir).rename(__hash_dir)
         
         entity_file_path = Path(__hash_dir + '\\' + entity.original_name)
-        entity_file_path_replace = f'{__hash_dir}\\{str((str(hash) + '.' + entity.format))}'
+        entity_file_path_replace = f'{__hash_dir}\\{str((str(entity.hash) + '.' + entity.format))}'
         entity_file_path.rename(entity_file_path_replace)
-
-    def cleanup_fail(self):
-        file_manager.rmdir(self.temp_dir)
     
-    async def execute(self, args):
+    # Does nothing :D
+    def saveToDirectory(self, __EXECUTE_RESULT):
+        pass
+
+    def onFail(self):
+        file_manager.rmdir(self.temp_dir)
+
+    async def run(self, args):
+        pass
+    
+    async def postRun(self):
         pass
     
     # Typical preview

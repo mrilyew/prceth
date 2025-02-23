@@ -6,10 +6,10 @@ class DownloadManager():
         self.max_concurrent_downloads = max_concurrent_downloads
         self.speed_limit_kbps = speed_limit_kbps
         self.semaphore = asyncio.Semaphore(self.max_concurrent_downloads)
-        self.__user_agent = {
+        self.__headers = {
             "User-Agent": config.get("net.useragent")
         }
-        self.__timeout = 10
+        self.__timeout = consts["net.global_timeout"]
     
     async def addDownload(self, end, dir):
         self.queue.append({
@@ -36,7 +36,7 @@ class DownloadManager():
         DOWNLOAD_DIR = queue_element.get("dir")
 
         async with self.semaphore:
-            async with session.get(DOWNLOAD_URL, timeout=self.__timeout, allow_redirects=True, headers=self.__user_agent) as response:
+            async with session.get(DOWNLOAD_URL, timeout=self.__timeout, allow_redirects=True, headers=self.__headers) as response:
                 logger.log("AsyncDownloadManager", "message", f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 HTTP_REQUEST_STATUS = response.status
 

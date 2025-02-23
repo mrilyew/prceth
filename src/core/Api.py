@@ -2,7 +2,7 @@ from resources.Globals import config, time, utils, logger, json, file_manager, P
 from resources.Exceptions import NotFoundException, NotPassedException
 from db.Collection import Collection
 from db.Entity import Entity
-from core.Wheels import extractor_wheel, extractor_list, acts_wheel, acts_list, service_wheel, services_list
+from core.Wheels import extractor_find, extractor_list, acts_wheel, acts_list, service_wheel, services_list
 
 class Api():
     def __init__(self):
@@ -250,78 +250,62 @@ class Api():
         count = fetch.count()
 
         return items, count
-    async def uploadEntity(self, params):
-        # TODO переписать превью в отдельную директорию с хешами
-        # + хеш для entity вместо id
-        if 'extractor' not in params:
+    async def uploadEntity(self, _ARGS):
+        if 'extractor' not in _ARGS:
             raise NotPassedException('--extractor not passed')
 
         # Extractor that will be using for export
-        extractor_input_name = params.get("extractor")
+        __extractor_input_name = _ARGS.get("extractor")
         # Collection to where entity will added
-        collection_id = params.get("collection_id", None)
-        # Display entity name
-        display_name = params.get("display_name")
-        # Alt
-        description = params.get("description")
+        collection_id = _ARGS.get("collection_id", None)
         # None: Result will be saved as entity
         # Text: Result will be saved at another dir
-        export_as_entity = params.get("export_to_folder", None) == None
-        temp_dir = None
-        if export_as_entity == True:
-            temp_dir = storage.makeTemporaryCollectionDir()
+        __export_as_entity = _ARGS.get("export_to_folder", None) == None
+
+        EXPORT_DIRECTORY = None
+        if __export_as_entity == True:
+            EXPORT_DIRECTORY = storage.makeTemporaryCollectionDir()
         else:
-            temp_dir = params.get("export_to_folder")
-            if Path(temp_dir).is_dir() == False:
+            EXPORT_DIRECTORY = _ARGS.get("export_to_folder")
+            if Path(EXPORT_DIRECTORY).is_dir() == False:
                 raise NotADirectoryError("Directory not found")
+        
+        INSTANCE_CLASS = extractor_find(extractor_name=__extractor_input_name)
+        assert INSTANCE_CLASS != None
 
-        instance, results = await extractor_wheel(args=params,entity_dir=temp_dir,extractor_name=extractor_input_name)
-        if export_as_entity == False: 
-            return temp_dir
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
+        EXTRACTOR_INSTANCE.passParams(_ARGS)
+        EXTRACTOR_RESULTS = None
+        try:
+            EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.run(args=_ARGS)
+        except Exception as x:
+            logger.logException(x, section="Exctractors")
+            EXTRACTOR_INSTANCE.onFail()
 
-        entity = Entity()
+            raise x
 
-        entity.format = results.format
-        # Hash
-        if results.hasHash() == False:
-            __hash = utils.getRandomHash(16)
+        if __export_as_entity == True: 
+            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS)
+            EXTRACTOR_INSTANCE.moveDestinationDirectory(entity=RETURN_ENTITY)
+            
+            thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
+            if thumb_result != None:
+                RETURN_ENTITY.preview = json.dumps(thumb_result)
+                RETURN_ENTITY.save()
+
+            if collection_id != None:
+                collection = Collection.get(collection_id)
+                if collection == None:
+                    logger.log("App", "Entity Uploader", "Collection not found, not adding.")
+                else:
+                    collection.addItem(RETURN_ENTITY)
+
+            await EXTRACTOR_INSTANCE.postRun()
+            return RETURN_ENTITY
         else:
-            __hash = results.hash
+            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveToDirectory(EXTRACTOR_RESULTS) # Does nothing :D
+            return
         
-        entity.hash = __hash
-        entity.original_name = results.original_name
-        entity.filesize = results.filesize
-        entity.dir_filesize = file_manager.getFolderSize(temp_dir)
-        entity.extractor_name = extractor_input_name
-        if display_name != None:
-            entity.display_name = display_name
-        else:
-            entity.display_name = results.original_name
-        if description != None:
-            entity.description = description
-        if results.hasSource():
-            entity.source = results.source
-        if results.hasJsonInfo():
-            json_ = results.json_info
-            entity.json_info = json.dumps(json_)
-            entity.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
-        
-        entity.save()
-        instance.cleanup(entity=entity,hash=__hash)
-        
-        thumb_result = instance.thumbnail(entity=entity,args=results)
-        if thumb_result != None:
-            entity.preview = json.dumps(thumb_result)
-            entity.save()
-
-        if collection_id != None:
-            collection = Collection.get(collection_id)
-            if collection == None:
-                logger.log("App", "Entity Uploader", "Collection not found, not adding.")
-            else:
-                collection.addItem(entity)
-
-        return entity
     def getExtractors(self, params):
         show_hidden = params.get("show_hidden", False) == True
 

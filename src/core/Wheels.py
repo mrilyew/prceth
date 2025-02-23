@@ -62,6 +62,17 @@ async def extractor_wheel(args, entity_dir, extractor_name):
         instance.cleanup_fail()
         raise 
 
+def extractor_find(extractor_name):
+    try:
+        module = importlib.import_module(f'executables.extractors.{extractor_name}')
+        __class = getattr(module, extractor_name)
+        if __class.category == "template":
+            return None
+        
+        return __class
+    except Exception:
+        return None
+
 def extractor_list(show_hidden=False):
     __exit = []
     for plugin in __typical_plugins_list("extractors"):

@@ -239,7 +239,7 @@ class Crawler():
                                                 css_stream_write.write(__css_modified)
                                                 css_stream_write.truncate()
                                     except Exception as exc:
-                                        logger.logException(exc, "Extractors|Crawling", "message")
+                                        logger.logException(exc, "Extractors|Crawling")
                         elif 'icon' in rel:
                             favicon_url = link['href']
                             link['data-orig'] = favicon_url

@@ -2,7 +2,6 @@ from executables.extractors.Base import BaseExtractor
 from resources.Globals import Crawler, file_manager, ExecuteResponse, logger
 from resources.Exceptions import NotPassedException
 
-# ON REWRITE
 class ERawHTML(BaseExtractor):
     name = 'ERawHTML'
     category = 'net'
@@ -14,20 +13,22 @@ class ERawHTML(BaseExtractor):
         }
     }
 
-    async def execute(self, args):
-        html_text = args.get("html", None)
-        possible_url = args.get("url", "")
-        if html_text == None:
-            raise NotPassedException("HTML was not passed")
-        
-        self.crawler = Crawler(save_dir=self.temp_dir,args=args)
+    def passParams(self, args):
+        self.passed_params = args
+
+        super().passParams(args)
+        assert self.passed_params.get("html") != None, "html was not passed"
+        #assert self.passed_params.get("url") != None, "url was not passed"
+
+    async def run(self, args):
+        self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)
         if self.crawler.checkWebDriver() == False:
-            self.crawler.downloadChrome()
+            await self.crawler.downloadChrome()
 
         self.crawler.startChrome()
 
         try:
-            self.crawler.crawlPageFromRawHTML(html=html_text,url_help=possible_url)
+            self.crawler.crawlPageFromRawHTML(html=self.passed_params.get("html"),url_help=self.passed_params.get("url", ""))
         except Exception as ecx:
             logger.logException(ecx,section="Extractors|Crawling")
             raise ecx
@@ -37,7 +38,7 @@ class ERawHTML(BaseExtractor):
         
         self.crawler.printHTML()
         __html = await self.crawler.reworkHTML()
-        if False:
+        if int(self.passed_params.get("literally", 0)) == 1:
             self.crawler.writeDocumentHTML(__html)
         
         self.crawler.printScreenshot()
@@ -46,7 +47,7 @@ class ERawHTML(BaseExtractor):
         file_manager.createFile(dir=self.temp_dir,filename=original_name,content=__html)
         output_metadata = self.crawler.printMeta()
 
-        source = possible_url
+        source = self.passed_params.get("url", "")
         if source == "":
             source = "api:html"
         else:
@@ -63,12 +64,14 @@ class ERawHTML(BaseExtractor):
         
         return final
     
-    def cleanup(self, entity):
-        super().cleanup(entity=entity)
+    async def postRun(self):
+        await super().postRun()
         
-        del self.crawler
+        if getattr(self, "crawler", None):
+            del self.crawler
     
-    def cleanup_fail(self):
-        super().cleanup_fail()
+    def onFail(self):
+        super().onFail()
         
-        del self.crawler
+        if getattr(self, "crawler", None):
+            del self.crawler

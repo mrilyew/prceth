@@ -19,13 +19,16 @@ class EPath(BaseExtractor):
         }
     }
 
-    async def execute(self, args):
-        input_path_text = args.get("path")
-        export_type = args.get("type", "link") # As you will see: "copy", "move", "link"
-        if input_path_text == None:
-            raise NotPassedException("path was not passed")
-        
-        input_path = Path(input_path_text)
+    def passParams(self, args):
+        self.passed_params["path"] = str(args.get("path"))
+        self.passed_params["type"] = args.get("type", "link")
+
+        super().passParams(args)
+        assert args.get("path") != None, "path was not passed"
+        assert self.passed_params.get("type") != None, "type was not passed"
+    
+    async def run(self, args):
+        input_path = Path(self.passed_params.get("path"))
         if input_path.exists() == False:
             raise FileNotFoundError("Path does not exists")
         
@@ -41,13 +44,13 @@ class EPath(BaseExtractor):
         
         file_action = None
         # Copying and leaving original file
-        if export_type == 'copy':
+        if self.passed_params.get("type") == 'copy':
             file_action = file_manager.copyFile(input_path, move_result_path)
         # Copying and removing original file
-        elif export_type == 'move':
+        elif self.passed_params.get("type") == 'move':
             file_action = file_manager.moveFile(input_path, move_result_path)
         # Making a symlink to original file
-        elif export_type == 'link':
+        elif self.passed_params.get("type") == 'link':
             file_action = file_manager.symlinkFile(input_path, move_result_path)
         else:
             raise InvalidPassedParam("Invalid \"type\"")
@@ -56,7 +59,7 @@ class EPath(BaseExtractor):
         file_metadata = metadata_wheel(input_file=str(input_path))
         output_metadata = {
             "original_path": str(input_path), 
-            "export_type": str(export_type),
+            "export_type": str(self.passed_params.get("type")),
             "metadata": utils.extract_metadata_to_dict(file_metadata),
         }
         # TODO

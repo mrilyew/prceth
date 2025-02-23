@@ -13,21 +13,25 @@ class EWebPage(BaseExtractor):
         }
     }
 
+    def passParams(self, args):
+        self.passed_params = args
+
+        super().passParams(args)
+        assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
+
     # BTW, all requests will be unauthorized. So we need to use input raw html parser
     # TODO rewrite to multitab
-    async def execute(self, args):
-        site_url = args.get("url", None)
-        if site_url == None or site_url == "":
-            raise NotPassedException("url was not passed")
-        
-        self.crawler = Crawler(save_dir=self.temp_dir,args=args)
+    async def run(self, args):
+        SITE_URL = self.passed_params.get("url")
+
+        self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)
         if self.crawler.checkWebDriver() == False:
             await self.crawler.downloadChrome()
 
         self.crawler.startChrome()
 
         try:
-            self.crawler.openURL(site_url)
+            self.crawler.openURL(SITE_URL)
         except Exception as ecx:
             logger.logException(ecx,section="Extractors|Crawling")
             raise ecx
@@ -37,7 +41,8 @@ class EWebPage(BaseExtractor):
         
         self.crawler.printHTML()
         __html = await self.crawler.reworkHTML()
-        if int(args.get("literally", 0)) == 1:
+
+        if int(self.passed_params.get("literally", 0)) == 1:
             self.crawler.writeDocumentHTML(__html)
 
         self.crawler.printScreenshot()
@@ -49,7 +54,7 @@ class EWebPage(BaseExtractor):
         final = ExecuteResponse(
             format="html",
             original_name=original_name,
-            source="url:"+site_url,
+            source="url:"+SITE_URL,
             filesize=len(__html),
             json_info=output_metadata,
             another_file="screenshot.png"
@@ -57,12 +62,14 @@ class EWebPage(BaseExtractor):
         
         return final
     
-    def cleanup(self, entity, hash):
-        super().cleanup(entity=entity,hash=hash)
+    async def postRun(self):
+        await super().postRun()
 
-        del self.crawler
+        if getattr(self, "crawler", None):
+            del self.crawler
     
-    def cleanup_fail(self):
-        super().cleanup_fail()
+    def onFail(self):
+        super().onFail()
         
-        del self.crawler
+        if getattr(self, "crawler", None):
+            del self.crawler

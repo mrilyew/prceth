@@ -20,14 +20,16 @@ class EURL(BaseExtractor):
         }
     }
 
-    async def execute(self, args):
-        input_url = args.get("url", None)
-        if input_url == None or input_url == "":
-            raise NotPassedException("url was not passed")
-        
-        __parsed_url = urlparse(input_url)
-        file_output_name = input_url
-        if input_url.find('/'):
+    def passParams(self, args):
+        self.passed_params["url"] = args.get("url")
+
+        super().passParams(args)
+        assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
+    
+    async def run(self, args):
+        __parsed_url = urlparse(self.passed_params.get("url"))
+        file_output_name = self.passed_params.get("url")
+        if self.passed_params.get("url").find('/'):
             file_output_name = __parsed_url.path.split('/')[-1].split('?')[0]
         
         file_output_name_split = file_output_name.split('.')
@@ -41,7 +43,7 @@ class EURL(BaseExtractor):
         final_file_name = '.'.join([file_output_name, file_output_ext])
         save_path = Path(os.path.join(self.temp_dir, final_file_name))
 
-        HTTP_REQUEST = await download_manager.addDownload(end=input_url,dir=save_path)
+        HTTP_REQUEST = await download_manager.addDownload(end=self.passed_params.get("url"),dir=save_path)
         if file_output_name == '':
             file_output_name = requests.utils.quote(__parsed_url.hostname) + '.'
         
@@ -58,7 +60,7 @@ class EURL(BaseExtractor):
         file_size = save_path.stat().st_size
 
         output_metadata = {
-            "original_url": str(input_url), 
+            "original_url": str(self.passed_params.get("url")), 
             "mime": str(MIME_EXT),
             "output_name": str(final_file_name),
             "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(save_path))),
@@ -69,6 +71,6 @@ class EURL(BaseExtractor):
             format=file_output_ext,
             original_name=final_file_name,
             filesize=file_size,
-            source="url:"+input_url,
+            source="url:"+self.passed_params.get("url"),
             json_info=output_metadata
         )
