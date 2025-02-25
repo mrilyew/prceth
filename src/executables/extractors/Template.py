@@ -1,7 +1,6 @@
 from executables.extractors.Base import BaseExtractor
 
-#@finalclass
-class Template(BaseException):
+class Template(BaseExtractor):
     name = 'template'
     category = 'template'
 

@@ -57,6 +57,6 @@ class EVkPhoto(BaseExtractor):
             format="jpg",
             original_name=original_name,
             filesize=save_path.stat().st_size,
-            source="vk:"+__photo_id,
+            source="vk:photo"+__photo_id,
             json_info=__photo_obj
         )

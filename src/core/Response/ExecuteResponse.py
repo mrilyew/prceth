@@ -1,5 +1,5 @@
 class ExecuteResponse():
-    def __init__(self, format, original_name, source, json_info, text = None, filesize = None, another_file = None, return_type = "entity"):
+    def __init__(self, original_name, source, json_info, format = None, text = None, filesize = None, another_file = None, unlisted = False, return_type = "entity"):
         self.format = format
         self.original_name = original_name
         self.source = source
@@ -9,6 +9,7 @@ class ExecuteResponse():
         self.another_file = another_file
         self.hash = None
         self.return_type = return_type
+        self.unlisted = unlisted
     
     def get_format(self):
         return str(self.format)
@@ -42,3 +43,9 @@ class ExecuteResponse():
 
     def hasHash(self):
         return self.hash != None
+
+    def hasFormat(self):
+        return getattr(self, "format", None) != None
+    
+    def isUnlisted(self):
+        return getattr(self, "unlisted", False) == True

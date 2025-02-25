@@ -15,16 +15,27 @@ class BaseExtractor:
 
     def saveAsEntity(self, __EXECUTE_RESULT):
         FINAL_ENTITY = Entity()
-        FINAL_ENTITY.format = __EXECUTE_RESULT.format
         if __EXECUTE_RESULT.hasHash() == False:
             __hash = utils.getRandomHash(16)
         else:
             __hash = __EXECUTE_RESULT.hash
         
+        json_ = __EXECUTE_RESULT.json_info
         FINAL_ENTITY.hash = __hash
         FINAL_ENTITY.original_name = __EXECUTE_RESULT.original_name
         FINAL_ENTITY.filesize = __EXECUTE_RESULT.filesize
-        FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
+        if __EXECUTE_RESULT.hasFormat():
+            FINAL_ENTITY.format = __EXECUTE_RESULT.format
+            FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
+        else:
+            FINAL_ENTITY.format = "json"
+            FINAL_ENTITY.dir_filesize = 0
+            FINAL_ENTITY.type = 1
+            FINAL_ENTITY.type_sub = json.dumps(json_)
+        
+        if __EXECUTE_RESULT.isUnlisted():
+            FINAL_ENTITY.unlisted = 1
+        
         FINAL_ENTITY.extractor_name = self.name
         if self.passed_params.get("display_name") != None:
             FINAL_ENTITY.display_name = self.passed_params["display_name"]
@@ -35,7 +46,6 @@ class BaseExtractor:
         if __EXECUTE_RESULT.hasSource():
             FINAL_ENTITY.source = __EXECUTE_RESULT.source
         if __EXECUTE_RESULT.hasJsonInfo():
-            json_ = __EXECUTE_RESULT.json_info
             FINAL_ENTITY.json_info = json.dumps(json_)
             FINAL_ENTITY.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
         

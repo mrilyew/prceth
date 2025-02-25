@@ -286,7 +286,8 @@ class Api():
 
         if __export_as_entity == True: 
             RETURN_ENTITY = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS)
-            EXTRACTOR_INSTANCE.moveDestinationDirectory(entity=RETURN_ENTITY)
+            if RETURN_ENTITY.type == 0:
+                EXTRACTOR_INSTANCE.moveDestinationDirectory(entity=RETURN_ENTITY)
             
             thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
             if thumb_result != None:
