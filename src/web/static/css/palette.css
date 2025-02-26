@@ -1,15 +1,5 @@
 :root {
-    --bg: #260525;
-    --upline: #390d37;
-    --head: #390d37;
-    --head2: #350c33;
-    --block: #2c122a;
-    --accent: #864373;
-    --head-gradient: linear-gradient(0deg, #863871, #9b5989);
-    --hyper-accent: #913a8d;
-    --tab: #863871;
-    --up-text: #914e8e;
-    --text: #e2c7e1;
-
-    --typical-border: 1px solid black;
+    --bg: #20211D;
+    --head: #604F4F;
+    --text: #e1e1e1;
 }

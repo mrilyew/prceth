@@ -78,13 +78,13 @@ class BaseExtractor:
     
     # Typical preview
     def thumbnail(self, entity, args={}):
-        from core.Wheels import thumbnail_wheel
-
+        from resources.Globals import ThumbnailsRepository
+        
         ext = entity.format
         if args.hasPreview():
             ext = utils.get_ext(args.another_file)
         
-        thumb = thumbnail_wheel(ext)
+        thumb = (ThumbnailsRepository()).getByFormat(ext)
         if thumb == None:
             return None
         

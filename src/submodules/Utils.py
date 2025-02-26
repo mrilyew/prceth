@@ -169,5 +169,10 @@ class Utils():
     
     def getRandomHash(self, __bytes = 32):
         return secrets.token_urlsafe(__bytes)
+    
+    def typicalPluginsList(self, folder):
+        dir = f"{consts["executable"]}\\{folder}"
+
+        return os.listdir(dir)
 
 utils = Utils()

@@ -1,8 +1,7 @@
-from resources.Globals import config, time, utils, logger, json, file_manager, Path, storage
+from resources.Globals import config, time, ExtractorsRepository, ActsRepository, ServicesRepository, logger, json, file_manager, Path, storage
 from resources.Exceptions import NotFoundException, NotPassedException
 from db.Collection import Collection
 from db.Entity import Entity
-from core.Wheels import extractor_find, extractor_list, acts_wheel, acts_list, service_wheel, services_list
 
 class Api():
     def __init__(self):
@@ -270,7 +269,7 @@ class Api():
             if Path(EXPORT_DIRECTORY).is_dir() == False:
                 raise NotADirectoryError("Directory not found")
         
-        INSTANCE_CLASS = extractor_find(extractor_name=__extractor_input_name)
+        INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None
 
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
@@ -310,14 +309,14 @@ class Api():
     def getExtractors(self, params):
         show_hidden = params.get("show_hidden", False) == True
 
-        extractors = extractor_list(show_hidden=show_hidden)
+        extractors = (ExtractorsRepository()).getList(show_hidden=show_hidden)
 
         return extractors
     def getActs(self, params):
         __show_hidden = params.get("show_hidden", None) != None
         __search_type = params.get("search_type", "all")
 
-        acts = acts_list(search_type=__search_type,show_hidden=__show_hidden)
+        acts = ActsRepository.getList(search_type=__search_type,show_hidden=__show_hidden)
 
         return acts
     def runAct(self, params):
@@ -325,12 +324,12 @@ class Api():
             raise NotPassedException('--act_name not passed')
 
         act_name = params.get("act_name")
-        instance, results = acts_wheel(args=params,entity_dir="",act_name=act_name)
+        instance, results = ActsRepository.run(args=params,entity_dir="",act_name=act_name)
 
         instance.cleanup()
         return results
     def getServices(self, params):
-        services = services_list(show_hidden=(int(params.get("show_hidden", 0)) == 1))
+        services = (ServicesRepository()).getList(show_hidden=(int(params.get("show_hidden", 0)) == 1))
 
         return services
     def runService(self, params):
@@ -341,7 +340,7 @@ class Api():
         if service_name == None:
             raise ValueError("--service_name is not passed")
 
-        service_wheel(args=params,service_name=service_name)
+        (ServicesRepository()).run(args=params,service_name=service_name)
 
         return True
 

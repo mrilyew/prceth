@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, render_template
-from resources.globals import config, consts
+from resources.Globals import config, consts
 
 app = Flask(__name__, template_folder='web', static_folder='web/static')
 

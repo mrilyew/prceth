@@ -32,7 +32,7 @@ class Logger():
 
         return True
     
-    def log(self, section = "App", name = "success", message = "Undefined"):
+    def log(self, message = "Undefined", section = "App", name = "success"):
         # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS".
         # Name can be "success", "message" or "error".
         # In "message" you should describe what you want to write.

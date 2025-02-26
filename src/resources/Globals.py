@@ -52,3 +52,10 @@ from submodules.web_services.VkApi import VkApi
 from db.BaseModel import db, BaseModel
 from core.Response.ExecuteResponse import ExecuteResponse
 from core.Storage import storage
+
+# Repos
+
+from repositories.Extractors import Extractors as ExtractorsRepository
+from repositories.Thumbnails import Thumbnails as ThumbnailsRepository
+from repositories.Acts import Acts as ActsRepository
+from repositories.Services import Services as ServicesRepository
