@@ -98,3 +98,9 @@ class BaseExtractor:
             "hidden": getattr(self, "hidden", False),
             "params": getattr(self, "params", {})
         }
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "none", "data": {
+            "source": None
+        }}
+

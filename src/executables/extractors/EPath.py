@@ -72,3 +72,8 @@ class EPath(BaseExtractor):
             filesize=file_action.get('filesize'),
             json_info=output_metadata
         )
+    
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "api", "data": {
+            "source": INPUT_ENTITY.orig_source
+        }}

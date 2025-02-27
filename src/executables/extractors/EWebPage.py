@@ -73,3 +73,8 @@ class EWebPage(BaseExtractor):
         
         if getattr(self, "crawler", None):
             del self.crawler
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "crawler", "data": {
+            "source": INPUT_ENTITY.orig_source
+        }}

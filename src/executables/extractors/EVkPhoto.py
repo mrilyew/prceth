@@ -60,3 +60,8 @@ class EVkPhoto(BaseExtractor):
             source="vk:photo"+__photo_id,
             json_info=__photo_obj
         )
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "vk", "data": {
+            "source": "https://vk.com/" + INPUT_ENTITY.orig_source
+        }}

@@ -74,3 +74,8 @@ class EURL(BaseExtractor):
             source="url:"+self.passed_params.get("url"),
             json_info=output_metadata
         )
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "url", "data": {
+            "source": INPUT_ENTITY.orig_source
+        }}

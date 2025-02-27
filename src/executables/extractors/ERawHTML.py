@@ -75,3 +75,8 @@ class ERawHTML(BaseExtractor):
         
         if getattr(self, "crawler", None):
             del self.crawler
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "api", "data": {
+            "source": INPUT_ENTITY.orig_source
+        }}

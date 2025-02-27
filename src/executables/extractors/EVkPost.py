@@ -44,3 +44,8 @@ class EVkPost(BaseExtractor):
             source="vk:wall"+__post_id,
             json_info=__post_obj
         )
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "vk", "data": {
+            "source": "https://vk.com/" + INPUT_ENTITY.orig_source
+        }}

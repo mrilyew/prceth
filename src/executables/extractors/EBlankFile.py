@@ -39,3 +39,8 @@ class EBlankFile(BaseExtractor):
                 "text": utils.proc_strtr(self.passed_params.get("text"), 100),
             }
         )
+
+    def describeSource(self, INPUT_ENTITY):
+        return {"type": "api", "data": {
+            "source": INPUT_ENTITY.orig_source
+        }}

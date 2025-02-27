@@ -1,10 +1,9 @@
-from resources.Globals import consts, time, operator, reduce, Path, os
+from resources.Globals import consts, time, operator, reduce, Path, os, BaseModel, json5, file_manager, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
-from resources.Globals import BaseModel, json5
 
 class Entity(BaseModel):
     self_name = 'entity'
-    
+
     id = AutoField() # Absolute id
     format = TextField(null=True) # File extension
     hash = TextField(null=True) # Entity hash
@@ -19,7 +18,7 @@ class Entity(BaseModel):
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
     extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
     tags = TextField(index=True,null=True) # csv tags
-    preview = TextField(null=True) # Preview in format photo,video
+    preview = TextField(null=True) # Preview in json format
     flags = IntegerField(default=0) # Flags.
     type = IntegerField(default=0) # 0 - main is the first file from dir
                                 # 1 - main info is from "type_sub" (jsonистый объект)
@@ -29,16 +28,29 @@ class Entity(BaseModel):
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True, default=None)
-
-    def deleteFile(self):
-        Path(self.getPath()).unlink()
     
-    def delete(self, delete_file=True):
-        if delete_file == True:
-            self.deleteFile()
+    @property
+    def orig_source(self):
+        p1, p2 = self.source.split(":", 1)
+
+        return p2
+
+    def delete(self, delete_dir=True):
+        if delete_dir == True:
+            file_manager.rmdir(self.getDirPath())
 
         self.deleted = 1
         self.save()
+
+    # Ну и зачем всё это было. Ладно, может пригодится.
+    def getCorrectSource(self):
+        from resources.Globals import ExtractorsRepository
+
+        __ext = (ExtractorsRepository()).getByName(self.extractor_name)
+        if __ext == None:
+            return {"type": "none", "data": {}}
+
+        return __ext().describeSource(INPUT_ENTITY=self)
 
     def getApiStructure(self):
         json_info = getattr(self, "json_info", "{}")
@@ -49,6 +61,13 @@ class Entity(BaseModel):
         if json_info == None:
             json_info = "{}"
         
+        frontend_data = None
+        try:
+            frontend_data = json5.loads(getattr(self, "frontend_data", "{}"))
+        except Exception as wx:
+            logger.logException(wx,noConsole=True)
+            frontend_data = "{}"
+        
         return {
             "id": self.id,
             "format": self.format,
@@ -56,16 +75,17 @@ class Entity(BaseModel):
             "display_name": self.display_name,
             "description": self.description,
             "filesize": self.filesize,
-            "source": self.source,
-            "index_content": self.index_content,
+            "source": self.getCorrectSource(),
             "json_info": json5.loads(json_info),
-            "frontend_data": self.frontend_data,
+            "frontend_data": frontend_data,
             "tags": tags,
             "flags": self.flags,
+            "type": self.type,
             "created": self.created_at,
             "edited": self.edited_at,
             "author": self.author,
             "path": self.getPath(),
+            "dir": self.getDirPath(),
         }
     
     def getPath(self):

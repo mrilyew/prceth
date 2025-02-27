@@ -32,7 +32,7 @@ class Logger():
 
         return True
     
-    def log(self, message = "Undefined", section = "App", name = "success"):
+    def log(self, message = "Undefined", section = "App", name = "success", noConsole=False):
         # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS".
         # Name can be "success", "message" or "error".
         # In "message" you should describe what you want to write.
@@ -44,11 +44,11 @@ class Logger():
         self.file.seek(0, os.SEEK_END)
         self.file.write(message_to_write)
 
-        if consts.get("context") == "cli":
+        if consts.get("context") == "cli" and noConsole == False:
             print(message_to_write)
 
-    def logException(self, input_exception, section="App"):
+    def logException(self, input_exception, section="App", noConsole=False):
         exp = str(input_exception) + traceback.format_exc()
-        self.log(section, type(input_exception).__name__, exp)
+        self.log(section, type(input_exception).__name__, exp, noConsole=noConsole)
 
 logger = Logger()
