@@ -40,6 +40,7 @@ class Config():
     def __post_init(self):
         consts["storage"] = self.get("storage.path").replace("?cwd?", os.getcwd())
         consts["tmp"] = os.path.join(consts["storage"], "tmp")
+        consts["binary"] = os.path.join(consts["storage"], "binary")
 
     def get(self, option, default = None):
         # if option is passed in settings, return it
