@@ -4,9 +4,9 @@ from resources.Globals import utils
 
 class AAdditionalMetadata(BaseAct):
     name = 'AAdditionalMetadata'
+    category = 'metadata'
     allow_type = 'entity'
-    type = 'entities'
 
-    def execute(self, args=None):
+    def execute(self, i, args=None):
         # todo videos, audios, docx
         return {}

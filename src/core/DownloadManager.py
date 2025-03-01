@@ -23,7 +23,8 @@ class DownloadManager():
 
     async def startDownload(self, queue_element):
         if getattr(self, "__session", None) == None:
-            self.__session = aiohttp.ClientSession()
+            timeout = aiohttp.ClientTimeout(total=self.__timeout)
+            self.__session = aiohttp.ClientSession(timeout=timeout)
 
         async with self.__session as session:
             queue_element["task"] = await asyncio.create_task(self.download(session, queue_element))
@@ -36,7 +37,7 @@ class DownloadManager():
         DOWNLOAD_DIR = queue_element.get("dir")
 
         async with self.semaphore:
-            async with session.get(DOWNLOAD_URL, timeout=self.__timeout, allow_redirects=True, headers=self.__headers) as response:
+            async with session.get(DOWNLOAD_URL, allow_redirects=True, headers=self.__headers) as response:
                 logger.log("AsyncDownloadManager", "message", f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 HTTP_REQUEST_STATUS = response.status
 

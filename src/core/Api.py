@@ -316,18 +316,25 @@ class Api():
         __show_hidden = params.get("show_hidden", None) != None
         __search_type = params.get("search_type", "all")
 
-        acts = ActsRepository.getList(search_type=__search_type,show_hidden=__show_hidden)
+        acts = ActsRepository().getList(search_type=__search_type,show_hidden=__show_hidden)
 
         return acts
     def runAct(self, params):
-        if "act_name" not in params:
-            raise NotPassedException('--act_name not passed')
+        assert "name" in params, "name not passed"
 
-        act_name = params.get("act_name")
-        instance, results = ActsRepository.run(args=params,entity_dir="",act_name=act_name)
+        __act_name = params.get("name")
+        __act_main = params.get("i")
+        __act_res = ActsRepository().getByName(act_name=__act_name)
+        assert __act_res != None, "act not found"
 
-        instance.cleanup()
-        return results
+        OUT_ACT = __act_res()
+        ACT_MAIN_INPUT = OUT_ACT.parseMainInput(main_input=__act_main)
+        if ACT_MAIN_INPUT == None:
+            raise NotFoundException("entity/collection/string not found")
+
+        ACT_F = OUT_ACT.execute(args=params,i=ACT_MAIN_INPUT)
+
+        return {"results": ACT_F}
     def getServices(self, params):
         services = (ServicesRepository()).getList(show_hidden=(int(params.get("show_hidden", 0)) == 1))
 

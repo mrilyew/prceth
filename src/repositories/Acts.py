@@ -14,7 +14,18 @@ class Acts:
         except Exception as e:
             logger.logException(e)
             instance.cleanup_fail()
-        
+    
+    def getByName(self, act_name):
+        try:
+            module = importlib.import_module(f'executables.acts.{act_name}')
+            __class = getattr(module, act_name)
+            if __class.category == "template" or __class.category == "base":
+                return None
+            
+            return __class
+        except Exception:
+            return None
+
     def getList(self, search_type='all',show_hidden=False):
         __exit = []
         for __plugin_name in utils.typicalPluginsList("acts"):

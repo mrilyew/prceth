@@ -5,6 +5,7 @@ venv/
 src/storage/tmp/chrome/chromedriver.exe
 src/storage/tmp/chrome/LICENSE.chromedriver
 src/storage/tmp/*
+src/storage/binary/*
 src/storage/assets_originals/*
 src/storage/main.db
 src/storage/settings/config.json

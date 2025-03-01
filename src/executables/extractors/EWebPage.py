@@ -4,7 +4,7 @@ from resources.Exceptions import NotPassedException
 
 class EWebPage(BaseExtractor):
     name = 'EWebPage'
-    category = 'net'
+    category = 'web'
     params = {
         "url": {
             "desc_key": "-",

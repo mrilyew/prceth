@@ -4,35 +4,29 @@ from resources.Globals import utils, createParser, extractMetadata
 
 class AExtractMetadata(BaseAct):
     name = 'AExtractMetadata'
-    allow_type = 'entity'
-    type = 'entities'
+    category = 'metadata'
+    accepts = 'entity'
 
-    def execute(self, args=None):
+    def execute(self, i, args=None):
         config.quiet = True
 
-        type = args.get('type', 'arr')
-        input_entity_str = args.get('input_entity')
-        path = None
-        if args.get("input_file", None) != None:
-            path = args.get("input_file")
-        else:
-            if input_entity_str == None:
-                raise ValueError("_error_no_passed_input_entity")
-
-            input_entity = utils.parse_entity(input_entity_str, ["entity"])
-            if input_entity == None:
-                raise ValueError("_error_no_input_entity")
-            
-            path = input_entity.getPath()
+        EXPORT_TYPE = args.get('type', 'arr')
+        PATH = None
+        #if args.get("input_file", None) != None:
+            #PATH = args.get("input_file")
+        #else:
+        assert i != None, "input entity not passed"
         
-        parser = createParser(path)
+        PATH = i.getPath()
+        
+        __PARSER = createParser(PATH)
         _metadata = None
-        if not parser:
+        if not __PARSER:
             return []
         
-        with parser:
+        with __PARSER:
             try:
-                _metadata = extractMetadata(parser)
+                _metadata = extractMetadata(__PARSER)
                 if _metadata == None:
                     raise ValueError
 

@@ -6,7 +6,7 @@ from core.Wheels import metadata_wheel, additional_metadata_wheel
 # Base URL downloader. Downloads single file, without styles, images or something.
 class EURL(BaseExtractor):
     name = 'EURL'
-    category = 'base'
+    category = 'web'
     params = {
         "path": {
             "desc_key": "extractor_key_desc_path_path",
@@ -63,9 +63,9 @@ class EURL(BaseExtractor):
             "original_url": str(self.passed_params.get("url")), 
             "mime": str(MIME_EXT),
             "output_name": str(final_file_name),
-            "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(save_path))),
+            "metadata": utils.extract_metadata_to_dict(metadata_wheel(i=str(save_path))),
         }
-        output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
+        output_metadata["additional_metadata"] = additional_metadata_wheel(i=str(save_path))
 
         return ExecuteResponse(
             format=file_output_ext,
