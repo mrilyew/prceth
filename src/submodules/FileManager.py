@@ -102,7 +102,7 @@ class FileManager():
     
     def rmdir(self, str_path):
         path = Path(str_path)
-
+        
         for sub in path.iterdir():
             if sub.is_dir():
                 self.rmdir(sub)
@@ -110,5 +110,15 @@ class FileManager():
                 sub.unlink()
 
         path.rmdir()
+
+    # https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
+    def copytree(self, src, dst, symlinks=False, ignore=None):
+        for item in os.listdir(src):
+            s = os.path.join(src, item)
+            d = os.path.join(dst, item)
+            if os.path.isdir(s):
+                shutil.copytree(s, d, symlinks, ignore)
+            else:
+                shutil.copy2(s, d)
     
 file_manager = FileManager()

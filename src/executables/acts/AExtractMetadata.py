@@ -10,14 +10,17 @@ class AExtractMetadata(BaseAct):
     def execute(self, i, args=None):
         config.quiet = True
 
-        EXPORT_TYPE = args.get('type', 'arr')
+        EXPORT_TYPE = args.get('INPUT_TYPE', 'entity')
         PATH = None
         #if args.get("input_file", None) != None:
             #PATH = args.get("input_file")
         #else:
         assert i != None, "input entity not passed"
         
-        PATH = i.getPath()
+        if EXPORT_TYPE == "entity":
+            PATH = i.getPath()
+        else:
+            PATH = i
         
         __PARSER = createParser(PATH)
         _metadata = None

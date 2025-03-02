@@ -45,7 +45,7 @@ class Logger():
         self.file.write(message_to_write)
 
         if consts.get("context") == "cli" and noConsole == False:
-            print(message_to_write)
+            print(message_to_write.replace("\n", ""))
 
     def logException(self, input_exception, section="App", noConsole=False):
         exp = str(input_exception) + traceback.format_exc()

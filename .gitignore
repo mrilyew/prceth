@@ -11,6 +11,7 @@ src/storage/main.db
 src/storage/settings/config.json
 src/storage/collections/*
 src/storage/tmp/collections/*
+src/storage/exports/*
 !src/storage/tmp/collections/.gitkeep
 src/storage/logs/*.log
 src/web/static/js/node_modules

@@ -16,7 +16,7 @@ class BaseExtractor:
     def saveAsEntity(self, __EXECUTE_RESULT):
         FINAL_ENTITY = Entity()
         if __EXECUTE_RESULT.hasHash() == False:
-            __hash = utils.getRandomHash(16)
+            __hash = utils.getRandomHash(32)
         else:
             __hash = __EXECUTE_RESULT.hash
         

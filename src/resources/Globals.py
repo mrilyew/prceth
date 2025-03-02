@@ -22,6 +22,7 @@ import zipfile
 import asyncio
 import aiohttp
 import secrets
+import copy
 from fake_useragent import UserAgent as FakeUserAgent
 from PIL import Image, ImageOps
 from moviepy import VideoFileClip
@@ -33,6 +34,7 @@ from urllib.parse import urlencode
 from pathlib import Path
 from datetime import datetime
 from functools import reduce
+from contextlib import contextmanager
 
 # Internal classes
 

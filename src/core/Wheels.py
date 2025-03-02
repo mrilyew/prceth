@@ -3,21 +3,20 @@ from executables.services.Base import BaseService
 from executables.acts.AExtractMetadata import AExtractMetadata
 from executables.acts.AAdditionalMetadata import AAdditionalMetadata
 
-def metadata_wheel(i):
+def metadata_wheel(input_file):
     ___ps = dict()
-    ___ps["type"] = "arr"
+    ___ps["INPUT_TYPE"] = "file"
 
     md = AExtractMetadata()
-    RES = md.execute(i=i,args=___ps)
+    RES = md.execute(i=input_file,args=___ps)
 
     return RES
 
-def additional_metadata_wheel(i):
+def additional_metadata_wheel(input_file):
     ___ps = dict()
-    ___ps["type"] = "arr"
+    ___ps["INPUT_TYPE"] = "file"
 
     md = AAdditionalMetadata()
-    __F = md.parseMainInput(main_input=i)
-    res = md.execute(i=__F,args=___ps)
+    res = md.execute(i=input_file,args=___ps)
 
     return res

@@ -1,4 +1,4 @@
-from resources.Globals import secrets, os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
+from resources.Globals import contextmanager, secrets, os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
 
 class Utils():
@@ -64,7 +64,7 @@ class Utils():
             
         return None
     
-    def fast_get_request(self, url='', user_agent=''):
+    def fast_get_request(self, url: str ='', user_agent=''):
         result = requests.get(url, headers={
             'User-Agent': user_agent
         })
@@ -79,7 +79,7 @@ class Utils():
 
         return newString + ("..." if text != newString else "")
     
-    def parse_entity(self, input_string, allowed_entities = ["entity", "collection"]):
+    def parse_entity(self, input_string: str, allowed_entities = ["entity", "collection"]):
         from db.Entity import Entity
         from db.Collection import Collection
 
@@ -122,11 +122,11 @@ class Utils():
         
         return ' '.join(filter(None, result))
     
-    def get_mime_type(self, filename):
+    def get_mime_type(self, filename: str):
         mime_type, _ = mimetypes.guess_type(filename)
         return mime_type
     
-    def get_ext(self, filename):
+    def get_ext(self, filename: str):
         file_splitted_array = filename.split('.')
         file_output_ext = ''
         if len(file_splitted_array) > 1:
@@ -134,7 +134,7 @@ class Utils():
 
         return file_output_ext
     
-    def is_generated_ext(self, ext):
+    def is_generated_ext(self, ext: str):
         return ext in ["php", "html"]
     
     def getChromishPlatform(self):
@@ -167,12 +167,19 @@ class Utils():
         
         return system_arch
     
-    def getRandomHash(self, __bytes = 32):
+    def getRandomHash(self, __bytes: int = 32):
         return secrets.token_urlsafe(__bytes)
     
-    def typicalPluginsList(self, folder):
+    def typicalPluginsList(self, folder: str):
         dir = f"{consts["executable"]}\\{folder}"
 
         return os.listdir(dir)
-
+    
+    @contextmanager
+    def overrideDb(self, __class, __db):
+        old_db = __class._meta.database
+        __class._meta.database = __db
+        yield
+        __class._meta.database = old_db
+    
 utils = Utils()

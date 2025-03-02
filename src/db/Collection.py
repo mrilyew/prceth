@@ -130,7 +130,9 @@ class Collection(BaseModel):
         from db.Entity import Entity
 
         items = self.__fetchItems(query=query,columns_search=columns_search)
-        items = items.offset(offset).limit(limit)
+        items = items.offset(offset)
+        if limit != None:
+            items = items.limit(limit)
 
         results = []
         for relation in items:
