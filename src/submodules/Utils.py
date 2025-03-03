@@ -175,6 +175,16 @@ class Utils():
 
         return os.listdir(dir)
     
+    def clearJson(self, __json):
+        if isinstance(__json, dict):
+            return {key: self.clearJson(value) for key, value in __json.items() if isinstance(value, (dict, list, str))}
+        elif isinstance(__json, list):
+            return [self.clearJson(item) for item in __json if isinstance(item, (dict, list, str))]
+        elif isinstance(__json, str):
+            return __json
+        else:
+            return None
+    
     @contextmanager
     def overrideDb(self, __class, __db):
         old_db = __class._meta.database

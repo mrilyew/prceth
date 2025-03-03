@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import os, download_manager, ExecuteResponse, VkApi, Path, json5
+from resources.Globals import os, download_manager, ExecuteResponse, VkApi, Path, json5, config, utils
 from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 
@@ -20,12 +20,14 @@ class EVkPhoto(BaseExtractor):
 
     def passParams(self, args):
         self.passed_params["photo_id"] = args.get("photo_id")
-        self.passed_params["access_token"] = args.get("access_token")
+        self.passed_params["access_token"] = args.get("access_token", config.get("vk.access_token", None))
         self.passed_params["api_url"] = args.get("api_url", "api.vk.com/method")
+        self.passed_params["vk_path"] = args.get("vk_path", "vk.com")
 
         assert self.passed_params.get("photo_id") != None, "photo_id not passed"
         assert self.passed_params.get("access_token") != None, "access_token not passed"
         assert self.passed_params.get("api_url") != None, "api_url not passed"
+        assert self.passed_params.get("vk_path") != None, "vk_path not passed"
     
     async def __recieveById(self, photo_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))

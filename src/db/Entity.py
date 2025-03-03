@@ -52,14 +52,17 @@ class Entity(BaseModel):
 
         return __ext().describeSource(INPUT_ENTITY=self)
 
-    def getApiStructure(self):
+    def getFormattedInfo(self):
         json_info = getattr(self, "json_info", "{}")
+        if json_info == None:
+            json_info = "{}"
+        
+        return json5.loads(json_info)
+
+    def getApiStructure(self):
         tags = ",".split(self.tags)
         if tags[0] == ",":
             tags = []
-        
-        if json_info == None:
-            json_info = "{}"
         
         frontend_data = None
         try:
@@ -68,7 +71,7 @@ class Entity(BaseModel):
             logger.logException(wx,noConsole=True)
             frontend_data = "{}"
         
-        return {
+        fnl = {
             "id": self.id,
             "format": self.format,
             "original_name": self.original_name,
@@ -76,7 +79,7 @@ class Entity(BaseModel):
             "description": self.description,
             "filesize": self.filesize,
             "source": self.getCorrectSource(),
-            "json_info": json5.loads(json_info),
+            "json_info": self.getFormattedInfo(),
             "frontend_data": frontend_data,
             "tags": tags,
             "flags": self.flags,
@@ -84,9 +87,13 @@ class Entity(BaseModel):
             "created": self.created_at,
             "edited": self.edited_at,
             "author": self.author,
-            "path": self.getPath(),
-            "dir": self.getDirPath(),
         }
+
+        if self.type != 1:
+            fnl.path = self.getPath()
+            fnl.dir = self.getDirPath()
+
+        return fnl
     
     def getPath(self):
         storage = consts['storage']

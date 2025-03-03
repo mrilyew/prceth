@@ -21,17 +21,18 @@ class BaseExtractor:
             __hash = __EXECUTE_RESULT.hash
         
         json_ = __EXECUTE_RESULT.json_info
+        summary_ = __EXECUTE_RESULT.summary # both
         FINAL_ENTITY.hash = __hash
         FINAL_ENTITY.original_name = __EXECUTE_RESULT.original_name
         FINAL_ENTITY.filesize = __EXECUTE_RESULT.filesize
-        if __EXECUTE_RESULT.hasFormat():
+        if __EXECUTE_RESULT.no_file == False:
             FINAL_ENTITY.format = __EXECUTE_RESULT.format
             FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
         else:
             FINAL_ENTITY.format = "json"
             FINAL_ENTITY.dir_filesize = 0
             FINAL_ENTITY.type = 1
-            FINAL_ENTITY.type_sub = json.dumps(json_)
+            FINAL_ENTITY.type_sub = json.dumps(summary_)
         
         if __EXECUTE_RESULT.isUnlisted():
             FINAL_ENTITY.unlisted = 1

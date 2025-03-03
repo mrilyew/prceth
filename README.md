@@ -9,7 +9,6 @@ App for creating virtual files collections. In fact it is an pre-bourbon of diff
 Tasks:
 
 - [ ] Перерисовать схему
-- [ ] Act чтобы экспортировать коллекцию в формате qcl
 - [ ] Web.crawler: Возможность для определённого сайта запускать определённые инструкции
 - [ ] Vk.post допилить (скачивание аттачментов, индексирование визуального текста)
 - [ ] Vk.video
