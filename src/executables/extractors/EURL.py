@@ -67,13 +67,13 @@ class EURL(BaseExtractor):
         }
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
 
-        return ExecuteResponse(
-            format=file_output_ext,
-            original_name=final_file_name,
-            filesize=file_size,
-            source="url:"+self.passed_params.get("url"),
-            json_info=output_metadata
-        )
+        return ExecuteResponse({
+            "format": file_output_ext,
+            "original_name": final_file_name,
+            "filesize": file_size,
+            "source": "url:"+self.passed_params.get("url"),
+            "json_info": output_metadata
+        })
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "url", "data": {

@@ -53,14 +53,14 @@ class ERawHTML(BaseExtractor):
         else:
             source = "url:" + source
 
-        final = ExecuteResponse(
-            format="html",
-            original_name=original_name,
-            source=source,
-            filesize=len(__html),
-            json_info=output_metadata,
-            another_file="screenshot.png"
-        )
+        final = ExecuteResponse({
+            "format": "html",
+            "original_name": original_name,
+            "source": source,
+            "filesize": len(__html),
+            "json_info": output_metadata,
+            "another_file": "screenshot.png"
+        })
         
         return final
     

@@ -29,16 +29,16 @@ class EBlankFile(BaseExtractor):
         original_name = f"blank.{self.passed_params.get("format")}"
         file_manager.createFile(filename=original_name,dir=self.temp_dir,content=self.passed_params.get("text"))
 
-        return ExecuteResponse(
-            format=str(self.passed_params.get("format")),
-            original_name=original_name,
-            source="api:blank",
-            filesize=len(self.passed_params.get("text").encode('utf-8')),
-            json_info={
+        return ExecuteResponse({
+            "format": str(self.passed_params.get("format")),
+            "original_name": original_name,
+            "source": "api:blank",
+            "filesize": len(self.passed_params.get("text").encode('utf-8')),
+            "json_info": {
                 "format": str(self.passed_params.get("format")),
                 "text": utils.proc_strtr(self.passed_params.get("text"), 100),
             }
-        )
+        })
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "api", "data": {

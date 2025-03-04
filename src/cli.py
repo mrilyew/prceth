@@ -78,7 +78,8 @@ async def __cliMain():
             if type(act) == str:
                 print(act)
             else:
-                print(act.getApiStructure())
+                #print(act.getApiStructure())
+                pass
         
         # Entities get actions
 

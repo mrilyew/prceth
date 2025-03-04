@@ -13,7 +13,7 @@ class VkApi():
 
     async def call(self, method, params):
         params["access_token"] = self.__token
-        params["v"] = 5.238
+        params["v"] = 5.221
         __end_url = f"https://{self.__endpoint}/{method}?"
         for param in params.items():
             __end_url += f"&{param[0]}={param[1]}"

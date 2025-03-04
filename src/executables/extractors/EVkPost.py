@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import VkApi, ExecuteResponse, json, utils, config
+from resources.Globals import VkApi, ExecuteResponse, json, utils, config, ExtractorsRepository, storage
 
 class EVkPost(BaseExtractor):
     name = 'EVkPost'
@@ -42,15 +42,48 @@ class EVkPost(BaseExtractor):
 
         __json_info = utils.clearJson(__post_obj)
         __json_info["site"] = self.passed_params.get("vk_path")
+        __summary = None
+        for key, attachment in enumerate(__post_obj.get("attachments")):
+            __attachment_type = attachment.get("type")
+            __attachment_object = attachment.get(__attachment_type)
+            if __attachment_object == None:
+                continue
+            
+            EXPORT_DIRECTORY = storage.makeTemporaryCollectionDir()
+            EXTRACTOR_INSTANCE_CLASS = (ExtractorsRepository().getByName(f"EVk{__attachment_type.title()}"))
+            if EXTRACTOR_INSTANCE_CLASS == None:
+                continue
 
-        return ExecuteResponse(
-            original_name="Post №"+__post_id,
-            filesize=len(json.dumps(__post_obj)),
-            source="vk:wall"+__post_id,
-            json_info=__json_info,
-            summary=__post_obj,
-            no_file=True,
-        )
+            EXTRACTOR_INSTANCE = EXTRACTOR_INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
+            EXTRACTOR_INSTANCE.passParams(args={
+                "is_hidden": True,
+                "preset_json": __attachment_object,
+                "access_token": self.passed_params.get("access_token"),
+                "api_url": self.passed_params.get("api_url"),
+                "vk_path": self.passed_params.get("vk_path"),
+            })
+
+            EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.run(args)
+            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS)
+            EXTRACTOR_INSTANCE.moveDestinationDirectory(entity=RETURN_ENTITY)
+
+            thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
+            if thumb_result != None:
+                RETURN_ENTITY.preview = json.dumps(thumb_result)
+                RETURN_ENTITY.save()
+            
+            __post_obj["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY.id}"
+
+        __summary = __post_obj
+
+        return ExecuteResponse({
+            "original_name": "Post №"+__post_id,
+            "filesize": len(json.dumps(__post_obj)),
+            "source": "vk:wall"+__post_id,
+            "json_info": __json_info,
+            "summary": __summary,
+            "no_file": True,
+        })
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "vk", "data": {

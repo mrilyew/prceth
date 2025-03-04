@@ -14,17 +14,15 @@ class EVkPhoto(BaseExtractor):
             "maxlength": 3
         },
     }
-
-    def dump(self, info):
-        self.__predumped_info = info
-
+    
     def passParams(self, args):
         self.passed_params["photo_id"] = args.get("photo_id")
+        self.passed_params["preset_json"] = args.get("preset_json", None)
         self.passed_params["access_token"] = args.get("access_token", config.get("vk.access_token", None))
         self.passed_params["api_url"] = args.get("api_url", "api.vk.com/method")
         self.passed_params["vk_path"] = args.get("vk_path", "vk.com")
 
-        assert self.passed_params.get("photo_id") != None, "photo_id not passed"
+        assert self.passed_params.get("photo_id") != None or self.passed_params.get("preset_json") != None, "photo_id not passed"
         assert self.passed_params.get("access_token") != None, "access_token not passed"
         assert self.passed_params.get("api_url") != None, "api_url not passed"
         assert self.passed_params.get("vk_path") != None, "vk_path not passed"
@@ -37,12 +35,15 @@ class EVkPhoto(BaseExtractor):
         # TODO add check for real links like vk.com/photo1_1
         __photo_res = None
         __photo_id  = self.passed_params.get("photo_id")
-        if getattr(self, "__predumped_info", None) == None:
+        __photo_obj = None
+        if self.passed_params.get("preset_json") == None:
             __photo_res = await self.__recieveById(__photo_id)
+            __photo_obj = __photo_res[0]
+            __photo_id  = f"{__photo_obj.get("owner_id")}_{__photo_obj.get("id")}"
         else:
-            __photo_res = self.__predumped_info
+            __photo_res = self.passed_params.get("preset_json")
+            __photo_obj = __photo_res
         
-        __photo_obj = __photo_res[0]
         original_name = "photo.jpg"
         save_path = Path(os.path.join(self.temp_dir, original_name))
         
@@ -55,13 +56,13 @@ class EVkPhoto(BaseExtractor):
         
         HTTP_REQUEST = await download_manager.addDownload(end=PHOTO_URL,dir=save_path)
 
-        return ExecuteResponse(
-            format="jpg",
-            original_name=original_name,
-            filesize=save_path.stat().st_size,
-            source="vk:photo"+__photo_id,
-            json_info=__photo_obj
-        )
+        return ExecuteResponse({
+            "format": "jpg",
+            "original_name": original_name,
+            "filesize": save_path.stat().st_size,
+            "source": "vk:photo"+str(__photo_id),
+            "json_info": __photo_obj
+        })
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "vk", "data": {

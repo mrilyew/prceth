@@ -12,6 +12,7 @@ class BaseExtractor:
     def passParams(self, args):
         self.passed_params["display_name"] = args.get("display_name", None)
         self.passed_params["description"] = args.get("description", None)
+        self.passed_params["is_hidden"] = args.get("is_hidden", None)
 
     def saveAsEntity(self, __EXECUTE_RESULT):
         FINAL_ENTITY = Entity()
@@ -29,12 +30,15 @@ class BaseExtractor:
             FINAL_ENTITY.format = __EXECUTE_RESULT.format
             FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
         else:
-            FINAL_ENTITY.format = "json"
+            FINAL_ENTITY.format = __EXECUTE_RESULT.format
+            if FINAL_ENTITY.format == None:
+                FINAL_ENTITY.format = "json"
+            
             FINAL_ENTITY.dir_filesize = 0
             FINAL_ENTITY.type = 1
             FINAL_ENTITY.type_sub = json.dumps(summary_)
         
-        if __EXECUTE_RESULT.isUnlisted():
+        if __EXECUTE_RESULT.isUnlisted() or self.passed_params.get("is_hidden") == True:
             FINAL_ENTITY.unlisted = 1
         
         FINAL_ENTITY.extractor_name = self.name

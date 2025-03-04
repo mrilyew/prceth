@@ -26,6 +26,7 @@ class Entity(BaseModel):
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0) # Is softly deleted
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
+    declared_created_at = TimestampField(default=time.time())
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True, default=None)
     

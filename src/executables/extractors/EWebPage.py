@@ -51,14 +51,14 @@ class EWebPage(BaseExtractor):
         file_manager.createFile(dir=self.temp_dir,filename=original_name,content=__html)
         output_metadata = self.crawler.printMeta()
 
-        final = ExecuteResponse(
-            format="html",
-            original_name=original_name,
-            source="url:"+SITE_URL,
-            filesize=len(__html),
-            json_info=output_metadata,
-            another_file="screenshot.png"
-        )
+        final = ExecuteResponse({
+            "format": "html",
+            "original_name": original_name,
+            "source": "url:" + SITE_URL,
+            "filesize": len(__html),
+            "json_info": output_metadata,
+            "another_file": "screenshot.png"
+        })
         
         return final
     

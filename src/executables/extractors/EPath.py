@@ -65,13 +65,13 @@ class EPath(BaseExtractor):
         # TODO
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(input_path))
         
-        return ExecuteResponse(
-            format=str(input_file_ext),
-            original_name=input_file_name,
-            source="path:"+str(input_path),
-            filesize=file_action.get('filesize'),
-            json_info=output_metadata
-        )
+        return ExecuteResponse({
+            "format": str(input_file_ext),
+            "original_name": input_file_name,
+            "source": "path:"+str(input_path),
+            "filesize": file_action.get('filesize'),
+            "json_info": output_metadata
+        })
     
     def describeSource(self, INPUT_ENTITY):
         return {"type": "api", "data": {
