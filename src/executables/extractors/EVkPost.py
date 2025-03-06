@@ -80,8 +80,8 @@ class EVkPost(BaseExtractor):
             "original_name": "Post №"+__post_id,
             "filesize": len(json.dumps(__post_obj)),
             "source": "vk:wall"+__post_id,
-            "json_info": __json_info,
-            "summary": __summary,
+            "indexation_content": __json_info,
+            "entity_internal_content": __summary,
             "no_file": True,
         })
 

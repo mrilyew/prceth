@@ -34,10 +34,10 @@ class EBlankFile(BaseExtractor):
             "original_name": original_name,
             "source": "api:blank",
             "filesize": len(self.passed_params.get("text").encode('utf-8')),
-            "json_info": {
+            "indexation_content": {
                 "format": str(self.passed_params.get("format")),
                 "text": utils.proc_strtr(self.passed_params.get("text"), 100),
-            }
+            },
         })
 
     def describeSource(self, INPUT_ENTITY):

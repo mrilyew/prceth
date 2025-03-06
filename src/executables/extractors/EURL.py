@@ -72,7 +72,7 @@ class EURL(BaseExtractor):
             "original_name": final_file_name,
             "filesize": file_size,
             "source": "url:"+self.passed_params.get("url"),
-            "json_info": output_metadata
+            "entity_internal_content": output_metadata
         })
 
     def describeSource(self, INPUT_ENTITY):

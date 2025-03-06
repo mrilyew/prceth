@@ -56,7 +56,7 @@ class EWebPage(BaseExtractor):
             "original_name": original_name,
             "source": "url:" + SITE_URL,
             "filesize": len(__html),
-            "json_info": output_metadata,
+            "entity_internal_content": output_metadata,
             "another_file": "screenshot.png"
         })
         

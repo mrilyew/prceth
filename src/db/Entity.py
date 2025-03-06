@@ -13,8 +13,8 @@ class Entity(BaseModel):
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
     filesize = BigIntegerField(default=0) # Size of main file in bytes. Set by api
     dir_filesize = BigIntegerField(default=0) # Size of entity dir
-    index_content = TextField(index=True,null=True) # Content that will be used for search. Set by extractor. Duplicates "json_info" but without keys.
-    json_info = TextField(null=True) # Additional info in json (ex. video name)
+    indexation_content_string = TextField(index=True,null=True) # Content that will be used for search. Set by extractor. Duplicates "indexation_content" but without keys.
+    # indexation_content = TextField(null=True) # TODO remove Additional info in json (ex. video name)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
     extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
     tags = TextField(index=True,null=True) # csv tags
@@ -22,7 +22,7 @@ class Entity(BaseModel):
     flags = IntegerField(default=0) # Flags.
     type = IntegerField(default=0) # 0 - main is the first file from dir
                                 # 1 - main info is from "type_sub" (jsonистый объект)
-    type_sub = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
+    entity_internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0) # Is softly deleted
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
@@ -54,11 +54,11 @@ class Entity(BaseModel):
         return __ext().describeSource(INPUT_ENTITY=self)
 
     def getFormattedInfo(self):
-        json_info = getattr(self, "json_info", "{}")
-        if json_info == None:
-            json_info = "{}"
+        entity_internal_content = getattr(self, "entity_internal_content", "{}")
+        if entity_internal_content == None:
+            entity_internal_content = "{}"
         
-        return json5.loads(json_info)
+        return json5.loads(entity_internal_content)
 
     def getApiStructure(self):
         tags = ",".split(self.tags)
@@ -80,7 +80,7 @@ class Entity(BaseModel):
             "description": self.description,
             "filesize": self.filesize,
             "source": self.getCorrectSource(),
-            "json_info": self.getFormattedInfo(),
+            "entity_internal_content": self.getFormattedInfo(),
             "frontend_data": frontend_data,
             "tags": tags,
             "flags": self.flags,

@@ -21,7 +21,7 @@ class EPath(BaseExtractor):
 
     def passParams(self, args):
         self.passed_params["path"] = str(args.get("path"))
-        self.passed_params["type"] = args.get("type", "link")
+        self.passed_params["type"] = args.get("type", "copy")
 
         super().passParams(args)
         assert args.get("path") != None, "path was not passed"
@@ -70,7 +70,11 @@ class EPath(BaseExtractor):
             "original_name": input_file_name,
             "source": "path:"+str(input_path),
             "filesize": file_action.get('filesize'),
-            "json_info": output_metadata
+            "entity_internal_content": output_metadata,
+            "indexation_content": {
+                "original_path": str(input_path), 
+                "metadata": output_metadata["metadata"]
+            }
         })
     
     def describeSource(self, INPUT_ENTITY):

@@ -4,14 +4,14 @@ class ExecuteResponse():
         self.original_name = infe.get("original_name")
         self.source = infe.get("source")
         self.filesize = infe.get("filesize")
-        self.json_info = infe.get("json_info")
+        self.entity_internal_content = infe.get("entity_internal_content")
+        self.indexation_content = infe.get("indexation_content")
         self.text = infe.get("text")
         self.another_file = infe.get("another_file")
         self.hash = infe.get("hash")
         self.return_type = infe.get("return_type")
         self.unlisted = infe.get("unlisted")
-        self.summary = infe.get("summary")
-        self.no_file = infe.get("no_file")
+        self.no_file = infe.get("no_file", False)
     
     def get_format(self):
         return str(self.format)
@@ -25,8 +25,8 @@ class ExecuteResponse():
     def get_source(self):
         return self.source
     
-    def get_json_info(self):
-        return self.json_info
+    def get_entity_internal_content(self):
+        return self.entity_internal_content
         
     def get_summary(self):
         return self.summary
@@ -40,8 +40,11 @@ class ExecuteResponse():
     def hasSource(self):
         return self.source != None
     
-    def hasJsonInfo(self):
-        return self.json_info != None
+    def hasIndexationContent(self):
+        return self.indexation_content != None
+
+    def hasInternalContent(self):
+        return self.entity_internal_content != None
     
     def hasPreview(self):
         return self.another_file != None

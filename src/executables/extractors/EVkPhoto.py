@@ -61,7 +61,7 @@ class EVkPhoto(BaseExtractor):
             "original_name": original_name,
             "filesize": save_path.stat().st_size,
             "source": "vk:photo"+str(__photo_id),
-            "json_info": __photo_obj
+            "entity_internal_content": __photo_obj
         })
 
     def describeSource(self, INPUT_ENTITY):

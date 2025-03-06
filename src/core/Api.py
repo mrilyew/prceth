@@ -270,19 +270,11 @@ class Api():
                 raise NotADirectoryError("Directory not found")
         
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
-        assert INSTANCE_CLASS != None
+        assert INSTANCE_CLASS != None, "Extractor not found"
 
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
-        EXTRACTOR_INSTANCE.passParams(_ARGS)
-        EXTRACTOR_RESULTS = None
-        try:
-            EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.run(args=_ARGS)
-        except Exception as x:
-            logger.logException(x, section="Exctractors")
-            EXTRACTOR_INSTANCE.onFail()
-
-            raise x
-
+        EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.shortExecute(_ARGS)
+        
         if __export_as_entity == True: 
             RETURN_ENTITY = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS)
             if RETURN_ENTITY.type == 0:

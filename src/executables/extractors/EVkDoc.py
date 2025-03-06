@@ -65,7 +65,7 @@ class EVkDoc(BaseExtractor):
             "original_name": str(item_TEXT),
             "filesize": __item_obj.get("size", 1),
             "source": __source,
-            "json_info": __item_obj
+            "entity_internal_content": __item_obj
         })
 
     def describeSource(self, INPUT_ENTITY):

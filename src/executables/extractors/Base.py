@@ -1,4 +1,4 @@
-from resources.Globals import consts, Path, utils, file_manager, json
+from resources.Globals import consts, Path, utils, file_manager, json, logger
 from db.Entity import Entity
 
 class BaseExtractor:
@@ -21,14 +21,21 @@ class BaseExtractor:
         else:
             __hash = __EXECUTE_RESULT.hash
         
-        json_ = __EXECUTE_RESULT.json_info
-        summary_ = __EXECUTE_RESULT.summary # both
+        indexation_content_ = __EXECUTE_RESULT.indexation_content
+        entity_internal_content_ = __EXECUTE_RESULT.entity_internal_content
+
         FINAL_ENTITY.hash = __hash
         FINAL_ENTITY.original_name = __EXECUTE_RESULT.original_name
         FINAL_ENTITY.filesize = __EXECUTE_RESULT.filesize
+        if __EXECUTE_RESULT.hasInternalContent():
+            FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
+        else:
+            FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
+        
         if __EXECUTE_RESULT.no_file == False:
             FINAL_ENTITY.format = __EXECUTE_RESULT.format
             FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
+            FINAL_ENTITY.type = 0
         else:
             FINAL_ENTITY.format = __EXECUTE_RESULT.format
             if FINAL_ENTITY.format == None:
@@ -36,7 +43,6 @@ class BaseExtractor:
             
             FINAL_ENTITY.dir_filesize = 0
             FINAL_ENTITY.type = 1
-            FINAL_ENTITY.type_sub = json.dumps(summary_)
         
         if __EXECUTE_RESULT.isUnlisted() or self.passed_params.get("is_hidden") == True:
             FINAL_ENTITY.unlisted = 1
@@ -50,9 +56,11 @@ class BaseExtractor:
             FINAL_ENTITY.description = self.passed_params["description"]
         if __EXECUTE_RESULT.hasSource():
             FINAL_ENTITY.source = __EXECUTE_RESULT.source
-        if __EXECUTE_RESULT.hasJsonInfo():
-            FINAL_ENTITY.json_info = json.dumps(json_)
-            FINAL_ENTITY.index_content = str(utils.json_values_to_string(json_)).replace('None', '').replace('  ', ' ')
+        if __EXECUTE_RESULT.hasIndexationContent():
+            #FINAL_ENTITY.indexation_content = json.dumps(indexation_content_) # remove
+            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ')
+        else:
+            FINAL_ENTITY.indexation_content_string = json.dumps(entity_internal_content_)
         
         FINAL_ENTITY.save()
 
@@ -109,3 +117,16 @@ class BaseExtractor:
             "source": None
         }}
 
+    async def shortExecute(self, args):
+        self.passParams(args)
+        EXTRACTOR_RESULTS = None
+
+        try:
+            EXTRACTOR_RESULTS = await self.run(args=args)
+        except Exception as x:
+            logger.logException(x, section="Exctractors")
+            self.onFail()
+
+            raise x
+
+        return EXTRACTOR_RESULTS
