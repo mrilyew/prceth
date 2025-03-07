@@ -1,12 +1,9 @@
 class ExecuteResponse():
     def __init__(self, infe = {}):
-        self.format = infe.get("format")
-        self.original_name = infe.get("original_name")
         self.source = infe.get("source")
-        self.filesize = infe.get("filesize")
         self.entity_internal_content = infe.get("entity_internal_content")
         self.indexation_content = infe.get("indexation_content")
-        self.text = infe.get("text")
+        self.main_file = infe.get("main_file")
         self.another_file = infe.get("another_file")
         self.hash = infe.get("hash")
         self.return_type = infe.get("return_type")

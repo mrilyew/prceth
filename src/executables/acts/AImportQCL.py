@@ -99,7 +99,7 @@ class AImportQCL(BaseAct):
             if NEW_ITEM.get("type") != 1:
                 HASH = NEW_ITEM.get("hash")
                 MINI_HASH = HASH[0:2]
-                NEW_MINI_HASH_DIR = os.path.join(consts["storage"], "collections", MINI_HASH)
+                NEW_MINI_HASH_DIR = os.path.join(consts["storage"], "files", MINI_HASH)
                 os.makedirs(NEW_MINI_HASH_DIR, exist_ok=True)
 
                 __ITEM_FOLDER = os.path.join(___UNPACKED_FILES, HASH)

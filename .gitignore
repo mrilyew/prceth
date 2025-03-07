@@ -8,11 +8,12 @@ src/storage/tmp/*
 src/storage/binary/*
 src/storage/assets_originals/*
 src/storage/main.db
-src/storage/collections/*
-src/storage/tmp/collections/*
+src/storage/files/*
+!src/storage/files/.gitkeep
+src/storage/tmp/files/*
 src/storage/exports/*
 src/storage/settings/*
-!src/storage/tmp/collections/.gitkeep
+!src/storage/tmp/files/.gitkeep
 src/storage/logs/*.log
 src/web/static/js/node_modules
 src/web/static/js/package-lock.json

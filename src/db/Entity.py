@@ -1,25 +1,24 @@
 from resources.Globals import consts, time, operator, reduce, Path, os, BaseModel, json5, file_manager, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
+from db.File import File
 
 class Entity(BaseModel):
     self_name = 'entity'
 
     id = AutoField() # Absolute id
-    format = TextField(null=True) # File extension
+    main_file = TextField(null=True) # File extension
+    files_list = TextField(null=True) # Files list
     hash = TextField(null=True) # Entity hash
-    original_name = TextField(index=True,default='N/A',null=False) # Name of file that been uploaded, hidden. Set by extractor
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
-    filesize = BigIntegerField(default=0) # Size of main file in bytes. Set by api
-    dir_filesize = BigIntegerField(default=0) # Size of entity dir
     indexation_content_string = TextField(index=True,null=True) # Content that will be used for search. Set by extractor. Duplicates "indexation_content" but without keys.
     # indexation_content = TextField(null=True) # TODO remove Additional info in json (ex. video name)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
     extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
     tags = TextField(index=True,null=True) # csv tags
     preview = TextField(null=True) # Preview in json format
-    flags = IntegerField(default=0) # Flags.
+    # flags = IntegerField(default=0) # Flags.
     type = IntegerField(default=0) # 0 - main is the first file from dir
                                 # 1 - main info is from "type_sub" (jsonистый объект)
     entity_internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
@@ -35,6 +34,10 @@ class Entity(BaseModel):
         p1, p2 = self.source.split(":", 1)
 
         return p2
+    
+    @property
+    def main_file_obj(self):
+        return File.get(self.main_file)
 
     def delete(self, delete_dir=True):
         if delete_dir == True:
@@ -100,7 +103,7 @@ class Entity(BaseModel):
         storage = consts['storage']
         hash = self.hash
 
-        collection_path = os.path.join(storage, "collections", hash[0:2])
+        collection_path = os.path.join(storage, "files", hash[0:2])
         entity_path = os.path.join(collection_path, hash, hash + '.' + str(self.format))
 
         return entity_path
@@ -109,14 +112,14 @@ class Entity(BaseModel):
         storage_path = consts['storage']
         hash = self.hash
 
-        collection_path = os.path.join(storage_path, "collections", str(hash[0:2]), hash)
+        collection_path = os.path.join(storage_path, "files", str(hash[0:2]), hash)
         coll_path = Path(collection_path)
 
         if need_check == True and coll_path.exists() == False:
             coll_path.mkdir(parents=True, exist_ok=True)
 
         return collection_path
-    
+
     @staticmethod
     def fetchItems(query = None, columns_search = []):
         items = Entity.select().where(Entity.unlisted == 0).where(Entity.deleted == 0)

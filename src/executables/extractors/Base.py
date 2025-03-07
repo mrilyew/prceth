@@ -25,33 +25,29 @@ class BaseExtractor:
         entity_internal_content_ = __EXECUTE_RESULT.entity_internal_content
 
         FINAL_ENTITY.hash = __hash
-        FINAL_ENTITY.original_name = __EXECUTE_RESULT.original_name
-        FINAL_ENTITY.filesize = __EXECUTE_RESULT.filesize
         if __EXECUTE_RESULT.hasInternalContent():
             FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
         else:
             FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
         
-        if __EXECUTE_RESULT.no_file == False:
-            FINAL_ENTITY.format = __EXECUTE_RESULT.format
-            FINAL_ENTITY.dir_filesize = file_manager.getFolderSize(self.temp_dir)
+        if __EXECUTE_RESULT.main_file == None:
             FINAL_ENTITY.type = 0
         else:
-            FINAL_ENTITY.format = __EXECUTE_RESULT.format
-            if FINAL_ENTITY.format == None:
-                FINAL_ENTITY.format = "json"
-            
-            FINAL_ENTITY.dir_filesize = 0
             FINAL_ENTITY.type = 1
         
         if __EXECUTE_RESULT.isUnlisted() or self.passed_params.get("is_hidden") == True:
             FINAL_ENTITY.unlisted = 1
         
+        FINAL_ENTITY.main_file = __EXECUTE_RESULT.main_file.id
         FINAL_ENTITY.extractor_name = self.name
         if self.passed_params.get("display_name") != None:
             FINAL_ENTITY.display_name = self.passed_params["display_name"]
         else:
-            FINAL_ENTITY.display_name = __EXECUTE_RESULT.original_name
+            if __EXECUTE_RESULT.main_file == None:
+                FINAL_ENTITY.display_name = "N/A"
+            else:
+                FINAL_ENTITY.display_name = __EXECUTE_RESULT.main_file.upload_name
+        
         if self.passed_params.get("description") != None:
             FINAL_ENTITY.description = self.passed_params["description"]
         if __EXECUTE_RESULT.hasSource():
@@ -66,16 +62,6 @@ class BaseExtractor:
 
         return FINAL_ENTITY
 
-    def moveDestinationDirectory(self, entity):
-        from resources.Globals import storage
-
-        __hash_dir = storage.makeHashDir(entity.hash, only_return=True)
-        Path(self.temp_dir).rename(__hash_dir)
-        
-        entity_file_path = Path(__hash_dir + '\\' + entity.original_name)
-        entity_file_path_replace = f'{__hash_dir}\\{str((str(entity.hash) + '.' + entity.format))}'
-        entity_file_path.rename(entity_file_path_replace)
-    
     # Does nothing :D
     def saveToDirectory(self, __EXECUTE_RESULT):
         pass
@@ -93,7 +79,7 @@ class BaseExtractor:
     def thumbnail(self, entity, args={}):
         from resources.Globals import ThumbnailsRepository
         
-        ext = entity.format
+        ext = entity.main_file_obj.extension
         if args.hasPreview():
             ext = utils.get_ext(args.another_file)
         

@@ -275,10 +275,10 @@ class Api():
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
         EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.shortExecute(_ARGS)
         
-        if __export_as_entity == True: 
+        if __export_as_entity == True:                
             RETURN_ENTITY = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS)
-            if RETURN_ENTITY.type == 0:
-                EXTRACTOR_INSTANCE.moveDestinationDirectory(entity=RETURN_ENTITY)
+            if EXTRACTOR_RESULTS.main_file != None:
+                EXTRACTOR_RESULTS.main_file.move()
             
             thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
             if thumb_result != None:
