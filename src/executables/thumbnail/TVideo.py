@@ -5,13 +5,13 @@ class TVideo(BaseThumbnail):
     name = 'TVideo'
     accept = ["mp4", "mov"]
 
-    def run(self, entity, params={}):
+    def run(self, file, params={}):
         size = (200, 200)
         __previews = {
             "photo": []
         }
 
-        path = entity.getPath()
+        path = file.getPath()
         if params.hasPreview():
             path = params.another_file
         
@@ -21,7 +21,7 @@ class TVideo(BaseThumbnail):
 
             for i in range(0, 10):
                 __hash = utils.getRandomHash(8)
-                __new_prev = os.path.join(entity.getDirPath(), f"{__hash}_thumb_{i}.jpg")
+                __new_prev = os.path.join(file.getDirPath(), f"{__hash}_thumb_{i}.jpg")
                 __previews["photo"].append({
                     "path": f"{__hash}_thumb_{i}.jpg",
                     "width": 200,

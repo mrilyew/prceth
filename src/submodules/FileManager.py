@@ -23,12 +23,12 @@ class FileInfo():
 
     def takeInfo(self):
         base = {
-                "name": self.name,
-                "path": self.path,
-                "type": self.type,
-                "extended": self.extended,
-                "type": self.type
-            }
+            "name": self.name,
+            "path": self.path,
+            "type": self.type,
+            "extended": self.extended,
+            "type": self.type
+        }
         
         if(self.extended == True):
             base['size'] = self.size
@@ -77,28 +77,13 @@ class FileManager():
         stream.close()
 
     def moveFile(self, input_path, output_path):
-        file_size = input_path.stat()
         shutil.move(str(input_path), str(output_path))
-
-        return {
-            'filesize': int(file_size.st_size)
-        }
     
     def copyFile(self, input_path, output_path):
-        file_size = input_path.stat()
         shutil.copy2(str(input_path), str(output_path))
-
-        return {
-            'filesize': int(file_size.st_size)
-        }
     
     def symlinkFile(self, input_path, output_path):
-        file_size = input_path.stat()
         os.symlink(str(input_path), str(output_path))
-
-        return {
-            'filesize': int(file_size.st_size)
-        }
     
     def rmdir(self, str_path):
         path = Path(str_path)

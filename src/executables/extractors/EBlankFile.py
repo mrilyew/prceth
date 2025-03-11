@@ -28,7 +28,9 @@ class EBlankFile(BaseExtractor):
 
     async def run(self, args):
         original_name = f"blank.{self.passed_params.get("extension")}"
-        file_manager.createFile(filename=original_name,dir=self.temp_dir,content=self.passed_params.get("text"))
+        file_manager.createFile(filename=original_name,
+                                dir=self.temp_dir,
+                                content=self.passed_params.get("text"))
 
         __file = File()
         __file.extension = self.passed_params.get("extension")

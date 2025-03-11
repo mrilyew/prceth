@@ -1,13 +1,13 @@
-from resources.Globals import consts, time, operator, reduce, Path, os, BaseModel, json5, file_manager, logger
-from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
+from resources.Globals import consts, time, operator, reduce, Path, BaseModel, json5, file_manager, logger
+from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
 from db.File import File
 
 class Entity(BaseModel):
     self_name = 'entity'
 
     id = AutoField() # Absolute id
-    main_file = TextField(null=True) # File extension
-    files_list = TextField(null=True) # Files list
+    file_id = TextField(null=True) # File extension
+    linked_files = TextField(null=True) # Files list
     hash = TextField(null=True) # Entity hash
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
@@ -19,7 +19,7 @@ class Entity(BaseModel):
     tags = TextField(index=True,null=True) # csv tags
     preview = TextField(null=True) # Preview in json format
     # flags = IntegerField(default=0) # Flags.
-    type = IntegerField(default=0) # 0 - main is the first file from dir
+    # type = IntegerField(default=0) # 0 - main is the first file from dir
                                 # 1 - main info is from "type_sub" (jsonистый объект)
     entity_internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
     unlisted = BooleanField(index=True,default=0)
@@ -36,8 +36,11 @@ class Entity(BaseModel):
         return p2
     
     @property
-    def main_file_obj(self):
-        return File.get(self.main_file)
+    def file(self):
+        if self.file_id == None:
+            return None
+        
+        return File.get(self.file_id)
 
     def delete(self, delete_dir=True):
         if delete_dir == True:
@@ -69,6 +72,7 @@ class Entity(BaseModel):
             tags = []
         
         frontend_data = None
+        FILE = self.file
         try:
             frontend_data = json5.loads(getattr(self, "frontend_data", "{}"))
         except Exception as wx:
@@ -77,58 +81,38 @@ class Entity(BaseModel):
         
         fnl = {
             "id": self.id,
-            "format": self.format,
-            "original_name": self.original_name,
+            "has_file": FILE != None,
             "display_name": self.display_name,
             "description": self.description,
-            "filesize": self.filesize,
             "source": self.getCorrectSource(),
-            "entity_internal_content": self.getFormattedInfo(),
+            "meta": self.getFormattedInfo(),
             "frontend_data": frontend_data,
             "tags": tags,
-            "flags": self.flags,
-            "type": self.type,
+            #"flags": self.flags,
+            #"type": self.type,
             "created": self.created_at,
+            "declared_created_at": self.declared_created_at,
             "edited": self.edited_at,
             "author": self.author,
         }
-
-        if self.type != 1:
-            fnl.path = self.getPath()
-            fnl.dir = self.getDirPath()
+        if FILE != None:
+            fnl["file"] = FILE.getApiStructure()
 
         return fnl
-    
-    def getPath(self):
-        storage = consts['storage']
-        hash = self.hash
-
-        collection_path = os.path.join(storage, "files", hash[0:2])
-        entity_path = os.path.join(collection_path, hash, hash + '.' + str(self.format))
-
-        return entity_path
-    
-    def getDirPath(self, need_check = False):
-        storage_path = consts['storage']
-        hash = self.hash
-
-        collection_path = os.path.join(storage_path, "files", str(hash[0:2]), hash)
-        coll_path = Path(collection_path)
-
-        if need_check == True and coll_path.exists() == False:
-            coll_path.mkdir(parents=True, exist_ok=True)
-
-        return collection_path
 
     @staticmethod
     def fetchItems(query = None, columns_search = []):
-        items = Entity.select().where(Entity.unlisted == 0).where(Entity.deleted == 0)
+        items = (Entity.select()
+                 .where(Entity.unlisted == 0)
+                 .where(Entity.deleted == 0)
+                 .join(File, on=(File.id == Entity.file_id), join_type=JOIN.LEFT_OUTER))
+
         conditions = []
 
         for column in columns_search:
             match column:
-                case "original_name":
-                    conditions.append((Entity.original_name.contains(query)))
+                case "upload_name":
+                    conditions.append((File.upload_name.contains(query)))
                 case "display_name":
                     conditions.append((Entity.display_name.contains(query)))
                 case "description":
@@ -136,7 +120,7 @@ class Entity(BaseModel):
                 case "source":
                     conditions.append((Entity.source.contains(query)))
                 case "index":
-                    conditions.append((Entity.index_content.contains(query)))
+                    conditions.append((Entity.indexation_content_string.contains(query)))
                 case "saved":
                     conditions.append((Entity.extractor_name.contains(query)))
                 case "author":

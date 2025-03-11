@@ -2,6 +2,7 @@ from executables.extractors.Base import BaseExtractor
 from resources.Globals import os, download_manager, Path, utils, urlparse, requests, mimetypes, config, file_manager, ExecuteResponse
 from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
+from db.File import File
 
 # Base URL downloader. Downloads single file, without styles, images or something.
 class EURL(BaseExtractor):
@@ -35,9 +36,13 @@ class EURL(BaseExtractor):
         file_output_name_split = file_output_name.split('.')
 
         file_output_name = file_output_name_split[0]
+        if file_output_name == None or len(file_output_name) < 1:
+            file_output_name = "file"
         file_output_ext = ''
         if len(file_output_name_split) > 1:
             file_output_ext = file_output_name_split[-1]
+        if file_output_ext == None or len(file_output_ext) < 1:
+            file_output_ext = "html"
 
         # Making HTTP request
         final_file_name = '.'.join([file_output_name, file_output_ext])
@@ -67,12 +72,18 @@ class EURL(BaseExtractor):
         }
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
 
+        __file = File()
+        __file.extension = file_output_ext
+        __file.upload_name = final_file_name
+        __file.filesize = file_size
+        __file.temp_dir = self.temp_dir
+        __file.save()
+
         return ExecuteResponse({
-            "format": file_output_ext,
-            "original_name": final_file_name,
-            "filesize": file_size,
+            "main_file": __file,
             "source": "url:"+self.passed_params.get("url"),
-            "entity_internal_content": output_metadata
+            "entity_internal_content": output_metadata,
+            "indexation_content": output_metadata,
         })
 
     def describeSource(self, INPUT_ENTITY):

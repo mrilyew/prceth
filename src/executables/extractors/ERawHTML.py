@@ -1,6 +1,7 @@
 from executables.extractors.Base import BaseExtractor
 from resources.Globals import Crawler, file_manager, ExecuteResponse, logger
 from resources.Exceptions import NotPassedException
+from db.File import File
 
 class ERawHTML(BaseExtractor):
     name = 'ERawHTML'
@@ -15,6 +16,7 @@ class ERawHTML(BaseExtractor):
 
     def passParams(self, args):
         self.passed_params = args
+        # TODO расписать
 
         super().passParams(args)
         assert self.passed_params.get("html") != None, "html was not passed"
@@ -45,6 +47,14 @@ class ERawHTML(BaseExtractor):
         original_name = "index.html"
         
         file_manager.createFile(dir=self.temp_dir,filename=original_name,content=__html)
+
+        __file = File()
+        __file.extension = "html"
+        __file.upload_name = original_name
+        __file.filesize = len(__html)
+        __file.temp_dir = self.temp_dir
+        __file.save()
+
         output_metadata = self.crawler.printMeta()
 
         source = self.passed_params.get("url", "")
@@ -54,11 +64,10 @@ class ERawHTML(BaseExtractor):
             source = "url:" + source
 
         final = ExecuteResponse({
-            "format": "html",
-            "original_name": original_name,
+            "main_file": __file,
             "source": source,
-            "filesize": len(__html),
             "entity_internal_content": output_metadata,
+            "indexation_content": output_metadata,
             "another_file": "screenshot.png"
         })
         
