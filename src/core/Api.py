@@ -272,7 +272,7 @@ class Api():
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY,del_dir_on_fail=__export_as_entity == True)
         EXTRACTOR_INSTANCE.passParams(_ARGS)
         EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(_ARGS)
         
@@ -289,14 +289,14 @@ class Api():
             if collection_id != None:
                 collection = Collection.get(collection_id)
                 if collection == None:
-                    logger.log("App", "Entity Uploader", "Collection not found, not adding.")
+                    logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
                 else:
                     collection.addItem(RETURN_ENTITY)
 
             await EXTRACTOR_INSTANCE.postRun()
             return RETURN_ENTITY
         else:
-            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveToDirectory(EXTRACTOR_RESULTS) # Does nothing :D
+            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveToDirectory(EXTRACTOR_RESULTS) # Does thing :D!
             return
         
     def getExtractors(self, params):

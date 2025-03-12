@@ -4,8 +4,8 @@ from resources.Exceptions import InvalidPassedParam, NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
 
-class EPath(BaseExtractor):
-    name = 'EPath'
+class FSPath(BaseExtractor):
+    name = 'FSPath'
     category = 'base'
     params = {
         "path": {

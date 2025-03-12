@@ -4,8 +4,8 @@ from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 
 # Downloads document from vk.com using api.
-class EVkDoc(BaseExtractor):
-    name = 'EVkDoc'
+class VkDoc(BaseExtractor):
+    name = 'VkDoc'
     category = 'vk'
     params = {
         "item_id": {

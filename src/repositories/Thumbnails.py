@@ -7,8 +7,8 @@ class Thumbnails:
             if plugin == '__init__.py' or plugin == '__pycache__':
                 continue
 
-            if plugin.endswith('.py'):
-                module_name = f"executables.thumbnail.{plugin[:-3]}"
+            if plugin.name.endswith('.py'):
+                module_name = f"executables.thumbnail.{plugin.name[:-3]}"
                 try:
                     module = importlib.import_module(module_name)
                     for item_name in dir(module):
@@ -21,6 +21,6 @@ class Thumbnails:
                             if itemer.acceptsFormat(input_format):
                                 return item
                 except ImportError as e:
-                    logger.log(f"Error importing {module_name}: {e}")
+                    logger.log(message=f"Error importing {module_name}: {e}")
 
         return None

@@ -5,8 +5,8 @@ from peewee import Model, SqliteDatabase
 from db.Entity import Entity
 from db.Relation import Relation
 
-class AImportQCL(BaseAct):
-    name = 'AImportQCL'
+class ImportQCL(BaseAct):
+    name = 'ImportQCL'
     category = 'export'
     accepts = 'string'
     
@@ -24,7 +24,7 @@ class AImportQCL(BaseAct):
         TEMP_UNPACK_DIR = Path(___TEMP_UNPACK_DIR)
         TEMP_UNPACK_DIR.mkdir()
 
-        logger.log(message="Extracting qcl",section="AImportQCL")
+        logger.log(message="Extracting qcl",section="ImportQCL")
         with zipfile.ZipFile(__IMPORT_PATH, "r") as zip_ref: # Unzipping
             zip_ref.extractall(os.path.join(___TEMP_UNPACK_DIR))
 
@@ -105,7 +105,7 @@ class AImportQCL(BaseAct):
                 __ITEM_FOLDER = os.path.join(___UNPACKED_FILES, HASH)
                 __NEW_PATH = Path(os.path.join(NEW_MINI_HASH_DIR, HASH))
                 if __NEW_PATH.is_dir():
-                    logger.log(f"Didn't copied file {str(__ITEM_FOLDER)}", "AImportQCL", "error")
+                    logger.log(message=f"Didn't copied file {str(__ITEM_FOLDER)}", section="AImportQCL", name="error")
                     continue
 
                 Path(__ITEM_FOLDER).rename(str(__NEW_PATH))

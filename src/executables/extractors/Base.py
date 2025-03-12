@@ -1,4 +1,4 @@
-from resources.Globals import consts, Path, utils, file_manager, json, logger
+from resources.Globals import consts, os, utils, file_manager, json, logger
 from db.Entity import Entity
 
 class BaseExtractor:
@@ -6,8 +6,9 @@ class BaseExtractor:
     category = 'template'
     passed_params = {}
 
-    def __init__(self, temp_dir=None):
+    def __init__(self, temp_dir=None, del_dir_on_fail=True):
         self.temp_dir = temp_dir
+        self.del_dir_on_fail = del_dir_on_fail
 
     def passParams(self, args):
         self.passed_params["display_name"] = args.get("display_name", None)
@@ -62,12 +63,21 @@ class BaseExtractor:
 
         return FINAL_ENTITY
 
-    # Does nothing :D
     def saveToDirectory(self, __EXECUTE_RESULT):
-        pass
+        stream = open(os.path.join(self.temp_dir, "data.json"), "w")
+        if __EXECUTE_RESULT != None:
+            stream.write(json.dumps({
+                "source": __EXECUTE_RESULT.source,
+                "entity_internal_content": __EXECUTE_RESULT.entity_internal_content,
+                "indexation_content": __EXECUTE_RESULT.indexation_content,
+                "hash": __EXECUTE_RESULT.hash,
+            }, indent=2))
+        
+        stream.close()
 
     def onFail(self):
-        file_manager.rmdir(self.temp_dir)
+        if self.del_dir_on_fail == True:
+            file_manager.rmdir(self.temp_dir)
 
     async def run(self, args):
         pass

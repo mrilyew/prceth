@@ -1,8 +1,8 @@
 from executables.extractors.Base import BaseExtractor
 from resources.Globals import VkApi, ExecuteResponse, json, utils, config, ExtractorsRepository, storage
 
-class EVkPost(BaseExtractor):
-    name = 'EVkPost'
+class VkPost(BaseExtractor):
+    name = 'VkPost'
     category = 'vk'
 
     def __init__(self, temp_dir=None):

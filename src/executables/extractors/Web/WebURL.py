@@ -1,12 +1,12 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import os, download_manager, Path, utils, urlparse, requests, mimetypes, config, file_manager, ExecuteResponse
+from resources.Globals import os, download_manager, Path, utils, requests, mimetypes, config, file_manager, ExecuteResponse
 from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
 
 # Base URL downloader. Downloads single file, without styles, images or something.
-class EURL(BaseExtractor):
-    name = 'EURL'
+class WebURL(BaseExtractor):
+    name = 'WebURL'
     category = 'web'
     params = {
         "path": {
@@ -28,53 +28,38 @@ class EURL(BaseExtractor):
         assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
     
     async def run(self, args):
-        __parsed_url = urlparse(self.passed_params.get("url"))
-        file_output_name = self.passed_params.get("url")
-        if self.passed_params.get("url").find('/'):
-            file_output_name = __parsed_url.path.split('/')[-1].split('?')[0]
-        
-        file_output_name_split = file_output_name.split('.')
-
-        file_output_name = file_output_name_split[0]
-        if file_output_name == None or len(file_output_name) < 1:
-            file_output_name = "file"
-        file_output_ext = ''
-        if len(file_output_name_split) > 1:
-            file_output_ext = file_output_name_split[-1]
-        if file_output_ext == None or len(file_output_ext) < 1:
-            file_output_ext = "html"
+        PASSED_URL = self.passed_params.get("url")
+        name, ext = utils.nameFromURL(PASSED_URL)
 
         # Making HTTP request
-        final_file_name = '.'.join([file_output_name, file_output_ext])
-        save_path = Path(os.path.join(self.temp_dir, final_file_name))
+        JOINED_FILE_NAME = '.'.join([name, ext])
+        save_path = Path(os.path.join(self.temp_dir, JOINED_FILE_NAME))
 
         HTTP_REQUEST = await download_manager.addDownload(end=self.passed_params.get("url"),dir=save_path)
-        if file_output_name == '':
-            file_output_name = requests.utils.quote(__parsed_url.hostname) + '.'
         
         CONTENT_TYPE = HTTP_REQUEST.headers.get('Content-Type', '').lower()
         MIME_EXT     = None
-        if file_output_ext == '' or utils.is_generated_ext(file_output_ext):
+        if ext == '' or utils.is_generated_ext(ext):
             CONTENT_TYPE = CONTENT_TYPE
             MIME_EXT = mimetypes.guess_extension(CONTENT_TYPE)
             if MIME_EXT:
-                file_output_ext = MIME_EXT[1:]
+                ext = MIME_EXT[1:]
             else:
-                file_output_ext = 'html'
+                ext = 'html'
         
         file_size = save_path.stat().st_size
 
         output_metadata = {
             "original_url": str(self.passed_params.get("url")), 
             "mime": str(MIME_EXT),
-            "output_name": str(final_file_name),
+            "output_name": str(JOINED_FILE_NAME),
             "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(save_path))),
         }
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
 
         __file = File()
-        __file.extension = file_output_ext
-        __file.upload_name = final_file_name
+        __file.extension = ext
+        __file.upload_name = JOINED_FILE_NAME
         __file.filesize = file_size
         __file.temp_dir = self.temp_dir
         __file.save()

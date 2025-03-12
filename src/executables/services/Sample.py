@@ -1,8 +1,8 @@
 from executables.services.Base import BaseService
 from resources.Globals import time
 
-class SSample(BaseService):
-    name = 'SSample'
+class Sample(BaseService):
+    name = 'Sample'
     name_key = "_"
     desc_key = "_"
     interval = 10

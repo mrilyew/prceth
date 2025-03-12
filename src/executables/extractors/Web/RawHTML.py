@@ -3,8 +3,8 @@ from resources.Globals import Crawler, file_manager, ExecuteResponse, logger
 from resources.Exceptions import NotPassedException
 from db.File import File
 
-class ERawHTML(BaseExtractor):
-    name = 'ERawHTML'
+class RawHTML(BaseExtractor):
+    name = 'RawHTML'
     category = 'net'
     params = {
         "url": {
@@ -27,10 +27,14 @@ class ERawHTML(BaseExtractor):
         if self.crawler.checkWebDriver() == False:
             await self.crawler.downloadChrome()
 
+        # Starting headless Chrome
         self.crawler.startChrome()
 
+        # Inserting HTML code
         try:
-            self.crawler.crawlPageFromRawHTML(html=self.passed_params.get("html"),url_help=self.passed_params.get("url", ""))
+            self.crawler.crawlPageFromRawHTML(html=
+                                              self.passed_params.get("html"),url_help=
+                                              self.passed_params.get("url", ""))
         except Exception as ecx:
             logger.logException(ecx,section="Extractors|Crawling")
             raise ecx
@@ -38,36 +42,36 @@ class ERawHTML(BaseExtractor):
         if True:
             self.crawler.scrollAvailableContent()
         
+        # Saving HTML
         self.crawler.printHTML()
         __html = await self.crawler.reworkHTML()
         if int(self.passed_params.get("literally", 0)) == 1:
             self.crawler.writeDocumentHTML(__html)
         
         self.crawler.printScreenshot()
-        original_name = "index.html"
+        ORIGINAL_NAME = "index.html"
         
-        file_manager.createFile(dir=self.temp_dir,filename=original_name,content=__html)
+        file_manager.createFile(dir=self.temp_dir,filename=ORIGINAL_NAME,content=__html)
 
         __file = File()
         __file.extension = "html"
-        __file.upload_name = original_name
+        __file.upload_name = ORIGINAL_NAME
         __file.filesize = len(__html)
         __file.temp_dir = self.temp_dir
         __file.save()
 
-        output_metadata = self.crawler.printMeta()
-
-        source = self.passed_params.get("url", "")
-        if source == "":
-            source = "api:html"
+        WEB_META = self.crawler.printMeta()
+        SOURCE = self.passed_params.get("url", "")
+        if SOURCE == "":
+            SOURCE = "api:html"
         else:
-            source = "url:" + source
+            SOURCE = "url:" + SOURCE
 
         final = ExecuteResponse({
             "main_file": __file,
-            "source": source,
-            "entity_internal_content": output_metadata,
-            "indexation_content": output_metadata,
+            "source": SOURCE,
+            "entity_internal_content": WEB_META,
+            "indexation_content": WEB_META,
             "another_file": "screenshot.png"
         })
         

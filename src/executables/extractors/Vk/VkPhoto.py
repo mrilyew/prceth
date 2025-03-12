@@ -4,8 +4,8 @@ from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 
 # Downloads photo from vk.com using api.
-class EVkPhoto(BaseExtractor):
-    name = 'EVkPhoto'
+class VkPhoto(BaseExtractor):
+    name = 'VkPhoto'
     category = 'vk'
     params = {
         "photo_id": {

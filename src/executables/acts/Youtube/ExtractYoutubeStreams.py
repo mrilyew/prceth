@@ -1,8 +1,8 @@
 from executables.acts.Base import BaseAct
 from resources.Globals import yt_dlp, json, utils
 
-class AExtractYoutubeStreams(BaseAct):
-    name = 'AExtractYoutubeStreams'
+class ExtractYoutubeStreams(BaseAct):
+    name = 'ExtractYoutubeStreams'
     category = 'web'
     accepts = 'string'
 

@@ -2,9 +2,8 @@ from executables.extractors.Base import BaseExtractor
 from resources.Globals import file_manager, utils, ExecuteResponse
 from db.File import File
 
-# hope its funny enough
-class EBlankFile(BaseExtractor):
-    name = 'EBlankFile'
+class BlankFile(BaseExtractor):
+    name = 'BlankFile'
     category = 'base'
     hidden = True
     params = {

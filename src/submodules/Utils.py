@@ -1,4 +1,4 @@
-from resources.Globals import contextmanager, secrets, os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
+from resources.Globals import contextmanager, secrets, os, urlparse, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
 
 class Utils():
@@ -173,7 +173,22 @@ class Utils():
     def typicalPluginsList(self, folder: str):
         dir = f"{consts["executable"]}\\{folder}"
 
-        return os.listdir(dir)
+        return Path(dir).rglob('*.py')
+    
+    def getExecutableList(self, folder: str = "extractors"):
+        __exit = []
+        __base_path = Path(f"{consts["executable"]}\\{folder}")
+        __plugins = Path(__base_path).rglob('*.py')
+        for plugin in __plugins:
+            if plugin.name == '__init__.py' or plugin.name == '__pycache__' or plugin.name == "Base.py":
+                continue
+
+            relative_path = plugin.relative_to(__base_path)
+            module_name = str(relative_path.with_suffix("")).replace("\\", ".").replace("/", ".")
+            if plugin.name.endswith('.py'):
+                __exit.append(module_name)
+        
+        return __exit
     
     def clearJson(self, __json):
         if isinstance(__json, dict):
@@ -184,6 +199,22 @@ class Utils():
             return __json
         else:
             return None
+        
+    def nameFromURL(self, input_url):
+        parsed_url = urlparse(input_url)
+        path = parsed_url.path
+
+        if path.endswith('/') or path == "":
+            return "index", "html"
+        
+        filename = os.path.basename(path)
+        OUTPUT_NAME, OUTPUT_NAME_EXT = os.path.splitext(filename)
+        if not OUTPUT_NAME_EXT:
+            OUTPUT_NAME_EXT = ""
+        else:
+            OUTPUT_NAME_EXT = OUTPUT_NAME_EXT[1:]
+        
+        return OUTPUT_NAME, OUTPUT_NAME_EXT
     
     @contextmanager
     def overrideDb(self, __class, __db):

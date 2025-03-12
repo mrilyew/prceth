@@ -38,7 +38,7 @@ class DownloadManager():
 
         async with self.semaphore:
             async with session.get(DOWNLOAD_URL, allow_redirects=True, headers=self.__headers) as response:
-                logger.log("AsyncDownloadManager", "message", f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
+                logger.log(section="AsyncDownloadManager", name="message", message=f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 HTTP_REQUEST_STATUS = response.status
 
                 #if HTTP_REQUEST_STATUS != 200:
@@ -48,7 +48,9 @@ class DownloadManager():
                     raise FileNotFoundError('File not found')
                 
                 if Path(DOWNLOAD_DIR).is_file():
-                    return True
+                    logger.log(section="AsyncDownloadManager", name="message", message=f"{DOWNLOAD_URL} already downloaded, didn't.")
+                    return response
+
                 start_time = time.time()
                 queue_element["downloaded"] = 0
                 queue_element["size"] = int(response.headers.get("Content-Length", 0))
@@ -70,7 +72,7 @@ class DownloadManager():
                             if expected_time > elapsed_time:
                                 await asyncio.sleep(expected_time - elapsed_time)
                 
-                logger.log("AsyncDownloadManager", "success", f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
+                logger.log(section="AsyncDownloadManager", name="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 return response
     
     def __findDownloadByURL(self, url):

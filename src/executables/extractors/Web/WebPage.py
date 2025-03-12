@@ -1,9 +1,10 @@
 from executables.extractors.Base import BaseExtractor
 from resources.Globals import Crawler, file_manager, ExecuteResponse, logger
 from resources.Exceptions import NotPassedException
+from db.File import File
 
-class EWebPage(BaseExtractor):
-    name = 'EWebPage'
+class WebPage(BaseExtractor):
+    name = 'WebPage'
     category = 'web'
     params = {
         "url": {
@@ -51,11 +52,16 @@ class EWebPage(BaseExtractor):
         file_manager.createFile(dir=self.temp_dir,filename=original_name,content=__html)
         output_metadata = self.crawler.printMeta()
 
+        __file = File()
+        __file.extension = "html"
+        __file.upload_name = original_name
+        __file.filesize = len(__html)
+        __file.temp_dir = self.temp_dir
+        __file.save()
+
         final = ExecuteResponse({
-            "format": "html",
-            "original_name": original_name,
+            "main_file": __file,
             "source": "url:" + SITE_URL,
-            "filesize": len(__html),
             "entity_internal_content": output_metadata,
             "another_file": "screenshot.png"
         })

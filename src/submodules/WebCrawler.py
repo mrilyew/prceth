@@ -231,7 +231,7 @@ class Crawler():
                                                 
                                                 __css_modified = __css_modified.replace(__css_asset_url, "assets/" + __css_download_name)
                                                 await self.downloadResource(__css_asset_url_full, os.path.join(self.save_dir, 'assets'))
-                                                logger.log("Extractors|Crawling", "message", f"Downloaded asset from {link} => {__css_asset_url}")
+                                                logger.log(section="Extractors|Crawling", name="message", message=f"Downloaded asset from {link} => {__css_asset_url}")
 
                                             # Rewriting css with new values
                                             async with open(os.path.join(self.save_dir, 'css', filename), 'w') as css_stream_write:
@@ -256,7 +256,7 @@ class Crawler():
 
     # Creating page from raw HTML
     def crawlPageFromRawHTML(self, html, url_help = ""):
-        logger.log("Extractors|Crawling", "message", f"Capturing the page from HTML")
+        logger.log(section="Extractors|Crawling", name="message", message=f"Capturing the page from HTML")
 
         self.url = "about:blank"
         self.base_url = '/'.join(url_help.split('/')[:3]) # :3
@@ -268,7 +268,7 @@ class Crawler():
     # Save resource to asset
     async def downloadResource(self, url, folder_path):
         if url in self.downloaded_assets:
-            logger.log("Extractors|Crawling", "download", f"File \"{url}\" already downloaded!!! Skipping.")
+            logger.log(section="Extractors|Crawling", name="download", message=f"File \"{url}\" already downloaded!!! Skipping.")
             return None
         
         try:
@@ -283,7 +283,7 @@ class Crawler():
 
             if int(config.get("extractor.cache_assets")) == 0:
                 # Writing file
-                logger.log("Extractors|Crawling", "download", f"Downloading URL {url} vid AsyncDownloadManager to original dir")
+                logger.log(section="Extractors|Crawling", name="download", message=f"Downloading URL {url} vid AsyncDownloadManager to original dir")
                 await download_manager.addDownload(end=url,dir=local_path)
                 self.downloaded_assets.append(url)
 
@@ -299,7 +299,7 @@ class Crawler():
 
                 return basename_with_site
         except Exception as e:
-            logger.log("Extractors|Crawling", "download", f"Error when downloading file {url} ({e}).")
+            logger.log(section="Extractors|Crawling", name="download", message=f"Error when downloading file {url} ({e}).")
 
             return None
     
@@ -315,11 +315,11 @@ class Crawler():
         if self.p_fullsize_page_screenshot == 0:
             page_height = min(self.p_fullsize_page_screenshot_value, max(page_height, 600))
 
-        logger.log("Extractors|Crawling", "download", f"Making screenshot with {page_width}x{page_height}")
+        logger.log(section="Extractors|Crawling", name="download", message=f"Making screenshot with {page_width}x{page_height}")
         self.driver.execute_script('window.scrollTo(0, {0});'.format(self.p_scroll_screenshot_px))
         self.driver.set_window_size(page_width, page_height)
         self.driver.save_screenshot(self.save_dir + "/screenshot.png")
     
     def printMeta(self):
-        logger.log("Extractors|Crawling", "message", f"Printing meta")
+        logger.log(section="Extractors|Crawling", name="message", message=f"Printing meta")
         return self.__meta
