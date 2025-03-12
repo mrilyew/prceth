@@ -5,9 +5,6 @@ class VkPost(BaseExtractor):
     name = 'VkPost'
     category = 'vk'
 
-    def __init__(self, temp_dir=None):
-        self.temp_dir = temp_dir
-
     def passParams(self, args):
         self.passed_params = args
         self.passed_params["post_id"] = args.get("post_id")
@@ -28,22 +25,23 @@ class VkPost(BaseExtractor):
 
     async def run(self, args):
         # TODO add check for real links like vk.com/wall1_1
-        __post_res = None
+        __post_api_response = None
         __post_id  = self.passed_params.get("post_id")
         if getattr(self, "__predumped_info", None) == None:
-            __post_res = await self.__recieveById(__post_id)
+            __post_api_response = await self.__recieveById(__post_id)
         else:
-            __post_res = self.__predumped_info
+            __post_api_response = self.__predumped_info
         
         # TODO: Attachments processing
-        __post_obj = __post_res.get("items")[0]
-        del __post_obj["track_code"]
-        del __post_obj["hash"]
+        __POST_OBJ = __post_api_response.get("items")[0]
+        del __POST_OBJ["track_code"]
+        del __POST_OBJ["hash"]
 
-        __json_info = utils.clearJson(__post_obj)
-        __json_info["site"] = self.passed_params.get("vk_path")
-        __summary = None
-        for key, attachment in enumerate(__post_obj.get("attachments")):
+        # Making indexation
+        __indexation = utils.clearJson(__POST_OBJ)
+        __indexation["site"] = self.passed_params.get("vk_path")
+        '''
+        for key, attachment in enumerate(__POST_OBJ.get("attachments")):
             __attachment_type = attachment.get("type")
             __attachment_object = attachment.get(__attachment_type)
             if __attachment_object == None:
@@ -72,16 +70,13 @@ class VkPost(BaseExtractor):
                 RETURN_ENTITY.preview = json.dumps(thumb_result)
                 RETURN_ENTITY.save()
             
-            __post_obj["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY.id}"
-
-        __summary = __post_obj
+            __post_obj["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY.id}"'
+        '''
 
         return ExecuteResponse({
-            "original_name": "Post №"+__post_id,
-            "filesize": len(json.dumps(__post_obj)),
             "source": "vk:wall"+__post_id,
-            "indexation_content": __json_info,
-            "entity_internal_content": __summary,
+            "indexation_content": __indexation,
+            "entity_internal_content": __POST_OBJ,
             "no_file": True,
         })
 

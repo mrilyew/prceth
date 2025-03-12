@@ -34,12 +34,12 @@ class BaseExtractor:
         if __EXECUTE_RESULT.main_file == None:
             FINAL_ENTITY.type = 0
         else:
+            FINAL_ENTITY.file_id = __EXECUTE_RESULT.main_file.id
             FINAL_ENTITY.type = 1
         
         if __EXECUTE_RESULT.isUnlisted() or self.passed_params.get("is_hidden") == True:
             FINAL_ENTITY.unlisted = 1
         
-        FINAL_ENTITY.file_id = __EXECUTE_RESULT.main_file.id
         FINAL_ENTITY.extractor_name = self.name
         if self.passed_params.get("display_name") != None:
             FINAL_ENTITY.display_name = self.passed_params["display_name"]
@@ -89,7 +89,9 @@ class BaseExtractor:
     def thumbnail(self, entity, args={}):
         from resources.Globals import ThumbnailsRepository
         __FILE = entity.file
-
+        if __FILE == None:
+            return None
+        
         ext = __FILE.extension
         if args.hasPreview():
             ext = utils.get_ext(args.another_file)
