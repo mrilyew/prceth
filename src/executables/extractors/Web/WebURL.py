@@ -7,7 +7,7 @@ from db.File import File
 # Base URL downloader. Downloads single file, without styles, images or something.
 class WebURL(BaseExtractor):
     name = 'WebURL'
-    category = 'web'
+    category = 'Web'
     params = {
         "path": {
             "desc_key": "extractor_key_desc_path_path",

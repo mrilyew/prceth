@@ -9,6 +9,8 @@ class ExecuteResponse():
         self.return_type = infe.get("return_type")
         self.unlisted = infe.get("unlisted")
         self.no_file = infe.get("no_file", False)
+        self.suggested_name = infe.get("suggested_name", None)
+        self.linked_files = infe.get("linked_files", None)
     
     def get_format(self):
         return str(self.format)

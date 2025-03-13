@@ -39,13 +39,19 @@ class BaseExtractor:
         
         if __EXECUTE_RESULT.isUnlisted() or self.passed_params.get("is_hidden") == True:
             FINAL_ENTITY.unlisted = 1
+
+        if __EXECUTE_RESULT.linked_files != None:
+            FINAL_ENTITY.linked_files = ",".join(str(v) for v in __EXECUTE_RESULT.linked_files)
         
         FINAL_ENTITY.extractor_name = self.name
         if self.passed_params.get("display_name") != None:
             FINAL_ENTITY.display_name = self.passed_params["display_name"]
         else:
             if __EXECUTE_RESULT.main_file == None:
-                FINAL_ENTITY.display_name = "N/A"
+                if __EXECUTE_RESULT.suggested_name == None:
+                    FINAL_ENTITY.display_name = "N/A"
+                else:
+                    FINAL_ENTITY.display_name = __EXECUTE_RESULT.suggested_name
             else:
                 FINAL_ENTITY.display_name = __EXECUTE_RESULT.main_file.upload_name
         
@@ -55,9 +61,9 @@ class BaseExtractor:
             FINAL_ENTITY.source = __EXECUTE_RESULT.source
         if __EXECUTE_RESULT.hasIndexationContent():
             #FINAL_ENTITY.indexation_content = json.dumps(indexation_content_) # remove
-            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ')
+            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
         else:
-            FINAL_ENTITY.indexation_content_string = json.dumps(entity_internal_content_)
+            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(entity_internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
         
         FINAL_ENTITY.save()
 
@@ -103,6 +109,23 @@ class BaseExtractor:
         thumb_class = thumb(save_dir=__FILE.getDirPath())
         return thumb_class.run(file=__FILE,params=args)
     
+    async def fastGetEntity(self, params, args):
+        self.passParams(params)
+        EXTRACTOR_RESULTS = await self.execute(args)
+        
+        RETURN_ENTITY = self.saveAsEntity(EXTRACTOR_RESULTS)
+        __file = EXTRACTOR_RESULTS.main_file
+        if __file != None:
+            __file.moveTempDir()
+
+        thumb_result = self.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
+        if thumb_result != None:
+            RETURN_ENTITY.preview = json.dumps(thumb_result)
+            RETURN_ENTITY.save()
+        
+        await self.postRun()
+        return RETURN_ENTITY
+            
     def describe(self):
         return {
             "id": self.name,
@@ -128,3 +151,4 @@ class BaseExtractor:
             raise x
 
         return EXTRACTOR_RESULTS
+    

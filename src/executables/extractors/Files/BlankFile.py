@@ -4,7 +4,7 @@ from db.File import File
 
 class BlankFile(BaseExtractor):
     name = 'BlankFile'
-    category = 'base'
+    category = 'Files'
     hidden = True
     params = {
         "extension": {

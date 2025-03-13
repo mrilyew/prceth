@@ -5,7 +5,7 @@ from db.File import File
 
 class RawHTML(BaseExtractor):
     name = 'RawHTML'
-    category = 'net'
+    category = 'Web'
     params = {
         "url": {
             "desc_key": "-",

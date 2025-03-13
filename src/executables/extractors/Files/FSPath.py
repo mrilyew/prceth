@@ -6,7 +6,7 @@ from db.File import File
 
 class FSPath(BaseExtractor):
     name = 'FSPath'
-    category = 'base'
+    category = 'Files'
     params = {
         "path": {
             "desc_key": "extractor_key_desc_path_path",

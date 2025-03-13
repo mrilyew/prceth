@@ -18,10 +18,10 @@ class Logger():
 
         # Keep=True: appends current time to file name.
         if self.keep:
-            self.path = f"{consts['storage']}/logs/{now.strftime("%d-%m-%Y_%H-%M-%S")}.log"
+            self.path = f"{consts['storage']}/logs/{now.strftime("%Y-%d-%m_%H-%M-%S")}.log"
         # Keep=False: creates log files per day.
         else:
-            self.path = f"{consts['storage']}/logs/{now.strftime("%d-%m-%Y")}.log"
+            self.path = f"{consts['storage']}/logs/{now.strftime("%Y-%d-%m")}.log"
         
         # Checking if file exists. If no, creating.
         if not os.path.exists(self.path):
@@ -42,10 +42,15 @@ class Logger():
         message = message.replace("\n", "\\n")
         message_to_write = f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] [{name}] {message}\n"
         self.file.seek(0, os.SEEK_END)
-        self.file.write(message_to_write)
+        self.file.write(message_to_write.replace("\n", "\\n"))
 
         if consts.get("context") == "cli" and noConsole == False:
-            print(message_to_write.replace("\n", ""))
+            if name == "error":
+                print("\033[91m" + message_to_write.replace("\n", "") + "\033[0m")
+            elif name == "success":
+                print("\033[92m" + message_to_write.replace("\n", "") + "\033[0m")
+            else:
+                print(message_to_write.replace("\n", ""))
 
     def logException(self, input_exception, section="App", noConsole=False):
         exp = str(input_exception) + traceback.format_exc()

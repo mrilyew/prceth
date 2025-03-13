@@ -15,5 +15,8 @@ src/storage/exports/*
 src/storage/settings/config.json
 !src/storage/tmp/files/.gitkeep
 src/storage/logs/*.log
+src/executables/extractors/Custom/*
+src/executables/acts/Custom/*
+src/executables/services/Custom/*
 src/web/static/js/node_modules
 src/web/static/js/package-lock.json

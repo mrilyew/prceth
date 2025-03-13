@@ -120,6 +120,9 @@ class Utils():
         else:
             return str(data)
         
+        if True:
+            return ''.join(filter(None, result))
+        
         return ' '.join(filter(None, result))
     
     def get_mime_type(self, filename: str):
@@ -196,6 +199,9 @@ class Utils():
         elif isinstance(__json, list):
             return [self.clearJson(item) for item in __json if isinstance(item, (dict, list, str))]
         elif isinstance(__json, str):
+            if __json.startswith("https://") == False and __json.startswith("http://") == False:
+                return __json
+        elif isinstance(__json, int):
             return __json
         else:
             return None

@@ -5,7 +5,7 @@ from db.File import File
 
 class WebPage(BaseExtractor):
     name = 'WebPage'
-    category = 'web'
+    category = 'Web'
     params = {
         "url": {
             "desc_key": "-",

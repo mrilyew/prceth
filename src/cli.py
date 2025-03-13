@@ -1,5 +1,5 @@
 from core.Api import api
-from resources.Globals import utils, asyncio, loop
+from resources.Globals import utils, asyncio, loop, Path
 from resources.DbPrefetch import prefetch__db
 
 prefetch__db()
@@ -113,6 +113,11 @@ async def __cliMain():
         case 'services.run':
             print("Started service")
             api.runService(args)
+        case "clear":
+            sure = input("You sure? ")
+            if sure == "yeah":
+                Path("storage/main.db").unlink()
+                print("Ok")
         case _:
             print('Unknown "--act" passed')
             exit(-14)

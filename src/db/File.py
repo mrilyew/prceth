@@ -16,7 +16,7 @@ class File(BaseModel):
 
     def moveTempDir(self):
         from resources.Globals import storage
-
+        
         # Making dir for file in storage
         __hash_dir = storage.makeHashDir(self.hash, only_return=True)
         Path(self.temp_dir).rename(__hash_dir)
