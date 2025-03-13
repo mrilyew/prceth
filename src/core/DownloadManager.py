@@ -12,14 +12,17 @@ class DownloadManager():
         self.__timeout = consts["net.global_timeout"]
     
     async def addDownload(self, end, dir):
-        self.queue.append({
-            "url": end, 
-            "dir": dir,
-            "pause_flag": asyncio.Event(),
-            "task": None,
-        })
+        try:
+            self.queue.append({
+                "url": end, 
+                "dir": dir,
+                "pause_flag": asyncio.Event(),
+                "task": None,
+            })
 
-        return await self.startDownload(self.queue[-1])
+            return await self.startDownload(self.queue[-1])
+        except:
+            return None
 
     async def startDownload(self, queue_element):
         if getattr(self, "__session", None) == None:

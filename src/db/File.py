@@ -1,4 +1,4 @@
-from resources.Globals import consts, BaseModel, Path, os, utils
+from resources.Globals import consts, BaseModel, Path, os, utils, shutil
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 
 # File is not a file, its a directory with main file and secondary files.
@@ -8,7 +8,7 @@ class File(BaseModel):
     temp_dir = ''
 
     id = AutoField() # ABSOLUTE ID
-    hash = TextField(null=True,default=utils.getRandomHash(32)) # Entity hash
+    hash = TextField(null=True,default=utils.getRandomHash(64)) # Entity hash
     upload_name = TextField(index=True,default='N/A') # Upload name (with extension)
     extension = TextField(null=True,default="json") # File extension
     filesize = BigIntegerField(default=0) # Size of file
@@ -17,14 +17,16 @@ class File(BaseModel):
     def moveTempDir(self):
         from resources.Globals import storage
         
-        # Making dir for file in storage
-        __hash_dir = storage.makeHashDir(self.hash, only_return=True)
-        Path(self.temp_dir).rename(__hash_dir)
-        
         # Renaming main file 
-        MAIN_FILE_PATH = Path(__hash_dir + '\\' + self.upload_name)
-        MAIN_FILE_PATH_NEW = f'{__hash_dir}\\{str((str(self.hash) + '.' + self.extension))}'
+        MAIN_FILE_PATH = Path(self.temp_dir + '\\' + self.upload_name)
+        MAIN_FILE_PATH_NEW = f'{self.temp_dir}\\{str((str(self.hash) + '.' + self.extension))}'
         MAIN_FILE_PATH.rename(MAIN_FILE_PATH_NEW)
+        
+        # Making short hash directory
+        # And returning full hash directory.
+        FULL_HASH_DIRECTORY = Path(storage.makeHashDir(self.hash, only_return=True))
+        
+        Path(self.temp_dir).rename(FULL_HASH_DIRECTORY)
 
     def getApiStructure(self):
         fnl = {

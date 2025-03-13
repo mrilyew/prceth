@@ -7,7 +7,8 @@ class Storage:
         self.tmp_coll_dir = os.path.join(self.tmp_dir, "files")
 
     def makeTemporaryCollectionDir(self):
-        rand = utils.random_int(1, 1000000) * -1
+        #rand = utils.random_int(1, 1000000) * -1
+        rand = utils.getRandomHash(64)
         path = Path(os.path.join(self.tmp_coll_dir, str(rand)))
         path.mkdir(exist_ok=True)
 

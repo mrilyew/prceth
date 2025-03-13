@@ -10,6 +10,8 @@ class Extractors:
                 return None
             
             return __class
+        except ModuleNotFoundError:
+            return None
         except Exception as ee:
             logger.logException(ee, "Extractors")
             return None
@@ -27,6 +29,8 @@ class Extractors:
                             continue
 
                         __exit.append(item())
+            except ModuleNotFoundError:
+                return None
             except ImportError as e:
                 logger.log(message=f"Error importing {module_name}: {e}")
 

@@ -80,6 +80,7 @@ class VkDoc(BaseExtractor):
         __file.upload_name = item_TEXT
         __file.filesize = item_SIZE
         __file.temp_dir = self.temp_dir
+        __file.hash = utils.getRandomHash(64)
         __file.save()
 
         return ExecuteResponse({

@@ -54,28 +54,34 @@ class VkPost(BaseExtractor):
 
         linked_files = []
         for key, attachment in enumerate(__POST_OBJ.get("attachments")):
-            __attachment_type = attachment.get("type")
-            __attachment_object = attachment.get(__attachment_type)
-            if __attachment_object == None:
-                continue
-            
-            EXPORT_DIRECTORY = storage.makeTemporaryCollectionDir()
-            EXTRACTOR_INSTANCE_CLASS = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_type.title()}"))
-            if EXTRACTOR_INSTANCE_CLASS == None:
-                continue
+            try:
+                __attachment_type = attachment.get("type")
+                __attachment_object = attachment.get(__attachment_type)
+                if __attachment_object == None:
+                    continue
 
-            EXTRACTOR_INSTANCE = EXTRACTOR_INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
-            RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
-                "is_hidden": True,
-                "item_id": f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}",
-                "preset_json": __attachment_object,
-                "access_token": self.passed_params.get("access_token"),
-                "api_url": self.passed_params.get("api_url"),
-                "vk_path": self.passed_params.get("vk_path"),
-            },args=args)
+                EXTRACTOR_INSTANCE_CLASS = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_type.title()}"))
+                if EXTRACTOR_INSTANCE_CLASS == None:
+                    logger.log(message="Unknown attachment: " + str(__attachment_object),section="VkAttachments",name="message")
+                    continue
 
-            linked_files.append(RETURN_ENTITY.id)
-            __POST_OBJ["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY.id}"
+                EXPORT_DIRECTORY = storage.makeTemporaryCollectionDir()
+                EXTRACTOR_INSTANCE = EXTRACTOR_INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY)
+                RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
+                    "is_hidden": True,
+                    "item_id": f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}",
+                    "preset_json": __attachment_object,
+                    "access_token": self.passed_params.get("access_token"),
+                    "api_url": self.passed_params.get("api_url"),
+                    "vk_path": self.passed_params.get("vk_path"),
+                },args=args)
+
+                linked_files.append(RETURN_ENTITY.id)
+                __POST_OBJ["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY.id}"
+            except ModuleNotFoundError:
+                pass
+            except Exception as ___e___:
+                logger.logException(___e___, "VkAttachment")
         
         return ExecuteResponse({
             "source": "vk:wall"+__item_id,
