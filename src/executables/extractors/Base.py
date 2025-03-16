@@ -1,4 +1,4 @@
-from resources.Globals import consts, os, utils, file_manager, json, logger
+from resources.Globals import storage, os, utils, file_manager, json, logger
 from db.Entity import Entity
 
 class BaseExtractor:
@@ -13,7 +13,7 @@ class BaseExtractor:
     def passParams(self, args):
         self.passed_params["display_name"] = args.get("display_name", None)
         self.passed_params["description"] = args.get("description", None)
-        self.passed_params["is_hidden"] = args.get("is_hidden", None)
+        self.passed_params["is_hidden"] = args.get("is_hidden", False)
     
     def saveAsCollection(self, __EXECUTE_RESULT):
         from db.Collection import Collection
@@ -55,11 +55,10 @@ class BaseExtractor:
             FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
         else:
             FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
-        
         if __EXECUTE_RESULT.get("main_file") != None:
             FINAL_ENTITY.file_id = __EXECUTE_RESULT.get("main_file").id
         
-        if __EXECUTE_RESULT.get("unlisted") == 1 or self.passed_params.get("is_hidden") == True:
+        if __EXECUTE_RESULT.get("unlisted", 0) == 1:
             FINAL_ENTITY.unlisted = 1
 
         if __EXECUTE_RESULT.get("linked_files") != None:
@@ -132,15 +131,25 @@ class BaseExtractor:
         return thumb_class.run(file=__FILE,params=args)
     
     async def fastGetEntity(self, params, args):
-        self.passParams(params)
-        EXTRACTOR_RESULTS = await self.execute(args)
-        
-        RETURN_ENTITY = self.saveAsEntity(EXTRACTOR_RESULTS)
-        __file = EXTRACTOR_RESULTS.main_file
-        if __file != None:
-            __file.moveTempDir()
+        from db.File import File
 
-        thumb_result = self.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
+        self.passParams(params)
+        EXTRACTOR_RESULTS = await self.execute({})
+        print(str(params) + "\n\n\n\n\n")
+        if params.get("is_hidden", False) == True:
+            EXTRACTOR_RESULTS["entities"][0]["unlisted"] = 1
+
+        __file = EXTRACTOR_RESULTS.get("entities")[0].get("file")
+        if __file != None:
+            file = File.fromJson(__file, self.temp_dir)
+            EXTRACTOR_RESULTS["entities"][0]["main_file"] = file
+        
+        RETURN_ENTITY = self.saveAsEntity(EXTRACTOR_RESULTS.get("entities")[0])
+
+        if EXTRACTOR_RESULTS.get("entities")[0].get("main_file") != None:
+            EXTRACTOR_RESULTS.get("entities")[0].get("main_file").moveTempDir()
+        
+        thumb_result = self.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS.get("entities")[0])
         if thumb_result != None:
             RETURN_ENTITY.preview = json.dumps(thumb_result)
             RETURN_ENTITY.save()

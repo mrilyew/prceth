@@ -68,7 +68,7 @@ class DownloadManager():
                         queue_element["downloaded"] += expected_time
 
                         #if consts["context"] == "cli":
-                            #print(f"Downloaded {queue_element["downloaded"]} from {queue_element["size"]}")
+                            #pfrint(f"Downloaded {queue_element["downloaded"]} from {queue_element["size"]}")
                         
                         if self.speed_limit_kbps:
                             expected_time = expected_time / (self.speed_limit_kbps * 1024)

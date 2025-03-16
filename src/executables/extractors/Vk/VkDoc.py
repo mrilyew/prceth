@@ -1,11 +1,11 @@
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger
 from resources.Exceptions import NotFoundException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
 
 # Downloads document from vk.com using api.
-class VkDoc(BaseExtractor):
+class VkDoc(VkTemplate):
     name = 'VkDoc'
     category = 'Vk'
     params = {
@@ -18,15 +18,11 @@ class VkDoc(BaseExtractor):
 
     def passParams(self, args):
         self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["preset_json"] = args.get("preset_json", None)
-        self.passed_params["access_token"] = args.get("access_token", config.get("vk.access_token", None))
-        self.passed_params["api_url"] = args.get("api_url", "api.vk.com/method")
-        self.passed_params["vk_path"] = args.get("vk_path", "vk.com")
+        self.passed_params["__json_info"] = args.get("__json_info", None)
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("preset_json") != None, "item_id not passed"
-        assert self.passed_params.get("access_token") != None, "access_token not passed"
-        assert self.passed_params.get("api_url") != None, "api_url not passed"
-        assert self.passed_params.get("vk_path") != None, "vk_path not passed"
+
+        super().passParams(args)
     
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -37,7 +33,7 @@ class VkDoc(BaseExtractor):
         __ITEM_ID  = self.passed_params.get("item_id")
         __SOURCE   = ""
         DOCUMENT = None
-        if self.passed_params.get("preset_json") == None:
+        if self.passed_params.get("__json_info") == None:
             __ITEM_RES = await self.__recieveById(__ITEM_ID)
             try:
                 DOCUMENT = __ITEM_RES[0]
@@ -45,7 +41,7 @@ class VkDoc(BaseExtractor):
                 DOCUMENT = None
         else:
             try:
-                __ITEM_RES = self.passed_params.get("preset_json")
+                __ITEM_RES = self.passed_params.get("__json_info")
                 DOCUMENT = __ITEM_RES
             except:
                 DOCUMENT = None

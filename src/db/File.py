@@ -65,7 +65,12 @@ class File(BaseModel):
     def fromJson(json, temp_dir):
         __file = File()
         __file.extension = json.get("extension")
-        __file.hash = utils.getRandomHash(32)
+
+        if json.get("hash") == None:
+            __file.hash = utils.getRandomHash(32)
+        else:
+            __file.hash = json.get("hash")
+        
         __file.upload_name = json.get("upload_name")
         __file.filesize = json.get("filesize")
         __file.temp_dir = temp_dir

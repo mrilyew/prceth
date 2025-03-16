@@ -283,7 +283,7 @@ class Api():
         if __export_as_entity == True:
             FINAL_RES = None
             if ENTITIES_COUNT == 1:
-                if EXTRACTOR_RESULTS.get("entities")[0] != None:
+                if EXTRACTOR_RESULTS.get("entities")[0].get("file") != None:
                     __FILE = File.fromJson(EXTRACTOR_RESULTS.get("entities")[0].get("file"), EXPORT_DIRECTORY)
                     EXTRACTOR_RESULTS.get("entities")[0]["main_file"] = __FILE
                 

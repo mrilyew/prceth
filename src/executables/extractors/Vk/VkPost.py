@@ -1,52 +1,44 @@
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Globals import VkApi, json, utils, config, ExtractorsRepository, storage, logger
 from resources.Exceptions import NotFoundException
 
-class VkPost(BaseExtractor):
+class VkPost(VkTemplate):
     name = 'VkPost'
     category = 'Vk'
 
     def passParams(self, args):
-        self.passed_params = args
         self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["access_token"] = args.get("access_token", config.get("vk.access_token", None))
-        self.passed_params["api_url"] = args.get("api_url", "api.vk.com/method")
-        self.passed_params["vk_path"] = args.get("vk_path", "vk.com")
+        self.passed_params["__json_info"] = args.get("__json_info")
 
-        assert self.passed_params.get("item_id") != None, "item_id not passed"
-        assert self.passed_params.get("access_token") != None, "access_token not passed"
-        assert self.passed_params.get("api_url") != None, "api_url not passed"
-        assert self.passed_params.get("vk_path") != None, "vk_path not passed"
-
+        assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
         super().passParams(args)
 
-    async def __recieveById(self, photo_id):
+    async def __recieveById(self, post_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
-        return await __vkapi.call("wall.getById", {"posts": photo_id, "extended": 1})
+        return await __vkapi.call("wall.getById", {"posts": post_id, "extended": 1})
 
     async def run(self, args):
         # TODO add check for real links like vk.com/wall1_1
-        __post_api_response = None
-        __item_id  = self.passed_params.get("item_id")
-        if getattr(self, "__predumped_info", None) == None:
-            __post_api_response = await self.__recieveById(__item_id)
+        __POST_RESPONSE = None
+        ITEM_ID = self.passed_params.get("item_id")
+        if self.passed_params.get("__json_info", None) == None:
+            __POST_RESPONSE = await self.__recieveById(ITEM_ID)
         else:
-            __post_api_response = self.__predumped_info
+            __POST_RESPONSE = self.passed_params.get("__json_info", None)
         
-        # TODO: Attachments processing
         try:
-            __POST_OBJ = __post_api_response.get("items")[0]
-            __item_id = f"{__POST_OBJ.get("owner_id")}_{__POST_OBJ.get("id")}"
+            __POST_OBJ = __POST_RESPONSE.get("items")[0]
             __POST_OBJ.pop("track_code", None)
             __POST_OBJ.pop("hash", None)
-        
+
+            ITEM_ID = f"{__POST_OBJ.get("owner_id")}_{__POST_OBJ.get("id")}"
         except Exception:
             __POST_OBJ = None
 
         if __POST_OBJ == None:
             raise NotFoundException("post not found")
 
-        logger.log(message=f"Recieved post {__item_id}",section="VK",name="message")
+        logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
 
         # Making indexation
         __POST_OBJ["site"] = self.passed_params.get("vk_path")
@@ -70,7 +62,7 @@ class VkPost(BaseExtractor):
                 RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
                     "is_hidden": True,
                     "item_id": f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}",
-                    "preset_json": __attachment_object,
+                    "__json_info": __attachment_object,
                     "access_token": self.passed_params.get("access_token"),
                     "api_url": self.passed_params.get("api_url"),
                     "vk_path": self.passed_params.get("vk_path"),
@@ -86,11 +78,12 @@ class VkPost(BaseExtractor):
         return {
             "entities": [
                 {
-                    "source": "vk:wall"+__item_id,
-                    "suggested_name": f"VK Post {str(__item_id)}",
+                    "source": "vk:wall"+ITEM_ID,
+                    "suggested_name": f"VK Post {str(ITEM_ID)}",
                     "indexation_content": __indexation,
                     "entity_internal_content": __POST_OBJ,
                     "linked_files": linked_files,
+                    "is_hidden": False,
                 }
             ]
         }
