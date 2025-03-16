@@ -14,52 +14,74 @@ class BaseExtractor:
         self.passed_params["display_name"] = args.get("display_name", None)
         self.passed_params["description"] = args.get("description", None)
         self.passed_params["is_hidden"] = args.get("is_hidden", None)
+    
+    def saveAsCollection(self, __EXECUTE_RESULT):
+        from db.Collection import Collection
+
+        FINAL_COLLECTION = Collection()
+        if self.passed_params.get("display_name") == None:
+            if __EXECUTE_RESULT.get("suggested_name") == None:
+                FINAL_COLLECTION.name = "N/A"
+            else:
+                FINAL_COLLECTION.name = __EXECUTE_RESULT.get("suggested_name")
+        else:
+            FINAL_COLLECTION.name = self.passed_params.get("display_name")
+
+        if __EXECUTE_RESULT.get("suggested_description") != None:
+            FINAL_COLLECTION.description = __EXECUTE_RESULT.get("suggested_description")
+        else:
+            FINAL_COLLECTION.description = self.passed_params.get("description")
+
+        FINAL_COLLECTION.order = Collection.getAllCount()
+        if FINAL_COLLECTION.get("source") != None:
+            FINAL_COLLECTION.source = __EXECUTE_RESULT.get("source")
+
+        FINAL_COLLECTION.save()
+
+        return FINAL_COLLECTION
 
     def saveAsEntity(self, __EXECUTE_RESULT):
         FINAL_ENTITY = Entity()
-        if __EXECUTE_RESULT.hasHash() == False:
+        if __EXECUTE_RESULT.get("hash") != None:
             __hash = utils.getRandomHash(32)
         else:
-            __hash = __EXECUTE_RESULT.hash
+            __hash = __EXECUTE_RESULT.get("hash")
         
-        indexation_content_ = __EXECUTE_RESULT.indexation_content
-        entity_internal_content_ = __EXECUTE_RESULT.entity_internal_content
+        indexation_content_ = __EXECUTE_RESULT.get("indexation_content")
+        entity_internal_content_ = __EXECUTE_RESULT.get("entity_internal_content")
 
         FINAL_ENTITY.hash = __hash
-        if __EXECUTE_RESULT.hasInternalContent():
+        if entity_internal_content_ != None:
             FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
         else:
             FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
         
-        if __EXECUTE_RESULT.main_file == None:
-            FINAL_ENTITY.type = 0
-        else:
-            FINAL_ENTITY.file_id = __EXECUTE_RESULT.main_file.id
-            FINAL_ENTITY.type = 1
+        if __EXECUTE_RESULT.get("main_file") != None:
+            FINAL_ENTITY.file_id = __EXECUTE_RESULT.get("main_file").id
         
-        if __EXECUTE_RESULT.isUnlisted() or self.passed_params.get("is_hidden") == True:
+        if __EXECUTE_RESULT.get("unlisted") == 1 or self.passed_params.get("is_hidden") == True:
             FINAL_ENTITY.unlisted = 1
 
-        if __EXECUTE_RESULT.linked_files != None:
-            FINAL_ENTITY.linked_files = ",".join(str(v) for v in __EXECUTE_RESULT.linked_files)
+        if __EXECUTE_RESULT.get("linked_files") != None:
+            FINAL_ENTITY.linked_files = ",".join(str(v) for v in __EXECUTE_RESULT.get("linked_files"))
         
         FINAL_ENTITY.extractor_name = self.name
         if self.passed_params.get("display_name") != None:
             FINAL_ENTITY.display_name = self.passed_params["display_name"]
         else:
-            if __EXECUTE_RESULT.main_file == None:
-                if __EXECUTE_RESULT.suggested_name == None:
+            if __EXECUTE_RESULT.get("main_file") == None:
+                if __EXECUTE_RESULT.get("suggested_name") == None:
                     FINAL_ENTITY.display_name = "N/A"
                 else:
-                    FINAL_ENTITY.display_name = __EXECUTE_RESULT.suggested_name
+                    FINAL_ENTITY.display_name = __EXECUTE_RESULT.get("suggested_name")
             else:
-                FINAL_ENTITY.display_name = __EXECUTE_RESULT.main_file.upload_name
+                FINAL_ENTITY.display_name = __EXECUTE_RESULT.get("main_file").upload_name
         
         if self.passed_params.get("description") != None:
             FINAL_ENTITY.description = self.passed_params["description"]
-        if __EXECUTE_RESULT.hasSource():
-            FINAL_ENTITY.source = __EXECUTE_RESULT.source
-        if __EXECUTE_RESULT.hasIndexationContent():
+        if __EXECUTE_RESULT.get("source") != None:
+            FINAL_ENTITY.source = __EXECUTE_RESULT.get("source")
+        if __EXECUTE_RESULT.get("indexation_content") != None:
             #FINAL_ENTITY.indexation_content = json.dumps(indexation_content_) # remove
             FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
         else:
@@ -99,8 +121,8 @@ class BaseExtractor:
             return None
         
         ext = __FILE.extension
-        if args.hasPreview():
-            ext = utils.get_ext(args.another_file)
+        if args.get("preview_file"):
+            ext = utils.get_ext(args.get("preview_file"))
         
         thumb = (ThumbnailsRepository()).getByFormat(ext)
         if thumb == None:

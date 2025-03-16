@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import os, download_manager, ExecuteResponse, VkApi, Path, json5, config, utils, logger
+from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger
 from resources.Exceptions import NotFoundException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
@@ -75,20 +75,20 @@ class VkDoc(BaseExtractor):
         DOCUMENT["site"] = self.passed_params.get("vk_path")
         __indexation = utils.clearJson(DOCUMENT)
 
-        __file = File()
-        __file.extension = item_EXT
-        __file.upload_name = item_TEXT
-        __file.filesize = item_SIZE
-        __file.temp_dir = self.temp_dir
-        __file.hash = utils.getRandomHash(64)
-        __file.save()
-
-        return ExecuteResponse({
-            "main_file": __file,
-            "source": __SOURCE,
-            "indexation_content": __indexation,
-            "entity_internal_content": DOCUMENT
-        })
+        return {
+            "entities": [
+                {
+                    "file": {
+                        "extension": item_EXT,
+                        "upload_name": item_TEXT,
+                        "filesize": item_SIZE,
+                    },
+                    "source": __SOURCE,
+                    "indexation_content": __indexation,
+                    "entity_internal_content": DOCUMENT
+                }
+            ]
+        }
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "vk", "data": {

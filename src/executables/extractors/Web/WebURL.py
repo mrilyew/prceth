@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import os, download_manager, Path, utils, requests, mimetypes, config, file_manager, ExecuteResponse
+from resources.Globals import os, download_manager, Path, utils, requests, mimetypes, config, file_manager
 from resources.Exceptions import NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
@@ -57,19 +57,20 @@ class WebURL(BaseExtractor):
         }
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
 
-        __file = File()
-        __file.extension = ext
-        __file.upload_name = JOINED_FILE_NAME
-        __file.filesize = file_size
-        __file.temp_dir = self.temp_dir
-        __file.save()
-
-        return ExecuteResponse({
-            "main_file": __file,
-            "source": "url:"+self.passed_params.get("url"),
-            "entity_internal_content": output_metadata,
-            "indexation_content": output_metadata,
-        })
+        return {
+            "entities": [
+                {
+                    "file": {
+                        "extension": ext,
+                        "upload_name": JOINED_FILE_NAME,
+                        "filesize": file_size,
+                    },
+                    "source": "url:"+self.passed_params.get("url"),
+                    "entity_internal_content": output_metadata,
+                    "indexation_content": output_metadata,
+                }
+            ]
+        }
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "url", "data": {

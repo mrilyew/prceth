@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import VkApi, ExecuteResponse, json, utils, config, ExtractorsRepository, storage, logger
+from resources.Globals import VkApi, json, utils, config, ExtractorsRepository, storage, logger
 from resources.Exceptions import NotFoundException
 
 class VkPost(BaseExtractor):
@@ -83,14 +83,17 @@ class VkPost(BaseExtractor):
             except Exception as ___e___:
                 logger.logException(___e___, "VkAttachment")
         
-        return ExecuteResponse({
-            "source": "vk:wall"+__item_id,
-            "suggested_name": f"VK Post {str(__item_id)}",
-            "indexation_content": __indexation,
-            "entity_internal_content": __POST_OBJ,
-            "no_file": True,
-            "linked_files": linked_files,
-        })
+        return {
+            "entities": [
+                {
+                    "source": "vk:wall"+__item_id,
+                    "suggested_name": f"VK Post {str(__item_id)}",
+                    "indexation_content": __indexation,
+                    "entity_internal_content": __POST_OBJ,
+                    "linked_files": linked_files,
+                }
+            ]
+        }
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "vk", "data": {

@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import os, download_manager, ExecuteResponse, VkApi, Path, json5, config, utils, logger
+from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger
 from resources.Exceptions import NotFoundException
 #from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
@@ -75,25 +75,25 @@ class VkPhoto(BaseExtractor):
                     PHOTO_URL = __photo_sizes[0].get("url")
         
         HTTP_REQUEST = await download_manager.addDownload(end=PHOTO_URL,dir=SAVE_PATH)
-        
-        __file = File()
-        __file.extension = "jpg"
-        __file.upload_name = ORIGINAL_NAME
-        __file.filesize = SAVE_PATH.stat().st_size
-        __file.temp_dir = self.temp_dir
-        __file.hash = utils.getRandomHash(64)
-        __file.save()
 
         __PHOTO_OBJECT["site"] = self.passed_params.get("vk_path")
         __indexation = utils.clearJson(__PHOTO_OBJECT)
 
-        return ExecuteResponse({
-            "main_file": __file,
-            "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
-            "source": "vk:photo"+str(__PHOTO_ID),
-            "indexation_content": __indexation,
-            "entity_internal_content": __PHOTO_OBJECT
-        })
+        return {
+            "entities": [
+                {
+                    "file": {
+                        "extension": "jpg",
+                        "upload_name": ORIGINAL_NAME,
+                        "filesize": SAVE_PATH.stat().st_size,
+                    },
+                    "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
+                    "source": "vk:photo"+str(__PHOTO_ID),
+                    "indexation_content": __indexation,
+                    "entity_internal_content": __PHOTO_OBJECT
+                }
+            ]
+        }
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "vk", "data": {

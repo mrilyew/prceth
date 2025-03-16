@@ -12,8 +12,8 @@ class TImage(BaseThumbnail):
             "photo": []
         }
 
-        if params.hasPreview():
-            path = file.getDirPath() + "/" + params.another_file
+        if params.get("preview_file"):
+            path = file.getDirPath() + "/" + params.get("preview_file")
         
         with Image.open(path) as img:
             __hash = utils.getRandomHash(8)

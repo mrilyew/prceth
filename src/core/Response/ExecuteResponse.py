@@ -8,8 +8,9 @@ class ExecuteResponse():
         self.hash = infe.get("hash")
         self.return_type = infe.get("return_type")
         self.unlisted = infe.get("unlisted")
-        self.no_file = infe.get("no_file", False)
+        self.entities = infe.get("entities", [])
         self.suggested_name = infe.get("suggested_name", None)
+        self.suggested_description = infe.get("suggested_description", None)
         self.linked_files = infe.get("linked_files", None)
     
     def get_format(self):

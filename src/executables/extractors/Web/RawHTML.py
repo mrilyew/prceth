@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import Crawler, file_manager, ExecuteResponse, logger
+from resources.Globals import Crawler, file_manager, logger
 from resources.Exceptions import NotPassedException
 from db.File import File
 
@@ -53,13 +53,6 @@ class RawHTML(BaseExtractor):
         
         file_manager.createFile(dir=self.temp_dir,filename=ORIGINAL_NAME,content=__html)
 
-        __file = File()
-        __file.extension = "html"
-        __file.upload_name = ORIGINAL_NAME
-        __file.filesize = len(__html)
-        __file.temp_dir = self.temp_dir
-        __file.save()
-
         WEB_META = self.crawler.printMeta()
         SOURCE = self.passed_params.get("url", "")
         if SOURCE == "":
@@ -67,13 +60,21 @@ class RawHTML(BaseExtractor):
         else:
             SOURCE = "url:" + SOURCE
 
-        final = ExecuteResponse({
-            "main_file": __file,
-            "source": SOURCE,
-            "entity_internal_content": WEB_META,
-            "indexation_content": WEB_META,
-            "another_file": "screenshot.png"
-        })
+        final = {
+            "entities": [
+                {
+                    "source": SOURCE,
+                    "entity_internal_content": WEB_META,
+                    "indexation_content": WEB_META,
+                    "preview_file": "screenshot.png",
+                    "file": {
+                        "extension": "html",
+                        "upload_name": ORIGINAL_NAME,
+                        "filesize": len(__html),
+                    },
+                }
+            ]
+        }
         
         return final
     

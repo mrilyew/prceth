@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import Path, file_manager, utils, ExecuteResponse
+from resources.Globals import Path, file_manager, utils
 from resources.Exceptions import InvalidPassedParam, NotPassedException
 from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
@@ -63,23 +63,23 @@ class FSPath(BaseExtractor):
         }
         # TODO
         __OUTPUT_METADATA["additional_metadata"] = additional_metadata_wheel(input_file=str(INPUT_PATH))
-        
-        __file = File()
-        __file.extension = INPUT_FILE_EXT
-        __file.upload_name = INPUT_FILE_NAME
-        __file.filesize = FILE_SIZE
-        __file.temp_dir = self.temp_dir
-        
-        __file.save()
 
-        return ExecuteResponse({
-            "source": "path:"+str(INPUT_PATH),
-            "main_file": __file,
-            "entity_internal_content": __OUTPUT_METADATA,
-            "indexation_content": {
-                "metadata": __OUTPUT_METADATA["metadata"]
-            }
-        })
+        return {
+            "entities": [
+                {
+                    "source": "path:"+str(INPUT_PATH),
+                    "entity_internal_content": __OUTPUT_METADATA,
+                    "indexation_content": {
+                        "metadata": __OUTPUT_METADATA["metadata"]
+                    },
+                    "file": {
+                        "extension": INPUT_FILE_EXT,
+                        "upload_name": INPUT_FILE_NAME,
+                        "filesize": FILE_SIZE,
+                    }
+                }
+            ],
+        }
     
     def describeSource(self, INPUT_ENTITY):
         return {"type": "api", "data": {

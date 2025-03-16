@@ -1,7 +1,8 @@
-from resources.Globals import config, time, ExtractorsRepository, ActsRepository, ServicesRepository, logger, json, file_manager, Path, storage
-from resources.Exceptions import NotFoundException, NotPassedException
+from resources.Globals import config, time, ExtractorsRepository, ActsRepository, ServicesRepository, logger, json, file_manager, Path, storage, utils
+from resources.Exceptions import NotFoundException, NotPassedException, ExtractorException
 from db.Collection import Collection
 from db.Entity import Entity
+from db.File import File
 
 class Api():
     def __init__(self):
@@ -275,16 +276,29 @@ class Api():
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY,del_dir_on_fail=__export_as_entity == True)
         EXTRACTOR_INSTANCE.passParams(_ARGS)
         EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(_ARGS)
+        ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
+        if ENTITIES_COUNT < 1:
+            raise ExtractorException("wtf bro")
         
-        if __export_as_entity == True:                
-            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS)
-            if EXTRACTOR_RESULTS.main_file != None:
-                EXTRACTOR_RESULTS.main_file.moveTempDir()
-            
-            thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS)
-            if thumb_result != None:
-                RETURN_ENTITY.preview = json.dumps(thumb_result)
-                RETURN_ENTITY.save()
+        if __export_as_entity == True:
+            FINAL_RES = None
+            if ENTITIES_COUNT == 1:
+                if EXTRACTOR_RESULTS.get("entities")[0] != None:
+                    __FILE = File.fromJson(EXTRACTOR_RESULTS.get("entities")[0].get("file"), EXPORT_DIRECTORY)
+                    EXTRACTOR_RESULTS.get("entities")[0]["main_file"] = __FILE
+                
+                FINAL_RES = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS.get("entities")[0])
+                if EXTRACTOR_RESULTS.get("entities")[0].get("main_file") != None:
+                    EXTRACTOR_RESULTS.get("entities")[0].get("main_file").moveTempDir()
+                
+                thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=FINAL_RES,args=EXTRACTOR_RESULTS.get("entities")[0])
+                if thumb_result != None:
+                    FINAL_RES.preview = json.dumps(thumb_result)
+                    FINAL_RES.save()
+            elif ENTITIES_COUNT > 1:
+                FINAL_RES = EXTRACTOR_INSTANCE.saveAsCollection(EXTRACTOR_RESULTS)
+                for i_entity in EXTRACTOR_RESULTS.get("entities"):
+                    FINAL_RES.addItem(i_entity)
 
             if collection_id != None:
                 collection = Collection.get(collection_id)
@@ -294,7 +308,7 @@ class Api():
                     collection.addItem(RETURN_ENTITY)
 
             await EXTRACTOR_INSTANCE.postRun()
-            return RETURN_ENTITY
+            return FINAL_RES
         else:
             RETURN_ENTITY = EXTRACTOR_INSTANCE.saveToDirectory(EXTRACTOR_RESULTS) # Does thing :D!
             return

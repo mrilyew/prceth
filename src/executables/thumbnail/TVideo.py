@@ -12,8 +12,8 @@ class TVideo(BaseThumbnail):
         }
 
         path = file.getPath()
-        if params.hasPreview():
-            path = params.another_file
+        if params.get("preview_file"):
+            path = params.get("preview_file")
         
         with VideoFileClip(path) as video:
             duration = video.duration

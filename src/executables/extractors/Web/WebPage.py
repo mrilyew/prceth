@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import Crawler, file_manager, ExecuteResponse, logger
+from resources.Globals import Crawler, file_manager, logger
 from resources.Exceptions import NotPassedException
 from db.File import File
 
@@ -48,23 +48,24 @@ class WebPage(BaseExtractor):
 
         self.crawler.printScreenshot()
 
-        original_name = "index.html"
-        file_manager.createFile(dir=self.temp_dir,filename=original_name,content=__html)
+        ORIGINAL_NAME = "index.html"
+        file_manager.createFile(dir=self.temp_dir,filename=ORIGINAL_NAME,content=__html)
         output_metadata = self.crawler.printMeta()
 
-        __file = File()
-        __file.extension = "html"
-        __file.upload_name = original_name
-        __file.filesize = len(__html)
-        __file.temp_dir = self.temp_dir
-        __file.save()
-
-        final = ExecuteResponse({
-            "main_file": __file,
-            "source": "url:" + SITE_URL,
-            "entity_internal_content": output_metadata,
-            "another_file": "screenshot.png"
-        })
+        final = {
+            "entities": [
+                {
+                    "source": "url:" + SITE_URL,
+                    "entity_internal_content": output_metadata,
+                    "preview_file": "screenshot.png",
+                    "file": {
+                        "extension": "html",
+                        "upload_name": ORIGINAL_NAME,
+                        "filesize": len(__html),
+                    }
+                }
+            ],
+        }
         
         return final
     
