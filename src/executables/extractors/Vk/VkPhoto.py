@@ -2,7 +2,6 @@ from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger
 from resources.Exceptions import NotFoundException
 #from core.Wheels import metadata_wheel, additional_metadata_wheel
-from db.File import File
 
 # Downloads photo from vk.com using api.
 class VkPhoto(VkTemplate):
@@ -90,8 +89,3 @@ class VkPhoto(VkTemplate):
                 }
             ]
         }
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "vk", "data": {
-            "source": f"https://{INPUT_ENTITY.getFormattedInfo().get("vk_path")}/" + INPUT_ENTITY.orig_source
-        }}

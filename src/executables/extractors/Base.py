@@ -135,7 +135,6 @@ class BaseExtractor:
 
         self.passParams(params)
         EXTRACTOR_RESULTS = await self.execute({})
-        print(str(params) + "\n\n\n\n\n")
         if params.get("is_hidden", False) == True:
             EXTRACTOR_RESULTS["entities"][0]["unlisted"] = 1
 
@@ -149,10 +148,10 @@ class BaseExtractor:
         if EXTRACTOR_RESULTS.get("entities")[0].get("main_file") != None:
             EXTRACTOR_RESULTS.get("entities")[0].get("main_file").moveTempDir()
         
-        thumb_result = self.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS.get("entities")[0])
-        if thumb_result != None:
-            RETURN_ENTITY.preview = json.dumps(thumb_result)
-            RETURN_ENTITY.save()
+            thumb_result = self.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS.get("entities")[0])
+            if thumb_result != None:
+                RETURN_ENTITY.preview = json.dumps(thumb_result)
+                RETURN_ENTITY.save()
         
         await self.postRun()
         return RETURN_ENTITY

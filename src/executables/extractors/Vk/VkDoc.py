@@ -85,8 +85,3 @@ class VkDoc(VkTemplate):
                 }
             ]
         }
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "vk", "data": {
-            "source": f"https://{INPUT_ENTITY.getFormattedInfo().get("vk_path")}/" + INPUT_ENTITY.orig_source
-        }}

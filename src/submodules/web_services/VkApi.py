@@ -22,7 +22,7 @@ class VkApi():
         async with aiohttp.ClientSession() as session:
             async with session.get(__end_url) as response:
                 __response = await response.json()
-
+        
         if __response.get("response") == None:
             raise VkApiException(message=__response.get("error").get("error_msg"))
         

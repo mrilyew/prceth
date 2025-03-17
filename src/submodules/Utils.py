@@ -1,5 +1,6 @@
 from resources.Globals import contextmanager, secrets, os, urlparse, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
+import re
 
 class Utils():
     def parse_args(self):
@@ -229,4 +230,13 @@ class Utils():
         yield
         __class._meta.database = old_db
     
+    def validName(self, text):
+        safe_filename = re.sub(r'[\\/*?:"<>| ]', '_', text)
+        safe_filename = re.sub(r'_+', '_', safe_filename)
+        safe_filename = safe_filename.strip('_')
+        if not safe_filename:
+            return "unnamed"
+        
+        return safe_filename
+
 utils = Utils()

@@ -9,6 +9,7 @@ class VkPost(VkTemplate):
     def passParams(self, args):
         self.passed_params["item_id"] = args.get("item_id")
         self.passed_params["__json_info"] = args.get("__json_info")
+        self.passed_params["download_external_media"] = int(args.get("download_external_media", "0")) == 1
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
         super().passParams(args)
@@ -66,6 +67,7 @@ class VkPost(VkTemplate):
                     "access_token": self.passed_params.get("access_token"),
                     "api_url": self.passed_params.get("api_url"),
                     "vk_path": self.passed_params.get("vk_path"),
+                    "download_file": self.passed_params.get("download_external_media"),
                 },args=args)
 
                 linked_files.append(RETURN_ENTITY.id)
@@ -87,8 +89,3 @@ class VkPost(VkTemplate):
                 }
             ]
         }
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "vk", "data": {
-            "source": f"https://{INPUT_ENTITY.getFormattedInfo().get("vk_path")}/" + INPUT_ENTITY.orig_source
-        }}
