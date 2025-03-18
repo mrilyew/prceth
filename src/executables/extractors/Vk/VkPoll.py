@@ -14,14 +14,14 @@ class VkPoll(VkTemplate):
         },
     }
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["item_id"] = args.get("item_id")
         self.passed_params["__json_info"] = args.get("__json_info", None)
         self.passed_params["indexation_text_cut"] = int(args.get("indexation_text_cut", "699"))
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("preset_json") != None, "item_id not passed"
 
-        super().passParams(args)
+        super().setArgs(args)
     
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -60,13 +60,15 @@ class VkPoll(VkTemplate):
         
         POLL["site"] = self.passed_params.get("vk_path")
         __indexation = utils.clearJson(POLL)
+        ENTITY = self._entityFromJson({
+            "source": __SOURCE,
+            "indexation_content": __indexation,
+            "entity_internal_content": POLL,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+        })
 
         return {
             "entities": [
-                {
-                    "source": __SOURCE,
-                    "indexation_content": __indexation,
-                    "entity_internal_content": POLL
-                }
+                ENTITY
             ]
         }

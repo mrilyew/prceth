@@ -1,9 +1,10 @@
-from resources.Globals import consts, time, operator, reduce, Path, BaseModel, json5, file_manager, logger
+from resources.Globals import consts, time, operator, reduce, utils, BaseModel, json5, json, file_manager, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
 from db.File import File
 
 class Entity(BaseModel):
     self_name = 'entity'
+    __cached_file = None
 
     id = AutoField() # Absolute id
     file_id = TextField(null=True) # File extension
@@ -39,6 +40,9 @@ class Entity(BaseModel):
     def file(self):
         if self.file_id == None:
             return None
+        
+        if self.__cached_file != None:
+            return self.__cached_file
         
         return File.get(self.file_id)
 
@@ -137,3 +141,55 @@ class Entity(BaseModel):
             return Entity.select().where(Entity.id == id).where(Entity.deleted == 0).get()
         except:
             return None
+
+    @staticmethod
+    def fromJson(json_input, passed_params):
+        FINAL_ENTITY = Entity()
+        if json_input.get("hash") == None:
+            __hash = utils.getRandomHash(32)
+        else:
+            __hash = json_input.get("hash")
+        
+        indexation_content_ = json_input.get("indexation_content")
+        entity_internal_content_ = json_input.get("entity_internal_content")
+
+        FINAL_ENTITY.hash = __hash
+        if entity_internal_content_ != None:
+            FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
+        else:
+            FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
+        if json_input.get("file") != None:
+            FINAL_ENTITY.file_id = json_input.get("file").id
+            FINAL_ENTITY.__cached_file = json_input.get("file")
+        
+        if json_input.get("unlisted", None) == True:
+            FINAL_ENTITY.unlisted = 1
+
+        if json_input.get("linked_files") != None:
+            FINAL_ENTITY.linked_files = ",".join(str(v) for v in json_input.get("linked_files"))
+        
+        FINAL_ENTITY.extractor_name = json_input.get("extractor_name")
+        if passed_params.get("display_name") != None:
+            FINAL_ENTITY.display_name = passed_params["display_name"]
+        else:
+            if json_input.get("file") == None:
+                if json_input.get("suggested_name") == None:
+                    FINAL_ENTITY.display_name = "N/A"
+                else:
+                    FINAL_ENTITY.display_name = json_input.get("suggested_name")
+            else:
+                FINAL_ENTITY.display_name = json_input.get("file").upload_name
+        
+        if passed_params.get("description") != None:
+            FINAL_ENTITY.description = passed_params["description"]
+        if json_input.get("source") != None:
+            FINAL_ENTITY.source = json_input.get("source")
+        if json_input.get("indexation_content") != None:
+            #FINAL_ENTITY.indexation_content = json_input.dumps(indexation_content_) # remove
+            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
+        else:
+            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(entity_internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
+        
+        FINAL_ENTITY.save()
+
+        return FINAL_ENTITY

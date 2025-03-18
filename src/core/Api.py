@@ -250,65 +250,50 @@ class Api():
         count = fetch.count()
 
         return items, count
-    async def uploadEntity(self, _ARGS):
-        if 'extractor' not in _ARGS:
+    async def uploadEntity(self, __INPUT_ARGS):
+        if 'extractor' not in __INPUT_ARGS:
             raise NotPassedException('--extractor not passed')
-
-        # Extractor that will be using for export
-        __extractor_input_name = _ARGS.get("extractor")
-        # Collection to where entity will added
-        collection_id = _ARGS.get("collection_id", None)
+        
+        __extractor_input_name = __INPUT_ARGS.get("extractor") # Extractor that will be using for export
+        collection_id = __INPUT_ARGS.get("collection_id", None) # Collection id to where entity will added
         # None: Result will be saved as entity
         # Text: Result will be saved at another dir
-        __export_as_entity = _ARGS.get("export_to_folder", None) == None
-
-        EXPORT_DIRECTORY = None
-        if __export_as_entity == True:
-            EXPORT_DIRECTORY = storage.makeTemporaryCollectionDir()
-        else:
-            EXPORT_DIRECTORY = _ARGS.get("export_to_folder")
-            if Path(EXPORT_DIRECTORY).is_dir() == False:
-                raise NotADirectoryError("Directory not found")
+        __export_to_db = __INPUT_ARGS.get("export_to_folder", None) == None
         
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=EXPORT_DIRECTORY,del_dir_on_fail=__export_as_entity == True)
-        EXTRACTOR_INSTANCE.passParams(_ARGS)
-        EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(_ARGS)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(del_dir_on_fail=__export_to_db == True)
+        EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
+        EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
         ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
         if ENTITIES_COUNT < 1:
             raise ExtractorException("wtf bro")
         
-        if __export_as_entity == True:
-            FINAL_RES = None
-            if ENTITIES_COUNT == 1:
-                if EXTRACTOR_RESULTS.get("entities")[0].get("file") != None:
-                    __FILE = File.fromJson(EXTRACTOR_RESULTS.get("entities")[0].get("file"), EXPORT_DIRECTORY)
-                    EXTRACTOR_RESULTS.get("entities")[0]["main_file"] = __FILE
-                
-                FINAL_RES = EXTRACTOR_INSTANCE.saveAsEntity(EXTRACTOR_RESULTS.get("entities")[0])
-                if EXTRACTOR_RESULTS.get("entities")[0].get("main_file") != None:
-                    EXTRACTOR_RESULTS.get("entities")[0].get("main_file").moveTempDir()
-                
-                thumb_result = EXTRACTOR_INSTANCE.thumbnail(entity=FINAL_RES,args=EXTRACTOR_RESULTS.get("entities")[0])
-                if thumb_result != None:
-                    FINAL_RES.preview = json.dumps(thumb_result)
-                    FINAL_RES.save()
-            elif ENTITIES_COUNT > 1:
-                FINAL_RES = EXTRACTOR_INSTANCE.saveAsCollection(EXTRACTOR_RESULTS)
+        if __export_to_db == True:
+            RETURN_ENTITIES = []
+            for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+                RETURN_ENTITIES.append(ENTITY)
+                if ENTITY.file != None:
+                    ENTITY.file.moveTempDir()
+            
+            if EXTRACTOR_RESULTS.get("collection") != None:
+                RETURN_ENTITIES = []
+                col = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
                 for i_entity in EXTRACTOR_RESULTS.get("entities"):
-                    FINAL_RES.addItem(i_entity)
+                    col.addItem(i_entity)
+
+                RETURN_ENTITIES.append(col)
 
             if collection_id != None:
-                collection = Collection.get(collection_id)
-                if collection == None:
+                POST_COLLECTION = Collection.get(collection_id)
+                if POST_COLLECTION == None:
                     logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
                 else:
-                    collection.addItem(RETURN_ENTITY)
+                    POST_COLLECTION.addItem(RETURN_ENTITY)
 
             await EXTRACTOR_INSTANCE.postRun()
-            return FINAL_RES
+            return RETURN_ENTITIES
         else:
             RETURN_ENTITY = EXTRACTOR_INSTANCE.saveToDirectory(EXTRACTOR_RESULTS) # Does thing :D!
             return

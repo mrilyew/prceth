@@ -62,17 +62,17 @@ class File(BaseModel):
         return COLLECTION_PATH
 
     @staticmethod
-    def fromJson(json, temp_dir):
+    def fromJson(json_input, temp_dir):
         __file = File()
-        __file.extension = json.get("extension")
+        __file.extension = json_input.get("extension")
 
-        if json.get("hash") == None:
+        if json_input.get("hash") == None:
             __file.hash = utils.getRandomHash(32)
         else:
-            __file.hash = json.get("hash")
+            __file.hash = json_input.get("hash")
         
-        __file.upload_name = json.get("upload_name")
-        __file.filesize = json.get("filesize")
+        __file.upload_name = json_input.get("upload_name")
+        __file.filesize = json_input.get("filesize")
         __file.temp_dir = temp_dir
         
         __file.save()

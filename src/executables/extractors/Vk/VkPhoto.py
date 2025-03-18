@@ -15,13 +15,13 @@ class VkPhoto(VkTemplate):
         },
     }
     
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["item_id"] = args.get("item_id")
         self.passed_params["__json_info"] = args.get("__json_info", None)
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
 
-        super().passParams(args)
+        super().setArgs(args)
     
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -73,19 +73,22 @@ class VkPhoto(VkTemplate):
 
         __PHOTO_OBJECT["site"] = self.passed_params.get("vk_path")
         __indexation = utils.clearJson(__PHOTO_OBJECT)
-
+        FILE = self._fileFromJson({
+            "extension": "jpg",
+            "upload_name": ORIGINAL_NAME,
+            "filesize": SAVE_PATH.stat().st_size,
+        })
+        ENTITY = self._entityFromJson({
+            "file": FILE,
+            "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
+            "source": "vk:photo"+str(__PHOTO_ID),
+            "indexation_content": __indexation,
+            "entity_internal_content": __PHOTO_OBJECT,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+        })
+        
         return {
             "entities": [
-                {
-                    "file": {
-                        "extension": "jpg",
-                        "upload_name": ORIGINAL_NAME,
-                        "filesize": SAVE_PATH.stat().st_size,
-                    },
-                    "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
-                    "source": "vk:photo"+str(__PHOTO_ID),
-                    "indexation_content": __indexation,
-                    "entity_internal_content": __PHOTO_OBJECT
-                }
+                ENTITY
             ]
         }

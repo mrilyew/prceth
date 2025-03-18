@@ -7,105 +7,45 @@ class BaseExtractor:
     passed_params = {}
 
     def __init__(self, temp_dir=None, del_dir_on_fail=True):
-        self.temp_dir = temp_dir
+        self.passed_params = {}
+        if temp_dir != None:
+            self.temp_dir = temp_dir
+        else:
+            self.temp_dir = storage.makeTemporaryCollectionDir()
+        
         self.del_dir_on_fail = del_dir_on_fail
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["display_name"] = args.get("display_name", None)
         self.passed_params["description"] = args.get("description", None)
-        self.passed_params["is_hidden"] = args.get("is_hidden", False)
-    
-    def saveAsCollection(self, __EXECUTE_RESULT):
-        from db.Collection import Collection
-
-        FINAL_COLLECTION = Collection()
-        if self.passed_params.get("display_name") == None:
-            if __EXECUTE_RESULT.get("suggested_name") == None:
-                FINAL_COLLECTION.name = "N/A"
-            else:
-                FINAL_COLLECTION.name = __EXECUTE_RESULT.get("suggested_name")
-        else:
-            FINAL_COLLECTION.name = self.passed_params.get("display_name")
-
-        if __EXECUTE_RESULT.get("suggested_description") != None:
-            FINAL_COLLECTION.description = __EXECUTE_RESULT.get("suggested_description")
-        else:
-            FINAL_COLLECTION.description = self.passed_params.get("description")
-
-        FINAL_COLLECTION.order = Collection.getAllCount()
-        if FINAL_COLLECTION.get("source") != None:
-            FINAL_COLLECTION.source = __EXECUTE_RESULT.get("source")
-
-        FINAL_COLLECTION.save()
-
-        return FINAL_COLLECTION
-
-    def saveAsEntity(self, __EXECUTE_RESULT):
-        FINAL_ENTITY = Entity()
-        if __EXECUTE_RESULT.get("hash") != None:
-            __hash = utils.getRandomHash(32)
-        else:
-            __hash = __EXECUTE_RESULT.get("hash")
-        
-        indexation_content_ = __EXECUTE_RESULT.get("indexation_content")
-        entity_internal_content_ = __EXECUTE_RESULT.get("entity_internal_content")
-
-        FINAL_ENTITY.hash = __hash
-        if entity_internal_content_ != None:
-            FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
-        else:
-            FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
-        if __EXECUTE_RESULT.get("main_file") != None:
-            FINAL_ENTITY.file_id = __EXECUTE_RESULT.get("main_file").id
-        
-        if __EXECUTE_RESULT.get("unlisted", 0) == 1:
-            FINAL_ENTITY.unlisted = 1
-
-        if __EXECUTE_RESULT.get("linked_files") != None:
-            FINAL_ENTITY.linked_files = ",".join(str(v) for v in __EXECUTE_RESULT.get("linked_files"))
-        
-        FINAL_ENTITY.extractor_name = self.name
-        if self.passed_params.get("display_name") != None:
-            FINAL_ENTITY.display_name = self.passed_params["display_name"]
-        else:
-            if __EXECUTE_RESULT.get("main_file") == None:
-                if __EXECUTE_RESULT.get("suggested_name") == None:
-                    FINAL_ENTITY.display_name = "N/A"
-                else:
-                    FINAL_ENTITY.display_name = __EXECUTE_RESULT.get("suggested_name")
-            else:
-                FINAL_ENTITY.display_name = __EXECUTE_RESULT.get("main_file").upload_name
-        
-        if self.passed_params.get("description") != None:
-            FINAL_ENTITY.description = self.passed_params["description"]
-        if __EXECUTE_RESULT.get("source") != None:
-            FINAL_ENTITY.source = __EXECUTE_RESULT.get("source")
-        if __EXECUTE_RESULT.get("indexation_content") != None:
-            #FINAL_ENTITY.indexation_content = json.dumps(indexation_content_) # remove
-            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
-        else:
-            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(entity_internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
-        
-        FINAL_ENTITY.save()
-
-        return FINAL_ENTITY
-
-    def saveToDirectory(self, __EXECUTE_RESULT):
-        stream = open(os.path.join(self.temp_dir, "data.json"), "w")
-        if __EXECUTE_RESULT != None:
-            stream.write(json.dumps({
-                "source": __EXECUTE_RESULT.source,
-                "entity_internal_content": __EXECUTE_RESULT.entity_internal_content,
-                "indexation_content": __EXECUTE_RESULT.indexation_content,
-                "hash": __EXECUTE_RESULT.hash,
-            }, indent=2))
-        
-        stream.close()
+        self.passed_params["unlisted"] = args.get("unlisted", 0)
 
     def onFail(self):
         if self.del_dir_on_fail == True:
             file_manager.rmdir(self.temp_dir)
+    
+    def _fileFromJson(self, json_data):
+        from db.File import File
 
+        return File.fromJson(json_data, self.temp_dir)
+    
+    def _entityFromJson(self, json_data, make_preview = True):
+        json_data["extractor_name"] = self.name
+        __entity = Entity.fromJson(json_data, self.passed_params)
+        # rewrite TODO
+        if make_preview == True:
+            thumb_result = self.thumbnail(entity=__entity,args=json_data)
+            if thumb_result != None:
+                __entity.preview = json.dumps(thumb_result)
+                __entity.save()
+
+        return __entity
+    
+    def _collectionFromJson(self, json_data):
+        from db.Collection import Collection
+
+        return Collection.fromJson(json_data, self.passed_params)
+        
     async def run(self, args):
         pass
     
@@ -127,34 +67,23 @@ class BaseExtractor:
         if thumb == None:
             return None
         
-        thumb_class = thumb(save_dir=__FILE.getDirPath())
+        #thumb_class = thumb(save_dir=__FILE.getDirPath())
+        thumb_class = thumb(save_dir=self.temp_dir)
         return thumb_class.run(file=__FILE,params=args)
     
     async def fastGetEntity(self, params, args):
         from db.File import File
 
-        self.passParams(params)
+        RETURN_ENTITIES = []
+        self.setArgs(params)
         EXTRACTOR_RESULTS = await self.execute({})
-        if params.get("is_hidden", False) == True:
-            EXTRACTOR_RESULTS["entities"][0]["unlisted"] = 1
-
-        __file = EXTRACTOR_RESULTS.get("entities")[0].get("file")
-        if __file != None:
-            file = File.fromJson(__file, self.temp_dir)
-            EXTRACTOR_RESULTS["entities"][0]["main_file"] = file
-        
-        RETURN_ENTITY = self.saveAsEntity(EXTRACTOR_RESULTS.get("entities")[0])
-
-        if EXTRACTOR_RESULTS.get("entities")[0].get("main_file") != None:
-            EXTRACTOR_RESULTS.get("entities")[0].get("main_file").moveTempDir()
-        
-            thumb_result = self.thumbnail(entity=RETURN_ENTITY,args=EXTRACTOR_RESULTS.get("entities")[0])
-            if thumb_result != None:
-                RETURN_ENTITY.preview = json.dumps(thumb_result)
-                RETURN_ENTITY.save()
+        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+            RETURN_ENTITIES.append(ENTITY)
+            if ENTITY.file != None:
+                ENTITY.file.moveTempDir()
         
         await self.postRun()
-        return RETURN_ENTITY
+        return RETURN_ENTITIES
             
     def describe(self):
         return {
@@ -181,4 +110,3 @@ class BaseExtractor:
             raise x
 
         return EXTRACTOR_RESULTS
-    

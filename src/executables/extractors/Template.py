@@ -4,10 +4,10 @@ class Template(BaseExtractor):
     name = 'template'
     category = 'template'
     
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params = args
 
-        super().passParams(args)
+        super().setArgs(args)
 
     def onFail(self):
         pass

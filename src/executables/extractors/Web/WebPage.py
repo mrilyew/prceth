@@ -14,10 +14,10 @@ class WebPage(BaseExtractor):
         }
     }
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params = args
 
-        super().passParams(args)
+        super().setArgs(args)
         assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
 
     # BTW, all requests will be unauthorized. So we need to use input raw html parser
@@ -52,22 +52,23 @@ class WebPage(BaseExtractor):
         file_manager.createFile(dir=self.temp_dir,filename=ORIGINAL_NAME,content=__html)
         output_metadata = self.crawler.printMeta()
 
-        final = {
+        FILE = self._fileFromJson({
+            "extension": "html",
+            "upload_name": ORIGINAL_NAME,
+            "filesize": len(__html),
+        })
+        ENTITY = self._entityFromJson({
+            "source": "url:" + SITE_URL,
+            "entity_internal_content": output_metadata,
+            "preview_file": "screenshot.png",
+            "file": FILE
+        })
+
+        return {
             "entities": [
-                {
-                    "source": "url:" + SITE_URL,
-                    "entity_internal_content": output_metadata,
-                    "preview_file": "screenshot.png",
-                    "file": {
-                        "extension": "html",
-                        "upload_name": ORIGINAL_NAME,
-                        "filesize": len(__html),
-                    }
-                }
+                ENTITY
             ],
         }
-        
-        return final
     
     async def postRun(self):
         await super().postRun()

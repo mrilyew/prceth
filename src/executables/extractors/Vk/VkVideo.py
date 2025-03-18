@@ -14,14 +14,14 @@ class VkVideo(VkTemplate):
         },
     }
     
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["item_id"] = args.get("item_id")
         self.passed_params["download_file"] = args.get("download_file", True)
         self.passed_params["__json_info"] = args.get("__json_info", None)
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
 
-        super().passParams(args)
+        super().setArgs(args)
 
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -71,29 +71,32 @@ class VkVideo(VkTemplate):
                     else:
                         logger.log(message=f"Video {__VIDEO_ID} has HLS; downloading",section="VKVideo",name="message")
             else:
-                logger.log(message=f"Do not downloading video {__VIDEO_ID} cuz download_file=1",section="VKVideo",name="message")
+                logger.log(message=f"Do not downloading video {__VIDEO_ID} cuz download_file=0",section="VKVideo",name="message")
         else:
             logger.log(message=f"Video {__VIDEO_ID} is from another platform. Do not downloading file.",section="VK",name="message")
 
         __VIDEO_OBJECT["site"] = self.passed_params.get("vk_path")
         __indexation = utils.clearJson(__VIDEO_OBJECT)
 
-        fnl = {
-            "entities": [
-                {
-                    "suggested_name": VIDEO_NAME,
-                    "source": "vk:video"+str(__VIDEO_ID),
-                    "indexation_content": __indexation,
-                    "entity_internal_content": __VIDEO_OBJECT
-                }
-            ]
-        }
-        
+        FILE = None
         if IS_DIRECT and self.passed_params.get("download_file"):
-            fnl["entities"][0]["file"] = {
+            FILE = self._fileFromJson({
                 "extension": "mp4",
                 "upload_name": ORIGINAL_NAME,
                 "filesize": SAVE_PATH.stat().st_size,
-            }
+            })
         
-        return fnl
+        ENTITY = self._entityFromJson({
+            "suggested_name": VIDEO_NAME,
+            "source": "vk:video"+str(__VIDEO_ID),
+            "indexation_content": __indexation,
+            "entity_internal_content": __VIDEO_OBJECT,
+            "file": FILE,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+        })
+
+        return {
+            "entities": [
+                ENTITY
+            ]
+        }

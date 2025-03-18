@@ -14,11 +14,11 @@ class RawHTML(BaseExtractor):
         }
     }
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params = args
         # TODO расписать
 
-        super().passParams(args)
+        super().setArgs(args)
         assert self.passed_params.get("html") != None, "html was not passed"
         #assert self.passed_params.get("url") != None, "url was not passed"
 
@@ -60,23 +60,24 @@ class RawHTML(BaseExtractor):
         else:
             SOURCE = "url:" + SOURCE
 
-        final = {
+        FILE = self._fileFromJson({
+            "extension": "html",
+            "upload_name": ORIGINAL_NAME,
+            "filesize": len(__html),
+        })
+        ENTITY = self._entityFromJson({
+            "source": SOURCE,
+            "entity_internal_content": WEB_META,
+            "indexation_content": WEB_META,
+            "preview_file": "screenshot.png",
+            "file": FILE,
+        })
+
+        return {
             "entities": [
-                {
-                    "source": SOURCE,
-                    "entity_internal_content": WEB_META,
-                    "indexation_content": WEB_META,
-                    "preview_file": "screenshot.png",
-                    "file": {
-                        "extension": "html",
-                        "upload_name": ORIGINAL_NAME,
-                        "filesize": len(__html),
-                    },
-                }
+                ENTITY
             ]
         }
-        
-        return final
     
     async def postRun(self):
         await super().postRun()

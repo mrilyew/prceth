@@ -194,3 +194,27 @@ class Collection(BaseModel):
             rel = rel.where(Relation.child_entity_id == entity.id)
         
         return rel.count() > 0
+
+    @staticmethod
+    def fromJson(json_input, passed_params):
+        FINAL_COLLECTION = Collection()
+        if json_input.get("display_name") == None:
+            if json_input.get("suggested_name") == None:
+                FINAL_COLLECTION.name = "N/A"
+            else:
+                FINAL_COLLECTION.name = json_input.get("suggested_name")
+        else:
+            FINAL_COLLECTION.name = json_input.get("display_name")
+        
+        if json_input.get("suggested_description") != None:
+            FINAL_COLLECTION.description = json_input.get("suggested_description")
+        else:
+            FINAL_COLLECTION.description = passed_params.get("description")
+
+        FINAL_COLLECTION.order = Collection.getAllCount()
+        if FINAL_COLLECTION.get("source") != None:
+            FINAL_COLLECTION.source = json_input.get("source")
+
+        FINAL_COLLECTION.save()
+
+        return FINAL_COLLECTION

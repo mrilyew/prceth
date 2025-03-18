@@ -5,7 +5,7 @@ class VkTemplate(BaseExtractor):
     name = 'VkTemplate'
     category = 'template'
     
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["access_token"] = args.get("access_token", config.get("vk.access_token", None))
         self.passed_params["api_url"] = args.get("api_url", config.get("vk.api_url", "api.vk.com/method"))
         self.passed_params["vk_path"] = args.get("vk_path", config.get("vk.vk_path", "vk.com"))
@@ -14,7 +14,7 @@ class VkTemplate(BaseExtractor):
         assert self.passed_params.get("api_url") != None, "api_url not passed"
         assert self.passed_params.get("vk_path") != None, "vk_path not passed"
 
-        super().passParams(args)
+        super().setArgs(args)
 
     async def run(self, args):
         pass

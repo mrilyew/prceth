@@ -20,11 +20,11 @@ class FSPath(BaseExtractor):
         }
     }
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["path"] = str(args.get("path"))
         self.passed_params["type"] = args.get("type", "copy")
 
-        super().passParams(args)
+        super().setArgs(args)
         assert args.get("path") != None, "path was not passed"
         assert self.passed_params.get("type") != None, "type was not passed"
     
@@ -64,20 +64,23 @@ class FSPath(BaseExtractor):
         # TODO
         __OUTPUT_METADATA["additional_metadata"] = additional_metadata_wheel(input_file=str(INPUT_PATH))
 
+        FILE = self._fileFromJson({
+            "extension": INPUT_FILE_EXT,
+            "upload_name": INPUT_FILE_NAME,
+            "filesize": FILE_SIZE,
+        })
+        ENTITY = self._entityFromJson({
+            "source": "path:"+str(INPUT_PATH),
+            "entity_internal_content": __OUTPUT_METADATA,
+            "indexation_content": {
+                "metadata": __OUTPUT_METADATA["metadata"]
+            },
+            "file": FILE
+        })
+        
         return {
             "entities": [
-                {
-                    "source": "path:"+str(INPUT_PATH),
-                    "entity_internal_content": __OUTPUT_METADATA,
-                    "indexation_content": {
-                        "metadata": __OUTPUT_METADATA["metadata"]
-                    },
-                    "file": {
-                        "extension": INPUT_FILE_EXT,
-                        "upload_name": INPUT_FILE_NAME,
-                        "filesize": FILE_SIZE,
-                    }
-                }
+                ENTITY
             ],
         }
     

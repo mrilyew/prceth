@@ -21,13 +21,13 @@ class WebURL(BaseExtractor):
         }
     }
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["url"] = args.get("url")
 
-        super().passParams(args)
+        super().setArgs(args)
         assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
     
-    async def run(self, args):
+    async def run(self, args = {}):
         PASSED_URL = self.passed_params.get("url")
         name, ext = utils.nameFromURL(PASSED_URL)
 
@@ -56,20 +56,22 @@ class WebURL(BaseExtractor):
             "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(save_path))),
         }
         output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
+        FILE = self._fileFromJson({
+            "extension": ext,
+            "upload_name": JOINED_FILE_NAME,
+            "filesize": file_size,
+        })
+        ENTITY = self._entityFromJson({
+            "file": FILE,
+            "source": "url:"+self.passed_params.get("url"),
+            "entity_internal_content": output_metadata,
+            "indexation_content": output_metadata,
+        })
 
         return {
             "entities": [
-                {
-                    "file": {
-                        "extension": ext,
-                        "upload_name": JOINED_FILE_NAME,
-                        "filesize": file_size,
-                    },
-                    "source": "url:"+self.passed_params.get("url"),
-                    "entity_internal_content": output_metadata,
-                    "indexation_content": output_metadata,
-                }
-            ]
+                ENTITY
+            ],
         }
 
     def describeSource(self, INPUT_ENTITY):

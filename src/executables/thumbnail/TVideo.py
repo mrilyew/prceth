@@ -11,7 +11,7 @@ class TVideo(BaseThumbnail):
             "photo": []
         }
 
-        path = file.getPath()
+        path = os.path.join(self.save_dir, file.upload_name)
         if params.get("preview_file"):
             path = params.get("preview_file")
         
@@ -21,7 +21,7 @@ class TVideo(BaseThumbnail):
 
             for i in range(0, 10):
                 __hash = utils.getRandomHash(8)
-                __new_prev = os.path.join(file.getDirPath(), f"{__hash}_thumb_{i}.jpg")
+                __new_prev = os.path.join(self.save_dir, f"{__hash}_thumb_{i}.jpg")
                 __previews["photo"].append({
                     "path": f"{__hash}_thumb_{i}.jpg",
                     "width": 200,

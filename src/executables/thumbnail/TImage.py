@@ -7,13 +7,13 @@ class TImage(BaseThumbnail):
 
     def run(self, file, params={}):
         size = (200, 200)
-        path = file.getPath()
+        path = os.path.join(self.save_dir, file.upload_name)
         __previews = {
             "photo": []
         }
 
         if params.get("preview_file"):
-            path = file.getDirPath() + "/" + params.get("preview_file")
+            path = self.save_dir + "/" + params.get("preview_file")
         
         with Image.open(path) as img:
             __hash = utils.getRandomHash(8)
@@ -28,7 +28,7 @@ class TImage(BaseThumbnail):
                 (img_width, img_height)
             )
 
-            __new_prev = os.path.join(file.getDirPath(), f"{__hash}_thumb.jpg")
+            __new_prev = os.path.join(self.save_dir, f"{__hash}_thumb.jpg")
             __previews["photo"].append({
                 "path": f"{__hash}_thumb.jpg",
                 "width": 200,

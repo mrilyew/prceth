@@ -19,37 +19,37 @@ class BlankFile(BaseExtractor):
         }
     }
 
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params["extension"] = args.get("extension", "txt")
         self.passed_params["text"] = args.get("text", "")
         self.passed_params["__original_name"] = f"blank.{self.passed_params.get("extension")}"
 
-        super().passParams(args)
-
-    async def make(self):
-        file_manager.createFile(filename=self.passed_params.get("__original_name"),
-                                dir=self.temp_dir,
-                                content=self.passed_params.get("text"))
+        super().setArgs(args)
 
     async def run(self, args):
-        await self.make()
+        file_manager.createFile(filename=self.passed_params.get("__original_name"),
+            dir=self.temp_dir,
+            content=self.passed_params.get("text")
+        )
+
+        FILE = self._fileFromJson({
+            "extension": self.passed_params.get("extension"),
+            "upload_name": self.passed_params.get("__original_name"),
+            "filesize": len(self.passed_params.get("text").encode('utf-8')),
+        })
+        ENTITY = self._entityFromJson({
+            "source": "api:blank",
+            "suggested_name": "blank.txt",
+            "indexation_content": {
+                "format": str(self.passed_params.get("extension")),
+                "text": utils.proc_strtr(self.passed_params.get("text"), 100),
+            },
+            "file": FILE
+        })
 
         return {
             "entities": [
-                {
-                    "source": "api:blank",
-                    "suggested_name": "blank.txt",
-                    "indexation_content": {
-                        "format": str(self.passed_params.get("extension")),
-                        "text": utils.proc_strtr(self.passed_params.get("text"), 100),
-                    },
-                    "file": {
-                        "extension": self.passed_params.get("extension"),
-                        # "hash": utils.getRandomHash(32),
-                        "upload_name": self.passed_params.get("__original_name"),
-                        "filesize": len(self.passed_params.get("text").encode('utf-8')),
-                    }
-                }
+                ENTITY
             ],
         }
 

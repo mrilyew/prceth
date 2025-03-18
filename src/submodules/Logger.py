@@ -33,6 +33,9 @@ class Logger():
         return True
     
     def log(self, message = "Undefined", section = "App", name = "message", noConsole=False):
+        if section in consts["logger.skip_categories"]:
+            return
+        
         # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS".
         # Name can be "success", "message" or "error".
         # In "message" you should describe what you want to write.
@@ -40,7 +43,7 @@ class Logger():
         now = datetime.now()
 
         message = message.replace("\n", "\\n")
-        message_to_write = f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] [{name}] {message}\n"
+        message_to_write = f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] {message}\n"
         self.file.seek(0, os.SEEK_END)
         self.file.write(message_to_write.replace("\n", "\\n"))
 

@@ -5,7 +5,7 @@ class VkAlbum(BaseExtractor):
     name = 'VkAlbum'
     category = 'Vk'
     
-    def passParams(self, args):
+    def setArgs(self, args):
         self.passed_params = args
         self.passed_params["item_id"] = args.get("item_id")
         self.passed_params["preset_json"] = args.get("preset_json", None)
@@ -15,7 +15,7 @@ class VkAlbum(BaseExtractor):
         self.passed_params["rev"] = args.get("rev", 0)
         self.passed_params["download_photos"] = args.get("download_photos", 0)
 
-        super().passParams(args)
+        super().setArgs(args)
 
     async def run(self, args):
         # Recieving album info
