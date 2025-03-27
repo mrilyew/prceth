@@ -239,4 +239,23 @@ class Utils():
         
         return safe_filename
 
+    def replaceStringsInDict(self, input_data, link_to_linked_files, recurse_level = 0):
+        if isinstance(input_data, dict):
+            return {key: self.replaceStringsInDict(value, link_to_linked_files) for key, value in input_data.items()}
+        elif isinstance(input_data, list):
+            return [self.replaceStringsInDict(item, link_to_linked_files) for item in input_data]
+        elif isinstance(input_data, str):
+            try:
+                if "__lcms|entity_" in input_data:
+                    got_id = int(input_data.replace("__lcms|entity_", ""))
+                    for linked in link_to_linked_files:
+                        if linked.id == got_id:
+                            return linked.getFormattedInfo(recursive=True,recurse_level=recurse_level+1)
+                else:
+                    return input_data
+            except Exception as __e:
+                return input_data
+        else:
+            return input_data
+
 utils = Utils()

@@ -1,4 +1,4 @@
-from resources.Globals import consts, BaseModel, Path, os, utils, shutil
+from resources.Globals import consts, BaseModel, Path, os, utils, shutil, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 
 # File is not a file, its a directory with main file and secondary files.
@@ -14,19 +14,50 @@ class File(BaseModel):
     filesize = BigIntegerField(default=0) # Size of file
     #dir_filesize = BigIntegerField(default=0) # Size of dir
 
-    def moveTempDir(self):
+    def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_entity_id_to_start = True):
         from resources.Globals import storage
         
         # Renaming main file 
         MAIN_FILE_PATH = Path(self.temp_dir + '\\' + self.upload_name)
         MAIN_FILE_PATH_NEW = f'{self.temp_dir}\\{str((str(self.hash) + '.' + self.extension))}'
+        if use_upload_name != False:
+            MAIN_FILE_PATH_NEW = f'{self.temp_dir}\\{str(self.upload_name)}.{str(self.extension)}'
+        
         MAIN_FILE_PATH.rename(MAIN_FILE_PATH_NEW)
         
         # Making short hash directory
         # And returning full hash directory.
-        FULL_HASH_DIRECTORY = Path(storage.makeHashDir(self.hash, only_return=True))
-        
-        Path(self.temp_dir).rename(FULL_HASH_DIRECTORY)
+        FULL_HASH_DIRECTORY = None
+        if preset_dir != None:
+            if move_type == -10:
+                FULL_HASH_DIRECTORY = Path(preset_dir)
+            elif move_type == 0:
+                FULL_HASH_DIRECTORY = Path(os.path.join(preset_dir, str(self.id)))
+                Path(self.temp_dir).rename(FULL_HASH_DIRECTORY)
+            elif move_type == 1:
+                FULL_HASH_DIRECTORY = Path(self.temp_dir)
+                __list = os.listdir(FULL_HASH_DIRECTORY)
+                try:
+                    if len(__list) < 1:
+                        pass
+                    elif len(__list) == 1:
+                        new_name_unsafe = str(self.upload_name)
+                        if append_entity_id_to_start == True:
+                            new_name_unsafe = str(self.id) + "_" + new_name_unsafe
+                        
+                        new_name = utils.validName(new_name_unsafe)
+                        file_path = os.path.join(self.temp_dir, __list[0])
+
+                        if os.path.isfile(file_path):
+                            shutil.move(file_path, os.path.join(preset_dir, new_name))
+                    elif len(__list) > 1:
+                        FULL_HASH_DIRECTORY = Path(os.path.join(preset_dir, str(self.id)))
+                        Path(self.temp_dir).rename(FULL_HASH_DIRECTORY)
+                except Exception as __e__:
+                    logger.logException(__e__, "File")
+        else:
+            FULL_HASH_DIRECTORY = Path(storage.makeHashDir(self.hash, only_return=True))
+            Path(self.temp_dir).rename(FULL_HASH_DIRECTORY)
 
     def getApiStructure(self):
         fnl = {

@@ -70,7 +70,7 @@ class VkPost(VkTemplate):
                     ENTITIES = await RET_EXT.execute({})
                     __ENTITY = ENTITIES.get("entities")[0]
 
-                    linked_files.append(__ENTITY.id)
+                    linked_files.append(__ENTITY)
                     __POST_OBJ["attachments"][key][__attachment_type] = f"__lcms|entity_{__ENTITY.id}"
 
                     logger.log(message="Unknown attachment: " + str(__attachment_object),section="VkAttachments",name="message")
@@ -87,7 +87,7 @@ class VkPost(VkTemplate):
                     "download_file": self.passed_params.get("download_external_media"),
                 },args=args)
 
-                linked_files.append(RETURN_ENTITY[0].id)
+                linked_files.append(RETURN_ENTITY[0])
                 __POST_OBJ["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY[0].id}"
             except ModuleNotFoundError:
                 pass
@@ -112,7 +112,7 @@ class VkPost(VkTemplate):
                         "download_external_media": self.passed_params.get("download_external_media"),
                     },args=args)
 
-                    linked_files.append(RETURN_ENTITY[0].id)
+                    linked_files.append(RETURN_ENTITY[0])
                     __POST_OBJ["copy_history"][key] = f"__lcms|entity_{RETURN_ENTITY[0].id}"
                 except ModuleNotFoundError:
                     pass

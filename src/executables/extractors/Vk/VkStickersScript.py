@@ -17,7 +17,7 @@ class VkStickersScript(BaseExtractor):
         self.passed_params["start"] = int(args.get("start", 1))
         self.passed_params["end"] = int(args.get("end", 100))
         self.passed_params["size"] = int(args.get("size", "512"))
-        self.passed_params["timeout"] = int(args.get("timeout", "1"))
+        self.passed_params["timeout"] = float(args.get("timeout", "1"))
 
         super().setArgs(args)
 
@@ -28,23 +28,15 @@ class VkStickersScript(BaseExtractor):
             try:
                 PATH_URL = (f"https://vk.com/sticker/1-{str(i_sticker)}-{str(self.passed_params.get("size"))}.png")
 
-                t_dir = storage.makeTemporaryCollectionDir()
-                __U = WebURL(temp_dir=t_dir)
-                __U.setArgs({
-                    "url": PATH_URL
+                __EXTR = WebURL()
+                __EXTR.setArgs({
+                    "url": PATH_URL,
+                    "make_preview": 0,
                 })
-                __ent_res = await __U.run()
+                __ent_res = await __EXTR.execute({})
+                entity_list.append(__ent_res.get("entities")[0])
 
-                NEW_ENTITY = __U.saveAsEntity(__ent_res.get("entities")[0])
-                if __ent_res.get("entities")[0].get("file") != None:
-                    __FILE = File.fromJson(__ent_res.get("entities")[0].get("file"), t_dir)
-                    __ent_res.get("entities")[0]["main_file"] = __FILE
-                
-                __ent_res.get("entities")[0].get("main_file").moveTempDir()
-
-                entity_list.append(NEW_ENTITY)
-
-                logger.log(f"Downloaded path {PATH_URL}", "VkStickersScript", "success")
+                logger.log(f"Downloaded URL {PATH_URL}", "VkStickersScript", "success")
             except Exception as ____e:
                 logger.logException(____e, "VkStickersScript")
 
@@ -52,5 +44,7 @@ class VkStickersScript(BaseExtractor):
 
         return {
             "entities": entity_list,
-            "suggested_name": f"VK Stickers {self.passed_params.get("start")}-{self.passed_params.get("end")}",
+            "collection": {
+                "suggested_name": f"VK Stickers {self.passed_params.get("start")}-{self.passed_params.get("end")}",
+            },
         }

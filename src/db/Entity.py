@@ -1,10 +1,11 @@
-from resources.Globals import consts, time, operator, reduce, utils, BaseModel, json5, json, file_manager, logger
+from resources.Globals import os, consts, time, model_to_dict, operator, reduce, utils, BaseModel, json5, json, file_manager, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
 from db.File import File
 
 class Entity(BaseModel):
     self_name = 'entity'
     __cached_file = None
+    __cachedLinkedEntities = None
 
     id = AutoField() # Absolute id
     file_id = TextField(null=True) # File extension
@@ -46,12 +47,12 @@ class Entity(BaseModel):
         
         return File.get(self.file_id)
 
-    def delete(self, delete_dir=True):
+    '''def delete(self, delete_dir=True):
         if delete_dir == True:
             file_manager.rmdir(self.getDirPath())
 
         self.deleted = 1
-        self.save()
+        self.save()'''
 
     # Ну и зачем всё это было. Ладно, может пригодится.
     def getCorrectSource(self):
@@ -63,13 +64,36 @@ class Entity(BaseModel):
 
         return __ext().describeSource(INPUT_ENTITY=self)
 
-    def getFormattedInfo(self):
+    def getFormattedInfo(self, recursive = False, recurse_level = 0):
         entity_internal_content = getattr(self, "entity_internal_content", "{}")
         if entity_internal_content == None:
             entity_internal_content = "{}"
         
-        return json5.loads(entity_internal_content)
+        lods_ = json5.loads(entity_internal_content)
+        if recursive == True and recurse_level < 3:
+            linked_files = self.getLinkedEntities()
+            lods_ = utils.replaceStringsInDict(input_data=lods_,link_to_linked_files=linked_files,recurse_level=recurse_level)
 
+        return lods_
+
+    def getLinkedEntities(self):
+        if self.__cachedLinkedEntities != None:
+            return self.__cachedLinkedEntities
+
+        #linked_array = []
+        try:
+            files_list = self.linked_files.split(",")
+            linked_entities = self.get(files_list)
+            __arr = []
+            for _e in linked_entities:
+                __arr.append(_e)
+
+            self.__cachedLinkedEntities = __arr
+        except Exception:
+            return []
+
+        return __arr
+    
     def getApiStructure(self):
         tags = ",".split(self.tags)
         if tags[0] == ",":
@@ -89,16 +113,21 @@ class Entity(BaseModel):
             "display_name": self.display_name,
             "description": self.description,
             "source": self.getCorrectSource(),
-            "meta": self.getFormattedInfo(),
+            "meta": self.getFormattedInfo(recursive=True),
             "frontend_data": frontend_data,
             "tags": tags,
-            #"flags": self.flags,
-            #"type": self.type,
-            "created": self.created_at,
-            "declared_created_at": self.declared_created_at,
-            "edited": self.edited_at,
             "author": self.author,
         }
+
+        if self.created_at != None:
+            fnl["created"] = str(self.created_at)
+        
+        if self.declared_created_at != None:
+            fnl["declared_created_at"] = str(self.declared_created_at)
+        
+        if self.edited_at != None:
+            fnl["edited"] = str(self.edited_at)
+
         if FILE != None:
             fnl["file"] = FILE.getApiStructure()
 
@@ -137,10 +166,16 @@ class Entity(BaseModel):
     
     @staticmethod
     def get(id):
-        try:
-            return Entity.select().where(Entity.id == id).where(Entity.deleted == 0).get()
-        except:
-            return None
+        if type(id) == "int":
+            try:
+                return Entity.select().where(Entity.id == id).where(Entity.deleted == 0).get()
+            except:
+                return None
+        else:
+            try:
+                return Entity.select().where(Entity.id << id).where(Entity.deleted == 0)
+            except:
+                return None
 
     @staticmethod
     def fromJson(json_input, passed_params):
@@ -166,7 +201,8 @@ class Entity(BaseModel):
             FINAL_ENTITY.unlisted = 1
 
         if json_input.get("linked_files") != None:
-            FINAL_ENTITY.linked_files = ",".join(str(v) for v in json_input.get("linked_files"))
+            FINAL_ENTITY.linked_files = ",".join(str(v.id) for v in json_input.get("linked_files"))
+            FINAL_ENTITY.__cachedLinkedEntities = json_input.get("linked_files")
         
         FINAL_ENTITY.extractor_name = json_input.get("extractor_name")
         if passed_params.get("display_name") != None:
@@ -193,3 +229,8 @@ class Entity(BaseModel):
         FINAL_ENTITY.save()
 
         return FINAL_ENTITY
+
+    def saveInfoToJson(self, dir):
+        stream = open(os.path.join(dir, f"data_{self.id}.json"), "w")
+        stream.write(json.dumps(self.getApiStructure(), indent=2))
+        stream.close()

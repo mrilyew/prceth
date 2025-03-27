@@ -55,8 +55,8 @@ class Logger():
             else:
                 print(message_to_write.replace("\n", ""))
 
-    def logException(self, input_exception, section="App", noConsole=False):
+    def logException(self, input_exception, section="App", noConsole=True):
         exp = str(input_exception) + traceback.format_exc()
-        self.log(section, type(input_exception).__name__, exp, noConsole=noConsole)
+        self.log(section=section, message=type(input_exception).__name__ + " " + exp, name="error", noConsole=noConsole)
 
 logger = Logger()

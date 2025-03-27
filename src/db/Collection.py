@@ -1,5 +1,5 @@
 from peewee import TextField, IntegerField, AutoField, BooleanField, TimestampField, DeferredForeignKey, JOIN
-from resources.Globals import BaseModel, consts, time, model_to_dict, reduce, operator
+from resources.Globals import BaseModel, consts, time, model_to_dict, reduce, operator, json, os
 
 class Collection(BaseModel):
     self_name = 'collection'
@@ -144,9 +144,9 @@ class Collection(BaseModel):
         
         return results
     
-    def delete(self, delete_file=True):
+    '''def delete(self, delete_file=True):
         self.deleted = 1
-        self.save()
+        self.save()'''
 
     def getItemsCount(self, query = None, columns_search = []):
         items = self.__fetchItems(query=query,columns_search=columns_search)
@@ -218,3 +218,8 @@ class Collection(BaseModel):
         FINAL_COLLECTION.save()
 
         return FINAL_COLLECTION
+    
+    def saveInfoToJson(self, dir):
+        stream = open(os.path.join(dir, "collection.json"), "w")
+        stream.write(json.dumps(self.getApiStructure(), indent=2))
+        stream.close()

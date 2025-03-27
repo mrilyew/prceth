@@ -9,16 +9,11 @@ class WebURL(BaseExtractor):
     name = 'WebURL'
     category = 'Web'
     params = {
-        "path": {
+        "url": {
             "desc_key": "extractor_key_desc_path_path",
             "type": "string",
             "maxlength": 3
         },
-        "type": {
-            "desc_key": "extractor_key_desc_path_text",
-            "type": "array",
-            "values": ["copy", "move", "link"]
-        }
     }
 
     def setArgs(self, args):
@@ -66,7 +61,7 @@ class WebURL(BaseExtractor):
             "source": "url:"+self.passed_params.get("url"),
             "entity_internal_content": output_metadata,
             "indexation_content": output_metadata,
-        })
+        }, make_preview=self.passed_params.get("make_preview") == 1)
 
         return {
             "entities": [

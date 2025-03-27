@@ -258,17 +258,19 @@ class Api():
         collection_id = __INPUT_ARGS.get("collection_id", None) # Collection id to where entity will added
         # None: Result will be saved as entity
         # Text: Result will be saved at another dir
-        __export_to_db = __INPUT_ARGS.get("export_to_folder", None) == None
+        __export_folder = __INPUT_ARGS.get("export_to_folder", None)
+        __export_to_db = __export_folder == None
+        __custom_temp_dir = __INPUT_ARGS.get("custom_temp_dir", None)
         
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(del_dir_on_fail=__export_to_db == True)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
         ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
         if ENTITIES_COUNT < 1:
-            raise ExtractorException("wtf bro")
+            raise ExtractorException("nothing exported")
         
         if __export_to_db == True:
             RETURN_ENTITIES = []
@@ -290,13 +292,41 @@ class Api():
                 if POST_COLLECTION == None:
                     logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
                 else:
-                    POST_COLLECTION.addItem(RETURN_ENTITY)
+                    for _ENT in RETURN_ENTITIES:
+                        POST_COLLECTION.addItem(_ENT)
 
             await EXTRACTOR_INSTANCE.postRun()
             return RETURN_ENTITIES
         else:
-            RETURN_ENTITY = EXTRACTOR_INSTANCE.saveToDirectory(EXTRACTOR_RESULTS) # Does thing :D!
-            return
+            RETURN_ENTITIES = []
+            __export_folder_type = int(__INPUT_ARGS.get("export_to_folder_type", 0))
+            __export_save_json_to_dir = int(__INPUT_ARGS.get("export_save_json_to_dir", 1))
+            __append_entity_id_to_start = int(__INPUT_ARGS.get("append_entity_id_to_start", 1))
+
+            for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+                RETURN_ENTITIES.append(ENTITY)
+                for LINKED_ENTITY in ENTITY.getLinkedEntities():
+                    RETURN_ENTITIES.append(LINKED_ENTITY)
+
+            for EXP_ENTITY in RETURN_ENTITIES:
+                if __export_folder_type == 0:
+                    if EXP_ENTITY.file != None:
+                        EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=0,append_entity_id_to_start=__append_entity_id_to_start==1)
+                elif __export_folder_type == 1 or __export_folder_type == 2:
+                    if EXP_ENTITY.file != None:
+                        EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=1,append_entity_id_to_start=__append_entity_id_to_start==1)
+
+                if __export_save_json_to_dir == 1:
+                    EXP_ENTITY.saveInfoToJson(dir=__export_folder)
+                
+                EXP_ENTITY.delete() # мылытся
+            
+            if EXTRACTOR_RESULTS.get("collection") != None and __export_folder_type == 1:
+                _COL = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
+                _COL.saveInfoToJson(dir=__export_folder)
+                _COL.delete()
+
+            return RETURN_ENTITIES
         
     def getExtractors(self, params):
         show_hidden = params.get("show_hidden", False) == True
@@ -344,3 +374,4 @@ class Api():
         return True
 
 api = Api()
+

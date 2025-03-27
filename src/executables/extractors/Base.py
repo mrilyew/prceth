@@ -19,6 +19,7 @@ class BaseExtractor:
         self.passed_params["display_name"] = args.get("display_name", None)
         self.passed_params["description"] = args.get("description", None)
         self.passed_params["unlisted"] = args.get("unlisted", 0)
+        self.passed_params["make_preview"] = int(args.get("make_preview", 1))
 
     def onFail(self):
         if self.del_dir_on_fail == True:
@@ -79,8 +80,8 @@ class BaseExtractor:
         EXTRACTOR_RESULTS = await self.execute({})
         for ENTITY in EXTRACTOR_RESULTS.get("entities"):
             RETURN_ENTITIES.append(ENTITY)
-            if ENTITY.file != None:
-                ENTITY.file.moveTempDir()
+            #if ENTITY.file != None:
+            #    ENTITY.file.moveTempDir()
         
         await self.postRun()
         return RETURN_ENTITIES
