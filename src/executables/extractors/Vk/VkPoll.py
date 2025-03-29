@@ -63,7 +63,7 @@ class VkPoll(VkTemplate):
         ENTITY = self._entityFromJson({
             "source": __SOURCE,
             "indexation_content": __indexation,
-            "entity_internal_content": POLL,
+            "internal_content": POLL,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })
 

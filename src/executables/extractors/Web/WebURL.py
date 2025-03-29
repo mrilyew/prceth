@@ -59,7 +59,7 @@ class WebURL(BaseExtractor):
         ENTITY = self._entityFromJson({
             "file": FILE,
             "source": "url:"+self.passed_params.get("url"),
-            "entity_internal_content": output_metadata,
+            "internal_content": output_metadata,
             "indexation_content": output_metadata,
         }, make_preview=self.passed_params.get("make_preview") == 1)
 

@@ -71,7 +71,7 @@ class FSPath(BaseExtractor):
         })
         ENTITY = self._entityFromJson({
             "source": "path:"+str(INPUT_PATH),
-            "entity_internal_content": __OUTPUT_METADATA,
+            "internal_content": __OUTPUT_METADATA,
             "indexation_content": {
                 "metadata": __OUTPUT_METADATA["metadata"]
             },

@@ -79,7 +79,7 @@ class VkDoc(VkTemplate):
             "file": FILE,
             "source": __SOURCE,
             "indexation_content": __indexation,
-            "entity_internal_content": DOCUMENT,
+            "internal_content": DOCUMENT,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })
 

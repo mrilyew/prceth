@@ -14,7 +14,7 @@ class JsonObject(BaseExtractor):
         ENTITY = self._entityFromJson({
             "source": "api:json",
             "suggested_name": "file.json",
-            "entity_internal_content": self.passed_params.get("json_object"),
+            "internal_content": self.passed_params.get("json_object"),
         })
 
         return {

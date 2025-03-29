@@ -65,7 +65,7 @@ class VkNote(VkTemplate):
         ENTITY = self._entityFromJson({
             "source": __SOURCE,
             "indexation_content": __indexation,
-            "entity_internal_content": NOTE,
+            "internal_content": NOTE,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })
 

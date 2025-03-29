@@ -59,7 +59,7 @@ class WebPage(BaseExtractor):
         })
         ENTITY = self._entityFromJson({
             "source": "url:" + SITE_URL,
-            "entity_internal_content": output_metadata,
+            "internal_content": output_metadata,
             "preview_file": "screenshot.png",
             "file": FILE
         })

@@ -92,7 +92,7 @@ class VkAudio(VkTemplate):
         ENTITY = self._entityFromJson({
             "source": __SOURCE,
             "indexation_content": __indexation,
-            "entity_internal_content": AUDIO,
+            "internal_content": AUDIO,
             "file": FILE,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })

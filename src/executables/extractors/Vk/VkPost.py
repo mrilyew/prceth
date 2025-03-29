@@ -123,7 +123,7 @@ class VkPost(VkTemplate):
             "source": "vk:wall"+ITEM_ID,
             "suggested_name": f"VK Post {str(ITEM_ID)}",
             "indexation_content": __indexation,
-            "entity_internal_content": __POST_OBJ,
+            "internal_content": __POST_OBJ,
             "linked_files": linked_files,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })

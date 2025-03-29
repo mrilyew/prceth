@@ -1,7 +1,7 @@
 class ExecuteResponse():
     def __init__(self, infe = {}):
         self.source = infe.get("source")
-        self.entity_internal_content = infe.get("entity_internal_content")
+        self.internal_content = infe.get("internal_content")
         self.indexation_content = infe.get("indexation_content")
         self.main_file = infe.get("main_file")
         self.another_file = infe.get("another_file")
@@ -25,8 +25,8 @@ class ExecuteResponse():
     def get_source(self):
         return self.source
     
-    def get_entity_internal_content(self):
-        return self.entity_internal_content
+    def get_internal_content(self):
+        return self.internal_content
         
     def get_summary(self):
         return self.summary
@@ -44,7 +44,7 @@ class ExecuteResponse():
         return self.indexation_content != None
 
     def hasInternalContent(self):
-        return self.entity_internal_content != None
+        return self.internal_content != None
     
     def hasPreview(self):
         return self.another_file != None

@@ -14,6 +14,7 @@ class VkAlbum(VkTemplate):
         self.passed_params["rev"] = int(args.get("rev", "0")) == 1
         self.passed_params["download_timeout"] = int(args.get("timeout", "0")) # for paranoic people
         self.passed_params["api_timeout"] = int(args.get("timeout", "0"))
+        self.passed_params["limit"] = int(args.get("limit", "0"))
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("preset_json") != None, "item_id not passed"
 
@@ -58,20 +59,23 @@ class VkAlbum(VkTemplate):
         ALBUM_ENTITY = self._entityFromJson({
             "source": __SOURCE,
             "indexation_content": __indexation,
-            "entity_internal_content": ALBUM,
+            "internal_content": ALBUM,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })
 
         if self.passed_params.get("download_photos") == True:
             __per_page = 100
             __count = ALBUM.get("size")
+            __downloaded_count = 0
             times   = math.ceil(__count / __per_page)
 
             final_entites_list = []
             final_entites_list.append(ALBUM_ENTITY)
 
             for time in range(0, times):
-                logger.log(message=f"{time + 1}/{times} time of photos recieving; {__per_page * time} offset",section="VkCollection",name="message")
+                OFFSET = __per_page * time
+
+                logger.log(message=f"{time + 1}/{times} time of photos recieving; {OFFSET} offset",section="VkCollection",name="message")
 
                 _ID = __ITEM_ID.split("_")
                 photos_api = await self.__vkapi.call("photos.get", {"owner_id": _ID[0], 
@@ -79,10 +83,13 @@ class VkAlbum(VkTemplate):
                                                                     "rev": int(self.passed_params.get("rev")), 
                                                                     "extended": 1,
                                                                     "photo_sizes": 1,
-                                                                    "offset": time * __per_page,
+                                                                    "offset": OFFSET,
                                                                     "count": __per_page})
                 
                 for photo_item in photos_api.get("items"):
+                    if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
+                        break
+                    
                     __PHOTO_ID = str(photo_item.get("owner_id")) + "_" + str(photo_item.get("id"))
                     vphoto_ext = VkPhoto(need_preview=self.need_preview)
                     vphoto_ext.setArgs({
@@ -106,6 +113,8 @@ class VkAlbum(VkTemplate):
 
                     if self.passed_params.get("download_timeout") != 0:
                         await asyncio.sleep(self.passed_params.get("download_timeout"))
+
+                    __downloaded_count += 1
                 
                 if self.passed_params.get("api_timeout") != 0:
                     await asyncio.sleep(self.passed_params.get("api_timeout"))

@@ -90,7 +90,7 @@ class VkVideo(VkTemplate):
             "suggested_name": VIDEO_NAME,
             "source": "vk:video"+str(__VIDEO_ID),
             "indexation_content": __indexation,
-            "entity_internal_content": __VIDEO_OBJECT,
+            "internal_content": __VIDEO_OBJECT,
             "file": FILE,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })

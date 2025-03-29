@@ -8,7 +8,7 @@ class Entity(BaseModel):
     __cachedLinkedEntities = None
 
     id = AutoField() # Absolute id
-    file_id = TextField(null=True) # File extension
+    file_id = IntegerField(null=True) # File id
     linked_files = TextField(null=True) # Files list
     hash = TextField(null=True) # Entity hash
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
@@ -23,7 +23,7 @@ class Entity(BaseModel):
     # flags = IntegerField(default=0) # Flags.
     # type = IntegerField(default=0) # 0 - main is the first file from dir
                                 # 1 - main info is from "type_sub" (jsonистый объект)
-    entity_internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
+    internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0) # Is softly deleted
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
@@ -47,14 +47,12 @@ class Entity(BaseModel):
         
         return File.get(self.file_id)
 
-    '''def delete(self, delete_dir=True):
+    def delete(self, delete_dir=True):
         if delete_dir == True:
             file_manager.rmdir(self.getDirPath())
 
-        self.deleted = 1
-        self.save()'''
-
-    # Ну и зачем всё это было. Ладно, может пригодится.
+        super().delete()
+    
     def getCorrectSource(self):
         from resources.Globals import ExtractorsRepository
 
@@ -65,11 +63,11 @@ class Entity(BaseModel):
         return __ext().describeSource(INPUT_ENTITY=self)
 
     def getFormattedInfo(self, recursive = False, recurse_level = 0):
-        entity_internal_content = getattr(self, "entity_internal_content", "{}")
-        if entity_internal_content == None:
-            entity_internal_content = "{}"
+        internal_content = getattr(self, "internal_content", "{}")
+        if internal_content == None:
+            internal_content = "{}"
         
-        lods_ = json5.loads(entity_internal_content)
+        lods_ = json5.loads(internal_content)
         if recursive == True and recurse_level < 3:
             linked_files = self.getLinkedEntities()
             lods_ = utils.replaceStringsInDict(input_data=lods_,link_to_linked_files=linked_files,recurse_level=recurse_level)
@@ -186,13 +184,13 @@ class Entity(BaseModel):
             __hash = json_input.get("hash")
         
         indexation_content_ = json_input.get("indexation_content")
-        entity_internal_content_ = json_input.get("entity_internal_content")
+        internal_content_ = json_input.get("internal_content")
 
         FINAL_ENTITY.hash = __hash
-        if entity_internal_content_ != None:
-            FINAL_ENTITY.entity_internal_content = json.dumps(entity_internal_content_)
+        if internal_content_ != None:
+            FINAL_ENTITY.internal_content = json.dumps(internal_content_)
         else:
-            FINAL_ENTITY.entity_internal_content = json.dumps(indexation_content_)
+            FINAL_ENTITY.internal_content = json.dumps(indexation_content_)
         if json_input.get("file") != None:
             FINAL_ENTITY.file_id = json_input.get("file").id
             FINAL_ENTITY.__cached_file = json_input.get("file")
@@ -224,7 +222,7 @@ class Entity(BaseModel):
             #FINAL_ENTITY.indexation_content = json_input.dumps(indexation_content_) # remove
             FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         else:
-            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(entity_internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
+            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         
         FINAL_ENTITY.save()
 

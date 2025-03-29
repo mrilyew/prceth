@@ -36,18 +36,24 @@ class Logger():
         if section in consts["logger.skip_categories"]:
             return
         
-        # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS".
+        # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS", etc.
         # Name can be "success", "message" or "error".
         # In "message" you should describe what you want to write.
         self.__log_file_check()
         now = datetime.now()
 
+        is_console = consts.get("context") == "cli" and noConsole == False
+        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
         message = message.replace("\n", "\\n")
-        message_to_write = f"{now.strftime("%Y-%m-%d %H:%M:%S")} [{section}] {message}\n"
+        message_to_write = f"{current_time} [{section}] {message}\n"
+
+        if is_console == False:
+            message_to_write = f"{current_time} [{name}] [{section}] {message}\n"
+        
         self.file.seek(0, os.SEEK_END)
         self.file.write(message_to_write.replace("\n", "\\n"))
 
-        if consts.get("context") == "cli" and noConsole == False:
+        if is_console == True:
             if name == "error":
                 print("\033[91m" + message_to_write.replace("\n", "") + "\033[0m")
             elif name == "success":

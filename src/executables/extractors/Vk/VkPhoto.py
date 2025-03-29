@@ -86,7 +86,7 @@ class VkPhoto(VkTemplate):
                 "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
                 "source": "vk:photo"+str(__PHOTO_ID),
                 "indexation_content": __indexation,
-                "entity_internal_content": __PHOTO_OBJECT,
+                "internal_content": __PHOTO_OBJECT,
                 "unlisted": self.passed_params.get("unlisted") == 1,
             })
             
