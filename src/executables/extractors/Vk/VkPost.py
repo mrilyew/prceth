@@ -76,7 +76,7 @@ class VkPost(VkTemplate):
                     logger.log(message="Unknown attachment: " + str(__attachment_object),section="VkAttachments",name="message")
                     continue
 
-                EXTRACTOR_INSTANCE = EXTRACTOR_INSTANCE_CLASS()
+                EXTRACTOR_INSTANCE = EXTRACTOR_INSTANCE_CLASS(need_preview=self.need_preview)
                 RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
                     "unlisted": 1,
                     "item_id": f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}",
@@ -101,7 +101,7 @@ class VkPost(VkTemplate):
                         continue
                     
                     logger.log(message=f"Found repost {key}",section="VKPost",name="message")
-                    EXTRACTOR_INSTANCE = VkPost()
+                    EXTRACTOR_INSTANCE = VkPost(need_preview=self.need_preview)
                     RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
                         "unlisted": 1,
                         "item_id": f"{repost.get("owner_id")}_{repost.get("id")}",

@@ -222,9 +222,9 @@ class Entity(BaseModel):
             FINAL_ENTITY.source = json_input.get("source")
         if json_input.get("indexation_content") != None:
             #FINAL_ENTITY.indexation_content = json_input.dumps(indexation_content_) # remove
-            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
+            FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         else:
-            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(entity_internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ')
+            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(entity_internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         
         FINAL_ENTITY.save()
 

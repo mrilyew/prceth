@@ -6,7 +6,7 @@ class BaseExtractor:
     category = 'template'
     passed_params = {}
 
-    def __init__(self, temp_dir=None, del_dir_on_fail=True):
+    def __init__(self, temp_dir=None, del_dir_on_fail=True,need_preview=True):
         self.passed_params = {}
         if temp_dir != None:
             self.temp_dir = temp_dir
@@ -14,6 +14,7 @@ class BaseExtractor:
             self.temp_dir = storage.makeTemporaryCollectionDir()
         
         self.del_dir_on_fail = del_dir_on_fail
+        self.need_preview = need_preview
 
     def setArgs(self, args):
         self.passed_params["display_name"] = args.get("display_name", None)
@@ -55,6 +56,9 @@ class BaseExtractor:
     
     # Typical preview
     def thumbnail(self, entity, args={}):
+        if self.need_preview == False:
+            return None
+        
         from resources.Globals import ThumbnailsRepository
         __FILE = entity.file
         if __FILE == None:

@@ -265,9 +265,17 @@ class Api():
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True,need_preview=__export_to_db == True)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
-        EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
+        EXTRACTOR_RESULTS = None
+
+        try:
+            EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
+            if EXTRACTOR_RESULTS == None:
+                raise Exception("Nothing returned")
+        except Exception as __ee:
+            logger.log(message=f"Extractor {__extractor_input_name} returned error: {str(__ee)}")
+        
         ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
         if ENTITIES_COUNT < 1:
             raise ExtractorException("nothing exported")
@@ -299,7 +307,7 @@ class Api():
             return RETURN_ENTITIES
         else:
             RETURN_ENTITIES = []
-            __export_folder_type = int(__INPUT_ARGS.get("export_to_folder_type", 0))
+            __export_folder_type = int(__INPUT_ARGS.get("export_to_folder_type", 1))
             __export_save_json_to_dir = int(__INPUT_ARGS.get("export_save_json_to_dir", 1))
             __append_entity_id_to_start = int(__INPUT_ARGS.get("append_entity_id_to_start", 1))
 

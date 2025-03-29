@@ -53,6 +53,7 @@ class VkPhoto(VkTemplate):
         SAVE_PATH = Path(os.path.join(self.temp_dir, ORIGINAL_NAME))
         logger.log(message=f"Recieved photo {__PHOTO_ID}",section="VK",name="message")
         
+        # So, downloading photo
         PHOTO_URL = ""
         if __PHOTO_OBJECT.get("orig_photo") != None:
             PHOTO_URL = __PHOTO_OBJECT.get("orig_photo").get("url")
@@ -69,26 +70,31 @@ class VkPhoto(VkTemplate):
                     __photo_sizes = sorted(__PHOTO_OBJECT.get("sizes"), key=lambda x: (x['width'] is None, x['width']))
                     PHOTO_URL = __photo_sizes[0].get("url")
         
-        HTTP_REQUEST = await download_manager.addDownload(end=PHOTO_URL,dir=SAVE_PATH)
+        try:
+            HTTP_REQUEST = await download_manager.addDownload(end=PHOTO_URL,dir=SAVE_PATH)
+            FILE_SIZE = SAVE_PATH.stat().st_size
 
-        __PHOTO_OBJECT["site"] = self.passed_params.get("vk_path")
-        __indexation = utils.clearJson(__PHOTO_OBJECT)
-        FILE = self._fileFromJson({
-            "extension": "jpg",
-            "upload_name": ORIGINAL_NAME,
-            "filesize": SAVE_PATH.stat().st_size,
-        })
-        ENTITY = self._entityFromJson({
-            "file": FILE,
-            "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
-            "source": "vk:photo"+str(__PHOTO_ID),
-            "indexation_content": __indexation,
-            "entity_internal_content": __PHOTO_OBJECT,
-            "unlisted": self.passed_params.get("unlisted") == 1,
-        })
-        
-        return {
-            "entities": [
-                ENTITY
-            ]
-        }
+            __PHOTO_OBJECT["site"] = self.passed_params.get("vk_path")
+            __indexation = utils.clearJson(__PHOTO_OBJECT)
+            FILE = self._fileFromJson({
+                "extension": "jpg",
+                "upload_name": ORIGINAL_NAME,
+                "filesize": FILE_SIZE,
+            })
+            ENTITY = self._entityFromJson({
+                "file": FILE,
+                "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
+                "source": "vk:photo"+str(__PHOTO_ID),
+                "indexation_content": __indexation,
+                "entity_internal_content": __PHOTO_OBJECT,
+                "unlisted": self.passed_params.get("unlisted") == 1,
+            })
+            
+            return {
+                "entities": [
+                    ENTITY
+                ]
+            }
+        except FileNotFoundError as _ea:
+            logger.log(message="Photo's file cannot be found. Probaly broken file?",section="VK",name="error")
+            raise _ea
