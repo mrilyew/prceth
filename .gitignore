@@ -20,3 +20,4 @@ src/executables/acts/Custom/*
 src/executables/services/Custom/*
 src/web/static/js/node_modules
 src/web/static/js/package-lock.json
+src/storage/main.db-journal

@@ -49,7 +49,7 @@ class VkPhoto(VkTemplate):
         if __PHOTO_OBJECT == None:
             raise NotFoundException("photo not found")
 
-        ORIGINAL_NAME = "photo.jpg"
+        ORIGINAL_NAME = f"photo_{__PHOTO_OBJECT.get("date")}.jpg"
         SAVE_PATH = Path(os.path.join(self.temp_dir, ORIGINAL_NAME))
         logger.log(message=f"Recieved photo {__PHOTO_ID}",section="VK",name="message")
         

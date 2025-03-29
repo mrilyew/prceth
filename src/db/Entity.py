@@ -1,4 +1,4 @@
-from resources.Globals import os, consts, time, model_to_dict, operator, reduce, utils, BaseModel, json5, json, file_manager, logger
+from resources.Globals import Path, os, consts, time, model_to_dict, operator, reduce, utils, BaseModel, json5, json, file_manager, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
 from db.File import File
 
@@ -47,9 +47,10 @@ class Entity(BaseModel):
         
         return File.get(self.file_id)
 
-    def delete(self, delete_dir=True):
+    def delete(self, delete_dir=False):
         if delete_dir == True:
-            file_manager.rmdir(self.getDirPath())
+            if self.file != None:
+                file_manager.rmdir(self.file.getDirPath())
 
         super().delete()
     
@@ -232,3 +233,35 @@ class Entity(BaseModel):
         stream = open(os.path.join(dir, f"data_{self.id}.json"), "w")
         stream.write(json.dumps(self.getApiStructure(), indent=2))
         stream.close()
+
+    def fullStop(self, move_dir, save_to_json=True):
+        RETURN_ENTITIES = []
+        dir_path = Path(move_dir)
+        if dir_path.is_dir() == False:
+            dir_path.mkdir()
+
+        entity_dir = Path(os.path.join(str(dir_path), str(self.id)))
+        linked_dir = Path(os.path.join(str(entity_dir), str(self.id)))
+        if entity_dir.is_dir() == False:
+            entity_dir.mkdir()
+
+        if self.file != None:
+            self.file.moveTempDir(use_upload_name=True,preset_dir=entity_dir,move_type=1,append_entity_id_to_start=True)
+        
+        RETURN_ENTITIES.append(self)
+        if len(self.getLinkedEntities()) > 0:
+            linked_dir.mkdir()
+            for LINKED_ENTITY in self.getLinkedEntities():
+                linked_entity_dir = Path(os.path.join(str(linked_dir), str(LINKED_ENTITY.id)))
+                linked_entity_dir.mkdir()
+
+                RETURN_ENTITIES.append(LINKED_ENTITY)
+                if LINKED_ENTITY.file != None:
+                    LINKED_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=linked_entity_dir,move_type=1,append_entity_id_to_start=True)
+                if save_to_json:
+                    LINKED_ENTITY.saveInfoToJson(dir=str(linked_entity_dir))
+        
+        if save_to_json:
+            self.saveInfoToJson(dir=str(entity_dir))
+
+        return RETURN_ENTITIES

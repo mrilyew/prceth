@@ -268,7 +268,6 @@ class Api():
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True,need_preview=__export_to_db == True)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = None
-
         try:
             EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
             if EXTRACTOR_RESULTS == None:
@@ -307,25 +306,37 @@ class Api():
             return RETURN_ENTITIES
         else:
             RETURN_ENTITIES = []
-            __export_folder_type = int(__INPUT_ARGS.get("export_to_folder_type", 1))
+            __export_folder_type = __INPUT_ARGS.get("export_to_folder_type", "simple_grouping")
             __export_save_json_to_dir = int(__INPUT_ARGS.get("export_save_json_to_dir", 1))
-            __append_entity_id_to_start = int(__INPUT_ARGS.get("append_entity_id_to_start", 1))
-
+            #__append_entity_id_to_start = int(__INPUT_ARGS.get("append_entity_id_to_start", 1))
+            __append_entity_id_to_start = True
             for ENTITY in EXTRACTOR_RESULTS.get("entities"):
                 RETURN_ENTITIES.append(ENTITY)
-                for LINKED_ENTITY in ENTITY.getLinkedEntities():
-                    RETURN_ENTITIES.append(LINKED_ENTITY)
 
             for EXP_ENTITY in RETURN_ENTITIES:
-                if __export_folder_type == 0:
-                    if EXP_ENTITY.file != None:
-                        EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=0,append_entity_id_to_start=__append_entity_id_to_start==1)
-                elif __export_folder_type == 1 or __export_folder_type == 2:
-                    if EXP_ENTITY.file != None:
-                        EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=1,append_entity_id_to_start=__append_entity_id_to_start==1)
+                match(__export_folder_type):
+                    case "simple_grouping":
+                        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+                            for LINKED_ENTITY in ENTITY.getLinkedEntities():
+                                RETURN_ENTITIES.append(LINKED_ENTITY)
+                        
+                        if EXP_ENTITY.file != None:
+                            EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=1,append_entity_id_to_start=__append_entity_id_to_start==1)
+                    
+                        if __export_save_json_to_dir == 1:
+                            EXP_ENTITY.saveInfoToJson(dir=__export_folder)
+                    case "grouping":
+                        RETURN_ENTITIES = EXP_ENTITY.fullStop(move_dir=__export_folder,save_to_json=__export_save_json_to_dir==1)
+                    case _: # "rename"
+                        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+                            for LINKED_ENTITY in ENTITY.getLinkedEntities():
+                                RETURN_ENTITIES.append(LINKED_ENTITY)
+                        
+                        if EXP_ENTITY.file != None:
+                            EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=0,append_entity_id_to_start=__append_entity_id_to_start==1)
 
-                if __export_save_json_to_dir == 1:
-                    EXP_ENTITY.saveInfoToJson(dir=__export_folder)
+                        if __export_save_json_to_dir == 1:
+                            EXP_ENTITY.saveInfoToJson(dir=__export_folder)
                 
                 EXP_ENTITY.delete() # мылытся
             
