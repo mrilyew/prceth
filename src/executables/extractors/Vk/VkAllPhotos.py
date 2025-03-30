@@ -1,6 +1,6 @@
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from executables.extractors.Vk.VkPhoto import VkPhoto
-from resources.Globals import config, VkApi, logger, utils, math, asyncio
+from resources.Globals import VkApi, logger, math, asyncio
 
 class VkAllPhotos(VkTemplate):
     name = 'VkAllPhotos'
@@ -13,6 +13,7 @@ class VkAllPhotos(VkTemplate):
         self.passed_params["api_timeout"] = int(args.get("timeout", "0"))
         self.passed_params["limit"] = int(args.get("limit", "0"))
 
+        assert self.passed_params.get("item_id") != None, "item_id not passed"
         super().setArgs(args)
 
     async def run(self, args):
@@ -32,7 +33,7 @@ class VkAllPhotos(VkTemplate):
                 break
             
             logger.log(message=f"{time + 1}/{times} time of photos recieving; {OFFSET} offset",section="VkCollection",name="message")
-            photo_call = await __vkapi.call("photos.getAll", {"owner_id": self.passed_params.get("item_id"), "extended": 1, "count": 100, "photo_sizes": 1})
+            photo_call = await __vkapi.call("photos.getAll", {"owner_id": self.passed_params.get("item_id"), "extended": 1, "count": 100, "photo_sizes": 1, "offset": OFFSET})
             for photo_item in photo_call.get("items"):
                 if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
                     break

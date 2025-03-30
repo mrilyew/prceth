@@ -10,9 +10,13 @@ class VkPost(VkTemplate):
     def setArgs(self, args):
         self.passed_params["item_id"] = args.get("item_id")
         self.passed_params["__json_info"] = args.get("__json_info")
+        self.passed_params["__json_profiles"] = args.get("__json_info")
+        self.passed_params["__json_groups"] = args.get("__json_groups")
         self.passed_params["download_external_media"] = int(args.get("download_external_media", "0")) == 1
+        self.passed_params["limit"] = int(args.get("limit", "0"))
 
         assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
+        
         super().setArgs(args)
 
     async def __recieveById(self, post_id):
@@ -22,11 +26,17 @@ class VkPost(VkTemplate):
     async def run(self, args):
         # TODO add check for real links like vk.com/wall1_1
         __POST_RESPONSE = None
+        __PROFILES = None
+        __GROUPS   = None
         ITEM_ID = self.passed_params.get("item_id")
         if self.passed_params.get("__json_info", None) == None:
             __POST_RESPONSE = await self.__recieveById(ITEM_ID)
+            __PROFILES = __POST_RESPONSE.get("profiles")
+            __GROUPS = __POST_RESPONSE.get("groups")
         else:
             __POST_RESPONSE = self.passed_params.get("__json_info", None)
+            __PROFILES = __POST_RESPONSE.get("__json_profiles")
+            __GROUPS = __POST_RESPONSE.get("__json_groups")
         
         try:
             __POST_OBJ = None
@@ -118,6 +128,13 @@ class VkPost(VkTemplate):
                     pass
                 except Exception as ___e___:
                     logger.logException(___e___, "VkAttachments")
+        
+        if __POST_OBJ.get("from_id") != None and __PROFILES != None:
+            __POST_OBJ["from"] = utils.find_owner(__POST_OBJ.get("from_id"), __PROFILES, __GROUPS)
+        if __POST_OBJ.get("owner_id") != None and __PROFILES != None:
+            __POST_OBJ["owner"] = utils.find_owner(__POST_OBJ.get("owner_id"), __PROFILES, __GROUPS)
+        if __POST_OBJ.get("copy_owner_id") != None and __PROFILES != None:
+            __POST_OBJ["copy_owner"] = utils.find_owner(__POST_OBJ.get("copy_owner_id"), __PROFILES, __GROUPS)
         
         ENTITY = self._entityFromJson({
             "source": "vk:wall"+ITEM_ID,

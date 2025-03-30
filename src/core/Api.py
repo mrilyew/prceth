@@ -273,7 +273,8 @@ class Api():
             if EXTRACTOR_RESULTS == None:
                 raise Exception("Nothing returned")
         except Exception as __ee:
-            logger.log(message=f"Extractor {__extractor_input_name} returned error: {str(__ee)}")
+            logger.log(message=f"Extractor {__extractor_input_name} returned error: {str(__ee)}",noConsole=True)
+            raise __ee
         
         ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
         if ENTITIES_COUNT < 1:
@@ -306,7 +307,7 @@ class Api():
             return RETURN_ENTITIES
         else:
             RETURN_ENTITIES = []
-            __export_folder_type = __INPUT_ARGS.get("export_to_folder_type", "simple_grouping")
+            __export_folder_type = __INPUT_ARGS.get("export_to_folder_type", "grouping")
             __export_save_json_to_dir = int(__INPUT_ARGS.get("export_save_json_to_dir", 1))
             #__append_entity_id_to_start = int(__INPUT_ARGS.get("append_entity_id_to_start", 1))
             __append_entity_id_to_start = True

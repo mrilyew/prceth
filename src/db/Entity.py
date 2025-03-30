@@ -93,7 +93,7 @@ class Entity(BaseModel):
 
         return __arr
     
-    def getApiStructure(self):
+    def getApiStructure(self, sensitive=False):
         tags = ",".split(self.tags)
         if tags[0] == ",":
             tags = []
@@ -127,7 +127,7 @@ class Entity(BaseModel):
         if self.edited_at != None:
             fnl["edited"] = str(self.edited_at)
 
-        if FILE != None:
+        if sensitive == False and FILE != None:
             fnl["file"] = FILE.getApiStructure()
 
         return fnl
@@ -230,9 +230,8 @@ class Entity(BaseModel):
         return FINAL_ENTITY
 
     def saveInfoToJson(self, dir):
-        stream = open(os.path.join(dir, f"data_{self.id}.json"), "w")
-        stream.write(json.dumps(self.getApiStructure(), indent=2))
-        stream.close()
+        with open(os.path.join(dir, f"data_{self.id}.json"), "w", encoding='utf8') as json_file:
+            json_file.write(json.dumps(self.getApiStructure(sensitive=True), indent=2, ensure_ascii=False))
 
     def fullStop(self, move_dir, save_to_json=True):
         RETURN_ENTITIES = []
