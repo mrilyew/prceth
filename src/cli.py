@@ -14,13 +14,13 @@ async def __cliMain():
         # Config actions
 
         case "config.get":
-            if 'param' in args:
-                print(api.getOption(args['param']))
+            if 'key' in args:
+                print(api.getOption(args['key']))
             else:
                 print('\'--param\' not passed.')
         case "config.set":
             if 'param' in args and 'value' in args:
-                api.setOption(args.get('param'), args['value'])
+                api.setOption(args.get('param'), args.get('value'))
             else:
                 print('\'--param\' and \'--value\' are not passed.')
         case "config.setNull":
@@ -84,9 +84,10 @@ async def __cliMain():
         # Entities get actions
 
         case 'entities.getById':
-            entity = api.getEntityById(args)
+            entities = api.getEntityById(args)
 
-            print(entity.getApiStructure())
+            for entity in entities:
+                print(entity.getApiStructure())
         case 'entities.get':
             items, count = api.getGlobalEntities(args)
 

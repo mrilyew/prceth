@@ -26,6 +26,7 @@ Tasks:
 - [ ] Vk.post экспорт комментов
 - [ ] Service подписка на стену вк
 - [ ] Service RSS подписка
+- [ ] Переписать Services на APScheduler
 - [ ] система закладок
 - [ ] Паралелльная загрузка
 - [ ] в linked_files добавить разделение file_x,entity_x

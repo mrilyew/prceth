@@ -87,7 +87,7 @@ class Api():
         if collection == None:
             raise NotFoundException("Collection not found")
         
-        collection.delete()
+        collection.delete_instance()
         return True
     def switchCollections(self, params):
         if 'id1' not in params and 'id2' not in params:
@@ -99,7 +99,7 @@ class Api():
             collection_1.switch(collection_2)
         else:
             raise NotFoundException("Collections are not found")
-    def getCollectionById(self, params):
+    def getCollectionById(self, params): # todo multiselect
         if "collection_id" not in params:
             raise NotPassedException("--collection_id not passed")
         
@@ -222,16 +222,18 @@ class Api():
 
         entity.edited_at = time.time()
         entity.save()
+
+        return entity
     def getEntityById(self, params):
-        if 'entity_id' not in params:
-            raise NotPassedException("--entity_id not passed")
+        if 'ids' not in params:
+            raise NotPassedException("--ids not passed")
         
-        entity_id = int(params.get("entity_id"))
-        entity = Entity.get(entity_id)
-        if entity == None:
+        ids = params.get("ids").split(",")
+        entities = Entity.get(ids)
+        if entities == None or len(entities) < 1:
             raise NotFoundException("Entity not found")
         
-        return entity
+        return entities
     def getGlobalEntities(self, params):
         columns_search = ['original_name', 'display_name']
         for column in ['description', 'source', 'index', 'saved', 'author']:
@@ -346,10 +348,10 @@ class Api():
                 _COL.saveInfoToJson(dir=__export_folder)
                 _COL.delete()
 
-            return RETURN_ENTITIES
+            return __export_folder
         
     def getExtractors(self, params):
-        show_hidden = params.get("show_hidden", False) == True
+        show_hidden = int(params.get("show_hidden", "0")) == 1
 
         extractors = (ExtractorsRepository()).getList(show_hidden=show_hidden)
 

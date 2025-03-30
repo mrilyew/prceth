@@ -21,3 +21,7 @@ class NotInstalledException(Exception):
 class ExtractorException(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+class AccessDeniedException(Exception):
+    def __init__(self, message):
+        super().__init__(message)

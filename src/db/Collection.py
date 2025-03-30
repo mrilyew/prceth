@@ -17,7 +17,7 @@ class Collection(BaseModel):
     unlisted = BooleanField(default=0)
     deleted = BooleanField(default=0)
     created_at = TimestampField(default=time.time())
-    edited_at = TimestampField(null=True, default=0)
+    edited_at = TimestampField(null=True)
 
     @staticmethod
     def getAll(query=None):
@@ -45,17 +45,24 @@ class Collection(BaseModel):
             return None
     
     def getApiStructure(self):
-        return {
+        obj = {
             "id": self.id,
             "name": self.name,
             "description": self.description,
             "order": self.order,
             "frontend_data": self.frontend_data,
             "preview": self.preview_id,
-            "created": self.created_at,
-            "edited": self.edited_at,
             "count": self.getItemsCount(),
+            "created": None,
+            "edited": None,
         }
+        try:
+            obj["created"] = int(self.created_at.timestamp())
+            obj["edited"] = int(self.edited_at.timestamp())
+        except Exception:
+            pass
+
+        return obj
     
     def switch(self, to_switch):
         f_order = self.order

@@ -1,23 +1,23 @@
 DefaultSettings = {
     "ui.lang": {
         "type": "string",
-        "default_value": 'ru',
+        "default_value": 'en',
     },
     "ui.name": {
         "type": "string",
-        "default_value": "LCM/S",
+        "default_value": "Inmaigat",
     },
-    "net.useragent": {
+    "web.useragent": {
         "type": "string",
         "default_value": 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
     },
-    "net.host": {
+    "web.host": {
         "type": "string",
         "default_value": "127.0.0.1",
     },
-    "net.port": {
+    "web.port": {
         "type": "int",
-        "default_value": 5667,
+        "default_value": 7856,
     },
     "flask.debug": {
         "type": "int",
@@ -25,7 +25,7 @@ DefaultSettings = {
     },
     "extractor.cache_assets": {
         "type": "int",
-        "default_value": 0, # If 1, on windows you should run CMD with admin privelegies
+        "default_value": 0, # If 1, on NT you should run CMD with admin privelegies
     },
     "storage.path": {
         "type": "string",

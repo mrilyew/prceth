@@ -93,7 +93,7 @@ class VkAlbum(VkTemplate):
                     __PHOTO_ID = str(photo_item.get("owner_id")) + "_" + str(photo_item.get("id"))
                     vphoto_ext = VkPhoto(need_preview=self.need_preview)
                     vphoto_ext.setArgs({
-                        "unlisted": 1,
+                        "unlisted": 0,
                         "item_id": __PHOTO_ID,
                         "__json_info": photo_item,
                         "access_token": self.passed_params.get("access_token"),

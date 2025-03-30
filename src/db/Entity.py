@@ -29,7 +29,7 @@ class Entity(BaseModel):
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
     declared_created_at = TimestampField(default=time.time())
     created_at = TimestampField(default=time.time())
-    edited_at = TimestampField(null=True, default=None)
+    edited_at = TimestampField(null=True)
     
     @property
     def orig_source(self):
@@ -116,16 +116,17 @@ class Entity(BaseModel):
             "frontend_data": frontend_data,
             "tags": tags,
             "author": self.author,
+            "created": None,
+            "edited": None,
+            "declared_created_at": None
         }
 
-        if self.created_at != None:
-            fnl["created"] = str(self.created_at)
-        
-        if self.declared_created_at != None:
+        try:
+            fnl["created"] = int(self.created_at)
+            fnl["edited"] = int(self.edited_at)
             fnl["declared_created_at"] = str(self.declared_created_at)
-        
-        if self.edited_at != None:
-            fnl["edited"] = str(self.edited_at)
+        except Exception:
+            pass
 
         if sensitive == False and FILE != None:
             fnl["file"] = FILE.getApiStructure()
@@ -172,9 +173,14 @@ class Entity(BaseModel):
                 return None
         else:
             try:
-                return Entity.select().where(Entity.id << id).where(Entity.deleted == 0)
-            except:
-                return None
+                __arr = []
+                for _e in Entity.select().where(Entity.id << id).where(Entity.deleted == 0):
+                    __arr.append(_e)
+
+                return __arr
+            except Exception as __egetexeption:
+                #print(__egetexeption)
+                return []
 
     @staticmethod
     def fromJson(json_input, passed_params):

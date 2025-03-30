@@ -7,7 +7,7 @@ class DownloadManager():
         self.speed_limit_kbps = speed_limit_kbps
         self.semaphore = asyncio.Semaphore(self.max_concurrent_downloads)
         self.__headers = {
-            "User-Agent": config.get("net.useragent")
+            "User-Agent": config.get("web.useragent")
         }
         self.__timeout = consts["net.global_timeout"]
     

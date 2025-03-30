@@ -15,5 +15,6 @@ consts['cwd'] = os.getcwd()
 consts["executable"] = os.path.join(consts["cwd"], "executables")
 consts["net.global_timeout"] = 1000
 consts["logger.skip_categories"] = ["AsyncDownloadManager"]
+consts["config.hidden"] = 1
 #consts['storage'] = __get_storage_dir()
 #consts['tmp'] = __get_storage_dir() + "/tmp"

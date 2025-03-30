@@ -1,6 +1,6 @@
 @echo off
 if exist "%CD%\venv" (
-echo Venv exists
+echo venv was found
 %CD%\venv\Scripts\activate.bat
 cd "%CD%\src"
 ) else (
