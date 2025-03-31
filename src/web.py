@@ -1,15 +1,32 @@
 from flask import Flask, request, jsonify, render_template, json
-from resources.Globals import config, consts, ActsRepository
+from resources.Globals import config, consts, ActsRepository, os, Path
 from core.Api import api
 from resources.Exceptions import NotPassedException, AccessDeniedException
 
 consts["context"] = "flask"
-app = Flask(__name__, template_folder=f'web/{config.get("flask.frontend")}', static_folder=f'web/{config.get("flask.frontend")}/static')
+CURRENT_FRONTEND = config.get("flask.frontend")
+
+app = Flask(__name__, template_folder=f'web/{CURRENT_FRONTEND}', static_folder=f'web/{CURRENT_FRONTEND}/static')
 app.json.ensure_ascii = False
 
 @app.route("/", methods=["GET"])
 def main_page():
-    return render_template("index.html", site_name=config.get("ui.name"), langs=["ru", "qqx"])
+    SITE_NAME = config.get("ui.name")
+    CSS_FILES = []
+    JS_FILES  = []
+
+    for css_file in Path(os.path.join(consts.get("cwd"), "web", CURRENT_FRONTEND, "static", "css")).rglob('*.css'):
+        CSS_FILES.append(str(css_file.name))
+
+    for js_file in Path(os.path.join(consts.get("cwd"), "web", CURRENT_FRONTEND, "static", "js")).rglob('*.js'):
+        relative_path = js_file.relative_to(os.path.join(consts.get("cwd"), "web", CURRENT_FRONTEND, "static", "js"))
+        ouput_relative = str(relative_path)
+        if "node_modules" in ouput_relative: #БЫДЛОКОДИНГ
+            continue
+        
+        JS_FILES.append(ouput_relative)
+    
+    return render_template("index.html", site_name=SITE_NAME,__css=CSS_FILES,__js=JS_FILES)
 
 if config.get("flask.debug") == 0:
     @app.errorhandler(Exception)
