@@ -4,12 +4,12 @@ from core.Api import api
 from resources.Exceptions import NotPassedException, AccessDeniedException
 
 consts["context"] = "flask"
-app = Flask(__name__, template_folder='web', static_folder='web/static')
+app = Flask(__name__, template_folder=f'web/{config.get("flask.frontend")}', static_folder=f'web/{config.get("flask.frontend")}/static')
 app.json.ensure_ascii = False
 
 @app.route("/", methods=["GET"])
 def main_page():
-    return render_template("index.html", site_name="tet", langs=["ru", "qqx"])
+    return render_template("index.html", site_name=config.get("ui.name"), langs=["ru", "qqx"])
 
 if config.get("flask.debug") == 0:
     @app.errorhandler(Exception)

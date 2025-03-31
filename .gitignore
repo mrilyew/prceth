@@ -18,6 +18,6 @@ src/storage/logs/*.log
 src/executables/extractors/Custom/*
 src/executables/acts/Custom/*
 src/executables/services/Custom/*
-src/web/static/js/node_modules
+*node_modules*
 src/web/static/js/package-lock.json
 src/storage/main.db-journal

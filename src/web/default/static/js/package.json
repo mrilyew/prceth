@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "umbrellajs": "^3.3.3",
+    "universal-router": "^9.2.1"
+  }
+}

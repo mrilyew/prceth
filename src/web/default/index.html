@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    
+    <script src="{{ url_for('static', filename='js/node_modules/umbrellajs/umbrella.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/node_modules/universal-router/universal-router.js') }}"></script>
+    <title>{{ site_name }}</title>
+
+</head>
+<body>
+    <div class="page-bg">
+        <div class="page-bg--left">
+            <div class="page-bg-block"></div>
+            <div class="page-bg-block-darker"></div>
+        </div>
+        <div class="page-bg--right">
+            <div class="page-bg-block"></div>
+            <div class="page-bg-block-darker"></div>
+        </div>
+    </div>
+</body>
+</html>

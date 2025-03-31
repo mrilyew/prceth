@@ -23,6 +23,10 @@ DefaultSettings = {
         "type": "int",
         "default_value": 1,
     },
+    "flask.frontend": {
+        "type": "string",
+        "default_value": "default",
+    },
     "extractor.cache_assets": {
         "type": "int",
         "default_value": 0, # If 1, on NT you should run CMD with admin privelegies
