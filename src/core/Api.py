@@ -260,10 +260,11 @@ class Api():
         collection_id = __INPUT_ARGS.get("collection_id", None) # Collection id to where entity will added
         # None: Result will be saved as entity
         # Text: Result will be saved at another dir
-        __export_folder = __INPUT_ARGS.get("export_to_folder", None)
+        __export_folder = __INPUT_ARGS.get("export_to_dir", None)
         __export_to_db = __export_folder == None
         __custom_temp_dir = __INPUT_ARGS.get("custom_temp_dir", None)
         
+        col = None
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
@@ -281,74 +282,47 @@ class Api():
         ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
         if ENTITIES_COUNT < 1:
             raise ExtractorException("nothing exported")
+
+        RETURN_ENTITIES = []
+        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+            RETURN_ENTITIES.append(ENTITY)
+            for _ENTITY in ENTITY.getLinkedEntities():
+                RETURN_ENTITIES.append(_ENTITY)
         
-        if __export_to_db == True:
+        for MOVE_ENTITY in RETURN_ENTITIES:
+            if MOVE_ENTITY.file != None:
+                MOVE_ENTITY.file.moveTempDir()
+        
+        if EXTRACTOR_RESULTS.get("collection") != None:
             RETURN_ENTITIES = []
-            for ENTITY in EXTRACTOR_RESULTS.get("entities"):
-                RETURN_ENTITIES.append(ENTITY)
-                if ENTITY.file != None:
-                    ENTITY.file.moveTempDir()
-            
-            if EXTRACTOR_RESULTS.get("collection") != None:
-                RETURN_ENTITIES = []
-                col = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
-                for i_entity in EXTRACTOR_RESULTS.get("entities"):
-                    col.addItem(i_entity)
+            col = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
+            for i_entity in EXTRACTOR_RESULTS.get("entities"):
+                col.addItem(i_entity)
 
-                RETURN_ENTITIES.append(col)
+            RETURN_ENTITIES.append(col)
 
-            if collection_id != None:
-                POST_COLLECTION = Collection.get(collection_id)
-                if POST_COLLECTION == None:
-                    logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
-                else:
-                    for _ENT in RETURN_ENTITIES:
-                        POST_COLLECTION.addItem(_ENT)
+        if collection_id != None:
+            POST_COLLECTION = Collection.get(collection_id)
+            if POST_COLLECTION == None:
+                logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
+            else:
+                for _ENT in RETURN_ENTITIES:
+                    POST_COLLECTION.addItem(_ENT)
 
-            await EXTRACTOR_INSTANCE.postRun()
-            return RETURN_ENTITIES
-        else:
-            RETURN_ENTITIES = []
-            __export_folder_type = __INPUT_ARGS.get("export_to_folder_type", "grouping")
-            __export_save_json_to_dir = int(__INPUT_ARGS.get("export_save_json_to_dir", 1))
-            #__append_entity_id_to_start = int(__INPUT_ARGS.get("append_entity_id_to_start", 1))
-            __append_entity_id_to_start = True
-            for ENTITY in EXTRACTOR_RESULTS.get("entities"):
-                RETURN_ENTITIES.append(ENTITY)
-
-            for EXP_ENTITY in RETURN_ENTITIES:
-                match(__export_folder_type):
-                    case "simple_grouping":
-                        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
-                            for LINKED_ENTITY in ENTITY.getLinkedEntities():
-                                RETURN_ENTITIES.append(LINKED_ENTITY)
-                        
-                        if EXP_ENTITY.file != None:
-                            EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=1,append_entity_id_to_start=__append_entity_id_to_start==1)
-                    
-                        if __export_save_json_to_dir == 1:
-                            EXP_ENTITY.saveInfoToJson(dir=__export_folder)
-                    case "grouping":
-                        RETURN_ENTITIES = EXP_ENTITY.fullStop(move_dir=__export_folder,save_to_json=__export_save_json_to_dir==1)
-                    case _: # "rename"
-                        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
-                            for LINKED_ENTITY in ENTITY.getLinkedEntities():
-                                RETURN_ENTITIES.append(LINKED_ENTITY)
-                        
-                        if EXP_ENTITY.file != None:
-                            EXP_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=__export_folder,move_type=0,append_entity_id_to_start=__append_entity_id_to_start==1)
-
-                        if __export_save_json_to_dir == 1:
-                            EXP_ENTITY.saveInfoToJson(dir=__export_folder)
+        await EXTRACTOR_INSTANCE.postRun()
+        if __export_folder != None:
+            if col != None:
+                __act = (ActsRepository().getByName("Export.CollectionToFS"))()
+                __act.execute(i=col.id,args={"dir": __export_folder})
+            else:
+                items_id = []
+                for __e in EXTRACTOR_RESULTS.get("entities"):
+                    items_id.append(str(__e.id))
                 
-                EXP_ENTITY.delete() # мылытся
-            
-            if EXTRACTOR_RESULTS.get("collection") != None and __export_folder_type == 1:
-                _COL = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
-                _COL.saveInfoToJson(dir=__export_folder)
-                _COL.delete()
+                __act = (ActsRepository().getByName("Export.EntityToFS"))()
+                __act.execute(i=",".join(items_id),args={"dir": __export_folder})
 
-            return __export_folder
+        return RETURN_ENTITIES
         
     def getExtractors(self, params):
         show_hidden = int(params.get("show_hidden", "0")) == 1

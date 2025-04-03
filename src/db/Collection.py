@@ -227,6 +227,6 @@ class Collection(BaseModel):
         return FINAL_COLLECTION
     
     def saveInfoToJson(self, dir):
-        stream = open(os.path.join(dir, "collection.json"), "w")
+        stream = open(os.path.join(dir, f"collection_{self.id}.json"), "w")
         stream.write(json.dumps(self.getApiStructure(), indent=2))
         stream.close()

@@ -246,23 +246,30 @@ class Entity(BaseModel):
             dir_path.mkdir()
 
         entity_dir = Path(os.path.join(str(dir_path), str(self.id)))
-        linked_dir = Path(os.path.join(str(entity_dir), str(self.id)))
+        linked_dir = Path(os.path.join(str(entity_dir), str(self.id) + "_linked"))
         if entity_dir.is_dir() == False:
             entity_dir.mkdir()
 
         if self.file != None:
-            self.file.moveTempDir(use_upload_name=True,preset_dir=entity_dir,move_type=1,append_entity_id_to_start=True)
+            self.file.saveToDir(use_upload_name=True,save_dir=entity_dir,move_type=1,append_entity_id_to_start=True)
         
         RETURN_ENTITIES.append(self)
         if len(self.getLinkedEntities()) > 0:
-            linked_dir.mkdir()
+            try:
+                linked_dir.mkdir()
+            except FileExistsError:
+                pass
+
             for LINKED_ENTITY in self.getLinkedEntities():
                 linked_entity_dir = Path(os.path.join(str(linked_dir), str(LINKED_ENTITY.id)))
-                linked_entity_dir.mkdir()
+                try:
+                    linked_entity_dir.mkdir()
+                except FileExistsError:
+                    pass
 
                 RETURN_ENTITIES.append(LINKED_ENTITY)
                 if LINKED_ENTITY.file != None:
-                    LINKED_ENTITY.file.moveTempDir(use_upload_name=True,preset_dir=linked_entity_dir,move_type=1,append_entity_id_to_start=True)
+                    LINKED_ENTITY.file.saveToDir(use_upload_name=True,save_dir=linked_entity_dir,move_type=1,append_entity_id_to_start=True)
                 if save_to_json:
                     LINKED_ENTITY.saveInfoToJson(dir=str(linked_entity_dir))
         

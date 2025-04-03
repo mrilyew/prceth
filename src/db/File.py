@@ -1,5 +1,6 @@
 from resources.Globals import consts, BaseModel, Path, os, utils, shutil, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
+from shutil import ignore_patterns
 
 # File is not a file, its a directory with main file and secondary files.
 # So the dir and main file names as hash
@@ -59,6 +60,38 @@ class File(BaseModel):
             FULL_HASH_DIRECTORY = Path(storage.makeHashDir(self.hash, only_return=True))
             Path(self.temp_dir).rename(FULL_HASH_DIRECTORY)
 
+    def saveToDir(self, save_dir, move_type = 1, append_entity_id_to_start = True, use_upload_name=True):
+        from resources.Globals import storage
+
+        CURRENT_FILE_PATH = Path(self.getDirPath())
+        OUTPUT_FILE_PATH = save_dir
+        OUTPUT_FILE_ENTITY_PATH = Path(os.path.join(OUTPUT_FILE_PATH, str(self.id)))
+
+        NEW_MAIN_FILE_NAME = str(self.upload_name)
+        if append_entity_id_to_start == True:
+            NEW_MAIN_FILE_NAME = str(self.id) + "_" + NEW_MAIN_FILE_NAME
+        
+        NEW_MAIN_FILE_NAME = NEW_MAIN_FILE_NAME.replace("thumb", "th_umb") #БЫДЛОКОД
+        if move_type == 0: # Just rename
+            CURRENT_MAIN_FILE_PATH = Path(os.path.join(OUTPUT_FILE_PATH, NEW_MAIN_FILE_NAME))
+            Path(CURRENT_FILE_PATH).rename(CURRENT_MAIN_FILE_PATH)
+        elif move_type == 1:
+            __list = os.listdir(CURRENT_FILE_PATH)
+            __count = len(__list)
+            FILES_LENGTH = __count
+            try:
+                if FILES_LENGTH < 1:
+                    pass
+                elif FILES_LENGTH > 0:
+                    OUTPUT_FILE_ENTITY_PATH_ = OUTPUT_FILE_ENTITY_PATH
+                    if FILES_LENGTH == 1:
+                        OUTPUT_FILE_ENTITY_PATH_ = Path(os.path.join(OUTPUT_FILE_PATH))
+                    
+                    shutil.copytree(str(CURRENT_FILE_PATH), str(OUTPUT_FILE_ENTITY_PATH_), ignore=ignore_patterns('*_thumb.*'))
+                    Path(os.path.join(OUTPUT_FILE_ENTITY_PATH_, self.getFsFileName())).rename(os.path.join(OUTPUT_FILE_ENTITY_PATH_, NEW_MAIN_FILE_NAME))
+            except Exception as __e__:
+                logger.logException(__e__, "File")
+        
     def getApiStructure(self):
         fnl = {
             "extension": self.extension,
@@ -79,6 +112,20 @@ class File(BaseModel):
         ENTITY_PATH = os.path.join(COLLECTION_PATH, HASH, f"{HASH}.{str(self.extension)}")
 
         return ENTITY_PATH
+    
+    def getFsFileName(self):
+        HASH = self.hash
+
+        return f"{HASH}.{str(self.extension)}"
+    
+    def getUpperHashDirPath(self):
+        STORAGE_PATH = consts["storage"]
+        HASH = self.hash
+
+        COLLECTION_PATH = os.path.join(STORAGE_PATH, "files", str(HASH[0:2]))
+        COLLECTION_PATH_OBJ = Path(COLLECTION_PATH)
+
+        return COLLECTION_PATH
     
     def getDirPath(self, need_check = False):
         STORAGE_PATH = consts["storage"]
