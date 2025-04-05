@@ -6,21 +6,21 @@ from db.File import File
 class RawHTML(BaseExtractor):
     name = 'RawHTML'
     category = 'Web'
+    # TODO расписать
     params = {
         "url": {
             "desc_key": "-",
             "type": "string",
-            "maxlength": 3
+        },
+        "html": {
+            "desc_key": "-",
+            "type": "string",
+            "assertion": {
+                "assert_not_null": True,
+            },
         }
     }
-
-    def setArgs(self, args):
-        self.passed_params = args
-        # TODO расписать
-
-        super().setArgs(args)
-        assert self.passed_params.get("html") != None, "html was not passed"
-        #assert self.passed_params.get("url") != None, "url was not passed"
+    manual_params = True
 
     async def run(self, args):
         self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)
@@ -32,9 +32,8 @@ class RawHTML(BaseExtractor):
 
         # Inserting HTML code
         try:
-            self.crawler.crawlPageFromRawHTML(html=
-                                              self.passed_params.get("html"),url_help=
-                                              self.passed_params.get("url", ""))
+            self.crawler.crawlPageFromRawHTML(html=self.passed_params.get("html"),
+                                              url_help=self.passed_params.get("url", ""))
         except Exception as ecx:
             logger.logException(ecx,section="Extractors|Crawling")
             raise ecx

@@ -12,9 +12,12 @@ class WebURL(BaseExtractor):
         "url": {
             "desc_key": "extractor_key_desc_url",
             "type": "string",
-            "assert": True,
+            "assertion": {
+                "assert_not_null": True,
+            },
         },
     }
+    manual_params = True
     
     async def run(self, args = {}):
         PASSED_URL = self.passed_params.get("url")

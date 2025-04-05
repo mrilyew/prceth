@@ -35,11 +35,17 @@ class BaseExtractor:
             "type": "bool",
             "default": False,
         }
+        params["make_preview"] = {
+            "name": "make_preview",
+            "type": "bool",
+            "default": True,
+        }
 
         return params
     
-    def setArgs(self, args, joined_args = None):
+    def setArgs(self, args):
         self.params = {}
+
         # Catching params from parent extractors
         for __sub_class in self.__class__.__mro__:
             if hasattr(__sub_class, "declare") == False:
@@ -49,47 +55,49 @@ class BaseExtractor:
             self.params.update(new_params)
         
         MAX_OUTPUT_CHECK_PARAMS = self.params
-        if joined_args != None:
-            MAX_OUTPUT_CHECK_PARAMS = MAX_OUTPUT_CHECK_PARAMS.update(joined_args)
-        
         self.passed_params["make_preview"] = int(args.get("make_preview", 1))
-        if MAX_OUTPUT_CHECK_PARAMS != None and self.manual_params == False:
-            for index, param_name in enumerate(MAX_OUTPUT_CHECK_PARAMS):
-                param_object = MAX_OUTPUT_CHECK_PARAMS.get(param_name)
-                __value = args.get(param_name, param_object.get("default"))
-                if __value != None:
-                    match(param_object.get("type")):
-                        case "int":
-                            __value = int(__value)
-                        case "array":
-                            __allowed = param_object.get("values")
-                            assert __value in __allowed, "not valid value"
+        if MAX_OUTPUT_CHECK_PARAMS == None:
+            return
+        
+        for index, param_name in enumerate(MAX_OUTPUT_CHECK_PARAMS):
+            param_object = MAX_OUTPUT_CHECK_PARAMS.get(param_name)
+            __value = args.get(param_name, param_object.get("default"))
+            if __value != None:
+                match(param_object.get("type")):
+                    case "int":
+                        __value = int(__value)
+                    case "array":
+                        __allowed = param_object.get("values")
+                        assert __value in __allowed, "not valid value"
 
-                            __value = param_object.get("default")
-                        case "string":
-                            if param_object.get("maxlength") != None:
-                                __value = utils.proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
+                        __value = param_object.get("default")
+                    case "string":
+                        if param_object.get("maxlength") != None:
+                            __value = utils.proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
+                        else:
+                            __value = str(__value)
+                    case "object":
+                        if type(__value) in ["dict", "array"] == False:
+                            if param_object.get("default") != None:
+                                __value = param_object.get("default")
                             else:
-                                __value = str(__value)
-                        case "object":
-                            if type(__value) in ["dict", "array"] == False:
-                                if param_object.get("default") != None:
-                                    __value = param_object.get("default")
-                                else:
-                                    __value = None
-                        case _:
-                            break
-                    
-                    self.passed_params[param_name] = __value
-                else:
-                    if param_object.get("default") != None:
-                        self.passed_params[param_name] = param_object.get("default")
+                                __value = None
+                    case _:
+                        break
+                
+                self.passed_params[param_name] = __value
+            else:
+                if param_object.get("default") != None:
+                    self.passed_params[param_name] = param_object.get("default")
 
-                if param_object.get("assertion") != None:
-                    __assertion = param_object.get("assertion")
-                    
-                    if __assertion.get("assert_not_null") == True:
-                        assert __value != None, f"{param_name} not passed"
+            if param_object.get("assertion") != None:
+                __assertion = param_object.get("assertion")
+                
+                if __assertion.get("assert_not_null") == True:
+                    assert __value != None, f"{param_name} not passed"
+        
+        if self.manual_params == True:
+            self.passed_params.update(args)
 
     def onFail(self):
         if self.del_dir_on_fail == True:

@@ -10,17 +10,13 @@ class WebPage(BaseExtractor):
         "url": {
             "desc_key": "-",
             "type": "string",
-            "maxlength": 3
+            "assertion": {
+                "assert_not_null": True,
+            },
         }
     }
 
-    def setArgs(self, args):
-        self.passed_params = args
-
-        super().setArgs(args)
-        assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
-
-    # BTW, all requests will be unauthorized. So we need to use input raw html parser
+    # BTW, all requests will be unauthorized. So i recommend to use input raw html parser
     # TODO rewrite to multitab
     async def run(self, args):
         SITE_URL = self.passed_params.get("url")

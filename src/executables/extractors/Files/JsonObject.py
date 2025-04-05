@@ -4,18 +4,18 @@ class JsonObject(BaseExtractor):
     name = 'JsonObject'
     category = 'Files'
     hidden = True
-    params = {
-        "json_object": {
+    
+    def declare(self, args):
+        params = {}
+        params["json_object"] = {
             "desc_key": "passed_json_object",
             "type": "object",
-            "assert": True,
+            "assert": {
+                "assert_not_null": True,
+            },
         }
-    }
-    
-    def setArgs(self, args):
-        self.passed_params["json_object"] = args.get("json_object")
 
-        super().setArgs(args)
+        return params
 
     async def run(self, args):
         ENTITY = self._entityFromJson({
