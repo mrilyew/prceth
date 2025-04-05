@@ -68,7 +68,6 @@ class RawHTML(BaseExtractor):
         ENTITY = self._entityFromJson({
             "source": SOURCE,
             "internal_content": WEB_META,
-            "indexation_content": WEB_META,
             "preview_file": "screenshot.png",
             "file": FILE,
         })

@@ -75,9 +75,12 @@ class Utils():
 
         return parsed_result
     
-    def proc_strtr(self, text, length = 0):
+    def proc_strtr(self, text, length = 0, multipoint = True):
         newString = text[:length]
 
+        if multipoint == False:
+            return newString
+        
         return newString + ("..." if text != newString else "")
     
     def parse_entity(self, input_string: str, allowed_entities = ["entity", "collection"]):

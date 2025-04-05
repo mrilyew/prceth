@@ -7,26 +7,27 @@ from db.File import File
 class FSPath(BaseExtractor):
     name = 'FSPath'
     category = 'Files'
-    params = {
-        "path": {
+    
+    def declare():
+        params = {}
+        params["path"] = {
             "desc_key": "extractor_key_desc_path_path",
             "type": "string",
-            "maxlength": 3
-        },
-        "type": {
+            "assertion": {
+                "assert_not_null": True,
+            },
+        }
+        params["type"] = {
             "desc_key": "extractor_key_desc_path_text",
             "type": "array",
-            "values": ["copy", "move", "link"]
+            "values": ["copy", "move", "link"],
+            "default": "copy",
+            "assertion": {
+                "assert_not_null": True,
+            },
         }
-    }
 
-    def setArgs(self, args):
-        self.passed_params["path"] = str(args.get("path"))
-        self.passed_params["type"] = args.get("type", "copy")
-
-        super().setArgs(args)
-        assert args.get("path") != None, "path was not passed"
-        assert self.passed_params.get("type") != None, "type was not passed"
+        return params
     
     async def run(self, args):
         INPUT_PATH = Path(self.passed_params.get("path"))

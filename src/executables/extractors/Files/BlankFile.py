@@ -6,26 +6,29 @@ class BlankFile(BaseExtractor):
     name = 'BlankFile'
     category = 'Files'
     hidden = True
-    params = {
-        "extension": {
+
+    def declare():
+        params = {}
+        params["extension"] = {
             "desc_key": "extractor_key_desc_blank_extension",
+            "default": "txt",
             "type": "string",
-            "maxlength": 6
-        },
-        "text": {
+            "maxlength": 6,
+        }
+        params["text"] = {
             "desc_key": "extractor_key_desc_blank_text",
             "type": "string",
-            "maxlength": -1
+            "default": "",
         }
-    }
+        params["__original_name"] = {
+            "desc_key": "original_name_key_desc_blank_text",
+            "type": "string",
+            "default": f"blank.txt",
+            "hidden": True,
+        }
 
-    def setArgs(self, args):
-        self.passed_params["extension"] = args.get("extension", "txt")
-        self.passed_params["text"] = args.get("text", "")
-        self.passed_params["__original_name"] = f"blank.{self.passed_params.get("extension")}"
-
-        super().setArgs(args)
-
+        return params
+    
     async def run(self, args):
         file_manager.createFile(filename=self.passed_params.get("__original_name"),
             dir=self.temp_dir,

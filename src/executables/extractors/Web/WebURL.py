@@ -10,17 +10,11 @@ class WebURL(BaseExtractor):
     category = 'Web'
     params = {
         "url": {
-            "desc_key": "extractor_key_desc_path_path",
+            "desc_key": "extractor_key_desc_url",
             "type": "string",
-            "maxlength": 3
+            "assert": True,
         },
     }
-
-    def setArgs(self, args):
-        self.passed_params["url"] = args.get("url")
-
-        super().setArgs(args)
-        assert self.passed_params.get("url") != None and self.passed_params.get("url") != "", "url was not passed"
     
     async def run(self, args = {}):
         PASSED_URL = self.passed_params.get("url")
@@ -60,7 +54,6 @@ class WebURL(BaseExtractor):
             "file": FILE,
             "source": "url:"+self.passed_params.get("url"),
             "internal_content": output_metadata,
-            "indexation_content": output_metadata,
         }, make_preview=self.passed_params.get("make_preview") == 1)
 
         return {

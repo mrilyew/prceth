@@ -6,19 +6,39 @@ from resources.Exceptions import NotFoundException
 class VkPost(VkTemplate):
     name = 'VkPost'
     category = 'Vk'
+    params = {
+        "item_id": {
+            "desc_key": "-",
+            "type": "string",
+            "assert": True,
+        },
+        "__json_info": {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+        },
+        "__json_profiles": {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+        },
+        "__json_groups": {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+        },
+        "download_external_media": {
+            "desc_key": "-",
+            "type": "bool",
+            "default": "0"
+        },
+    }
 
     def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["__json_info"] = args.get("__json_info")
-        self.passed_params["__json_profiles"] = args.get("__json_info")
-        self.passed_params["__json_groups"] = args.get("__json_groups")
-        self.passed_params["download_external_media"] = int(args.get("download_external_media", "0")) == 1
-        self.passed_params["limit"] = int(args.get("limit", "0"))
-
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
-        
         super().setArgs(args)
 
+        assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
+    
     async def __recieveById(self, post_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("wall.getById", {"posts": post_id, "extended": 1})

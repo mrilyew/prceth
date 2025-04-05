@@ -268,7 +268,7 @@ class Api():
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True,need_preview=__export_to_db == True)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = None
         try:

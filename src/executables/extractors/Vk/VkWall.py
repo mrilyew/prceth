@@ -6,17 +6,43 @@ from resources.Globals import config, VkApi, logger, utils, math, asyncio
 class VkWall(VkTemplate):
     name = 'VkWall'
     category = 'Vk'
+    params = {
+        "item_id": {
+            "desc_key": "-",
+            "type": "string",
+            "assert": True,
+        },
+        "filter": {
+            "desc_key": "-",
+            "type": "array",
+            "values": ["suggests", "postponed", "owner", "others", "all", "donut", "archived"],
+            "default": "all",
+            "assert": True,
+        },
+        "download_timeout": {
+            "desc_key": "-",
+            "type": "int",
+            "default": 0,
+        },
+        "api_timeout": {
+            "desc_key": "-",
+            "type": "int",
+            "default": 0,
+        },
+        "download_external_media": {
+            "desc_key": "-",
+            "type": "bool",
+            "default": "0"
+        },
+        "limit": {
+            "desc_key": "-",
+            "type": "int",
+            "default": "0"
+        },
+    }
 
     def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["filter"] = args.get("filter")
-        self.passed_params["download_timeout"] = int(args.get("timeout", "0"))
-        self.passed_params["api_timeout"] = int(args.get("timeout", "0"))
-        self.passed_params["limit"] = int(args.get("limit", "0"))
-        self.passed_params["download_external_media"] = int(args.get("download_external_media", "1"))
-
-        assert self.passed_params.get("item_id") != None, "item_id not passed"
-
+        self.setArgs(args)
         super().setArgs(args)
 
     async def run(self, args):

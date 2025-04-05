@@ -79,19 +79,23 @@ class Entity(BaseModel):
         if self.__cachedLinkedEntities != None:
             return self.__cachedLinkedEntities
 
-        #linked_array = []
+        linked_array = []
         try:
+            if self.linked_files == None:
+                return []
+            
             files_list = self.linked_files.split(",")
             linked_entities = self.get(files_list)
-            __arr = []
+            linked_array = []
             for _e in linked_entities:
-                __arr.append(_e)
+                linked_array.append(_e)
 
-            self.__cachedLinkedEntities = __arr
-        except Exception:
+        except Exception as ____e:
+            logger.logException(input_exception=____e,section="Entity",noConsole=False)
             return []
-
-        return __arr
+        
+        self.__cachedLinkedEntities = linked_array
+        return linked_array
     
     def getApiStructure(self, sensitive=False):
         tags = ",".split(self.tags)
