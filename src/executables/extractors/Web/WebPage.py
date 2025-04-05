@@ -6,21 +6,25 @@ from db.File import File
 class WebPage(BaseExtractor):
     name = 'WebPage'
     category = 'Web'
-    params = {
-        "url": {
+    manual_params = True
+
+    # BTW, all requests will be unauthorized. So i recommend to use input raw html parser
+    # TODO rewrite to multitab
+
+    def declare():
+        params = {}
+        params["url"] = {
             "desc_key": "-",
             "type": "string",
             "assertion": {
                 "assert_not_null": True,
             },
         }
-    }
 
-    # BTW, all requests will be unauthorized. So i recommend to use input raw html parser
-    # TODO rewrite to multitab
+        return params
+    
     async def run(self, args):
         SITE_URL = self.passed_params.get("url")
-
         self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)
         if self.crawler.checkWebDriver() == False:
             await self.crawler.downloadChrome()

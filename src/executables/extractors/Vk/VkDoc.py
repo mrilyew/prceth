@@ -8,21 +8,23 @@ from db.File import File
 class VkDoc(VkTemplate):
     name = 'VkDoc'
     category = 'Vk'
-    params = {
-        "item_id": {
-            "desc_key": "doc_id_desc",
+
+    def declare():
+        params = {}
+        params["item_id"] = {
+            "desc_key": "-",
             "type": "string",
-            "maxlength": 3
-        },
-    }
+        }
+        params["__json_info"] = {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+            "assertion": {
+                "assert_link": "item_id"
+            }
+        }
 
-    def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["__json_info"] = args.get("__json_info", None)
-
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("preset_json") != None, "item_id not passed"
-
-        super().setArgs(args)
+        return params
     
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -69,7 +71,6 @@ class VkDoc(VkTemplate):
 
         HTTP_REQUEST = await download_manager.addDownload(end=item_URL,dir=save_path)
         DOCUMENT["site"] = self.passed_params.get("vk_path")
-        __indexation = utils.clearJson(DOCUMENT)
         FILE = self._fileFromJson({
             "extension": item_EXT,
             "upload_name": item_TEXT,
@@ -78,7 +79,6 @@ class VkDoc(VkTemplate):
         ENTITY = self._entityFromJson({
             "file": FILE,
             "source": __SOURCE,
-            "indexation_content": __indexation,
             "internal_content": DOCUMENT,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })

@@ -66,6 +66,8 @@ class BaseExtractor:
                 match(param_object.get("type")):
                     case "int":
                         __value = int(__value)
+                    case "float":
+                        __value = float(__value)
                     case "array":
                         __allowed = param_object.get("values")
                         assert __value in __allowed, "not valid value"
@@ -82,6 +84,8 @@ class BaseExtractor:
                                 __value = param_object.get("default")
                             else:
                                 __value = None
+                    case "bool":
+                        __value = int(__value) == 1
                     case _:
                         break
                 
@@ -95,6 +99,12 @@ class BaseExtractor:
                 
                 if __assertion.get("assert_not_null") == True:
                     assert __value != None, f"{param_name} not passed"
+
+                if __assertion.get("assert_link") != None:
+                    new_param_name = __assertion.get("assert_link")
+                    new_param_object = MAX_OUTPUT_CHECK_PARAMS.get(new_param_name)
+
+                    assert __value != None or args.get(new_param_name, new_param_object.get("default")) != None
         
         if self.manual_params == True:
             self.passed_params.update(args)

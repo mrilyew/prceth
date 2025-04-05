@@ -5,16 +5,33 @@ from resources.Globals import VkApi, logger, math, asyncio
 class VkAllPhotos(VkTemplate):
     name = 'VkAllPhotos'
     category = 'Vk'
-    params = {}
 
-    def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["download_timeout"] = int(args.get("timeout", "0"))
-        self.passed_params["api_timeout"] = int(args.get("timeout", "0"))
-        self.passed_params["limit"] = int(args.get("limit", "0"))
+    def declare():
+        params = {}
+        params["item_id"] = {
+            "desc_key": "-",
+            "type": "string",
+            "assertion": {
+                "assert_not_null": True,
+            }
+        }
+        params["download_timeout"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 1,
+        }
+        params["api_timeout"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 1,
+        }
+        params["limit"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 0,
+        }
 
-        assert self.passed_params.get("item_id") != None, "item_id not passed"
-        super().setArgs(args)
+        return params
 
     async def run(self, args):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))

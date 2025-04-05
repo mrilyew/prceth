@@ -5,22 +5,28 @@ from resources.Exceptions import NotFoundException
 class VkAudio(VkTemplate):
     name = 'VkAudio'
     category = 'Vk'
-    params = {
-        "item_id": {
-            "desc_key": "audio_id_desc",
+    
+    def declare():
+        params = {}
+        params["item_id"] = {
+            "desc_key": "-",
             "type": "string",
-            "maxlength": 3
-        },
-    }
+        }
+        params["__json_info"] = {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+            "assertion": {
+                "assert_link": "item_id"
+            }
+        }
+        params["download_file"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True
+        }
 
-    def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["__json_info"] = args.get("__json_info", None)
-        self.passed_params["download_file"] = args.get("download_file", True)
-
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("preset_json") != None, "item_id not passed"
-
-        super().setArgs(args)
+        return params
     
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -83,7 +89,6 @@ class VkAudio(VkTemplate):
                     }
 
         AUDIO["site"] = self.passed_params.get("vk_path")
-        __indexation = utils.clearJson(AUDIO)
 
         FILE = None
         if ___OUT_FILE != None:
@@ -91,7 +96,6 @@ class VkAudio(VkTemplate):
         
         ENTITY = self._entityFromJson({
             "source": __SOURCE,
-            "indexation_content": __indexation,
             "internal_content": AUDIO,
             "file": FILE,
             "unlisted": self.passed_params.get("unlisted") == 1,

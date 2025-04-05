@@ -201,7 +201,11 @@ class Entity(BaseModel):
         if internal_content_ != None:
             FINAL_ENTITY.internal_content = json.dumps(internal_content_)
         else:
-            FINAL_ENTITY.internal_content = json.dumps(indexation_content_)
+            try:
+                internal_content_ = utils.clearJson(indexation_content_)
+                FINAL_ENTITY.internal_content = json.dumps(internal_content_)
+            except Exception:
+                FINAL_ENTITY.internal_content = json.dumps(indexation_content_)
         if json_input.get("file") != None:
             FINAL_ENTITY.file_id = json_input.get("file").id
             FINAL_ENTITY.__cached_file = json_input.get("file")

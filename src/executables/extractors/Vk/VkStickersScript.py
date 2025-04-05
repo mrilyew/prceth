@@ -6,20 +6,43 @@ from db.File import File
 class VkStickersScript(BaseExtractor):
     name = 'VkStickersScript'
     category = 'Vk'
-    params = {
-        "start": {
-            "desc_key": "vk_stickers_start_desc",
+
+    def declare():
+        params = {}
+        params["start"] = {
             "type": "int",
-        },
-    }
+            "desc_key": "-",
+            "default": 1,
+            "assertion": {
+                "assert_not_null": True,
+            }
+        }
+        params["end"] = {
+            "type": "int",
+            "desc_key": "-",
+            "default": 100,
+            "assertion": {
+                "assert_not_null": True,
+            }
+        }
+        params["size"] = {
+            "type": "int",
+            "desc_key": "-",
+            "default": 512,
+            "assertion": {
+                "assert_not_null": True,
+            }
+        }
+        params["timeout"] = {
+            "type": "float",
+            "desc_key": "-",
+            "default": 1,
+            "assertion": {
+                "assert_not_null": True,
+            }
+        }
 
-    def setArgs(self, args):
-        self.passed_params["start"] = int(args.get("start", 1))
-        self.passed_params["end"] = int(args.get("end", 100))
-        self.passed_params["size"] = int(args.get("size", "512"))
-        self.passed_params["timeout"] = float(args.get("timeout", "1"))
-
-        super().setArgs(args)
+        return params
 
     async def run(self, args):
         entity_list = []

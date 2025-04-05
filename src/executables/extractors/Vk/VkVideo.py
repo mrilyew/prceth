@@ -6,22 +6,28 @@ from resources.Exceptions import NotFoundException
 class VkVideo(VkTemplate):
     name = 'VkVideo'
     category = 'Vk'
-    params = {
-        "item_id": {
-            "desc_key": "item_id_desc",
+
+    def declare():
+        params = {}
+        params["item_id"] = {
+            "desc_key": "-",
             "type": "string",
-            "maxlength": 3
-        },
-    }
-    
-    def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["download_file"] = args.get("download_file", True)
-        self.passed_params["__json_info"] = args.get("__json_info", None)
+        }
+        params["download_file"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True,
+        }
+        params["__json_info"] = {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+            "assertion": {
+                "assert_link": "item_id"
+            }
+        }
 
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
-
-        super().setArgs(args)
+        return params
 
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -76,7 +82,6 @@ class VkVideo(VkTemplate):
             logger.log(message=f"Video {__VIDEO_ID} is from another platform. Do not downloading file.",section="VK",name="message")
 
         __VIDEO_OBJECT["site"] = self.passed_params.get("vk_path")
-        __indexation = utils.clearJson(__VIDEO_OBJECT)
 
         FILE = None
         if IS_DIRECT and self.passed_params.get("download_file"):
@@ -89,7 +94,6 @@ class VkVideo(VkTemplate):
         ENTITY = self._entityFromJson({
             "suggested_name": VIDEO_NAME,
             "source": "vk:video"+str(__VIDEO_ID),
-            "indexation_content": __indexation,
             "internal_content": __VIDEO_OBJECT,
             "file": FILE,
             "unlisted": self.passed_params.get("unlisted") == 1,

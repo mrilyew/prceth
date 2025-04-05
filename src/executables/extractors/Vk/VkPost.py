@@ -6,39 +6,39 @@ from resources.Exceptions import NotFoundException
 class VkPost(VkTemplate):
     name = 'VkPost'
     category = 'Vk'
-    params = {
-        "item_id": {
+
+    def declare():
+        params = {}
+        params["item_id"] = {
             "desc_key": "-",
             "type": "string",
-            "assert": True,
-        },
-        "__json_info": {
+        }
+        params["__json_info"] = {
             "desc_key": "-",
             "type": "object",
             "hidden": True,
-        },
-        "__json_profiles": {
+            "assertion": {
+                "assert_link": "item_id"
+            }
+        }
+        params["__json_profiles"] = {
             "desc_key": "-",
             "type": "object",
             "hidden": True,
-        },
-        "__json_groups": {
+        }
+        params["__json_groups"] = {
             "desc_key": "-",
             "type": "object",
             "hidden": True,
-        },
-        "download_external_media": {
+        }
+        params["download_external_media"] = {
             "desc_key": "-",
             "type": "bool",
             "default": "0"
-        },
-    }
+        }
 
-    def setArgs(self, args):
-        super().setArgs(args)
+        return params
 
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
-    
     async def __recieveById(self, post_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("wall.getById", {"posts": post_id, "extended": 1})
@@ -80,7 +80,6 @@ class VkPost(VkTemplate):
 
         # Making indexation
         __POST_OBJ["site"] = self.passed_params.get("vk_path")
-        __indexation = utils.clearJson(__POST_OBJ)
 
         linked_files = []
         for key, attachment in enumerate(__POST_OBJ.get("attachments")):
@@ -159,7 +158,6 @@ class VkPost(VkTemplate):
         ENTITY = self._entityFromJson({
             "source": "vk:wall"+ITEM_ID,
             "suggested_name": f"VK Post {str(ITEM_ID)}",
-            "indexation_content": __indexation,
             "internal_content": __POST_OBJ,
             "linked_files": linked_files,
             "unlisted": self.passed_params.get("unlisted") == 1,

@@ -7,21 +7,23 @@ from resources.Exceptions import NotFoundException
 class VkPhoto(VkTemplate):
     name = 'VkPhoto'
     category = 'Vk'
-    params = {
-        "item_id": {
-            "desc_key": "item_id_desc",
+
+    def declare():
+        params = {}
+        params["item_id"] = {
+            "desc_key": "-",
             "type": "string",
-            "maxlength": 3
-        },
-    }
-    
-    def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["__json_info"] = args.get("__json_info", None)
+        }
+        params["__json_info"] = {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+            "assertion": {
+                "assert_link": "item_id"
+            }
+        }
 
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("__json_info") != None, "item_id not passed"
-
-        super().setArgs(args)
+        return params
     
     async def __recieveById(self, item_id):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -75,7 +77,6 @@ class VkPhoto(VkTemplate):
             FILE_SIZE = SAVE_PATH.stat().st_size
 
             __PHOTO_OBJECT["site"] = self.passed_params.get("vk_path")
-            __indexation = utils.clearJson(__PHOTO_OBJECT)
             FILE = self._fileFromJson({
                 "extension": "jpg",
                 "upload_name": ORIGINAL_NAME,
@@ -85,7 +86,6 @@ class VkPhoto(VkTemplate):
                 "file": FILE,
                 "suggested_name": f"VK Photo {str(__PHOTO_ID)}",
                 "source": "vk:photo"+str(__PHOTO_ID),
-                "indexation_content": __indexation,
                 "internal_content": __PHOTO_OBJECT,
                 "unlisted": self.passed_params.get("unlisted") == 1,
             })

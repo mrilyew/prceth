@@ -6,21 +6,24 @@ from db.File import File
 class RawHTML(BaseExtractor):
     name = 'RawHTML'
     category = 'Web'
-    # TODO расписать
-    params = {
-        "url": {
+    manual_params = True
+
+    def declare():
+        # TODO расписать
+        params = {}
+        params["url"] = {
             "desc_key": "-",
             "type": "string",
-        },
-        "html": {
+        }
+        params["html"] = {
             "desc_key": "-",
             "type": "string",
             "assertion": {
                 "assert_not_null": True,
-            },
+            }
         }
-    }
-    manual_params = True
+
+        return params
 
     async def run(self, args):
         self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)

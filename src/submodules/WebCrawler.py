@@ -118,7 +118,7 @@ class Crawler():
         self.service = ChromeService(executable_path=self.__webdriver,chrome_options=_options,log_path='NUL')
         self.driver  = webdriver.Chrome(service=self.service,options=_options)
 
-        logger.log(section="Extractors|Crawling",name="message",message="Started Google Chrome tm.")
+        logger.log(section="Extractors|Crawling",name="message",message="Started Google Chrome")
     
     def openURL(self, input_url):
         self.url = input_url

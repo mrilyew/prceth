@@ -6,44 +6,47 @@ from resources.Globals import config, VkApi, logger, utils, math, asyncio
 class VkWall(VkTemplate):
     name = 'VkWall'
     category = 'Vk'
-    params = {
-        "item_id": {
+    
+    def declare():
+        params = {}
+        params["item_id"] = {
             "desc_key": "-",
             "type": "string",
-            "assert": True,
-        },
-        "filter": {
+            "assertion": {
+                "assert_not_null": True,
+            },
+        }
+        params["filter"] = {
             "desc_key": "-",
             "type": "array",
             "values": ["suggests", "postponed", "owner", "others", "all", "donut", "archived"],
             "default": "all",
-            "assert": True,
-        },
-        "download_timeout": {
+            "assertion": {
+                "assert_not_null": True,
+            },
+        }
+        params["download_timeout"] = {
             "desc_key": "-",
             "type": "int",
             "default": 0,
-        },
-        "api_timeout": {
+        }
+        params["api_timeout"] = {
             "desc_key": "-",
             "type": "int",
             "default": 0,
-        },
-        "download_external_media": {
+        }
+        params["download_external_media"] = {
             "desc_key": "-",
             "type": "bool",
-            "default": "0"
-        },
-        "limit": {
+            "default": False
+        }
+        params["limit"] = {
             "desc_key": "-",
             "type": "int",
-            "default": "0"
-        },
-    }
+            "default": 0
+        }
 
-    def setArgs(self, args):
-        self.setArgs(args)
-        super().setArgs(args)
+        return params
 
     async def run(self, args):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))

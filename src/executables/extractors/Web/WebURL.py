@@ -8,27 +8,27 @@ from db.File import File
 class WebURL(BaseExtractor):
     name = 'WebURL'
     category = 'Web'
-    params = {
-        "url": {
-            "desc_key": "extractor_key_desc_url",
+    manual_params = True
+    
+    def declare():
+        params = {}
+        params["url"] = {
+            "desc_key": "-",
             "type": "string",
             "assertion": {
                 "assert_not_null": True,
             },
-        },
-    }
-    manual_params = True
+        }
+
+        return params
     
     async def run(self, args = {}):
         PASSED_URL = self.passed_params.get("url")
         name, ext = utils.nameFromURL(PASSED_URL)
 
         # Making HTTP request
-        JOINED_FILE_NAME = '.'.join([name, ext])
-        save_path = Path(os.path.join(self.temp_dir, JOINED_FILE_NAME))
-
+        save_path = Path(os.path.join(self.temp_dir, "download.tmp"))
         HTTP_REQUEST = await download_manager.addDownload(end=self.passed_params.get("url"),dir=save_path)
-        
         CONTENT_TYPE = HTTP_REQUEST.headers.get('Content-Type', '').lower()
         MIME_EXT     = None
         if ext == '' or utils.is_generated_ext(ext):
@@ -39,15 +39,18 @@ class WebURL(BaseExtractor):
             else:
                 ext = 'html'
         
-        file_size = save_path.stat().st_size
+        JOINED_FILE_NAME = '.'.join([name, ext])
+        NEW_SAVE_PATH = Path(os.path.join(self.temp_dir, JOINED_FILE_NAME))
+        save_path.rename(os.path.join(self.temp_dir, NEW_SAVE_PATH))
+        file_size = NEW_SAVE_PATH.stat().st_size
 
         output_metadata = {
             "original_url": str(self.passed_params.get("url")), 
             "mime": str(MIME_EXT),
             "output_name": str(JOINED_FILE_NAME),
-            "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(save_path))),
+            "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(NEW_SAVE_PATH))),
         }
-        output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(save_path))
+        output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(NEW_SAVE_PATH))
         FILE = self._fileFromJson({
             "extension": ext,
             "upload_name": JOINED_FILE_NAME,

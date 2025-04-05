@@ -7,18 +7,47 @@ class VkAlbum(VkTemplate):
     name = 'VkAlbum'
     category = 'Vk'
 
-    def setArgs(self, args):
-        self.passed_params["item_id"] = args.get("item_id")
-        self.passed_params["__json_info"] = args.get("__json_info", None)
-        self.passed_params["download_photos"] = int(args.get("download_photos", "1")) == 1
-        self.passed_params["rev"] = int(args.get("rev", "0")) == 1
-        self.passed_params["download_timeout"] = int(args.get("timeout", "0")) # for paranoic people
-        self.passed_params["api_timeout"] = int(args.get("timeout", "0"))
-        self.passed_params["limit"] = int(args.get("limit", "0"))
+    def declare():
+        params = {}
+        params["item_id"] = {
+            "desc_key": "-",
+            "type": "string",
+        }
+        params["__json_info"] = {
+            "desc_key": "-",
+            "type": "object",
+            "hidden": True,
+            "assertion": {
+                "assert_link": "item_id"
+            }
+        }
+        params["download_photos"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True
+        }
+        params["rev"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True
+        }
+        params["download_timeout"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 0, # for paranoic people
+        }
+        params["api_timeout"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 0,
+        }
+        params["limit"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 0,
+        }
 
-        assert self.passed_params.get("item_id") != None or self.passed_params.get("preset_json") != None, "item_id not passed"
-
-        super().setArgs(args)
+        return params
     
     async def __recieveById(self, item_id):
         return await self.__vkapi.call("photos.getAlbums", {"owner_id": 0, "album_ids": item_id, "need_covers": 1, "photo_sizes": 1})
@@ -55,10 +84,8 @@ class VkAlbum(VkTemplate):
         logger.log(message=f"Recieved album {__ITEM_ID}",section="VkCollection",name="message")
 
         ALBUM["site"] = self.passed_params.get("vk_path")
-        __indexation = utils.clearJson(ALBUM)
         ALBUM_ENTITY = self._entityFromJson({
             "source": __SOURCE,
-            "indexation_content": __indexation,
             "internal_content": ALBUM,
             "unlisted": self.passed_params.get("unlisted") == 1,
         })

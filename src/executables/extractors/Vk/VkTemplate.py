@@ -4,30 +4,38 @@ from resources.Globals import config
 class VkTemplate(BaseExtractor):
     name = 'VkTemplate'
     category = 'template'
-    params = {
-        "access_token": {
+
+    def declare():
+        params = {}
+        params["access_token"] = {
             "desc_key": "-",
             "type": "string",
             "default": config.get("vk.access_token", None),
-            "assert": True,
-        },
-        "api_url": {
+            "assert": {
+                "assert_not_null": True,
+            },
+        }
+        params["api_url"] = {
             "desc_key": "-",
             "type": "string",
             "default": config.get("vk.api_url", "api.vk.com/method"),
-            "assert": True,
-        },
-        "vk_path": {
+            "assert": {
+                "assert_not_null": True,
+            },
+        }
+        params["vk_path"] = {
             "desc_key": "-",
             "type": "string",
             "default": config.get("vk.vk_path", "vk.com"),
-            "assert": True,
+            "assert": {
+                "assert_not_null": True,
+            },
         }
-    }
 
-    def setArgs(self, args, joined_args):
-        print(self.params)
-        super().setArgs(args, joined_args)
+        return params
+
+    def setArgs(self, args):
+        super().setArgs(args)
 
     async def run(self, args):
         pass
