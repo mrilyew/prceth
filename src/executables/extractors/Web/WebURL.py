@@ -1,7 +1,6 @@
 from executables.extractors.Base import BaseExtractor
 from resources.Globals import os, download_manager, Path, utils, requests, mimetypes, config, file_manager
 from resources.Exceptions import NotPassedException
-from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
 
 # Base URL downloader. Downloads single file, without styles, images or something.
@@ -48,9 +47,7 @@ class WebURL(BaseExtractor):
             "original_url": str(self.passed_params.get("url")), 
             "mime": str(MIME_EXT),
             "output_name": str(JOINED_FILE_NAME),
-            "metadata": utils.extract_metadata_to_dict(metadata_wheel(input_file=str(NEW_SAVE_PATH))),
         }
-        output_metadata["additional_metadata"] = additional_metadata_wheel(input_file=str(NEW_SAVE_PATH))
         FILE = self._fileFromJson({
             "extension": ext,
             "upload_name": JOINED_FILE_NAME,

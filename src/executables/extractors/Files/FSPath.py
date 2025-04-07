@@ -1,7 +1,6 @@
 from executables.extractors.Base import BaseExtractor
 from resources.Globals import Path, file_manager, utils
 from resources.Exceptions import InvalidPassedParam, NotPassedException
-from core.Wheels import metadata_wheel, additional_metadata_wheel
 from db.File import File
 
 class FSPath(BaseExtractor):
@@ -57,13 +56,9 @@ class FSPath(BaseExtractor):
             raise InvalidPassedParam("Invalid \"type\"")
         
         # Catching metadata
-        __METADATA = metadata_wheel(input_file=str(INPUT_PATH))
         __OUTPUT_METADATA = {
             "export_as": str(self.passed_params.get("type")),
-            "metadata": utils.extract_metadata_to_dict(__METADATA),
         }
-        # TODO
-        __OUTPUT_METADATA["additional_metadata"] = additional_metadata_wheel(input_file=str(INPUT_PATH))
 
         FILE = self._fileFromJson({
             "extension": INPUT_FILE_EXT,
@@ -73,9 +68,6 @@ class FSPath(BaseExtractor):
         ENTITY = self._entityFromJson({
             "source": "path:"+str(INPUT_PATH),
             "internal_content": __OUTPUT_METADATA,
-            "indexation_content": {
-                "metadata": __OUTPUT_METADATA["metadata"]
-            },
             "file": FILE
         })
         

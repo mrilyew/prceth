@@ -347,8 +347,7 @@ class Api():
 
         OUT_ACT = __act_res()
         ACT_MAIN_INPUT = OUT_ACT.parseMainInput(main_input=__act_main)
-        if ACT_MAIN_INPUT == None:
-            raise NotFoundException("entity/collection/string not found")
+        assert ACT_MAIN_INPUT != None, f"{__act_res.accepts} not found"
 
         ACT_F = OUT_ACT.execute(args=params,i=ACT_MAIN_INPUT)
 

@@ -1,7 +1,6 @@
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger
 from resources.Exceptions import NotFoundException
-#from core.Wheels import metadata_wheel, additional_metadata_wheel
 
 # Downloads photo from vk.com using api.
 class VkPhoto(VkTemplate):

@@ -1,4 +1,4 @@
-from resources.Globals import consts, BaseModel, Path, os, utils, shutil, logger
+from resources.Globals import consts, BaseModel, Path, os, utils, shutil, logger, json
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 from shutil import ignore_patterns
 
@@ -13,6 +13,7 @@ class File(BaseModel):
     upload_name = TextField(index=True,default='N/A') # Upload name (with extension)
     extension = TextField(null=True,default="json") # File extension
     filesize = BigIntegerField(default=0) # Size of file
+    metadata = TextField(null=True,default=None)
     #dir_filesize = BigIntegerField(default=0) # Size of dir
 
     def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_entity_id_to_start = True):
@@ -127,7 +128,11 @@ class File(BaseModel):
         HASH = self.hash
 
         COLLECTION_PATH = os.path.join(STORAGE_PATH, "files", HASH[0:2])
-        ENTITY_PATH = os.path.join(COLLECTION_PATH, HASH, f"{HASH}.{str(self.extension)}")
+        END_DIR = os.path.join(COLLECTION_PATH, HASH)
+        if self.temp_dir != None:
+            END_DIR = self.temp_dir
+        
+        ENTITY_PATH = os.path.join(END_DIR, str(self.upload_name))
 
         return ENTITY_PATH
     
@@ -172,7 +177,8 @@ class File(BaseModel):
         return _
 
     @staticmethod
-    def fromJson(json_input, temp_dir):
+    def fromJson(json_input, temp_dir = None):
+        print(temp_dir)
         __file = File()
         __file.extension = json_input.get("extension")
 
@@ -183,8 +189,26 @@ class File(BaseModel):
         
         __file.upload_name = json_input.get("upload_name")
         __file.filesize = json_input.get("filesize")
-        __file.temp_dir = temp_dir
+        if temp_dir != None or json_input.get("temp_dir") != None:
+            __file.temp_dir = temp_dir
+        
+        if json_input.get("take_metadata", True) == True:
+            __file.fillMeta()
         
         __file.save()
 
         return __file
+    
+    def fillMeta(self):
+        from resources.Globals import ActsRepository
+
+        metadata_act = (ActsRepository().getByName("Metadata.ExtractMetadata"))()
+        ext_metadata_act = (ActsRepository().getByName("Metadata.AdditionalMetadata"))()
+
+        metadata_arr = metadata_act.execute(i=self)
+        ext_metadata_arr = ext_metadata_act.execute(i=self)
+
+        main_metadata = utils.extract_metadata_to_dict(metadata_arr)
+        main_metadata.update(ext_metadata_arr)
+
+        self.metadata = json.dumps(main_metadata)

@@ -248,6 +248,8 @@ class Entity(BaseModel):
             FINAL_ENTITY.description = passed_params["description"]
         if json_input.get("source") != None:
             FINAL_ENTITY.source = json_input.get("source")
+        if json_input.get("declared_created_at") != None:
+            FINAL_ENTITY.declared_created_at = json_input.get("declared_created_at")
         if json_input.get("indexation_content") != None:
             #FINAL_ENTITY.indexation_content = json_input.dumps(indexation_content_) # remove
             FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")

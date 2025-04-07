@@ -3,21 +3,18 @@ from hachoir.core import config
 from resources.Globals import utils, createParser, extractMetadata
 
 class ExtractMetadata(BaseAct):
-    name = 'ExtractMetadata'
-    category = 'metadata'
-    accepts = 'entity'
+    name = "ExtractMetadata"
+    category = "metadata"
+    accepts = "file"
 
-    def execute(self, i, args=None):
+    def execute(self, i, args={}):
         config.quiet = True
 
-        EXPORT_TYPE = args.get('INPUT_TYPE', 'entity')
+        EXPORT_TYPE = args.get("INPUT_TYPE", "file")
         PATH = None
-        #if args.get("input_file", None) != None:
-            #PATH = args.get("input_file")
-        #else:
-        assert i != None, "input entity not passed"
+        assert i != None, "input file not passed"
         
-        if EXPORT_TYPE == "entity":
+        if EXPORT_TYPE == "file":
             PATH = i.getPath()
         else:
             PATH = i

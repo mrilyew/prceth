@@ -1,6 +1,7 @@
 from resources.Globals import consts, Path, utils
 from db.Collection import Collection
 from db.Entity import Entity
+from db.File import File
 
 class BaseAct:
     name = 'base'
@@ -14,7 +15,6 @@ class BaseAct:
         try:
             if main_input == None:
                 return None
-            
             if self.accepts == "string":
                 return main_input
             
@@ -22,17 +22,27 @@ class BaseAct:
             if (p1 != "entity" and p1 != "collection"):
                 return None
             
+            if p1 == None:
+                p2 = p1
+                p1 = self.accepts
+            
             if p1 == "entity":
-                if self.accepts == "collection":
+                if self.accepts != "entity" or self.accepts != "both":
                     return None
                 
                 __ent = Entity.get(int(p2))
                 return __ent
             elif p1 == "collection":
-                if self.accepts == "entity":
+                if self.accepts != "collection" or self.accepts != "both":
                     return None
                 
                 __ent = Collection.get(int(p2))
+                return __ent
+            elif p1 == "file":
+                if self.accepts != "file":
+                    return None
+                
+                __ent = File.get(int(p2))
                 return __ent
         except Exception:
             return None
