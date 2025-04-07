@@ -79,15 +79,26 @@ class Entity(BaseModel):
         if self.__cachedLinkedEntities != None:
             return self.__cachedLinkedEntities
 
-        linked_array = []
         try:
             if self.linked_files == None:
                 return []
             
             files_list = self.linked_files.split(",")
-            linked_entities = self.get(files_list)
+            entities_ids = []
+            files_ids = []
+            for file_listed in files_list:
+                file_listed_type = file_listed.split("_")
+                if file_listed_type[0] == "file":
+                    files_ids.append(int(file_listed_type[1]))
+                else:
+                    entities_ids.append(int(file_listed_type[1]))
+
+            linked_entities = self.get(entities_ids)
+            linked_files    = File.get(files_ids)
             linked_array = []
             for _e in linked_entities:
+                linked_array.append(_e)
+            for _e in linked_files:
                 linked_array.append(_e)
 
         except Exception as ____e:
@@ -214,7 +225,11 @@ class Entity(BaseModel):
             FINAL_ENTITY.unlisted = 1
 
         if json_input.get("linked_files") != None:
-            FINAL_ENTITY.linked_files = ",".join(str(v.id) for v in json_input.get("linked_files"))
+            __out = []
+            for item in json_input.get("linked_files"):
+                __out.append(f"{item.self_name}_{item.id}")
+            
+            FINAL_ENTITY.linked_files = ",".join(__out)
             FINAL_ENTITY.__cachedLinkedEntities = json_input.get("linked_files")
         
         FINAL_ENTITY.extractor_name = json_input.get("extractor_name")

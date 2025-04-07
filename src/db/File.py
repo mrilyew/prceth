@@ -103,7 +103,25 @@ class File(BaseModel):
         }
 
         return fnl
+    
+    @staticmethod
+    def get(id):
+        if type(id) == "int":
+            try:
+                return File.select().where(File.id == id).get()
+            except:
+                return None
+        else:
+            try:
+                __arr = []
+                for _e in File.select().where(File.id << id):
+                    __arr.append(_e)
 
+                return __arr
+            except Exception as __egetexeption:
+                #print(__egetexeption)
+                return []
+    
     def getPath(self):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
@@ -138,6 +156,20 @@ class File(BaseModel):
             COLLECTION_PATH_OBJ.mkdir(parents=True, exist_ok=True)
 
         return COLLECTION_PATH
+
+    def getFormattedInfo(self):
+        _ = {
+            "extension": self.extension,
+            "upload_name": self.upload_name,
+            "filesize": self.filesize,
+            "dir": self.getDirPath(),
+            "main_file": self.getPath(), 
+            "hash": self.hash,
+            "upper_hash": self.getUpperHashDirPath(),
+        }
+        _["relative_path"] = f"/{_.get("upper_hash")}/{_.get("hash")}"
+        
+        return _
 
     @staticmethod
     def fromJson(json_input, temp_dir):

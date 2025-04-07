@@ -252,8 +252,17 @@ class Utils():
                 if "__lcms|entity_" in input_data:
                     got_id = int(input_data.replace("__lcms|entity_", ""))
                     for linked in link_to_linked_files:
-                        if linked.id == got_id:
+                        if linked.id == got_id and linked.self_name == "entity":
                             return linked.getFormattedInfo(recursive=True,recurse_level=recurse_level+1)
+                        else:
+                            return input_data
+                elif "__lcms|file_" in input_data:
+                    got_id = int(input_data.replace("__lcms|file_", ""))
+                    for linked in link_to_linked_files:
+                        if linked.id == got_id and linked.self_name == "file":
+                            return linked.getFormattedInfo(recursive=True,recurse_level=recurse_level+1)
+                        else:
+                            return input_data
                 else:
                     return input_data
             except Exception as __e:

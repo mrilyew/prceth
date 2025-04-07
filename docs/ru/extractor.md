@@ -12,6 +12,42 @@
 
 Экстрактор должен наследовать класс Base.
 
+#### Параметры
+
+Параметры экстрактора задаются с помощью статичной функции declare() в формате:
+```
+def declare():
+    params = {}
+    params[{name}] = {...}
+
+    return params
+```
+
+По ключу задаётся словарь в формате:
+
+`desc_key` — ключ локализации, отвечающий за описание параметра в интерфейсе
+`type` — тип параметра. Возможные значения:
+`int`, `float` — принимается число
+`array` — Значение может быть только из перечисленных в массиве.
+`string` — принимается строка
+`object` — python объект; может быть задан только изнутри кода.
+`bool` — false/true
+
+---
+
+`default` — какое значение будет задано при None
+`hidden` — True/False; параметр скрыт из интерфейса
+`assertion` — словарь, отвечающий за функцию assert:
+`assert_not_null` со значением True — будет проверка значение на не равность None.
+`assert_link` — значение будет привязано к указанному параметру, назовём X.
+Если текущий параметр равен None, будет проверятся параметр X, если он тоже равен None, будет возвращено AssertionError.
+
+---
+
+`maxlength` — максимальная длина значения, только при `type` = `string`. 
+
+Если в классе задан `manual_params`=True, будут переданы все переданные параметры, в том числе и недекларированные.
+
 #### Методы
 
 **__init__(temp_dir=,del_dir_on_fail=,need_preview=)**
@@ -47,24 +83,24 @@
 #### Шаблон
 
 ```
-    from executables.extractors.Base import BaseExtractor
+from executables.extractors.Base import BaseExtractor
 
-    class Template(BaseExtractor):
-        name = 'template'
-        category = 'template'
-        params = {}
+class Template(BaseExtractor):
+    name = 'template'
+    category = 'template'
+    params = {}
 
-        def setArgs(self, args):
-            self.passed_params = args
+    def setArgs(self, args):
+        self.passed_params = args
 
-            super().setArgs(args)
+        super().setArgs(args)
 
-        def onFail(self):
-            pass
+    def onFail(self):
+        pass
 
-        async def run(self, args):
-            pass
+    async def run(self, args):
+        pass
 
-        async def postRun(self):
-            pass
+    async def postRun(self):
+        pass
 ```
