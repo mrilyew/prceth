@@ -10,11 +10,11 @@ class BaseExtractor:
 
     def __init__(self, temp_dir=None, del_dir_on_fail=True,need_preview=True):
         self.passed_params = {}
-        if temp_dir != None:
-            self.temp_dir = temp_dir
-        else:
-            self.temp_dir = storage.makeTemporaryCollectionDir()
-        
+        #if temp_dir != None:
+            #self.temp_dir_prefix = temp_dir
+        self.temp_dir_prefix = None
+
+        self.temp_dirs = []
         self.del_dir_on_fail = del_dir_on_fail
         self.need_preview = need_preview
     
@@ -104,19 +104,23 @@ class BaseExtractor:
                     new_param_name = __assertion.get("assert_link")
                     new_param_object = MAX_OUTPUT_CHECK_PARAMS.get(new_param_name)
 
-                    assert __value != None or args.get(new_param_name, new_param_object.get("default")) != None
+                    assert __value != None or args.get(new_param_name, new_param_object.get("default")) != None, f"{new_param_name} or {param_name} not passed"
         
         if self.manual_params == True:
             self.passed_params.update(args)
 
     def onFail(self):
         if self.del_dir_on_fail == True:
-            file_manager.rmdir(self.temp_dir)
+            for t_dir in self.temp_dirs:
+                file_manager.rmdir(t_dir)
     
-    def _fileFromJson(self, json_data):
+    def _fileFromJson(self, json_data, _temp_dir = None):
         from db.File import File
 
-        return File.fromJson(json_data, self.temp_dir)
+        if _temp_dir == None:
+            _temp_dir = self.temp_dirs[-1]
+
+        return File.fromJson(json_data, _temp_dir)
     
     def _entityFromJson(self, json_data, make_preview = True):
         json_data["extractor_name"] = self.name
@@ -142,7 +146,7 @@ class BaseExtractor:
         pass
     
     # Typical preview
-    def thumbnail(self, entity, args={}):
+    def thumbnail(self, entity, args={}, temp_dir = None):
         if self.need_preview == False:
             return None
         
@@ -159,8 +163,11 @@ class BaseExtractor:
         if thumb == None:
             return None
         
+        if temp_dir == None:
+            temp_dir = __FILE.temp_dir
+        
         #thumb_class = thumb(save_dir=__FILE.getDirPath())
-        thumb_class = thumb(save_dir=self.temp_dir)
+        thumb_class = thumb(save_dir=temp_dir)
         return thumb_class.run(file=__FILE,params=args)
     
     async def fastGetEntity(self, params, args):
@@ -189,6 +196,12 @@ class BaseExtractor:
         return {"type": "none", "data": {
             "source": None
         }}
+
+    def allocateTemp(self):
+        _dir = storage.makeTemporaryCollectionDir(self.temp_dir_prefix)
+        self.temp_dirs.append(_dir)
+
+        return _dir
 
     async def execute(self, args):
         EXTRACTOR_RESULTS = None

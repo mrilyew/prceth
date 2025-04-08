@@ -10,7 +10,7 @@ class Entity(BaseModel):
     id = AutoField() # Absolute id
     file_id = IntegerField(null=True) # File id
     linked_files = TextField(null=True) # Files list
-    hash = TextField(null=True) # Entity hash
+    # hash = TextField(null=True) # Entity hash
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
@@ -208,7 +208,7 @@ class Entity(BaseModel):
         indexation_content_ = json_input.get("indexation_content")
         internal_content_ = json_input.get("internal_content")
 
-        FINAL_ENTITY.hash = __hash
+        # FINAL_ENTITY.hash = __hash
         if internal_content_ != None:
             FINAL_ENTITY.internal_content = json.dumps(internal_content_)
         else:

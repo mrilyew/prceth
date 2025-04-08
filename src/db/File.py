@@ -9,7 +9,7 @@ class File(BaseModel):
     temp_dir = ''
 
     id = AutoField() # ABSOLUTE ID
-    hash = TextField(null=True,default=utils.getRandomHash(64)) # Entity hash
+    hash = TextField(null=True) # Entity hash
     upload_name = TextField(index=True,default='N/A') # Upload name (with extension)
     extension = TextField(null=True,default="json") # File extension
     filesize = BigIntegerField(default=0) # Size of file
@@ -178,7 +178,6 @@ class File(BaseModel):
 
     @staticmethod
     def fromJson(json_input, temp_dir = None):
-        print(temp_dir)
         __file = File()
         __file.extension = json_input.get("extension")
 
@@ -192,7 +191,8 @@ class File(BaseModel):
         if temp_dir != None or json_input.get("temp_dir") != None:
             __file.temp_dir = temp_dir
         
-        if json_input.get("take_metadata", True) == True:
+        # TODO handle async
+        if json_input.get("take_metadata", False) == True:
             __file.fillMeta()
         
         __file.save()

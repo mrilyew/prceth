@@ -31,26 +31,44 @@ class VkPost(VkTemplate):
             "type": "object",
             "hidden": True,
         }
-        params["download_external_media"] = {
+        params["download_attachments_json_list"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "*",
+        }
+        params["download_attachments_file_list"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "photo",
+        }
+        params["download_reposts"] = {
             "desc_key": "-",
             "type": "bool",
-            "default": "0"
+            "default": True,
+        }
+        params["download_comments"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": False,
         }
 
         return params
 
-    async def __recieveById(self, post_id):
+    async def __recieveById(self, post_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
-        return await __vkapi.call("wall.getById", {"posts": post_id, "extended": 1})
+        return await __vkapi.call("wall.getById", {"posts": ",".join(post_ids), "extended": 1})
 
     async def run(self, args):
         # TODO add check for real links like vk.com/wall1_1
         __POST_RESPONSE = None
         __PROFILES = None
         __GROUPS   = None
-        ITEM_ID = self.passed_params.get("item_id")
+        ITEM_IDS_STR = self.passed_params.get("item_id")
+        ITEM_IDS = ITEM_IDS_STR.split(",")
+
         if self.passed_params.get("__json_info", None) == None:
-            __POST_RESPONSE = await self.__recieveById(ITEM_ID)
+            assert len(ITEM_IDS) > 0, "item_id's not passed("
+            __POST_RESPONSE = await self.__recieveById(ITEM_IDS)
             __PROFILES = __POST_RESPONSE.get("profiles")
             __GROUPS = __POST_RESPONSE.get("groups")
         else:
@@ -58,113 +76,126 @@ class VkPost(VkTemplate):
             __PROFILES = __POST_RESPONSE.get("__json_profiles")
             __GROUPS = __POST_RESPONSE.get("__json_groups")
         
+        __POST_ITEMS = []
         try:
-            __POST_OBJ = None
-
+            post = None
             if __POST_RESPONSE.get("items") != None:
-                __POST_OBJ = __POST_RESPONSE.get("items")[0]
+                __POST_ITEMS = __POST_RESPONSE.get("items")
             else:
-                __POST_OBJ = __POST_RESPONSE
-            
-            __POST_OBJ.pop("track_code", None)
-            __POST_OBJ.pop("hash", None)
-
-            ITEM_ID = f"{__POST_OBJ.get("owner_id")}_{__POST_OBJ.get("id")}"
+                __POST_ITEMS = [__POST_RESPONSE]
         except Exception:
-            __POST_OBJ = None
+            __POST_ITEMS = None
 
-        if __POST_OBJ == None:
-            raise NotFoundException("post not found")
+        if __POST_ITEMS == None:
+            raise NotFoundException("post items not found")
 
-        logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
+        DOWNLOAD_JSON_LIST = self.passed_params.get("download_attachments_json_list").split(",")
+        DOWNLOAD_FILE_LIST = self.passed_params.get("download_attachments_file_list").split(",")
 
-        # Making indexation
-        __POST_OBJ["site"] = self.passed_params.get("vk_path")
+        final_entities = []
+        for post in __POST_ITEMS:
+            ITEM_ID = f"{post.get("owner_id")}_{post.get("id")}"
 
-        linked_files = []
-        for key, attachment in enumerate(__POST_OBJ.get("attachments")):
-            try:
-                __attachment_type = attachment.get("type")
-                __attachment_object = attachment.get(__attachment_type)
-                if __attachment_object == None:
-                    continue
+            post.pop("track_code", None)
+            post.pop("hash", None)
+            post["site"] = self.passed_params.get("vk_path")
 
-                EXTRACTOR_INSTANCE_CLASS = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_type.title()}"))
-                if EXTRACTOR_INSTANCE_CLASS == None:
-                    RET_EXT = JsonObject()
-                    RET_EXT.setArgs({
-                        "json_object": __POST_OBJ["attachments"][key][__attachment_type],
-                    })
+            logger.log(message=f"— Recieved post {ITEM_ID}",section="VK",name="message")
 
-                    ENTITIES = await RET_EXT.execute({})
-                    __ENTITY = ENTITIES.get("entities")[0]
-
-                    linked_files.append(__ENTITY)
-                    __POST_OBJ["attachments"][key][__attachment_type] = f"__lcms|entity_{__ENTITY.id}"
-
-                    logger.log(message="Unknown attachment: " + str(__attachment_object),section="VkAttachments",name="message")
-                    continue
-
-                EXTRACTOR_INSTANCE = EXTRACTOR_INSTANCE_CLASS(need_preview=self.need_preview)
-                RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
-                    "unlisted": 1,
-                    "item_id": f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}",
-                    "__json_info": __attachment_object,
-                    "access_token": self.passed_params.get("access_token"),
-                    "api_url": self.passed_params.get("api_url"),
-                    "vk_path": self.passed_params.get("vk_path"),
-                    "download_file": self.passed_params.get("download_external_media"),
-                },args=args)
-
-                linked_files.append(RETURN_ENTITY[0])
-                __POST_OBJ["attachments"][key][__attachment_type] = f"__lcms|entity_{RETURN_ENTITY[0].id}"
-            except ModuleNotFoundError:
-                pass
-            except Exception as ___e___:
-                logger.logException(___e___, "VkAttachments")
-
-        if __POST_OBJ.get("copy_history") != None:
-            for key, repost in enumerate(__POST_OBJ.get("copy_history")):
+            linked_files = []
+            for key, attachment in enumerate(post.get("attachments")):
                 try:
-                    if repost == None:
+                    __attachment_type = attachment.get("type")
+                    __attachment_object = attachment.get(__attachment_type)
+                    if __attachment_object == None:
                         continue
-                    
-                    logger.log(message=f"Found repost {key}",section="VKPost",name="message")
-                    EXTRACTOR_INSTANCE = VkPost(need_preview=self.need_preview)
-                    RETURN_ENTITY = await EXTRACTOR_INSTANCE.fastGetEntity(params={
-                        "unlisted": 1,
-                        "item_id": f"{repost.get("owner_id")}_{repost.get("id")}",
-                        "__json_info": repost,
-                        "access_token": self.passed_params.get("access_token"),
-                        "api_url": self.passed_params.get("api_url"),
-                        "vk_path": self.passed_params.get("vk_path"),
-                        "download_external_media": self.passed_params.get("download_external_media"),
-                    },args=args)
 
-                    linked_files.append(RETURN_ENTITY[0])
-                    __POST_OBJ["copy_history"][key] = f"__lcms|entity_{RETURN_ENTITY[0].id}"
+                    should_download_json = DOWNLOAD_JSON_LIST[0] == "*" or __attachment_type in DOWNLOAD_JSON_LIST
+                    should_download_file = DOWNLOAD_FILE_LIST[0] == "*" or __attachment_type in DOWNLOAD_FILE_LIST
+                    if should_download_json == False:
+                        continue
+
+                    __attachment_class = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_type.title()}"))
+                    if __attachment_class == None:
+                        logger.log(message="Recieved unknown attachment: " + str(__attachment_type),section="VkAttachments",name="message")
+
+                        __attachment_class_unknown = JsonObject()
+                        __attachment_class_unknown.setArgs({
+                            "json_object": post["attachments"][key][__attachment_type],
+                        })
+
+                        __attachment_class_unknown_entities = await __attachment_class_unknown.execute({})
+                        __attachment_class_entity = __attachment_class_unknown_entities.get("entities")[0]
+
+                        linked_files.append(__attachment_class_entity)
+                        post["attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_entity.id}"
+                    else:
+                        ATTACHMENT_ID = f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}"
+                        logger.log(message=f"Recieved attachment {str(__attachment_type)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
+                        
+                        __attachment_class_dec = __attachment_class(need_preview=self.need_preview)
+                        __attachment_class_return = await __attachment_class_dec.fastGetEntity(params={
+                            "unlisted": 1,
+                            "item_id": ATTACHMENT_ID,
+                            "__json_info": __attachment_object,
+                            "access_token": self.passed_params.get("access_token"),
+                            "api_url": self.passed_params.get("api_url"),
+                            "vk_path": self.passed_params.get("vk_path"),
+                            "download_file": should_download_file,
+                        },args=args)
+
+                        linked_files.append(__attachment_class_return[0])
+                        post["attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_return[0].id}"
                 except ModuleNotFoundError:
                     pass
                 except Exception as ___e___:
                     logger.logException(___e___, "VkAttachments")
-        
-        if __POST_OBJ.get("from_id") != None and __PROFILES != None:
-            __POST_OBJ["from"] = utils.find_owner(__POST_OBJ.get("from_id"), __PROFILES, __GROUPS)
-        if __POST_OBJ.get("owner_id") != None and __PROFILES != None:
-            __POST_OBJ["owner"] = utils.find_owner(__POST_OBJ.get("owner_id"), __PROFILES, __GROUPS)
-        if __POST_OBJ.get("copy_owner_id") != None and __PROFILES != None:
-            __POST_OBJ["copy_owner"] = utils.find_owner(__POST_OBJ.get("copy_owner_id"), __PROFILES, __GROUPS)
-        
-        ENTITY = self._entityFromJson({
-            "source": "vk:wall"+ITEM_ID,
-            "suggested_name": f"VK Post {str(ITEM_ID)}",
-            "internal_content": __POST_OBJ,
-            "linked_files": linked_files,
-            "unlisted": self.passed_params.get("unlisted") == 1,
-        })
+
+            if post.get("copy_history") != None and self.passed_params.get("download_reposts") == True:
+                for key, repost in enumerate(post.get("copy_history")):
+                    try:
+                        REPOST_ID = f"{repost.get("owner_id")}_{repost.get("id")}"
+                        if repost == None:
+                            continue
+                        
+                        logger.log(message=f"Found repost {key}",section="VKPost",name="message")
+
+                        __vk_post_extractor = VkPost(need_preview=self.need_preview)
+                        __vk_post_entity = await __vk_post_extractor.fastGetEntity(params={
+                            "unlisted": 1,
+                            "item_id": REPOST_ID,
+                            "__json_info": repost,
+                            "access_token": self.passed_params.get("access_token"),
+                            "api_url": self.passed_params.get("api_url"),
+                            "vk_path": self.passed_params.get("vk_path"),
+                            "download_attachments_json_list": self.passed_params.get("download_attachments_json_list"),
+                            "download_attachments_file_list": self.passed_params.get("download_attachments_file_list"),
+                            "download_reposts": False,
+                        },args=args)
+
+                        linked_files.append(__vk_post_entity[0])
+                        post["copy_history"][key] = f"__lcms|entity_{__vk_post_entity[0].id}"
+                    except ModuleNotFoundError:
+                        pass
+                    except Exception as ___e___:
+                        logger.logException(___e___, "VkAttachments")
+            
+            if post.get("from_id") != None and __PROFILES != None:
+                post["from"] = utils.find_owner(post.get("from_id"), __PROFILES, __GROUPS)
+            if post.get("owner_id") != None and __PROFILES != None:
+                post["owner"] = utils.find_owner(post.get("owner_id"), __PROFILES, __GROUPS)
+            if post.get("copy_owner_id") != None and __PROFILES != None:
+                post["copy_owner"] = utils.find_owner(post.get("copy_owner_id"), __PROFILES, __GROUPS)
+            
+            ENTITY = self._entityFromJson({
+                "source": "vk:wall"+ITEM_ID,
+                "suggested_name": f"VK Post {str(ITEM_ID)}",
+                "internal_content": post,
+                "linked_files": linked_files,
+                "unlisted": self.passed_params.get("unlisted") == 1,
+            })
+            final_entities.append(ENTITY)
         
         return {
-            "entities": [
-                ENTITY
-            ]
+            "entities": final_entities
         }

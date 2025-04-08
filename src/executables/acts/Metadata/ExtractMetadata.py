@@ -29,7 +29,7 @@ class ExtractMetadata(BaseAct):
                 _metadata = extractMetadata(__PARSER)
                 if _metadata == None:
                     raise ValueError
-
+                
                 return _metadata.exportPlaintext()
             except Exception as err:
                 return []

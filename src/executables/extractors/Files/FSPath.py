@@ -29,6 +29,7 @@ class FSPath(BaseExtractor):
         return params
     
     async def run(self, args):
+        TEMP_DIR = self.allocateTemp()
         INPUT_PATH = Path(self.passed_params.get("path"))
         if INPUT_PATH.exists() == False:
             raise FileNotFoundError("Path does not exists")
@@ -40,7 +41,7 @@ class FSPath(BaseExtractor):
         FILE_SIZE = FILE_STAT.st_size
         INPUT_FILE_NAME  = INPUT_PATH.name
         INPUT_FILE_EXT   = str(INPUT_PATH.suffix[1:]) # remove dot
-        MOVE_TO = Path(self.temp_dir + '\\' + INPUT_FILE_NAME)
+        MOVE_TO = Path(TEMP_DIR + '\\' + INPUT_FILE_NAME)
 
         # Creating entity
         # Copying and leaving original file

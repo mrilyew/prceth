@@ -6,10 +6,13 @@ class Storage:
         self.tmp_dir = consts["tmp"]
         self.tmp_coll_dir = os.path.join(self.tmp_dir, "files")
 
-    def makeTemporaryCollectionDir(self):
+    def makeTemporaryCollectionDir(self, temp_dir_prefix = None):
         #rand = utils.random_int(1, 1000000) * -1
+        if temp_dir_prefix == None:
+            temp_dir_prefix = self.tmp_coll_dir
+        
         rand = utils.getRandomHash(64)
-        path = Path(os.path.join(self.tmp_coll_dir, str(rand)))
+        path = Path(os.path.join(temp_dir_prefix, str(rand)))
         path.mkdir(exist_ok=True)
 
         return str(path)

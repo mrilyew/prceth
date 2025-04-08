@@ -263,12 +263,13 @@ class Api():
         __export_folder = __INPUT_ARGS.get("export_to_dir", None)
         __export_to_db = __export_folder == None
         __custom_temp_dir = __INPUT_ARGS.get("custom_temp_dir", None)
+        __del_dir_on_fail = int(__INPUT_ARGS.get("del_dir", "1")) == 1 and __export_to_db == True
         
         col = None
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__export_to_db == True)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__del_dir_on_fail)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = None
         try:

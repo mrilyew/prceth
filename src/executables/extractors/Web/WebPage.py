@@ -24,8 +24,10 @@ class WebPage(BaseExtractor):
         return params
     
     async def run(self, args):
+        TEMP_DIR = self.allocateTemp()
+
         SITE_URL = self.passed_params.get("url")
-        self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)
+        self.crawler = Crawler(save_dir=TEMP_DIR,args=self.passed_params)
         if self.crawler.checkWebDriver() == False:
             await self.crawler.downloadChrome()
 
@@ -49,7 +51,7 @@ class WebPage(BaseExtractor):
         self.crawler.printScreenshot()
 
         ORIGINAL_NAME = "index.html"
-        file_manager.createFile(dir=self.temp_dir,filename=ORIGINAL_NAME,content=__html)
+        file_manager.createFile(dir=TEMP_DIR,filename=ORIGINAL_NAME,content=__html)
         output_metadata = self.crawler.printMeta()
 
         FILE = self._fileFromJson({

@@ -22,11 +22,13 @@ class WebURL(BaseExtractor):
         return params
     
     async def run(self, args = {}):
+        TEMP_DIR = self.allocateTemp()
+
         PASSED_URL = self.passed_params.get("url")
         name, ext = utils.nameFromURL(PASSED_URL)
 
         # Making HTTP request
-        save_path = Path(os.path.join(self.temp_dir, "download.tmp"))
+        save_path = Path(os.path.join(TEMP_DIR, "download.tmp"))
         HTTP_REQUEST = await download_manager.addDownload(end=self.passed_params.get("url"),dir=save_path)
         CONTENT_TYPE = HTTP_REQUEST.headers.get('Content-Type', '').lower()
         MIME_EXT     = None
@@ -39,8 +41,8 @@ class WebURL(BaseExtractor):
                 ext = 'html'
         
         JOINED_FILE_NAME = '.'.join([name, ext])
-        NEW_SAVE_PATH = Path(os.path.join(self.temp_dir, JOINED_FILE_NAME))
-        save_path.rename(os.path.join(self.temp_dir, NEW_SAVE_PATH))
+        NEW_SAVE_PATH = Path(os.path.join(TEMP_DIR, JOINED_FILE_NAME))
+        save_path.rename(os.path.join(TEMP_DIR, NEW_SAVE_PATH))
         file_size = NEW_SAVE_PATH.stat().st_size
 
         output_metadata = {

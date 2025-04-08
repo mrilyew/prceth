@@ -31,7 +31,7 @@ class BlankFile(BaseExtractor):
     
     async def run(self, args):
         file_manager.createFile(filename=self.passed_params.get("__original_name"),
-            dir=self.temp_dir,
+            dir=self.allocateTemp(),
             content=self.passed_params.get("text")
         )
 

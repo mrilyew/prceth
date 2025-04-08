@@ -26,7 +26,9 @@ class RawHTML(BaseExtractor):
         return params
 
     async def run(self, args):
-        self.crawler = Crawler(save_dir=self.temp_dir,args=self.passed_params)
+        TEMP_DIR = self.allocateTemp()
+
+        self.crawler = Crawler(save_dir=TEMP_DIR,args=self.passed_params)
         if self.crawler.checkWebDriver() == False:
             await self.crawler.downloadChrome()
 
@@ -53,7 +55,7 @@ class RawHTML(BaseExtractor):
         self.crawler.printScreenshot()
         ORIGINAL_NAME = "index.html"
         
-        file_manager.createFile(dir=self.temp_dir,filename=ORIGINAL_NAME,content=__html)
+        file_manager.createFile(dir=TEMP_DIR,filename=ORIGINAL_NAME,content=__html)
 
         WEB_META = self.crawler.printMeta()
         SOURCE = self.passed_params.get("url", "")
