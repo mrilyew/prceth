@@ -88,6 +88,9 @@ class Entity(BaseModel):
             files_ids = []
             for file_listed in files_list:
                 file_listed_type = file_listed.split("_")
+                if len(file_listed_type) < 1:
+                    continue
+
                 if file_listed_type[0] == "file":
                     files_ids.append(int(file_listed_type[1]))
                 else:
@@ -229,8 +232,9 @@ class Entity(BaseModel):
             for item in json_input.get("linked_files"):
                 __out.append(f"{item.self_name}_{item.id}")
             
-            FINAL_ENTITY.linked_files = ",".join(__out)
-            FINAL_ENTITY.__cachedLinkedEntities = json_input.get("linked_files")
+            if len(__out) > 0:
+                FINAL_ENTITY.linked_files = ",".join(__out)
+                FINAL_ENTITY.__cachedLinkedEntities = json_input.get("linked_files")
         
         FINAL_ENTITY.extractor_name = json_input.get("extractor_name")
         if passed_params.get("display_name") != None:
@@ -249,12 +253,12 @@ class Entity(BaseModel):
         if json_input.get("source") != None:
             FINAL_ENTITY.source = json_input.get("source")
         if json_input.get("declared_created_at") != None:
-            FINAL_ENTITY.declared_created_at = json_input.get("declared_created_at")
+            FINAL_ENTITY.declared_created_at = int(json_input.get("declared_created_at"))
         if json_input.get("indexation_content") != None:
             #FINAL_ENTITY.indexation_content = json_input.dumps(indexation_content_) # remove
             FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         else:
-            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(internal_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
+            FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(internal_content_), ensure_ascii=False).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         
         FINAL_ENTITY.save()
 

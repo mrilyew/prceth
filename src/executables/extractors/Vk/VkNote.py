@@ -30,52 +30,55 @@ class VkNote(VkTemplate):
 
         return params
 
-    async def __recieveById(self, item_id):
+    async def __recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
-        return await __vkapi.call("notes.get", {"note_ids": item_id, "user_id": 1})
+        __item_id = item_ids[0].split("_")
+
+        return await __vkapi.call("notes.getById", {"owner_id": __item_id[0], "note_id": __item_id[1]})
     
     async def run(self, args):
-        __ITEM_RES = None
-        __SOURCE   = None
-        NOTE = None
-        __ITEM_ID  = self.passed_params.get("item_id")
+        __item_ids = self.passed_params.get("item_id")
+        item_ids = __item_ids.split(",")
+        notes = None
+
         if self.passed_params.get("__json_info") == None:
             try:
-                __ITEM_RES = await self.__recieveById(__ITEM_ID)
-                if __ITEM_RES.get("items") != None:
-                    NOTE = __ITEM_RES.get("items")[0]
-                else:
-                    NOTE = __ITEM_RES.get("notes")[0]
+                notes = await self.__recieveById(item_ids)
             except:
-                NOTE = None
+                notes = None
         else:
             try:
-                __ITEM_RES = self.passed_params.get("__json_info")
-                NOTE = __ITEM_RES
+                notes = self.passed_params.get("__json_info")
             except:
-                NOTE = None
-
-        if NOTE == None:
+                pass
+        
+        if type(notes) == dict:
+            notes = [notes]
+        
+        if notes == None or len(notes) < 1:
             raise NotFoundException("note not found")
-        
-        logger.log(message=f"Recieved note {__ITEM_ID}",section="VkNote",name="message")
-        if __ITEM_ID == None:
-            __ITEM_ID  = f"{NOTE.get("owner_id")}_{NOTE.get("id")}"
+
+        __entities_list = []
+        for note in notes:
+            __ITEM_ID  = f"{note.get("owner_id")}_{note.get("id")}"
             __SOURCE   = f"vk:note{__ITEM_ID}"
-        else:
-            __SOURCE = f"vk:note{__ITEM_ID}"
-        
-        NOTE["site"] = self.passed_params.get("vk_path")
-        __NOTE_INDEX = NOTE.copy()
-        __NOTE_INDEX["text"] = utils.proc_strtr(__NOTE_INDEX.get("text"), self.passed_params.get("indexation_text_cut"))
-        ENTITY = self._entityFromJson({
-            "source": __SOURCE,
-            "internal_content": NOTE,
-            "unlisted": self.passed_params.get("unlisted") == 1,
-        })
+
+            logger.log(message=f"Recieved note {__ITEM_ID}",section="VkAttachments",name="message")
+
+            note["site"] = self.passed_params.get("vk_path")
+            __note_index = note.copy()
+            __note_index["text"] = utils.proc_strtr(__note_index.get("text"), self.passed_params.get("indexation_text_cut"))
+
+            ENTITY = self._entityFromJson({
+                "source": __SOURCE,
+                "indexation_content": __note_index,
+                "internal_content": note,
+                "unlisted": self.passed_params.get("unlisted") == 1,
+                "suggested_name": utils.proc_strtr(note.get("title"), 1000),
+                "declared_created_at": note.get("date"),
+            })
+            __entities_list.append(ENTITY)
 
         return {
-            "entities": [
-                ENTITY
-            ]
+            "entities": __entities_list
         }

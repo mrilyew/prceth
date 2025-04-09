@@ -28,81 +28,82 @@ class VkAudio(VkTemplate):
 
         return params
     
-    async def __recieveById(self, item_id):
+    async def __recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
-        return await __vkapi.call("audio.get", {"audio_ids": item_id, "extended": 1})
+        return await __vkapi.call("audio.get", {"audio_ids": ",".join(item_ids), "extended": 1})
     
     async def run(self, args):
-        __ITEM_RES = None
-        AUDIO = None
-        __SOURCE   = None
-        __ITEM_ID  = self.passed_params.get("item_id")
+        __audio_response = None
+        __item_ids = self.passed_params.get("item_id")
+        item_ids = __item_ids.split(",")
         if self.passed_params.get("__json_info") == None:
             try:
-                __ITEM_RES = await self.__recieveById(__ITEM_ID)
-                AUDIO = __ITEM_RES.get("items")[0]
+                __audio_response = await self.__recieveById(item_ids)
+                if __audio_response.get("items") != None:
+                    __audio_response = __audio_response.get("items")
             except:
-                AUDIO = None
+                pass
         else:
             try:
-                __ITEM_RES = self.passed_params.get("__json_info")
-                AUDIO = __ITEM_RES
+                __audio_response = self.passed_params.get("__json_info")
+                if type(__audio_response) == dict:
+                    __audio_response = [__audio_response]
             except:
-                AUDIO = None
+                __audio_response = None
 
-        if AUDIO == None:
+        if __audio_response == None or len(__audio_response) < 1:
             raise NotFoundException("audio not found")
         
-        if __ITEM_ID == None:
-            __ITEM_ID  = f"{AUDIO.get("owner_id")}_{AUDIO.get("id")}"
-            __SOURCE   = f"vk:audio{__ITEM_ID}"
-        else:
-            __SOURCE = f"vk:audio{__ITEM_ID}"
+        __entities_list = []
+        for audio in __audio_response:
+            audio["site"] = self.passed_params.get("vk_path")
 
-        logger.log(message=f"Recieved audio {__ITEM_ID}",section="VkAudio",name="message")
+            __ITEM_ID = f"{audio.get("owner_id")}_{audio.get("id")}"
+            __SOURCE  = f"vk:audio{__ITEM_ID}"
 
-        ___OUT_FILE = None
-        ___OUT_EXT  = "mp3"
-        ___OUT_SIZE = 0
+            logger.log(message=f"Recieved audio {__ITEM_ID}",section="VkAttachments",name="message")
 
-        AUDIO_NAME = f"{AUDIO.get("artist")} — {AUDIO.get("title")}"
-        AUDIO_UPLOAD_NAME = utils.validName(AUDIO_NAME) + f".{___OUT_EXT}"
-        ___SAVE_PATH = Path(os.path.join(self.temp_dir, AUDIO_UPLOAD_NAME))
+            FILE = None
+            ___OUT_EXT  = "mp3"
+            ___OUT_SIZE = 0
 
-        if self.passed_params.get("download_file") == False:
-            logger.log(message=f"Do not downloading audio {__ITEM_ID} because download_file!=1",section="VkAudio",name="message")
-        else:
-            if AUDIO.get("url") == None:
-                logger.log(message=f"Audio {__ITEM_ID} does not contains url to file",section="VkAudio",name="error")
-            else:
-                # Todo HLS
-                if ".m3u8" in AUDIO.get("url"):
-                    pass
+            AUDIO_NAME = f"{audio.get("artist")} — {audio.get("title")}"
+            AUDIO_UPLOAD_NAME = utils.validName(AUDIO_NAME) + f".{___OUT_EXT}"
+
+            if self.passed_params.get("download_file") == True:
+                TEMP_DIR = self.allocateTemp()
+                ___SAVE_PATH = Path(os.path.join(TEMP_DIR, AUDIO_UPLOAD_NAME))
+
+                if audio.get("url") == None:
+                    logger.log(message=f"Audio {__ITEM_ID} does not contains url to file",section="VkAudio",name="error")
                 else:
-                    DOWNLOAD_URL = AUDIO.get("url")
-                    HTTP_REQUEST = await download_manager.addDownload(end=DOWNLOAD_URL,dir=___SAVE_PATH)
+                    # Todo HLS
+                    if ".m3u8" in audio.get("url"):
+                        logger.log(message=f"Found .m3u8 of audio {__ITEM_ID}",section="VkAudio",name="message")
+                        pass
+                    else:
+                        logger.log(message=f"Downloading raw .mp3 of audio {__ITEM_ID}",section="VkAudio",name="message")
 
-                    ___OUT_FILE = {
-                        "extension": ___OUT_EXT,
-                        "upload_name": AUDIO_UPLOAD_NAME,
-                        "filesize": ___OUT_SIZE,
-                    }
+                        DOWNLOAD_URL = audio.get("url")
+                        HTTP_REQUEST = await download_manager.addDownload(end=DOWNLOAD_URL,dir=___SAVE_PATH)
+                        ___OUT_SIZE = ___SAVE_PATH.stat().st_size
 
-        AUDIO["site"] = self.passed_params.get("vk_path")
-
-        FILE = None
-        if ___OUT_FILE != None:
-            FILE = self._fileFromJson(___OUT_FILE)
-        
-        ENTITY = self._entityFromJson({
-            "source": __SOURCE,
-            "internal_content": AUDIO,
-            "file": FILE,
-            "unlisted": self.passed_params.get("unlisted") == 1,
-        })
+                        FILE = self._fileFromJson({
+                            "extension": ___OUT_EXT,
+                            "upload_name": AUDIO_UPLOAD_NAME,
+                            "filesize": ___OUT_SIZE,
+                        })
+            
+            ENTITY = self._entityFromJson({
+                "source": __SOURCE,
+                "internal_content": audio,
+                "suggested_name": AUDIO_NAME,
+                "file": FILE,
+                "unlisted": self.passed_params.get("unlisted") == 1,
+                "declared_created_at": audio.get("date"),
+            })
+            __entities_list.append(ENTITY)
         
         return {
-            "entities": [
-                ENTITY
-            ]
+            "entities": __entities_list
         }

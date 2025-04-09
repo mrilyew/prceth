@@ -63,6 +63,7 @@ class VkPoll(VkTemplate):
             "source": __SOURCE,
             "internal_content": POLL,
             "unlisted": self.passed_params.get("unlisted") == 1,
+            "declared_created_at": POLL.get("date"),
         })
 
         return {

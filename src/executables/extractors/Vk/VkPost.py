@@ -100,9 +100,9 @@ class VkPost(VkTemplate):
             post.pop("hash", None)
             post["site"] = self.passed_params.get("vk_path")
 
-            logger.log(message=f"— Recieved post {ITEM_ID}",section="VK",name="message")
+            logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
 
-            linked_files = []
+            __linked_files = []
             for key, attachment in enumerate(post.get("attachments")):
                 try:
                     __attachment_type = attachment.get("type")
@@ -127,7 +127,7 @@ class VkPost(VkTemplate):
                         __attachment_class_unknown_entities = await __attachment_class_unknown.execute({})
                         __attachment_class_entity = __attachment_class_unknown_entities.get("entities")[0]
 
-                        linked_files.append(__attachment_class_entity)
+                        __linked_files.append(__attachment_class_entity)
                         post["attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_entity.id}"
                     else:
                         ATTACHMENT_ID = f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}"
@@ -144,7 +144,7 @@ class VkPost(VkTemplate):
                             "download_file": should_download_file,
                         },args=args)
 
-                        linked_files.append(__attachment_class_return[0])
+                        __linked_files.append(__attachment_class_return[0])
                         post["attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_return[0].id}"
                 except ModuleNotFoundError:
                     pass
@@ -173,7 +173,7 @@ class VkPost(VkTemplate):
                             "download_reposts": False,
                         },args=args)
 
-                        linked_files.append(__vk_post_entity[0])
+                        __linked_files.append(__vk_post_entity[0])
                         post["copy_history"][key] = f"__lcms|entity_{__vk_post_entity[0].id}"
                     except ModuleNotFoundError:
                         pass
@@ -186,13 +186,14 @@ class VkPost(VkTemplate):
                 post["owner"] = utils.find_owner(post.get("owner_id"), __PROFILES, __GROUPS)
             if post.get("copy_owner_id") != None and __PROFILES != None:
                 post["copy_owner"] = utils.find_owner(post.get("copy_owner_id"), __PROFILES, __GROUPS)
-            
+
             ENTITY = self._entityFromJson({
                 "source": "vk:wall"+ITEM_ID,
                 "suggested_name": f"VK Post {str(ITEM_ID)}",
                 "internal_content": post,
-                "linked_files": linked_files,
+                "linked_files": __linked_files,
                 "unlisted": self.passed_params.get("unlisted") == 1,
+                "declared_created_at": post.get("date"),
             })
             final_entities.append(ENTITY)
         

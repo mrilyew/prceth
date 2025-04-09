@@ -45,6 +45,11 @@ class VkWall(VkTemplate):
             "type": "int",
             "default": 0
         }
+        params["per_page"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 100
+        }
 
         return params
 
@@ -61,7 +66,7 @@ class VkWall(VkTemplate):
 
         logger.log(message=f"Total {total_count} posts",section="VkCollection",name="message")
 
-        __per_page = 100
+        __per_page = self.passed_params.get("per_page")
         __downloaded_count = 0
         times = math.ceil(total_count / __per_page)
         for time in range(0, times):

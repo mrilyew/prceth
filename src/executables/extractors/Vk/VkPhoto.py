@@ -44,15 +44,15 @@ class VkPhoto(VkTemplate):
             final_photos_objects = await self.__recieveById(photo_ids)
         else:
             final_photos_objects = self.passed_params.get("__json_info")
-
+            if type(final_photos_objects) == dict:
+                final_photos_objects = [final_photos_objects]
+        
         __entities_list = []
         for photo in final_photos_objects:
-            TEMP_DIR = self.allocateTemp()
             photo["site"] = self.passed_params.get("vk_path")
 
             PHOTO_ID = f"{photo.get("owner_id")}_{photo.get("id")}"
             ORIGINAL_NAME = f"photo_{PHOTO_ID}_{photo.get("date")}.jpg"
-            SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
             
             logger.log(message=f"Recieved photo {PHOTO_ID}",section="VK",name="message")
         
@@ -76,6 +76,9 @@ class VkPhoto(VkTemplate):
             if self.passed_params.get("download_file") == True:
                 __FILE = None
                 try:
+                    TEMP_DIR = self.allocateTemp()
+
+                    SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
                     HTTP_REQUEST = await download_manager.addDownload(end=PHOTO_URL,dir=SAVE_PATH)
                     FILE_SIZE = SAVE_PATH.stat().st_size
                     __FILE = self._fileFromJson({
@@ -92,6 +95,7 @@ class VkPhoto(VkTemplate):
                 "source": "vk:photo"+str(PHOTO_ID),
                 "internal_content": photo,
                 "unlisted": self.passed_params.get("unlisted") == 1,
+                "declared_created_at": photo.get("date"),
             }, TEMP_DIR)
             __entities_list.append(ENTITY)
 

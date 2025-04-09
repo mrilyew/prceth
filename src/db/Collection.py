@@ -17,6 +17,7 @@ class Collection(BaseModel):
     unlisted = BooleanField(default=0)
     deleted = BooleanField(default=0)
     created_at = TimestampField(default=time.time())
+    declared_created_at = TimestampField(null=True)
     edited_at = TimestampField(null=True)
 
     @staticmethod
@@ -221,7 +222,9 @@ class Collection(BaseModel):
         FINAL_COLLECTION.order = Collection.getAllCount()
         if FINAL_COLLECTION.get("source") != None:
             FINAL_COLLECTION.source = json_input.get("source")
-
+        if json_input.get("declared_created_at") != None:
+            FINAL_COLLECTION.declared_created_at = int(json_input.get("declared_created_at"))
+        
         FINAL_COLLECTION.save()
 
         return FINAL_COLLECTION
