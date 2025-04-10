@@ -23,51 +23,54 @@ class VkPoll(VkTemplate):
 
         return params
     
-    async def __recieveById(self, item_id):
+    async def __recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
-        spl = item_id.split("_")
+        spl = item_ids[0].split("_")
+
         return await __vkapi.call("polls.getById", {"owner_id": spl[0], "poll_id": spl[1], "extended": 1})
     
     async def run(self, args):
-        __ITEM_RES = None
-        __SOURCE   = None
-        POLL = None
-        __ITEM_ID  = self.passed_params.get("item_id")
+        __item_ids = self.passed_params.get("item_id")
+        item_ids = __item_ids.split(",")
+        items = None
+
         if self.passed_params.get("__json_info") == None:
             try:
-                __ITEM_RES = await self.__recieveById(__ITEM_ID)
-                if __ITEM_RES != None:
-                    POLL = __ITEM_RES
+                item_resp = await self.__recieveById(item_ids)
+                if item_resp != None:
+                    items = [item_resp]
             except:
-                POLL = None
+                items = None
         else:
             try:
-                __ITEM_RES = self.passed_params.get("__json_info")
-                POLL = __ITEM_RES
+                items = self.passed_params.get("__json_info")
+                if type(items) == dict:
+                    items = [items]
             except:
-                POLL = None
+                items = None
 
-        if POLL == None:
+        if items == None or len(items) < 1:
             raise NotFoundException("poll not found")
         
-        # TODO: background downloader
-        logger.log(message=f"Recieved poll {__ITEM_ID}",section="VkPoll",name="message")
-        if __ITEM_ID == None:
-            __ITEM_ID  = f"{POLL.get("owner_id")}_{POLL.get("id")}"
+        __entities_list = []
+        for poll in items:
+            poll["site"] = self.passed_params.get("vk_path")
+
+            # TODO: background downloader
+            __ITEM_ID  = f"{poll.get("owner_id")}_{poll.get("id")}"
             __SOURCE   = f"vk:poll{__ITEM_ID}"
-        else:
-            __SOURCE = f"vk:poll{__ITEM_ID}"
+
+            logger.log(message=f"Recieved poll {__ITEM_ID}",section="VkAttachments",name="message")
         
-        POLL["site"] = self.passed_params.get("vk_path")
-        ENTITY = self._entityFromJson({
-            "source": __SOURCE,
-            "internal_content": POLL,
-            "unlisted": self.passed_params.get("unlisted") == 1,
-            "declared_created_at": POLL.get("date"),
-        })
+            ENTITY = self._entityFromJson({
+                "source": __SOURCE,
+                "internal_content": poll,
+                "unlisted": self.passed_params.get("unlisted") == 1,
+                "declared_created_at": poll.get("date"),
+                "suggested_name": poll.get("question"),
+            })
+            __entities_list.append(ENTITY)
 
         return {
-            "entities": [
-                ENTITY
-            ]
+            "entities": __entities_list
         }

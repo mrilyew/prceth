@@ -81,14 +81,12 @@ class File(BaseModel):
             __count = len(__list)
             FILES_LENGTH = __count
             try:
-                if FILES_LENGTH < 1:
-                    pass
-                elif FILES_LENGTH > 0:
+                if FILES_LENGTH > 0:
                     OUTPUT_FILE_ENTITY_PATH_ = OUTPUT_FILE_ENTITY_PATH
                     if FILES_LENGTH == 1:
                         OUTPUT_FILE_ENTITY_PATH_ = Path(os.path.join(OUTPUT_FILE_PATH))
                     
-                    shutil.copytree(str(CURRENT_FILE_PATH), str(OUTPUT_FILE_ENTITY_PATH_), ignore=ignore_patterns('*_thumb.*'))
+                    shutil.copytree(str(CURRENT_FILE_PATH), str(OUTPUT_FILE_ENTITY_PATH_), ignore=ignore_patterns('*_thumb.*'), dirs_exist_ok = True)
                     Path(os.path.join(OUTPUT_FILE_ENTITY_PATH_, self.getFsFileName())).rename(os.path.join(OUTPUT_FILE_ENTITY_PATH_, NEW_MAIN_FILE_NAME))
             except Exception as __e__:
                 logger.logException(__e__, "File")
@@ -107,7 +105,7 @@ class File(BaseModel):
     
     @staticmethod
     def get(id):
-        if type(id) == "int":
+        if type(id) == int:
             try:
                 return File.select().where(File.id == id).get()
             except:

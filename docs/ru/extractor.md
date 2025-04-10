@@ -63,8 +63,6 @@ def declare():
 
 **__init__(temp_dir=,del_dir_on_fail=,need_preview=)**
 
-`temp_dir` = временная папка во время выполнения Extractor'а
-
 `del_dir_on_fail` = удалить ли папку при неудаче
 
 `need_preview` = нужно ли превью
@@ -91,7 +89,7 @@ def declare():
 
 **execute()**
 
-Более краткий run()
+Алиас run()
 
 #### Шаблон
 

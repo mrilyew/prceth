@@ -12,9 +12,9 @@ class EntityToFS(BaseAct):
         entities = []
         LINKED_ENTITY = []
 
-        __export_folder_type = args.get("export_type", "grouping")
+        __export_folder_type = args.get("export_type", "full_stop")
         __export_folder = args.get("dir", None)
-        __export_save_json_to_dir = int(args.get("export_json", 1))
+        __export_save_json_to_dir = int(args.get("export_json", 1)) == 1
         __append_entity_id_to_start = True
 
         assert __export_folder != None, "dir not passed"
@@ -22,30 +22,78 @@ class EntityToFS(BaseAct):
         for entity in Entity.get(entities_ids):
             entities.append(entity)
         
-        for EXP_ENTITY in entities:
-            match(__export_folder_type):
-                case "simple_grouping":
-                    for LINKED_ENTITY in EXP_ENTITY.getLinkedEntities():
+        assert len(entities) > 0, "no entities"
+
+        match(__export_folder_type):
+            case "simple_grouping":
+                for LNK_ENTITY in entities:
+                    for LINKED_ENTITY in LNK_ENTITY.getLinkedEntities():
+                        if LINKED_ENTITY.self_name == "file":
+                            continue
+
                         entities.append(LINKED_ENTITY)
-                    
+
+                for EXP_ENTITY in entities: 
                     if EXP_ENTITY.file != None:
                         EXP_ENTITY.file.saveToDir(use_upload_name=True,save_dir=__export_folder,move_type=1,append_entity_id_to_start=__append_entity_id_to_start==1)
                 
                     if __export_save_json_to_dir == 1:
                         EXP_ENTITY.saveInfoToJson(dir=__export_folder)
-                case "grouping":
-                    RETURN_ENTITIES = EXP_ENTITY.fullStop(move_dir=__export_folder,save_to_json=__export_save_json_to_dir==1)
-            '''case _: # "rename"
-                for ENTITY in entities:
-                    for LINKED_ENTITY in ENTITY.getLinkedEntities():
-                        RETURN_ENTITIES.append(LINKED_ENTITY)
+            case "full_stop" | "full_stop_unlink" | "full_stop_full_unlink" | "full_stop_one_dir":
+                return_entities = []
+                dir_path = Path(__export_folder)
+                if dir_path.is_dir() == False:
+                    dir_path.mkdir()
                 
-                if EXP_ENTITY.file != None:
-                    EXP_ENTITY.file.saveToDir(use_upload_name=True,save_dir=__export_folder,move_type=0,append_entity_id_to_start=__append_entity_id_to_start==1)
+                for entity in entities:
+                    entity_dir = Path(os.path.join(str(dir_path), str(entity.id)))
+                    if __export_folder_type == "full_stop_one_dir":
+                        entity_dir = Path(str(dir_path))
+                    
+                    linked_dir = Path(os.path.join(str(entity_dir), str(entity.id) + "_linked"))
+                    if entity_dir.is_dir() == False:
+                        entity_dir.mkdir()
 
-                if __export_save_json_to_dir == 1:
-                    EXP_ENTITY.saveInfoToJson(dir=__export_folder)'''
-        
+                    if __export_folder_type == "full_stop_unlink" or __export_folder_type == "full_stop_full_unlink" or __export_folder_type == "full_stop_one_dir":
+                        linked_dir = entity_dir
+                    
+                    __file = entity.file
+                    if __file != None and type(__file) != list:
+                        entity.file.saveToDir(use_upload_name=True,save_dir=entity_dir,move_type=1,append_entity_id_to_start=True)
+                    
+                    return_entities.append(entity)
+                    if len(entity.getLinkedEntities()) > 0:
+                        try:
+                            linked_dir.mkdir()
+                        except FileExistsError:
+                            pass
+
+                        for LINKED_ENTITY in entity.getLinkedEntities():
+                            if LINKED_ENTITY.self_name != "entity":
+                                continue
+
+                            linked_entity_dir = Path(os.path.join(str(linked_dir), str(LINKED_ENTITY.id)))
+                            if __export_folder_type == "full_stop_full_unlink" or __export_folder_type == "full_stop_one_dir":
+                                linked_entity_dir = entity_dir
+                            
+                            try:
+                                linked_entity_dir.mkdir()
+                            except FileExistsError:
+                                pass
+
+                            return_entities.append(LINKED_ENTITY)
+                            ___file = LINKED_ENTITY.file
+                            if ___file != None and type(___file) != list:
+                                ___file.saveToDir(use_upload_name=True,save_dir=linked_entity_dir,move_type=1,append_entity_id_to_start=True)
+                            if __export_save_json_to_dir:
+                                LINKED_ENTITY.saveInfoToJson(dir=str(linked_entity_dir))
+
+                            logger.log(f"_ Exported subentity {LINKED_ENTITY.id}", section="Export",name="success")
+                    
+                    logger.log(f"Exported entity {entity.id}", section="Export",name="success")
+                    if __export_save_json_to_dir:
+                        entity.saveInfoToJson(dir=str(entity_dir))
+            
         return {
             "destination": __export_folder
         }

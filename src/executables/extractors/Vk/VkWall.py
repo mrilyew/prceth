@@ -35,10 +35,20 @@ class VkWall(VkTemplate):
             "type": "int",
             "default": 0,
         }
-        params["download_external_media"] = {
+        params["download_attachments_json_list"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "*",
+        }
+        params["download_attachments_file_list"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "photo",
+        }
+        params["download_reposts"] = {
             "desc_key": "-",
             "type": "bool",
-            "default": False
+            "default": True,
         }
         params["limit"] = {
             "desc_key": "-",
@@ -69,6 +79,8 @@ class VkWall(VkTemplate):
         __per_page = self.passed_params.get("per_page")
         __downloaded_count = 0
         times = math.ceil(total_count / __per_page)
+        vpost_ext = VkPost(need_preview=self.need_preview)
+
         for time in range(0, times):
             OFFSET = __per_page * time
             if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
@@ -86,17 +98,19 @@ class VkWall(VkTemplate):
                     break
                 
                 __POST_ID = str(post_item.get("owner_id")) + "_" + str(post_item.get("id"))
-                vpost_ext = VkPost(need_preview=self.need_preview)
                 vpost_ext.setArgs({
                     "unlisted": 1,
                     "item_id": __POST_ID,
                     "__json_info": post_item,
                     "__json_profiles": __post_call_params.get("profiles"),
                     "__json_groups": __post_call_params.get("groups"),
+                    "download_attachments_json_list": self.passed_params.get("download_attachments_json_list"),
+                    "download_attachments_file_list": self.passed_params.get("download_attachments_file_list"),
+                    "download_reposts": self.passed_params.get("download_reposts"),
+                    "download_comments": False,
                     "access_token": self.passed_params.get("access_token"),
                     "api_url": self.passed_params.get("api_url"),
                     "vk_path": self.passed_params.get("vk_path"),
-                    "download_external_media": self.passed_params.get("download_external_media"),
                 })
 
                 try:
@@ -105,8 +119,6 @@ class VkWall(VkTemplate):
                         final_entites_list.append(__post)
                 except Exception as _ae:
                     logger.logException(_ae, section="VkCollection")
-                
-                del vpost_ext
 
                 if self.passed_params.get("download_timeout") != 0:
                     await asyncio.sleep(self.passed_params.get("download_timeout"))
@@ -116,6 +128,9 @@ class VkWall(VkTemplate):
             if self.passed_params.get("api_timeout") != 0:
                 await asyncio.sleep(self.passed_params.get("api_timeout"))
         
+        await vpost_ext.postRun(final_entites_list)
+        del vpost_ext
+
         return {
             "entities": final_entites_list,
             "collection": {

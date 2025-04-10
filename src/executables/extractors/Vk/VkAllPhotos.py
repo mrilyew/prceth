@@ -30,6 +30,11 @@ class VkAllPhotos(VkTemplate):
             "type": "int",
             "default": 0,
         }
+        params["per_page"] = {
+            "desc_key": "-",
+            "type": "int",
+            "default": 100
+        }
 
         return params
 
@@ -41,14 +46,15 @@ class VkAllPhotos(VkTemplate):
 
         logger.log(message=f"Total {total_count} photos",section="VkCollection",name="message")
 
-        __per_page = 100
+        __per_page = self.passed_params.get("per_page")
         __downloaded_count = 0
         times = math.ceil(total_count / __per_page)
+        vphoto_ext = VkPhoto(need_preview=self.need_preview)
         for time in range(0, times):
             OFFSET = __per_page * time
             if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
                 break
-            
+
             logger.log(message=f"{time + 1}/{times} time of photos recieving; {OFFSET} offset",section="VkCollection",name="message")
             photo_call = await __vkapi.call("photos.getAll", {"owner_id": self.passed_params.get("item_id"), "extended": 1, "count": 100, "photo_sizes": 1, "offset": OFFSET})
             for photo_item in photo_call.get("items"):
@@ -56,7 +62,6 @@ class VkAllPhotos(VkTemplate):
                     break
                 
                 __PHOTO_ID = str(photo_item.get("owner_id")) + "_" + str(photo_item.get("id"))
-                vphoto_ext = VkPhoto(need_preview=self.need_preview)
                 vphoto_ext.setArgs({
                     "unlisted": 1,
                     "item_id": __PHOTO_ID,
@@ -73,17 +78,19 @@ class VkAllPhotos(VkTemplate):
                         final_entites_list.append(__photo)
                 except Exception:
                     pass
-                
-                del vphoto_ext
 
                 if self.passed_params.get("download_timeout") != 0:
                     await asyncio.sleep(self.passed_params.get("download_timeout"))
 
                 __downloaded_count += 1
             
+            await vphoto_ext.postRun(return_entities=final_entites_list)
+            
             if self.passed_params.get("api_timeout") != 0:
                 await asyncio.sleep(self.passed_params.get("api_timeout"))
 
+        del vphoto_ext
+        
         return {
             "entities": final_entites_list,
             "collection": {

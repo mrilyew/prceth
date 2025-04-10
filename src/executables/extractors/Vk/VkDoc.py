@@ -89,6 +89,7 @@ class VkDoc(VkTemplate):
 
             ENTITY = self._entityFromJson({
                 "file": FILE,
+                "suggested_name": item_TEXT,
                 "source": __SOURCE,
                 "internal_content": DOC,
                 "unlisted": self.passed_params.get("unlisted") == 1,

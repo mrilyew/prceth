@@ -183,7 +183,7 @@ class BaseExtractor:
             #if ENTITY.file != None:
             #    ENTITY.file.moveTempDir()
         
-        await self.postRun()
+        await self.postRun(return_entities=RETURN_ENTITIES)
         return RETURN_ENTITIES
             
     def describe(self):

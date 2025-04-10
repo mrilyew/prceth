@@ -86,6 +86,8 @@ class VkPhoto(VkTemplate):
                         "upload_name": ORIGINAL_NAME,
                         "filesize": FILE_SIZE,
                     }, TEMP_DIR)
+
+                    logger.log(message=f"Downloaded photo {PHOTO_ID}",section="VK",name="success")
                 except FileNotFoundError as _ea:
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
                 

@@ -44,8 +44,11 @@ class Entity(BaseModel):
         
         if self.__cached_file != None:
             return self.__cached_file
+
+        _fl = File.get(self.file_id)
+        self.__cached_file = _fl
         
-        return File.get(self.file_id)
+        return _fl
 
     def delete(self, delete_dir=False):
         if delete_dir == True:
@@ -184,7 +187,7 @@ class Entity(BaseModel):
     
     @staticmethod
     def get(id):
-        if type(id) == "int":
+        if type(id) == int:
             try:
                 return Entity.select().where(Entity.id == id).where(Entity.deleted == 0).get()
             except:
@@ -267,42 +270,3 @@ class Entity(BaseModel):
     def saveInfoToJson(self, dir):
         with open(os.path.join(dir, f"data_{self.id}.json"), "w", encoding='utf8') as json_file:
             json_file.write(json.dumps(self.getApiStructure(sensitive=True), indent=2, ensure_ascii=False))
-
-    def fullStop(self, move_dir, save_to_json=True):
-        RETURN_ENTITIES = []
-        dir_path = Path(move_dir)
-        if dir_path.is_dir() == False:
-            dir_path.mkdir()
-
-        entity_dir = Path(os.path.join(str(dir_path), str(self.id)))
-        linked_dir = Path(os.path.join(str(entity_dir), str(self.id) + "_linked"))
-        if entity_dir.is_dir() == False:
-            entity_dir.mkdir()
-
-        if self.file != None:
-            self.file.saveToDir(use_upload_name=True,save_dir=entity_dir,move_type=1,append_entity_id_to_start=True)
-        
-        RETURN_ENTITIES.append(self)
-        if len(self.getLinkedEntities()) > 0:
-            try:
-                linked_dir.mkdir()
-            except FileExistsError:
-                pass
-
-            for LINKED_ENTITY in self.getLinkedEntities():
-                linked_entity_dir = Path(os.path.join(str(linked_dir), str(LINKED_ENTITY.id)))
-                try:
-                    linked_entity_dir.mkdir()
-                except FileExistsError:
-                    pass
-
-                RETURN_ENTITIES.append(LINKED_ENTITY)
-                if LINKED_ENTITY.file != None:
-                    LINKED_ENTITY.file.saveToDir(use_upload_name=True,save_dir=linked_entity_dir,move_type=1,append_entity_id_to_start=True)
-                if save_to_json:
-                    LINKED_ENTITY.saveInfoToJson(dir=str(linked_entity_dir))
-        
-        if save_to_json:
-            self.saveInfoToJson(dir=str(entity_dir))
-
-        return RETURN_ENTITIES
