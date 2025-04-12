@@ -220,9 +220,9 @@ class Entity(BaseModel):
         else:
             try:
                 internal_content_ = utils.clearJson(indexation_content_)
-                FINAL_ENTITY.internal_content = json.dumps(internal_content_)
+                FINAL_ENTITY.internal_content = json.dumps(internal_content_, ensure_ascii=False)
             except Exception:
-                FINAL_ENTITY.internal_content = json.dumps(indexation_content_)
+                FINAL_ENTITY.internal_content = json.dumps(indexation_content_, ensure_ascii=False)
         if json_input.get("file") != None:
             FINAL_ENTITY.file_id = json_input.get("file").id
             FINAL_ENTITY.__cached_file = json_input.get("file")
@@ -243,13 +243,13 @@ class Entity(BaseModel):
         if passed_params.get("display_name") != None:
             FINAL_ENTITY.display_name = passed_params["display_name"]
         else:
-            if json_input.get("file") == None:
-                if json_input.get("suggested_name") == None:
+            if json_input.get("suggested_name") == None:
+                if json_input.get("file") == None:
                     FINAL_ENTITY.display_name = "N/A"
                 else:
-                    FINAL_ENTITY.display_name = json_input.get("suggested_name")
+                    FINAL_ENTITY.display_name = json_input.get("file").upload_name
             else:
-                FINAL_ENTITY.display_name = json_input.get("file").upload_name
+                FINAL_ENTITY.display_name = json_input.get("suggested_name")
         
         if passed_params.get("description") != None:
             FINAL_ENTITY.description = passed_params["description"]

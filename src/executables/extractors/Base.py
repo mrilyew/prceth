@@ -152,7 +152,12 @@ class BaseExtractor:
     async def postRun(self, return_entities):
         if self.write_mode == 1:
             try:
-                logger.log(f"Saving total {len(self.unsaved_entities)} entities; don't turn off your computer.",section="Extractors",name="success")
+                ___ln = len(self.unsaved_entities)
+                __msg = f"Saving total {___ln} entities;"
+                if ___ln > 100:
+                    ___ln += " do not turn off your computer."
+                
+                logger.log(__msg,section="Extractors",name="success")
             except Exception:
                 pass
 

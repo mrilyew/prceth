@@ -81,7 +81,7 @@ def declare():
 
 **postRun()** *async*
 
-Выполняет действия после основного
+Перемещение файлов в %storage% и сохранение Entity при write_mode = 1
 
 **thumbnail()**
 

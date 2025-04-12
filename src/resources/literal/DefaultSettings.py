@@ -35,4 +35,8 @@ DefaultSettings = {
         "type": "string",
         "default_value": "?cwd?\\storage" # /src -> /storage
     },
+    "db.path": {
+        "type": "string",
+        "default_value": "storage/dbs/main.db"
+    }
 }

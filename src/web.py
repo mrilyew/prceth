@@ -2,6 +2,9 @@ from flask import Flask, request, jsonify, render_template, json
 from resources.Globals import config, consts, ActsRepository, os, Path
 from core.Api import api
 from resources.Exceptions import NotPassedException, AccessDeniedException
+from resources.DbPrefetch import prefetch__db
+
+prefetch__db()
 
 consts["context"] = "flask"
 CURRENT_FRONTEND = config.get("flask.frontend")

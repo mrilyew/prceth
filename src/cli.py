@@ -114,13 +114,11 @@ async def __cliMain():
         case 'services.run':
             print("Started service")
             api.runService(args)
-        case "clear":
-            sure = input("You sure? ")
-            if sure == "yeah":
-                Path("storage/main.db").unlink()
-                print("Ok")
         case _:
             print('Unknown "--act" passed')
             exit(-14)
 
-loop.run_until_complete(__cliMain())
+try:
+    loop.run_until_complete(__cliMain())
+except KeyboardInterrupt:
+    asyncio.sleep(10)

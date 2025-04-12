@@ -279,6 +279,8 @@ class Api():
             EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
             if EXTRACTOR_RESULTS == None:
                 raise Exception("Nothing returned")
+        except KeyboardInterrupt:
+            pass
         except Exception as __ee:
             logger.log(message=f"Extractor {__extractor_input_name} returned error: {str(__ee)}",noConsole=True)
             raise __ee
@@ -297,7 +299,10 @@ class Api():
             RETURN_ENTITIES = []
             col = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
             for i_entity in EXTRACTOR_RESULTS.get("entities"):
-                col.addItem(i_entity)
+                try:
+                    col.addItem(i_entity)
+                except:
+                    pass
 
             RETURN_ENTITIES.append(col)
 
@@ -307,7 +312,10 @@ class Api():
                 logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
             else:
                 for _ENT in RETURN_ENTITIES:
-                    POST_COLLECTION.addItem(_ENT)
+                    try:
+                        POST_COLLECTION.addItem(_ENT)
+                    except:
+                        pass
 
         await EXTRACTOR_INSTANCE.postRun(return_entities=RETURN_ENTITIES)
         if __export_folder != None:

@@ -10,12 +10,15 @@ src/storage/assets_originals/*
 src/storage/main.db
 src/storage/files/*
 !src/storage/files/.gitkeep
+src/storage/dbs/*
+!src/storage/dbs/.gitkeep
 src/storage/tmp/files/*
 src/storage/exports/*
 src/storage/settings/config.json
 !src/storage/tmp/files/.gitkeep
 src/storage/logs/*.log
 src/executables/extractors/Custom/*
+src/executables/extractors/Secret/*
 src/executables/acts/Custom/*
 src/executables/services/Custom/*
 *node_modules*
