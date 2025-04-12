@@ -88,7 +88,7 @@ class VkWall(VkTemplate):
             
             logger.log(message=f"{time + 1}/{times} time of posts recieving; {OFFSET} offset",section="VkCollection",name="message")
             
-            __post_call_params = {"owner_id": self.passed_params.get("item_id"), "extended": 1, "count": 100, "photo_sizes": 1, "offset": OFFSET}
+            __post_call_params = {"owner_id": self.passed_params.get("item_id"), "extended": 1, "count": __per_page, "photo_sizes": 1, "offset": OFFSET}
             if self.passed_params.get("filter") != None:
                 __post_call_params["filter"] = self.passed_params.get("filter")
             

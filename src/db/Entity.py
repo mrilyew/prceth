@@ -262,8 +262,6 @@ class Entity(BaseModel):
             FINAL_ENTITY.indexation_content_string = str(utils.json_values_to_string(indexation_content_)).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
         else:
             FINAL_ENTITY.indexation_content_string = json.dumps(utils.json_values_to_string(internal_content_), ensure_ascii=False).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
-        
-        FINAL_ENTITY.save()
 
         return FINAL_ENTITY
 

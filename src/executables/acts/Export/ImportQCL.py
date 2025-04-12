@@ -6,7 +6,7 @@ from db.Entity import Entity
 from db.Relation import Relation
 
 class ImportQCL(BaseAct):
-    name = 'ImportQCL'
+    name = 'NOT WORKING BRO'
     category = 'export'
     accepts = 'string'
     

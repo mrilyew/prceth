@@ -63,10 +63,10 @@ class VkPost(VkTemplate):
         __POST_RESPONSE = None
         __PROFILES = None
         __GROUPS   = None
-        ITEM_IDS_STR = self.passed_params.get("item_id")
+        ITEM_IDS_STR = self.passed_params.get("item_id", "")
         ITEM_IDS = ITEM_IDS_STR.split(",")
 
-        if self.passed_params.get("__json_info", None) == None:
+        if self.passed_params.get("__json_info") == None:
             assert len(ITEM_IDS) > 0, "item_id's not passed("
             __POST_RESPONSE = await self.__recieveById(ITEM_IDS)
             __PROFILES = __POST_RESPONSE.get("profiles")
@@ -78,7 +78,6 @@ class VkPost(VkTemplate):
         
         __POST_ITEMS = []
         try:
-            post = None
             if __POST_RESPONSE.get("items") != None:
                 __POST_ITEMS = __POST_RESPONSE.get("items")
             else:
@@ -88,7 +87,7 @@ class VkPost(VkTemplate):
 
         if __POST_ITEMS == None:
             raise NotFoundException("post items not found")
-
+        
         DOWNLOAD_JSON_LIST = self.passed_params.get("download_attachments_json_list").split(",")
         DOWNLOAD_FILE_LIST = self.passed_params.get("download_attachments_file_list").split(",")
 

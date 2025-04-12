@@ -6,9 +6,10 @@ class BaseExtractor:
     category = 'template'
     params = {}
     passed_params = {}
+    unsaved_entities = []
     manual_params = False
 
-    def __init__(self, temp_dir=None, del_dir_on_fail=True,need_preview=True):
+    def __init__(self, temp_dir=None, del_dir_on_fail=True,need_preview=True,write_mode=1):
         self.passed_params = {}
         #if temp_dir != None:
             #self.temp_dir_prefix = temp_dir
@@ -17,6 +18,7 @@ class BaseExtractor:
         self.temp_dirs = []
         self.del_dir_on_fail = del_dir_on_fail
         self.need_preview = need_preview
+        self.write_mode = write_mode
     
     def declare():
         params = {}
@@ -130,8 +132,13 @@ class BaseExtractor:
             thumb_result = self.thumbnail(entity=__entity,args=json_data)
             if thumb_result != None:
                 __entity.preview = json.dumps(thumb_result)
-                __entity.save()
 
+        self.unsaved_entities.append(__entity)
+
+        if self.write_mode == 2:
+            __entity.save()
+            logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")
+        
         return __entity
     
     def _collectionFromJson(self, json_data):
@@ -143,6 +150,20 @@ class BaseExtractor:
         pass
     
     async def postRun(self, return_entities):
+        if self.write_mode == 1:
+            try:
+                logger.log(f"Saving total {len(self.unsaved_entities)} entities; don't turn off your computer.",section="Extractors",name="success")
+            except Exception:
+                pass
+
+            for unsaved_entity in self.unsaved_entities:
+                unsaved_entity.save()
+
+                try:
+                    logger.log(f"Saved entity {str(unsaved_entity.id)} 👍",section="EntitySaveMechanism",name="success")
+                except Exception:
+                    pass
+        
         for MOVE_ENTITY in return_entities:
             if MOVE_ENTITY.self_name == "entity" and MOVE_ENTITY.file != None:
                 MOVE_ENTITY.file.moveTempDir()

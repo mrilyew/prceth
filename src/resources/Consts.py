@@ -10,7 +10,7 @@ consts['pc_fullname'] = consts['pc_name'] + ', ' + consts['pc_user']
 consts['cwd'] = os.getcwd()
 consts["executable"] = os.path.join(consts["cwd"], "executables")
 consts["net.global_timeout"] = 1000
-consts["logger.skip_categories"] = ["AsyncDownloadManager"]
+consts["logger.skip_categories"] = ["AsyncDownloadManager", "EntitySaveMechanism"]
 consts["config.hidden"] = 1
 
 # Executables consts

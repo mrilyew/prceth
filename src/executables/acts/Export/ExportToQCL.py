@@ -5,7 +5,7 @@ from db.Entity import Entity
 from db.Collection import Collection
 
 class ExportToQCL(BaseAct):
-    name = 'ExportToQCL'
+    name = 'NOT WORKING BRO'
     category = 'export'
     accepts = 'collection'
 
