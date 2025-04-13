@@ -111,6 +111,7 @@ class VkPost(VkTemplate):
                     
                     should_download_json = DOWNLOAD_JSON_LIST[0] == "*" or __attachment_type in DOWNLOAD_JSON_LIST
                     should_download_file = DOWNLOAD_FILE_LIST[0] == "*" or __attachment_type in DOWNLOAD_FILE_LIST
+                    
                     if should_download_json == False:
                         continue
                     

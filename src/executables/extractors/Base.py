@@ -47,7 +47,7 @@ class BaseExtractor:
     
     def setArgs(self, args):
         self.params = {}
-
+        
         # Catching params from parent extractors
         for __sub_class in self.__class__.__mro__:
             if hasattr(__sub_class, "declare") == False:
@@ -73,8 +73,8 @@ class BaseExtractor:
                     case "array":
                         __allowed = param_object.get("values")
                         assert __value in __allowed, "not valid value"
-
-                        __value = param_object.get("default")
+                        if __value == None:
+                            __value = param_object.get("default")
                     case "string":
                         if param_object.get("maxlength") != None:
                             __value = utils.proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
@@ -134,7 +134,7 @@ class BaseExtractor:
                 __entity.preview = json.dumps(thumb_result)
 
         self.unsaved_entities.append(__entity)
-
+        
         if self.write_mode == 2:
             __entity.save()
             logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")
@@ -153,12 +153,13 @@ class BaseExtractor:
         if self.write_mode == 1:
             try:
                 ___ln = len(self.unsaved_entities)
-                __msg = f"Saving total {___ln} entities;"
+                __msg = f"Saving total {str(___ln)} entities;"
                 if ___ln > 100:
                     ___ln += " do not turn off your computer."
                 
-                logger.log(__msg,section="Extractors",name="success")
-            except Exception:
+                logger.log(__msg,section="EntitySaveMechanism",name="success")
+            except Exception as _x:
+                print(_x)
                 pass
 
             for unsaved_entity in self.unsaved_entities:
@@ -166,7 +167,7 @@ class BaseExtractor:
 
                 try:
                     logger.log(f"Saved entity {str(unsaved_entity.id)} 👍",section="EntitySaveMechanism",name="success")
-                except Exception:
+                except Exception as _x:
                     pass
         
         for MOVE_ENTITY in return_entities:
@@ -205,11 +206,11 @@ class BaseExtractor:
         self.setArgs(params)
         EXTRACTOR_RESULTS = await self.execute({})
         for ENTITY in EXTRACTOR_RESULTS.get("entities"):
+            ENTITY.save()
             RETURN_ENTITIES.append(ENTITY)
             #if ENTITY.file != None:
             #    ENTITY.file.moveTempDir()
-        
-        await self.postRun(return_entities=RETURN_ENTITIES)
+
         return RETURN_ENTITIES
             
     def describe(self):

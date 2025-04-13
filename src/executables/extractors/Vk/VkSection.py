@@ -18,8 +18,7 @@ class VkSection(VkTemplate):
         params["section"] = {
             "desc_key": "-",
             "type": "array",
-            "values": ["photos", "videos", "notes"],
-            "default": "copy",
+            "values": ["photos", "wall", "album"],
             "assertion": {
                 "assert_not_null": True,
             },
@@ -33,11 +32,6 @@ class VkSection(VkTemplate):
             "desc_key": "-",
             "type": "int",
             "default": 0,
-        }
-        params["for_timeout"] = {
-            "desc_key": "-",
-            "type": "int",
-            "default": 5,
         }
         params["limit"] = {
             "desc_key": "-",
@@ -64,6 +58,26 @@ class VkSection(VkTemplate):
                 }
             }
         }
+        params["download_attachments_json_list"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "*",
+        }
+        params["download_attachments_file_list"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "photo",
+        }
+        params["download_reposts"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True,
+        }
+        params["download_comments"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": False,
+        }
 
         return params
     
@@ -77,6 +91,7 @@ class VkSection(VkTemplate):
         __method = ""
         __dict_name = "items"
         __final_entities = []
+        __has_profile = False
         __pass_params = {}
         __extractor = None
         __extractor_params = {
@@ -113,13 +128,18 @@ class VkSection(VkTemplate):
                 if self.passed_params.get("filter") != None:
                     __temp_final_params["filter"] = self.passed_params.get("filter")
 
+                __has_profile = True
                 __count_call = await __vkapi.call(__method, __temp_final_params)
                 __total_count = __count_call.get("count")
                 __extractor = VkPost()
+                __extractor_params["download_attachments_json_list"] = self.passed_params.get("download_attachments_json_list")
+                __extractor_params["download_attachments_file_list"] = self.passed_params.get("download_attachments_file_list")
+                __extractor_params["download_reposts"] = self.passed_params.get("download_reposts")
+                __extractor_params["download_comments"] = False
                 __pass_params = {
                     "owner_id": item_id_collection, 
                     "extended": 1, 
-                    "photo_sizes": 1, 
+                    "photo_sizes": 1,
                 }
                 if self.passed_params.get("filter") != None:
                     __pass_params["filter"] = self.passed_params.get("filter")
@@ -168,6 +188,11 @@ class VkSection(VkTemplate):
 
                 __extractor_params["item_id"] = item_id
                 __extractor_params["__json_info"] = item
+                
+                if __has_profile == True:
+                    __extractor_params["__json_profiles"] = __time_call.get("profiles")
+                    __extractor_params["__json_groups"] = __time_call.get("groups")
+                
                 __extractor.setArgs(__extractor_params)
 
                 try:
