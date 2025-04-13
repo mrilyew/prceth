@@ -58,6 +58,8 @@ class Logger():
                 print("\033[91m" + message_to_write.replace("\n", "") + "\033[0m")
             elif name == "success":
                 print("\033[92m" + message_to_write.replace("\n", "") + "\033[0m")
+            elif name == "deprecated":
+                print("\033[93m" + message_to_write.replace("\n", "") + "\033[0m")
             else:
                 print(message_to_write.replace("\n", ""))
 

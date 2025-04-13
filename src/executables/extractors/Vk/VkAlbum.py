@@ -87,6 +87,9 @@ class VkAlbum(VkTemplate):
         if albums == None or len(albums) < 1:
             raise NotFoundException("album not found")
         
+        if self.passed_params.get("download_photos") == True:
+            logger.log(message="Bro! This method is deprecated! Use Vk.VkSection instead!",section="VkCollection",name="deprecated")
+
         __entities_list = []
         for album in albums:
             album["site"] = self.passed_params.get("vk_path")

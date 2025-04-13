@@ -93,11 +93,11 @@ class VkPost(VkTemplate):
 
         final_entities = []
         for post in __POST_ITEMS:
+            post["site"] = self.passed_params.get("vk_path")
             ITEM_ID = f"{post.get("owner_id")}_{post.get("id")}"
 
             post.pop("track_code", None)
             post.pop("hash", None)
-            post["site"] = self.passed_params.get("vk_path")
 
             logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
 
@@ -108,12 +108,12 @@ class VkPost(VkTemplate):
                     __attachment_object = attachment.get(__attachment_type)
                     if __attachment_object == None:
                         continue
-
+                    
                     should_download_json = DOWNLOAD_JSON_LIST[0] == "*" or __attachment_type in DOWNLOAD_JSON_LIST
                     should_download_file = DOWNLOAD_FILE_LIST[0] == "*" or __attachment_type in DOWNLOAD_FILE_LIST
                     if should_download_json == False:
                         continue
-
+                    
                     __attachment_class = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_type.title()}"))
                     if __attachment_class == None:
                         logger.log(message="Recieved unknown attachment: " + str(__attachment_type),section="VkAttachments",name="message")

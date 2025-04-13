@@ -216,7 +216,7 @@ class Entity(BaseModel):
 
         # FINAL_ENTITY.hash = __hash
         if internal_content_ != None:
-            FINAL_ENTITY.internal_content = json.dumps(internal_content_)
+            FINAL_ENTITY.internal_content = json.dumps(internal_content_, ensure_ascii=False)
         else:
             try:
                 internal_content_ = utils.clearJson(indexation_content_)
