@@ -1,10 +1,8 @@
 ## Difault
 
-Introvertical metaweb extensible local content saver/indexator/aggregator.
+Pythonical app for creating virtual collections with internet content
 
-App for creating virtual content collections. In fact it is an pre-bourbon of different python libraries.
-
-см. [docs](docs/ru/README.md)
+Wt. [docs](docs/ru/README.md)
 <!--![lcms work scheme](readme/scheme.jpg)-->
 
 Tasks:
@@ -25,11 +23,12 @@ Tasks:
 - [ ] система закладок
 - [ ] Паралелльная загрузка
 - [ ] vk post экспорт всех комментариев
-- [ ] entities.createFromScratch
 - [ ] entities.edit
 - [ ] files.edit
+- [ ] Защита от рекурсии
+- [ ] Pre-execute 
+- [ ] Подмена "created_at" у файла на тот что в таблице
 
 **ui**:
-- [ ] Система вкладок (Но наверно нет потому что есть вкладки браузера)
 - [ ] Закладки сбоку
 - [ ] Список объектов

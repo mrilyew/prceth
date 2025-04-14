@@ -15,15 +15,18 @@ class VkApi():
         params["access_token"] = self.__token
         params["v"] = 5.221
         __end_url = f"https://{self.__endpoint}/{method}?"
+        __save_end_url = f"https://{self.__endpoint}/{method}?"
         for param in params.items():
             __end_url += f"&{param[0]}={param[1]}"
+            if param[0] != "access_token":
+                __save_end_url += f"&{param[0]}={param[1]}"
         
         __response = None
         async with aiohttp.ClientSession() as session:
             async with session.get(__end_url) as response:
                 __response = await response.json()
         
-        logger.log(f"Called VK API {__end_url}", section="VkApi")
+        logger.log(f"Called VK API {__save_end_url}", section="VkApi")
         
         if __response.get("response") == None:
             raise VkApiException(message=__response.get("error").get("error_msg"))

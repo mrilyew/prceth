@@ -12,7 +12,7 @@ class EntityToFS(BaseAct):
         entities = []
         LINKED_ENTITY = []
 
-        __export_folder_type = args.get("export_type", "full_stop")
+        __export_folder_type = args.get("export_type", "full_stop_one_dir")
         __export_folder = args.get("dir", None)
         __export_save_json_to_dir = int(args.get("export_json", 1)) == 1
         __append_entity_id_to_start = True

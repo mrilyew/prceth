@@ -1,13 +1,10 @@
 from resources.Globals import storage, os, utils, file_manager, json, logger
 from db.Entity import Entity
+from executables.Executable import Executable
 
-class BaseExtractor:
+class BaseExtractor(Executable):
     name = 'base'
-    category = 'template'
-    params = {}
-    passed_params = {}
     unsaved_entities = []
-    manual_params = False
 
     def __init__(self, temp_dir=None, del_dir_on_fail=True,need_preview=True,write_mode=1):
         self.passed_params = {}
@@ -19,7 +16,8 @@ class BaseExtractor:
         self.del_dir_on_fail = del_dir_on_fail
         self.need_preview = need_preview
         self.write_mode = write_mode
-    
+
+
     def declare():
         params = {}
         params["display_name"] = {
@@ -45,72 +43,6 @@ class BaseExtractor:
 
         return params
     
-    def setArgs(self, args):
-        self.params = {}
-        
-        # Catching params from parent extractors
-        for __sub_class in self.__class__.__mro__:
-            if hasattr(__sub_class, "declare") == False:
-                continue
-
-            new_params = __sub_class.declare()
-            self.params.update(new_params)
-        
-        MAX_OUTPUT_CHECK_PARAMS = self.params
-        self.passed_params["make_preview"] = int(args.get("make_preview", 1))
-        if MAX_OUTPUT_CHECK_PARAMS == None:
-            return
-        
-        for index, param_name in enumerate(MAX_OUTPUT_CHECK_PARAMS):
-            param_object = MAX_OUTPUT_CHECK_PARAMS.get(param_name)
-            __value = args.get(param_name, param_object.get("default"))
-            if __value != None:
-                match(param_object.get("type")):
-                    case "int":
-                        __value = int(__value)
-                    case "float":
-                        __value = float(__value)
-                    case "array":
-                        __allowed = param_object.get("values")
-                        assert __value in __allowed, "not valid value"
-                        if __value == None:
-                            __value = param_object.get("default")
-                    case "string":
-                        if param_object.get("maxlength") != None:
-                            __value = utils.proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
-                        else:
-                            __value = str(__value)
-                    case "object":
-                        if type(__value) in ["dict", "array"] == False:
-                            if param_object.get("default") != None:
-                                __value = param_object.get("default")
-                            else:
-                                __value = None
-                    case "bool":
-                        __value = int(__value) == 1
-                    case _:
-                        break
-                
-                self.passed_params[param_name] = __value
-            else:
-                if param_object.get("default") != None:
-                    self.passed_params[param_name] = param_object.get("default")
-
-            if param_object.get("assertion") != None:
-                __assertion = param_object.get("assertion")
-                
-                if __assertion.get("assert_not_null") == True:
-                    assert __value != None, f"{param_name} not passed"
-
-                if __assertion.get("assert_link") != None:
-                    new_param_name = __assertion.get("assert_link")
-                    new_param_object = MAX_OUTPUT_CHECK_PARAMS.get(new_param_name)
-
-                    assert __value != None or args.get(new_param_name, new_param_object.get("default")) != None, f"{new_param_name} or {param_name} not passed"
-        
-        if self.manual_params == True:
-            self.passed_params.update(args)
-
     def onFail(self):
         if self.del_dir_on_fail == True:
             for t_dir in self.temp_dirs:
@@ -134,7 +66,6 @@ class BaseExtractor:
                 __entity.preview = json.dumps(thumb_result)
 
         self.unsaved_entities.append(__entity)
-        
         if self.write_mode == 2:
             __entity.save()
             logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")
@@ -155,7 +86,7 @@ class BaseExtractor:
                 ___ln = len(self.unsaved_entities)
                 __msg = f"Saving total {str(___ln)} entities;"
                 if ___ln > 100:
-                    ___ln += " do not turn off your computer."
+                    __msg += " do not turn off your computer."
                 
                 logger.log(__msg,section="EntitySaveMechanism",name="success")
             except Exception as _x:
@@ -168,9 +99,10 @@ class BaseExtractor:
                 try:
                     logger.log(f"Saved entity {str(unsaved_entity.id)} 👍",section="EntitySaveMechanism",name="success")
                 except Exception as _x:
+                    print(_x)
                     pass
-        
-        for MOVE_ENTITY in return_entities:
+
+        for MOVE_ENTITY in return_entities:        
             if MOVE_ENTITY.self_name == "entity" and MOVE_ENTITY.file != None:
                 MOVE_ENTITY.file.moveTempDir()
     
@@ -212,25 +144,11 @@ class BaseExtractor:
             #    ENTITY.file.moveTempDir()
 
         return RETURN_ENTITIES
-            
-    def describe(self):
-        return {
-            "id": self.name,
-            "category": self.category,
-            "hidden": getattr(self, "hidden", False),
-            "params": getattr(self, "params", {})
-        }
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "none", "data": {
             "source": None
         }}
-
-    def allocateTemp(self):
-        _dir = storage.makeTemporaryCollectionDir(self.temp_dir_prefix)
-        self.temp_dirs.append(_dir)
-
-        return _dir
 
     async def execute(self, args):
         EXTRACTOR_RESULTS = None

@@ -153,14 +153,25 @@ class VkSection(VkTemplate):
             case "album":
                 __method = "photos.get"
                 __spl = item_id_collection.split("_")
+                __owner_id = __spl[0]
+                __item_id =  __spl[1]
+
+                match __item_id:
+                    case "0":
+                        __item_id = "wall"
+                    case "00":
+                        __item_id = "profile"
+                    case "000":
+                        __item_id = "saved"
+                
                 __pass_params = {
-                    "owner_id": __spl[0],
-                    "album_id": __spl[1],
+                    "owner_id": __owner_id,
+                    "album_id": __item_id,
                     "rev": int(self.passed_params.get("rev")), 
                     "extended": 1,
                     "photo_sizes": 1,
                 }
-                __count_call = await __vkapi.call(__method, {"owner_id": __spl[0], "album_id": __spl[1], "count": 1})
+                __count_call = await __vkapi.call(__method, {"owner_id": __owner_id, "album_id": __item_id, "count": 1})
                 __total_count = __count_call.get("count")
                 __extractor = VkPhoto()
                 

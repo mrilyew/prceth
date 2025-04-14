@@ -65,13 +65,10 @@ class VkPhoto(VkTemplate):
                     PHOTO_URL = photo.get("url")
                 else:
                     try:
-                        __photo_size = next((d for d in photo.get("sizes") if d.get("type") == "w"), None)
-                        PHOTO_URL = __photo_size.get("url")
-                    except Exception as ___e:
-                        logger.logException(___e, section="Vk")
-
                         __photo_sizes = sorted(photo.get("sizes"), key=lambda x: (x['width'] is None, x['width']))
                         PHOTO_URL = __photo_sizes[0].get("url")
+                    except Exception as ___e:
+                        logger.logException(___e, section="Vk")
             
             if self.passed_params.get("download_file") == True:
                 __FILE = None

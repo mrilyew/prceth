@@ -295,8 +295,9 @@ class Api():
             for _ENTITY in ENTITY.getLinkedEntities():
                 RETURN_ENTITIES.append(_ENTITY)
         
+        await EXTRACTOR_INSTANCE.postRun(return_entities=RETURN_ENTITIES)
+
         if EXTRACTOR_RESULTS.get("collection") != None:
-            RETURN_ENTITIES = []
             col = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
             for i_entity in EXTRACTOR_RESULTS.get("entities"):
                 try:
@@ -304,8 +305,8 @@ class Api():
                 except:
                     pass
 
-            RETURN_ENTITIES.append(col)
-
+            #RETURN_ENTITIES.append(col)
+                
         if collection_id != None:
             POST_COLLECTION = Collection.get(collection_id)
             if POST_COLLECTION == None:
@@ -317,7 +318,6 @@ class Api():
                     except:
                         pass
 
-        await EXTRACTOR_INSTANCE.postRun(return_entities=RETURN_ENTITIES)
         if __export_folder != None:
             if col != None:
                 __act = (ActsRepository().getByName("Export.CollectionToFS"))()

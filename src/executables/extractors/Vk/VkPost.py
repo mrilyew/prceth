@@ -94,13 +94,16 @@ class VkPost(VkTemplate):
         final_entities = []
         for post in __POST_ITEMS:
             post["site"] = self.passed_params.get("vk_path")
+            post["relative_attachments"] = {}
+            post["relative_copy_history"] = {}
+
             ITEM_ID = f"{post.get("owner_id")}_{post.get("id")}"
 
             post.pop("track_code", None)
             post.pop("hash", None)
 
             logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
-
+            
             __linked_files = []
             for key, attachment in enumerate(post.get("attachments")):
                 try:
@@ -128,7 +131,7 @@ class VkPost(VkTemplate):
                         __attachment_class_entity = __attachment_class_unknown_entities.get("entities")[0]
 
                         __linked_files.append(__attachment_class_entity)
-                        post["attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_entity.id}"
+                        post["relative_attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_entity.id}"
                     else:
                         ATTACHMENT_ID = f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}"
                         logger.log(message=f"Recieved attachment {str(__attachment_type)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
@@ -145,7 +148,7 @@ class VkPost(VkTemplate):
                         },args=args)
 
                         __linked_files.append(__attachment_class_return[0])
-                        post["attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_return[0].id}"
+                        post["relative_attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_return[0].id}"
                 except ModuleNotFoundError:
                     pass
                 except Exception as ___e___:
@@ -174,7 +177,7 @@ class VkPost(VkTemplate):
                         },args=args)
 
                         __linked_files.append(__vk_post_entity[0])
-                        post["copy_history"][key] = f"__lcms|entity_{__vk_post_entity[0].id}"
+                        post["relative_copy_history"][key] = f"__lcms|entity_{__vk_post_entity[0].id}"
                     except ModuleNotFoundError:
                         pass
                     except Exception as ___e___:

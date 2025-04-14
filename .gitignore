@@ -14,7 +14,7 @@ src/storage/dbs/*
 !src/storage/dbs/.gitkeep
 src/storage/tmp/files/*
 src/storage/exports/*
-src/storage/settings/config.json
+src/storage/settings/*
 !src/storage/tmp/files/.gitkeep
 src/storage/logs/*.log
 src/executables/extractors/Custom/*

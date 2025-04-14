@@ -1,4 +1,4 @@
-from resources.Globals import config, VkApi, logger, consts, math, asyncio
+from resources.Globals import os, VkApi, logger, consts, Path, download_manager
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from executables.extractors.Vk.VkPhoto import VkPhoto
 from resources.Exceptions import NotFoundException
@@ -14,6 +14,11 @@ class VkIdentity(VkTemplate):
             "type": "string",
         }
         params["download_avatar"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True,
+        }
+        params["download_cover"] = {
             "desc_key": "-",
             "type": "bool",
             "default": True,
@@ -58,36 +63,106 @@ class VkIdentity(VkTemplate):
             __users_response = self.passed_params.get("__json_info").get("users", [])
             __groups_response = self.passed_params.get("__json_info").get("groups", [])
         
+        async def __download_avatar(json):
+            TEMP_DIR = self.allocateTemp()
+            ORIGINAL_NAME = "avatar.jpg"
+            SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
+
+            URL = json.get("photo_max")
+
+            await download_manager.addDownload(dir=SAVE_PATH,end=URL)
+            if URL == None:
+                raise NotFoundException("ava not found")
+            
+            __file = self._fileFromJson({
+                "extension": "jpg",
+                "upload_name": ORIGINAL_NAME,
+                "filesize": SAVE_PATH.stat().st_size,
+            }, TEMP_DIR)
+
+            return __file
+                
+        async def __download_cover(json):
+            TEMP_DIR = self.allocateTemp()
+            ORIGINAL_NAME = "cover.jpg"
+            SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
+
+            cover = json.get("cover")
+            if cover == None or len(cover.get("images")) < 1:
+                raise NotFoundException("cover not found")
+            
+            images = cover.get("images")
+            images_ = sorted(images, key=lambda x: (x['width'] is None, x['width']))
+            image = images_[0]
+            
+            await download_manager.addDownload(dir=SAVE_PATH,end=image.get("url"))
+
+            __file = self._fileFromJson({
+                "extension": "jpg",
+                "upload_name": ORIGINAL_NAME,
+                "filesize": SAVE_PATH.stat().st_size,
+            }, TEMP_DIR)
+
+            return __file
+        
         if __users_response != None:
             for user in __users_response:
+                user["vkapi_type"] = "user"
                 users.append(user)
         
         if type(__groups_response) != "dict":
             for club in __groups_response:
+                club["vkapi_type"] = "club"
                 groups.append(club)
         else:
             for club in __groups_response.get("groups"):
+                club["vkapi_type"] = "club"
                 groups.append(club)
         
         entities = []
-        for user in users:
-            NAME = f"@vk_user: {user.get("first_name")} {user.get("last_name")}"
-            ENTITY = self._entityFromJson({
-                "source": f"vk:user{user.get("id")}",
-                "internal_content": user,
-                "suggested_name": NAME,
-                "declared_created_at": user.get("reg_date", None),
-            })
-            entities.append(ENTITY)
-        
-        for group in groups:
-            # TODO: get history
-            NAME = f"@vk_club: {group.get("name")}"
+        for identity in groups + users:
+            name = ""
+            source = ""
+            reg_date = None
+            linked_files = []
 
+            if identity.get("vkapi_type") == "user":
+                name = f"@vk_user: {user.get("first_name")} {user.get("last_name")}"
+                source = f"vk:id{identity.get("id")}"
+                reg_date = identity.get("reg_date", None)
+            else:
+                name = f"@vk_club: {user.get("name")}"
+                source = f"vk:group{identity.get("id")}"
+            
+            if self.passed_params.get("download_avatar") == True:
+                try:
+                    __file = await __download_avatar(identity)
+                    __file.moveTempDir()
+                    identity["relative_photo_max_orig"] = f"__lcms|file_{__file.id}"
+
+                    linked_files.append(__file)
+                except Exception as _e:
+                    logger.logException(_e,section="Vk",noConsole=False)
+                            
+            if self.passed_params.get("download_cover") == True:
+                try:
+                    __file = await __download_cover(identity)
+                    __file.moveTempDir()
+                    identity["relative_cover"] = f"__lcms|file_{__file.id}"
+                    
+                    linked_files.append(__file)
+                except NotFoundException:
+                    pass
+                except Exception as _e:
+                    logger.logException(_e,section="Vk",noConsole=False)
+            
             ENTITY = self._entityFromJson({
-                "source": f"vk:group{group.get("id")}",
-                "internal_content": group,
-                "suggested_name": NAME,
+                "source": source,
+                "internal_content": user,
+                "suggested_name": name,
+                "internal_content": identity,
+                "declared_created_at": reg_date,
+                "linked_files": linked_files,
             })
             entities.append(ENTITY)
         
