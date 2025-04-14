@@ -18,7 +18,7 @@ class VkSection(VkTemplate):
         params["section"] = {
             "desc_key": "-",
             "type": "array",
-            "values": ["photos", "wall", "album"],
+            "values": ["photos", "wall", "album", "board"],
             "assertion": {
                 "assert_not_null": True,
             },
@@ -77,6 +77,11 @@ class VkSection(VkTemplate):
             "desc_key": "-",
             "type": "bool",
             "default": False,
+        }
+        params["rev"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True
         }
 
         return params
@@ -149,16 +154,13 @@ class VkSection(VkTemplate):
                 __method = "photos.get"
                 __spl = item_id_collection.split("_")
                 __pass_params = {
-                    "owner_id": __spl[0], 
-                    "album_id": __spl[1], 
+                    "owner_id": __spl[0],
+                    "album_id": __spl[1],
                     "rev": int(self.passed_params.get("rev")), 
                     "extended": 1,
                     "photo_sizes": 1,
                 }
-                __pass_params_temp = __pass_params.update({
-                    "count": 1
-                })
-                __count_call = await __vkapi.call(__method, __pass_params_temp)
+                __count_call = await __vkapi.call(__method, {"owner_id": __spl[0], "album_id": __spl[1], "count": 1})
                 __total_count = __count_call.get("count")
                 __extractor = VkPhoto()
                 

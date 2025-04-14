@@ -5,7 +5,7 @@ DefaultSettings = {
     },
     "ui.name": {
         "type": "string",
-        "default_value": "Inmaigat",
+        "default_value": "Difault",
     },
     "web.useragent": {
         "type": "string",

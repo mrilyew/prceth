@@ -1,4 +1,4 @@
-## Inmaigart
+## Difault
 
 Introvertical metaweb extensible local content saver/indexator/aggregator.
 
@@ -10,26 +10,20 @@ App for creating virtual content collections. In fact it is an pre-bourbon of di
 Tasks:
 
 - [ ] сохранять метаданные из файла
-- [ ] метод logger.get
 - [ ] Получение дополнительных метаданных из медиафайлов
-- [ ] Экспорт в директорию (с разделением на папки)
-- [ ] Документация
 - [ ] Проверка реальных ссылок для vk
-- [ ] Web.crawler: переписать работу как на archive.is (без скриптов)
+- [ ] Web.crawler: переписать работу как на archive.is (убирать js)
 - [ ] Перерисовать схему
 - [ ] Web.crawler: Возможность для определённого сайта запускать определённые инструкции
-- [ ] vk extended получение автора
 - [ ] Vk.video
 - [ ] Vk.audio
 - [ ] Vk.poll скачивание фона
 - [ ] Vk.post экспорт комментов
 - [ ] Service подписка на стену вк
 - [ ] Service RSS подписка
-- [ ] Переписать Services на APScheduler
+- [ ] Переписать Services с сохранением в db; запускать отдельным процессом
 - [ ] система закладок
 - [ ] Паралелльная загрузка
-- [ ] в linked_files добавить разделение file_x,entity_x
-- [ ] сохранение автора в посте
 - [ ] vk post экспорт всех комментариев
 - [ ] entities.createFromScratch
 - [ ] entities.edit

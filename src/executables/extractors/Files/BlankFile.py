@@ -43,7 +43,7 @@ class BlankFile(BaseExtractor):
         ENTITY = self._entityFromJson({
             "source": "api:blank",
             "suggested_name": "blank.txt",
-            "indexation_content": {
+            "internal_content": {
                 "format": str(self.passed_params.get("extension")),
                 "text": utils.proc_strtr(self.passed_params.get("text"), 100),
             },
