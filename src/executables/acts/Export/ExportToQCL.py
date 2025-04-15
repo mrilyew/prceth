@@ -4,7 +4,7 @@ from peewee import Model, SqliteDatabase
 from db.Entity import Entity
 from db.Collection import Collection
 
-class ExportToQCL(BaseAct):
+class ExportToDC(BaseAct):
     name = 'NOT WORKING BRO'
     category = 'export'
     accepts = 'collection'

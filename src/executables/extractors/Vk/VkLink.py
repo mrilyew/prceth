@@ -23,7 +23,6 @@ class VkLink(VkTemplate):
         }
 
         return params
-    
         
     async def run(self, args):
         __json = self.passed_params.get("__json_info")
@@ -36,6 +35,7 @@ class VkLink(VkTemplate):
 
         ENTITY = self._entityFromJson({
             "internal_content": __json,
+            "source": f"url:{__json.get("url")}",
             "unlisted": self.passed_params.get("unlisted") == 1,
             "suggested_name": f"Vk Attached link",
         })

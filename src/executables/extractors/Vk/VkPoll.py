@@ -6,6 +6,7 @@ from resources.Exceptions import NotFoundException
 class VkPoll(VkTemplate):
     name = 'VkPoll'
     category = 'Vk'
+    hidden = True
 
     def declare():
         params = {}

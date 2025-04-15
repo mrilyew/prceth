@@ -179,4 +179,3 @@ class VkAlbum(VkTemplate):
                 return {
                     "entities": [ALBUM_ENTITY]
                 }
-        

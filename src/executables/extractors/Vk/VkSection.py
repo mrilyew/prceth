@@ -1,7 +1,5 @@
 from resources.Globals import config, VkApi, logger, utils, math, asyncio
 from executables.extractors.Vk.VkTemplate import VkTemplate
-from executables.extractors.Vk.VkPhoto import VkPhoto
-from executables.extractors.Vk.VkPost import VkPost
 from resources.Exceptions import InvalidPassedParam
 
 class VkSection(VkTemplate):
@@ -11,14 +9,14 @@ class VkSection(VkTemplate):
 
     def declare():
         params = {}
-        params["item_id"] = {
-            "desc_key": "-",
+        params["item_id"] = { # For fave — string name of section
+            "desc_key": "-", 
             "type": "string",
         }
         params["section"] = {
             "desc_key": "-",
             "type": "array",
-            "values": ["photos", "wall", "album", "board"],
+            "values": ["photos", "wall", "album", "board", "fave"],
             "assertion": {
                 "assert_not_null": True,
             },
@@ -53,35 +51,105 @@ class VkSection(VkTemplate):
             "type": "string",
             "default": None,
             "assertion": {
-                "only_when": {
-                    "section": "wall"
-                }
+                "only_when": [
+                    {"section": ["wall"]}
+                ]
             }
         }
         params["download_attachments_json_list"] = {
             "desc_key": "-",
             "type": "string",
             "default": "*",
+            "assertion": {
+                "only_when": [
+                    {"section": ["wall"]},
+                    {
+                        "section": ["fave"],
+                        "item_id": "post"
+                    }
+                ]
+            }
         }
         params["download_attachments_file_list"] = {
             "desc_key": "-",
             "type": "string",
             "default": "photo",
+            "assertion": {
+                "only_when": [
+                    {"section": ["wall"]},
+                    {
+                        "section": ["fave"],
+                        "item_id": "post"
+                    }
+                ]
+            }
         }
         params["download_reposts"] = {
             "desc_key": "-",
             "type": "bool",
             "default": True,
+            "assertion": {
+                "only_when": [
+                    {"section": ["wall"]},
+                    {
+                        "section": ["fave"],
+                        "item_id": "post"
+                    }
+                ]
+            }
         }
         params["download_comments"] = {
             "desc_key": "-",
             "type": "bool",
             "default": False,
+            "assertion": {
+                "only_when": [
+                    {"section": ["wall"]},
+                    {
+                        "section": ["fave"],
+                        "item_id": "post"
+                    }
+                ]
+            }
         }
         params["rev"] = {
             "desc_key": "-",
             "type": "bool",
-            "default": True
+            "default": True,
+            "assertion": {
+                "only_when": [
+                    {"section": ["album"]}
+                ]
+            }
+        }
+        params["tag_id"] = {
+            "desc_key": "-",
+            "type": "int",
+            "assertion": {
+                "only_when": [
+                    {"section": ["fave"]}
+                ]
+            }
+        }
+        params["download_file"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True,
+            "assertion": {
+                "only_when": [
+                    {"section": ["fave"]}
+                ]
+            }
+        }
+        params["download_file"] = {
+            "desc_key": "-",
+            "type": "bool",
+            "default": True,
+            "assertion": {
+                "only_when": [
+                    {"section": ["fave"]}
+                ]
+            }
         }
 
         return params
@@ -99,12 +167,14 @@ class VkSection(VkTemplate):
         __has_profile = False
         __pass_params = {}
         __extractor = None
+        __extract_type = False
+        __count_call = None
         __extractor_params = {
             "unlisted": 1,
             "access_token": self.passed_params.get("access_token"),
             "api_url": self.passed_params.get("api_url"),
             "vk_path": self.passed_params.get("vk_path"),
-            "download_file": 1,
+            "download_file": self.passed_params.get("download_file"),
         }
 
         __item_ids = self.passed_params.get("item_id")
@@ -114,13 +184,19 @@ class VkSection(VkTemplate):
             "suggested_name": f"Vk Collection {item_id_collection}",
         }
 
+        from executables.extractors.Vk.VkPhoto import VkPhoto
+        from executables.extractors.Vk.VkPost import VkPost
+        from executables.extractors.Vk.VkIdentity import VkIdentity
+        from executables.extractors.Vk.VkVideo import VkVideo
+        from executables.extractors.Vk.VkArticle import VkArticle
+        from executables.extractors.Vk.VkLink import VkLink
+
         # Making first call
         match(self.passed_params.get("section")):
             case "photos":
                 __method = "photos.getAll"
                 __count_call = await __vkapi.call(__method, {"owner_id": item_id_collection, "count": 1})
-                __total_count = __count_call.get("count")
-                __extractor = VkPhoto()
+                __extractor = VkPhoto
                 __pass_params = {
                     "owner_id": item_id_collection, 
                     "extended": 1,
@@ -135,8 +211,7 @@ class VkSection(VkTemplate):
 
                 __has_profile = True
                 __count_call = await __vkapi.call(__method, __temp_final_params)
-                __total_count = __count_call.get("count")
-                __extractor = VkPost()
+                __extractor = VkPost
                 __extractor_params["download_attachments_json_list"] = self.passed_params.get("download_attachments_json_list")
                 __extractor_params["download_attachments_file_list"] = self.passed_params.get("download_attachments_file_list")
                 __extractor_params["download_reposts"] = self.passed_params.get("download_reposts")
@@ -158,9 +233,9 @@ class VkSection(VkTemplate):
 
                 match __item_id:
                     case "0":
-                        __item_id = "wall"
-                    case "00":
                         __item_id = "profile"
+                    case "00":
+                        __item_id = "wall"
                     case "000":
                         __item_id = "saved"
                 
@@ -172,14 +247,58 @@ class VkSection(VkTemplate):
                     "photo_sizes": 1,
                 }
                 __count_call = await __vkapi.call(__method, {"owner_id": __owner_id, "album_id": __item_id, "count": 1})
-                __total_count = __count_call.get("count")
-                __extractor = VkPhoto()
+                __extractor = VkPhoto
                 
                 __collection["suggested_name"] = f"Vk Album {item_id_collection}"
+            case "fave":
+                min_group_fields = "activity,photo_100,photo_200,photo_50,is_member,is_closed,description,members_count,is_subscribed"
+                min_user_fields = "photo_50,online,photo_max,last_seen"
+                __extract_type = True
+
+                match self.passed_params.get("item_id"):
+                    case "users" | "groups" | "hints":
+                        __method = "fave.getPages"
+                        __pass_params = {
+                            "type": self.passed_params.get("item_id"),
+                        }
+                        __extractor = VkIdentity
+                    case "post" | "video" | "article" | "link":
+                        __method = "fave.get"
+                        __pass_params = {
+                            "item_type": self.passed_params.get("item_id"),
+                            "extended": 1,
+                        }
+
+                        match self.passed_params.get("item_id"):
+                            case "post":
+                                __extractor = VkPost
+                                __extractor_params["download_attachments_json_list"] = self.passed_params.get("download_attachments_json_list")
+                                __extractor_params["download_attachments_file_list"] = self.passed_params.get("download_attachments_file_list")
+                                __extractor_params["download_reposts"] = self.passed_params.get("download_reposts")
+                                __extractor_params["download_comments"] = False
+                            case "video":
+                                __extractor = VkVideo
+                            case "article":
+                                __extractor = VkArticle
+                            case "link":
+                                __extractor = VkLink
+                
+                __extractor_params["download_avatar"] = self.passed_params.get("download_file")
+                __extractor_params["download_cover"] = self.passed_params.get("download_cover")
+
+                _tmp_call = {"item_type": self.passed_params.get("item_id"), "count": 1}
+                __pass_params["fields"] = min_group_fields + "," + min_user_fields
+                if self.passed_params.get("tag_id") != None:
+                    __pass_params["tag_id"] = self.passed_params.get("tag_id")
+                    _tmp_call["tag_id"] = self.passed_params.get("tag_id")
+                
+                __count_call = await __vkapi.call(__method, _tmp_call)
             case _:
                 raise InvalidPassedParam("invalid section")
         
+        __total_count = __count_call.get("count")
         __times = math.ceil(__total_count / __per_page)
+        __extractor = __extractor(write_mode=self.write_mode)
 
         logger.log(message=f"Total {__total_count} items; will be {__times} calls",section="VkSection",name="message")
         for time in range(__start_range, __times):
@@ -187,13 +306,18 @@ class VkSection(VkTemplate):
             if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
                 break
 
-            logger.log(message=f"{time + 1}/{__times} time of photos recieving; {offset} offset",section="VkCollection",name="message")
+            logger.log(message=f"{time + 1}/{__times} time of items recieving; {offset} offset",section="VkCollection",name="message")
            
             __pass_params["count"] = __per_page
             __pass_params["offset"] = offset
             __time_call = await __vkapi.call(__method, __pass_params)
+            
+            __items = __time_call.get(__dict_name)
+            '''if len(__items) < 1:
+                logger.log(message=f"Time {time + 1}/{__times}: no items. Probaly broken count. Exiting...",section="VkCollection",name="message")
+                break'''
 
-            for item in __time_call.get(__dict_name):
+            for item in __items:
                 if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
                     break
                 
@@ -205,6 +329,12 @@ class VkSection(VkTemplate):
                 if __has_profile == True:
                     __extractor_params["__json_profiles"] = __time_call.get("profiles")
                     __extractor_params["__json_groups"] = __time_call.get("groups")
+
+                # Я думаю, важен не сам факт сохранения всей информации о закладке,
+                # а сам её контент. Так что будут отброшены лишние данные
+                if __extract_type == True:
+                    __type = item.get("type")
+                    __extractor_params["__json_info"] = item.get(__type)
                 
                 __extractor.setArgs(__extractor_params)
 

@@ -6,6 +6,7 @@ from resources.Exceptions import NotFoundException
 class VkNote(VkTemplate):
     name = 'VkNote'
     category = 'Vk'
+    hidden = True
 
     def declare():
         params = {}

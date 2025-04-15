@@ -76,7 +76,7 @@ class VkVideo(VkTemplate):
                     if video.get("files") != None:
                         VIDEO_URL = video.get("files").get("mp4_480")
                         # TODO hls download
-                        if ".m3u8" not in VIDEO_URL:
+                        if "srcIp=" not in VIDEO_URL:
                             logger.log(message=f"Video {VIDEO_ID} contains direct mp4; downloading",section="VkAttachments",name="message")
                             HTTP_REQUEST = await download_manager.addDownload(end=VIDEO_URL,dir=SAVE_PATH)
                             FILE = self._fileFromJson({

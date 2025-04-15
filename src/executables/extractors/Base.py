@@ -6,7 +6,7 @@ class BaseExtractor(Executable):
     name = 'base'
     unsaved_entities = []
 
-    def __init__(self, temp_dir=None, del_dir_on_fail=True,need_preview=True,write_mode=1):
+    def __init__(self, temp_dir=None, del_dir_on_fail=True, need_preview=True, write_mode=2):
         self.passed_params = {}
         #if temp_dir != None:
             #self.temp_dir_prefix = temp_dir
@@ -15,8 +15,7 @@ class BaseExtractor(Executable):
         self.temp_dirs = []
         self.del_dir_on_fail = del_dir_on_fail
         self.need_preview = need_preview
-        self.write_mode = write_mode
-
+        self.write_mode = int(write_mode)
 
     def declare():
         params = {}
@@ -46,7 +45,10 @@ class BaseExtractor(Executable):
     def onFail(self):
         if self.del_dir_on_fail == True:
             for t_dir in self.temp_dirs:
-                file_manager.rmdir(t_dir)
+                try:
+                    file_manager.rmdir(t_dir)
+                except:
+                    pass
     
     def _fileFromJson(self, json_data, _temp_dir = None):
         from db.File import File

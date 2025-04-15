@@ -5,6 +5,7 @@ class Executable:
     name = 'base'
     category = 'template'
     passed_params = {}
+    temp_dir_prefix = None
     params = {}
     temp_dirs = []
     manual_params = False

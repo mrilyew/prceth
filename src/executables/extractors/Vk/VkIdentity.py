@@ -40,7 +40,7 @@ class VkIdentity(VkTemplate):
         IDENTITIES_IDS = identities_id_string.split(",")
         users   = []
         groups  = []
-        __users_response, __groups_response = [{}, {}]
+        __users_response, __groups_response = [[], []]
 
         if self.passed_params.get("__json_info") == None:
             user_ids = []
@@ -60,8 +60,19 @@ class VkIdentity(VkTemplate):
             if len(group_ids) > 0:
                 __groups_response = await __vkapi.call("groups.getById", {"group_ids": ",".join(str(x) for x in group_ids), "fields": ",".join(consts["vk.group_fields"])})
         else:
-            __users_response = self.passed_params.get("__json_info").get("users", [])
-            __groups_response = self.passed_params.get("__json_info").get("groups", [])
+            json_inf = self.passed_params.get("__json_info")
+        
+            if type(json_inf) == dict:
+                if json_inf.get("first_name") != None:
+                    __users_response.append(json_inf)
+                else:
+                    __groups_response.append(json_inf)
+            elif type(json_inf) == list:
+                for __item in json_inf:
+                    if __item.get("first_name") != None:
+                        __users_response.append(__item)
+                    else:
+                        __groups_response.append(__item)
         
         async def __download_avatar(json):
             TEMP_DIR = self.allocateTemp()
@@ -127,11 +138,11 @@ class VkIdentity(VkTemplate):
             linked_files = []
 
             if identity.get("vkapi_type") == "user":
-                name = f"@vk_user: {user.get("first_name")} {user.get("last_name")}"
+                name = f"@vk_user: {identity.get("first_name")} {identity.get("last_name")}"
                 source = f"vk:id{identity.get("id")}"
                 reg_date = identity.get("reg_date", None)
             else:
-                name = f"@vk_club: {user.get("name")}"
+                name = f"@vk_club: {identity.get("name")}"
                 source = f"vk:group{identity.get("id")}"
             
             if self.passed_params.get("download_avatar") == True:
@@ -158,7 +169,6 @@ class VkIdentity(VkTemplate):
             
             ENTITY = self._entityFromJson({
                 "source": source,
-                "internal_content": user,
                 "suggested_name": name,
                 "internal_content": identity,
                 "declared_created_at": reg_date,

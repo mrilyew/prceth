@@ -14,7 +14,7 @@ class Storage:
         rand = utils.getRandomHash(64)
         path = Path(os.path.join(temp_dir_prefix, str(rand)))
         path.mkdir(exist_ok=True)
-
+        
         return str(path)
 
     def makeHashDir(self, hash, only_return = False):

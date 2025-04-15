@@ -8,28 +8,28 @@ class Entity(BaseModel):
     __cachedLinkedEntities = None
 
     id = AutoField() # Absolute id
-    file_id = IntegerField(null=True) # File id
-    linked_files = TextField(null=True) # Files list
-    # hash = TextField(null=True) # Entity hash
+    internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
-    indexation_content_string = TextField(index=True,null=True) # Content that will be used for search. Set by extractor. Duplicates "indexation_content" but without keys.
-    # indexation_content = TextField(null=True) # TODO remove Additional info in json (ex. video name)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
-    extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
     tags = TextField(index=True,null=True) # csv tags
+    file_id = IntegerField(null=True) # File id
+    linked_files = TextField(null=True) # Files list
+    # hash = TextField(null=True) # Entity hash
+    # indexation_content = TextField(null=True) # TODO remove Additional info in json (ex. video name)
+    extractor_name = TextField(null=True,default='base') # Extractor that was used for entity
     preview = TextField(null=True) # Preview in json format
     # flags = IntegerField(default=0) # Flags.
     # type = IntegerField(default=0) # 0 - main is the first file from dir
-                                # 1 - main info is from "type_sub" (jsonистый объект)
-    internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
+                                    # 1 - main info is from "type_sub" (jsonистый объект)
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0) # Is softly deleted
     author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
     declared_created_at = TimestampField(default=time.time())
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True)
+    indexation_content_string = TextField(index=True,null=True) # Content that will be used for search. Set by extractor. Duplicates "indexation_content" but without keys.
     
     @property
     def orig_source(self):

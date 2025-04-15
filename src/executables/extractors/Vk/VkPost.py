@@ -105,7 +105,7 @@ class VkPost(VkTemplate):
             logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
             
             __linked_files = []
-            for key, attachment in enumerate(post.get("attachments")):
+            for key, attachment in enumerate(post.get("attachments", [])):
                 try:
                     __attachment_type = attachment.get("type")
                     __attachment_object = attachment.get(__attachment_type)
