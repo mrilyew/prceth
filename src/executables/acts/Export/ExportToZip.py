@@ -4,8 +4,8 @@ from peewee import Model, SqliteDatabase
 from db.Entity import Entity
 from db.Collection import Collection
 
-class ExportToDC(BaseAct):
-    name = 'NOT WORKING BRO'
+class ExportToZip(BaseAct):
+    name = 'ExportToZip'
     category = 'export'
     accepts = 'collection'
 
@@ -15,7 +15,7 @@ class ExportToDC(BaseAct):
         __EXPORTS_PATH = os.path.join(consts["tmp"], "exports")
         __SAVE_PATH = args.get("save_path", __EXPORTS_PATH)
         __FILE_NAME = f"col{i.id}_{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}"
-        __FILE_EXT_NAME = __FILE_NAME + ".qcl"
+        __FILE_EXT_NAME = __FILE_NAME + ".zips"
         __SAVE_DIR_PATH = os.path.join(__EXPORTS_PATH, __FILE_NAME)
         __SAVE_STORAGE_PATH = os.path.join(__SAVE_DIR_PATH, "entities")
         __SAVE_FILE_PATH = os.path.join(__SAVE_PATH, __FILE_EXT_NAME)
@@ -53,20 +53,20 @@ class ExportToDC(BaseAct):
             __DB.connect()
             __DB.create_tables([Entity], safe=True)
 
-            logger.log(message="Created DB and entities table",section="ExportToQCL")
+            logger.log(message="Created DB and entities table",section="Export")
 
             for ITEM in __ITEMS:
                 ___ID = ITEM.id
                 ___TYPE = ITEM.type
 
-                logger.log(message=f"Inserting Entity №{___ID}",section="ExportToQCL")
+                logger.log(message=f"Inserting Entity №{___ID}",section="Export")
                 
                 __data = ITEM.__dict__["__data__"]
                 __data.pop('id')
                 ITEM.insert(__data).execute()
                 
                 if ___TYPE != 1:
-                    logger.log(message=f"Copying Entity №{___ID} files",section="ExportToQCL")
+                    logger.log(message=f"Copying Entity №{___ID} files",section="Export")
 
                     HASH = ITEM.hash
                     __hash_path = os.path.join(__SAVE_STORAGE_PATH, HASH)
@@ -75,7 +75,7 @@ class ExportToDC(BaseAct):
                     file_manager.copytree(src=ITEM.getDirPath(),dst=__hash_path)
 
         __DB.close()
-        logger.log(message="Making \"INFO\" file",section="ExportToQCL")
+        logger.log(message="Making \"INFO\" file",section="Export")
         __RES__ = {
             "name": i.name,
             "description": i.description,
@@ -90,7 +90,7 @@ class ExportToDC(BaseAct):
         json.dump(__RES__, __INFO_FILE)
         __INFO_FILE.close()
 
-        logger.log(message="Copying table dir to zip",section="ExportToQCL")
+        logger.log(message="Copying table dir to zip",section="Export")
 
         zf = zipfile.ZipFile(__SAVE_FILE_PATH, "w", compression=COMPRESSION)
         with zf as zip_file:
@@ -99,7 +99,7 @@ class ExportToDC(BaseAct):
         
         zf.close()
 
-        logger.log(message="OK, removing original directory.",section="ExportToQCL")
+        logger.log(message="OK, removing original directory.",section="Export")
         file_manager.rmdir(str_path=__SAVE_DIR_PATH)
 
         return {

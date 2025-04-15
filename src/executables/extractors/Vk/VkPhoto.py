@@ -66,7 +66,12 @@ class VkPhoto(VkTemplate):
                 else:
                     try:
                         __photo_sizes = sorted(photo.get("sizes"), key=lambda x: (x['width'] is None, x['width']))
-                        PHOTO_URL = __photo_sizes[0].get("url")
+                        __optimal_size = __photo_sizes[0]
+                        # For old photos without sizes.
+                        if __optimal_size.get("height") == 0:
+                            __optimal_size = photo.get("sizes")[-1]
+                        
+                        PHOTO_URL = __optimal_size.get("url")
                     except Exception as ___e:
                         logger.logException(___e, section="Vk")
             

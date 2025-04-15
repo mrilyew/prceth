@@ -58,7 +58,7 @@ class WebPage(BaseExtractor):
             "extension": "html",
             "upload_name": ORIGINAL_NAME,
             "filesize": len(__html),
-        })
+        }, TEMP_DIR)
         ENTITY = self._entityFromJson({
             "source": "url:" + SITE_URL,
             "internal_content": output_metadata,
@@ -72,9 +72,7 @@ class WebPage(BaseExtractor):
             ],
         }
     
-    async def postRun(self):
-        await super().postRun()
-
+    def __del__(self):
         if getattr(self, "crawler", None):
             del self.crawler
     

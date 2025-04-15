@@ -66,7 +66,7 @@ class File(BaseModel):
             FULL_HASH_DIRECTORY = Path(storage.makeHashDir(self.hash, only_return=True))
             Path(TMP_DIR).rename(FULL_HASH_DIRECTORY)
 
-    def saveToDir(self, save_dir, move_type = 1, append_entity_id_to_start = True, use_upload_name=True):
+    def saveToDir(self, save_dir, move_type = 1, prefix = ""):
         from resources.Globals import storage
 
         CURRENT_FILE_PATH = Path(self.getDirPath())
@@ -74,8 +74,7 @@ class File(BaseModel):
         OUTPUT_FILE_ENTITY_PATH = Path(os.path.join(OUTPUT_FILE_PATH, str(self.id)))
 
         NEW_MAIN_FILE_NAME = str(self.upload_name)
-        if append_entity_id_to_start == True:
-            NEW_MAIN_FILE_NAME = str(self.id) + "_" + NEW_MAIN_FILE_NAME
+        NEW_MAIN_FILE_NAME = prefix + NEW_MAIN_FILE_NAME
         
         NEW_MAIN_FILE_NAME = NEW_MAIN_FILE_NAME.replace("thumb", "th_umb") #БЫДЛОКОД
         if move_type == 0: # Just rename

@@ -15,7 +15,8 @@ class EntityToFS(BaseAct):
         __export_folder_type = args.get("export_type", "full_stop_one_dir")
         __export_folder = args.get("dir", None)
         __export_save_json_to_dir = int(args.get("export_json", 1)) == 1
-        __append_entity_id_to_start = True
+        __export_prefix = args.get("prefix", "iter")
+        __iter = 1
 
         assert __export_folder != None, "dir not passed"
 
@@ -35,7 +36,7 @@ class EntityToFS(BaseAct):
 
                 for EXP_ENTITY in entities: 
                     if EXP_ENTITY.file != None:
-                        EXP_ENTITY.file.saveToDir(use_upload_name=True,save_dir=__export_folder,move_type=1,append_entity_id_to_start=__append_entity_id_to_start==1)
+                        EXP_ENTITY.file.saveToDir(save_dir=__export_folder,move_type=1)
                 
                     if __export_save_json_to_dir == 1:
                         EXP_ENTITY.saveInfoToJson(dir=__export_folder)
@@ -59,7 +60,14 @@ class EntityToFS(BaseAct):
                     
                     __file = entity.file
                     if __file != None and type(__file) != list:
-                        entity.file.saveToDir(use_upload_name=True,save_dir=entity_dir,move_type=1,append_entity_id_to_start=True)
+                        __prefix = ""
+                        if __export_prefix == "id":
+                            __prefix = f"{__file.id}_"
+                        else:
+                            __prefix = f"{__iter}."
+                        
+                        entity.file.saveToDir(save_dir=entity_dir,move_type=1,prefix=__prefix)
+                        __iter += 1
                     
                     return_entities.append(entity)
                     if len(entity.getLinkedEntities()) > 0:
@@ -82,9 +90,17 @@ class EntityToFS(BaseAct):
                                 pass
 
                             return_entities.append(LINKED_ENTITY)
+                            
                             ___file = LINKED_ENTITY.file
                             if ___file != None and type(___file) != list:
-                                ___file.saveToDir(use_upload_name=True,save_dir=linked_entity_dir,move_type=1,append_entity_id_to_start=True)
+                                __prefix = ""
+                                if __export_prefix == "id":
+                                    __prefix = f"{__file.id}_"
+                                else:
+                                    __prefix = f"{__iter}."
+                                
+                                ___file.saveToDir(save_dir=linked_entity_dir,move_type=1,prefix=__prefix)
+                                __iter += 1
                             if __export_save_json_to_dir:
                                 LINKED_ENTITY.saveInfoToJson(dir=str(linked_entity_dir))
 
