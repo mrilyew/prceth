@@ -16,7 +16,7 @@ class VkSection(VkTemplate):
         params["section"] = {
             "desc_key": "-",
             "type": "array",
-            "values": ["photos", "wall", "album", "board", "fave"],
+            "values": ["photos", "wall", "album", "board", "fave", "post_comments", "video_comments", "board", "photo_comments", "photo_all_comments", "video_comments", "notes_comments"],
             "assertion": {
                 "assert_not_null": True,
             },
@@ -131,6 +131,15 @@ class VkSection(VkTemplate):
                 ]
             }
         }
+        params["comment_id"] = {
+            "desc_key": "-",
+            "type": "int",
+            "assertion": {
+                "only_when": [
+                    {"section": ["post_comments"]}
+                ]
+            }
+        }
         params["download_file"] = {
             "desc_key": "-",
             "type": "bool",
@@ -190,6 +199,7 @@ class VkSection(VkTemplate):
         from executables.extractors.Vk.VkVideo import VkVideo
         from executables.extractors.Vk.VkArticle import VkArticle
         from executables.extractors.Vk.VkLink import VkLink
+        from executables.extractors.Vk.VkComment import VkComment
 
         # Making first call
         match(self.passed_params.get("section")):
@@ -293,6 +303,60 @@ class VkSection(VkTemplate):
                     _tmp_call["tag_id"] = self.passed_params.get("tag_id")
                 
                 __count_call = await __vkapi.call(__method, _tmp_call)
+            case "post_comments" | "board" | "photo_comments" | "photo_all_comments" | "video_comments" | "notes_comments":
+                __spl = item_id_collection.split("_")
+                __owner_id = __spl[0]
+                __item_id =  __spl[1]
+                __suggested_name = ""
+
+                __pass_params = {
+                    "need_likes": 1, 
+                    "sort": "asc",
+                    "extended": 1,
+                    "thread_items_count": self.passed_params.get("thread_items_count", 10),
+                }
+
+                match(self.passed_params.get("section")):
+                    case "post_comments":
+                        __pass_params["owner_id"] = __owner_id
+                        __pass_params["post_id"] = __item_id
+                        __method = "wall.getComments"
+                        __suggested_name = f"Vk Comments from post {item_id_collection}"
+                        if self.passed_params.get("comment_id") != None:
+                            __pass_params["comment_id"] = self.passed_params.get("comment_id")
+                    case "board":
+                        __pass_params["group_id"] = abs(__owner_id)
+                        __pass_params["topic_id"] = __item_id
+                        __method = "board.getComments"
+                        __suggested_name = f"Vk Comments from board {item_id_collection}"
+                    case "notes_comments":
+                        __pass_params["owner_id"] = __owner_id
+                        __pass_params["note_id"] = __item_id
+                        __method = "notes.getComments"
+                        __suggested_name = f"Vk Comments from note {item_id_collection}"
+                    case "photo_all_comments":
+                        __pass_params["owner_id"] = __owner_id
+                        __pass_params["album_id"] = __item_id
+                        __method = "photos.getAllComments"
+                        __suggested_name = f"Vk Comments from album {item_id_collection}"
+                    case "photo_comments":
+                        __pass_params["owner_id"] = __owner_id
+                        __pass_params["photo_id"] = __item_id
+                        __method = "photos.getComments"
+                        __suggested_name = f"Vk Comments from photo {item_id_collection}"
+                    case "video_comments":
+                        __pass_params["owner_id"] = __owner_id
+                        __pass_params["video_id"] = __item_id
+                        __method = "video.getComments"
+                        __suggested_name = f"Vk Comments from video {item_id_collection}"
+                
+                __temp_params = __pass_params
+                __temp_params["count"] = 1
+
+                __count_call = await __vkapi.call(__method, __temp_params)
+                __extractor = VkComment
+                
+                __collection["suggested_name"] = __suggested_name
             case _:
                 raise InvalidPassedParam("invalid section")
         

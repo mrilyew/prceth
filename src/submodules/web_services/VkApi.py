@@ -20,6 +20,8 @@ class VkApi():
             __end_url += f"&{param[0]}={param[1]}"
             if param[0] != "access_token":
                 __save_end_url += f"&{param[0]}={param[1]}"
+            else:
+                __save_end_url += f"&access_token=X"
         
         __response = None
         async with aiohttp.ClientSession() as session:

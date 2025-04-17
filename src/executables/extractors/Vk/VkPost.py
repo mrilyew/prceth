@@ -6,6 +6,7 @@ from resources.Exceptions import NotFoundException
 class VkPost(VkTemplate):
     name = 'VkPost'
     category = 'Vk'
+    vk_type = "post"
 
     def declare():
         params = {}
@@ -102,7 +103,7 @@ class VkPost(VkTemplate):
             post.pop("track_code", None)
             post.pop("hash", None)
 
-            logger.log(message=f"Recieved post {ITEM_ID}",section="VK",name="message")
+            logger.log(message=f"Recieved {self.vk_type} {ITEM_ID}",section="VK",name="message")
             
             __linked_files = []
             for key, attachment in enumerate(post.get("attachments", [])):
@@ -192,7 +193,7 @@ class VkPost(VkTemplate):
 
             ENTITY = self._entityFromJson({
                 "source": "vk:wall"+ITEM_ID,
-                "suggested_name": f"VK Post {str(ITEM_ID)}",
+                "suggested_name": f"VK {self.vk_type.title()} {str(ITEM_ID)}",
                 "internal_content": post,
                 "linked_files": __linked_files,
                 "unlisted": self.passed_params.get("unlisted") == 1,

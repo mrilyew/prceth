@@ -44,7 +44,7 @@ class Executable:
                         __value = float(__value)
                     case "array":
                         __allowed = param_object.get("values")
-                        assert __value in __allowed, "not valid value"
+                        assert __value in __allowed, f"not valid value, {param_name}={__value}"
                         if __value == None:
                             __value = param_object.get("default")
                     case "string":
