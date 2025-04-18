@@ -2,7 +2,7 @@ from resources.Globals import json, os, consts
 from resources.literal.DefaultSettings import DefaultSettings
 
 class Config():
-    def __init__(self, file_name = 'config.json'):
+    def __init__(self, file_name: str = 'config.json'):
         self.default_settings = DefaultSettings
         path_to_config = f"{consts['cwd']}/storage/settings/{file_name}"
         # path_to_config = f"your/custom/path/..."
@@ -42,7 +42,7 @@ class Config():
         consts["tmp"] = os.path.join(consts["storage"], "tmp")
         consts["binary"] = os.path.join(consts["storage"], "binary")
 
-    def get(self, option, default = None):
+    def get(self, option: str, default: str = None):
         # if option is passed in settings, return it
         if option in self.data:
             setting_value = self.data[option]
@@ -58,7 +58,7 @@ class Config():
         if default != None:
             return default
     
-    def set(self, option, value):
+    def set(self, option: str, value: str):
         if value == None:
             del self.data[option]
         else:

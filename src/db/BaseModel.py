@@ -1,5 +1,5 @@
 from peewee import Model, SqliteDatabase
-from submodules.Config import config
+from core.Config import config
 
 DATABASE_PATH = config.get("db.path")
 db = SqliteDatabase(DATABASE_PATH)

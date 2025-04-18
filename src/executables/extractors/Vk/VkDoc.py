@@ -63,7 +63,7 @@ class VkDoc(VkTemplate):
                     __ITEM_ID = "url:" + DOC.get("private_url")
                     __SOURCE  = __ITEM_ID
                 else:
-                    __ITEM_ID  = f"{DOC.get("owner_id")}_{DOC.get("id")}"
+                    __ITEM_ID  = f"{DOC.get('owner_id')}_{DOC.get('id')}"
                     __SOURCE   = f"vk:doc{__ITEM_ID}"
             else:
                 __SOURCE = f"vk:doc{__ITEM_ID}"

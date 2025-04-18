@@ -41,16 +41,16 @@ loop = asyncio.get_event_loop()
 
 from resources.Exceptions import ApiException
 from resources.Consts import consts
-from submodules.Config import config
-from submodules.Config import env
-from submodules.Logger import logger
-from submodules.FileManager import file_manager 
-from submodules.Utils import utils
-from submodules.HTMLFormatter import HTMLFormatter
+from core.Config import config
+from core.Config import env
+from core.Logger import logger
+from submodules.Files.FileManager import file_manager 
+from core.Utils import utils
+from submodules.Web.HTMLFormatter import HTMLFormatter
 from core.DownloadManager import download_manager
 from resources.AssetsCacheStorage import assets_cache_storage
-from submodules.WebCrawler import Crawler
-from submodules.web_services.VkApi import VkApi
+from submodules.Web.WebCrawler import Crawler
+from submodules.WebServices.VkApi import VkApi
 from db.BaseModel import db, BaseModel
 from core.Storage import storage
 

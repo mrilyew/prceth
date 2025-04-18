@@ -1,7 +1,7 @@
 from resources.Globals import datetime, os, consts, traceback, Path
 
 class Logger():
-    def __init__(self, keep=False):
+    def __init__(self, keep: bool=False):
         self.keep = keep
         self.dir = Path(f"{consts['storage']}/logs")
         if self.dir.is_dir() == False:
@@ -35,7 +35,7 @@ class Logger():
 
         return True
     
-    def log(self, message = "Undefined", section = "App", name = "message", noConsole=False):
+    def log(self, message: str = "Undefined", section: str = "App", name: str = "message", noConsole: bool = False):
         if section in consts["logger.skip_categories"]:
             return
         
@@ -66,7 +66,7 @@ class Logger():
             else:
                 print(message_to_write.replace("\n", ""))
 
-    def logException(self, input_exception, section="App", noConsole=True):
+    def logException(self, input_exception, section: str ="App", noConsole: bool =True):
         exp = str(input_exception) + traceback.format_exc()
         self.log(section=section, message=type(input_exception).__name__ + " " + exp, name="error", noConsole=noConsole)
 

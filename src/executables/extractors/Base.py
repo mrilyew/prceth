@@ -16,6 +16,10 @@ class BaseExtractor(Executable):
         self.del_dir_on_fail = del_dir_on_fail
         self.need_preview = need_preview
         self.write_mode = int(write_mode)
+        self.defineConsts()
+
+    def defineConsts(self):
+        pass
 
     def declare():
         params = {}

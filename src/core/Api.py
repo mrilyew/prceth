@@ -204,12 +204,13 @@ class Api():
         
         entity.delete(delete_file=delete_file)
     def editEntity(self, params):
-        if 'entity_id' not in params:
-            raise NotPassedException('--entity_id not passed')
-        
         entity_id = int(params.get("entity_id"))
+        assert entity_id != None, "entity_id not passed"
+
         display_name = params.get("display_name")
         description = params.get("description")
+        internal_content = params.get("internal_content")
+        frontend_data = params.get("frontend_data")
 
         entity = Entity.get(entity_id)
         if entity == None:
@@ -219,6 +220,10 @@ class Api():
             entity.display_name = display_name
         if description != None:
             entity.description = description
+        if internal_content != None:
+            entity.internal_content = json.dumps(internal_content, ensure_ascii=False)
+        if frontend_data != None:
+            entity.frontend_data = json.dumps(frontend_data, ensure_ascii=False)
 
         entity.edited_at = time.time()
         entity.save()
@@ -331,7 +336,6 @@ class Api():
                 __act.execute(i=",".join(items_id),args={"dir": __export_folder})
 
         return RETURN_ENTITIES
-        
     def getExtractors(self, params):
         show_hidden = int(params.get("show_hidden", "0")) == 1
 

@@ -8,7 +8,7 @@ class Entity(BaseModel):
     __cachedLinkedEntities = None
 
     id = AutoField() # Absolute id
-    internal_content = TextField(null=True,default=None) # DB info type. Format will be taken from "format" (json, xml)
+    internal_content = TextField(null=True,default=None)
     display_name = TextField(index=True,default='N/A') # Name that shown in list. Set by api
     description = TextField(index=True,null=True) # Description of entity. Set by api
     source = TextField(null=True) # Source of content (URL or path). Set by extractor
