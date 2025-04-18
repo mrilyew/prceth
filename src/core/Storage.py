@@ -5,6 +5,11 @@ class Storage:
         self.storage_dir = consts["storage"]
         self.tmp_dir = consts["tmp"]
         self.tmp_coll_dir = os.path.join(self.tmp_dir, "files")
+        if Path(self.tmp_dir).is_dir() == False:
+            Path(self.tmp_dir).mkdir()
+
+        if Path(self.tmp_coll_dir).is_dir() == False:
+            Path(self.tmp_coll_dir).mkdir()
 
     def makeTemporaryCollectionDir(self, temp_dir_prefix = None):
         #rand = utils.random_int(1, 1000000) * -1

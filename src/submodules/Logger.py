@@ -1,8 +1,11 @@
-from resources.Globals import datetime, os, consts, traceback
+from resources.Globals import datetime, os, consts, traceback, Path
 
 class Logger():
     def __init__(self, keep=False):
         self.keep = keep
+        self.dir = Path(f"{consts['storage']}/logs")
+        if self.dir.is_dir() == False:
+            self.dir.mkdir()
 
     def __del__(self):
         try:

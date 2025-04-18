@@ -3,7 +3,7 @@ from resources.Globals import consts, os, file_manager, Path
 class AssetsCacheStorage():
     def __init__(self):
         self.path = consts["storage"] + "\\assets_originals"
-        self.files = os.listdir(self.path)
+        #self.files = os.listdir(self.path)
 
     def contains(self, filename):
         return filename in self.files

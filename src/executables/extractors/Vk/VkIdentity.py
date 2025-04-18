@@ -78,12 +78,12 @@ class VkIdentity(VkTemplate):
             TEMP_DIR = self.allocateTemp()
             ORIGINAL_NAME = "avatar.jpg"
             SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
-
+            
             URL = json.get("photo_max")
-
-            await download_manager.addDownload(dir=SAVE_PATH,end=URL)
             if URL == None:
                 raise NotFoundException("ava not found")
+            
+            await download_manager.addDownload(dir=SAVE_PATH,end=URL)
             
             __file = self._fileFromJson({
                 "extension": "jpg",

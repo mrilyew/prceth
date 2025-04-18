@@ -10,7 +10,6 @@ import win32file
 import json
 import sys
 import random
-import yt_dlp
 import shutil
 import requests
 import mimetypes
@@ -43,6 +42,7 @@ loop = asyncio.get_event_loop()
 from resources.Exceptions import ApiException
 from resources.Consts import consts
 from submodules.Config import config
+from submodules.Config import env
 from submodules.Logger import logger
 from submodules.FileManager import file_manager 
 from submodules.Utils import utils

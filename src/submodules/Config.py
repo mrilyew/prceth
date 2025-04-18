@@ -73,3 +73,4 @@ class Config():
         self.data = {}
 
 config = Config()
+env = Config(file_name="env.json")

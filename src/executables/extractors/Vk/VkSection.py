@@ -150,17 +150,7 @@ class VkSection(VkTemplate):
                 ]
             }
         }
-        params["download_file"] = {
-            "desc_key": "-",
-            "type": "bool",
-            "default": True,
-            "assertion": {
-                "only_when": [
-                    {"section": ["fave"]}
-                ]
-            }
-        }
-
+        
         return params
     
     async def run(self, args):
@@ -168,8 +158,8 @@ class VkSection(VkTemplate):
         __total_count = 0
         __downloaded_count = 0
         __times = 0
-        __per_page = self.passed_params.get("per_page")
-        __start_range = self.passed_params.get("start_range")
+        __per_page = int(self.passed_params.get("per_page"))
+        __start_range = int(self.passed_params.get("start_range"))
         __method = ""
         __dict_name = "items"
         __final_entities = []

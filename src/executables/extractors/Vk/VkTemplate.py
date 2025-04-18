@@ -1,5 +1,5 @@
 from executables.extractors.Base import BaseExtractor
-from resources.Globals import config
+from resources.Globals import env
 
 class VkTemplate(BaseExtractor):
     name = 'VkTemplate'
@@ -10,7 +10,7 @@ class VkTemplate(BaseExtractor):
         params["access_token"] = {
             "desc_key": "-",
             "type": "string",
-            "default": config.get("vk.access_token", None),
+            "default": env.get("vk.access_token", None),
             "assert": {
                 "assert_not_null": True,
             },
@@ -18,7 +18,7 @@ class VkTemplate(BaseExtractor):
         params["api_url"] = {
             "desc_key": "-",
             "type": "string",
-            "default": config.get("vk.api_url", "api.vk.com/method"),
+            "default": env.get("vk.api_url", "api.vk.com/method"),
             "assert": {
                 "assert_not_null": True,
             },
@@ -26,7 +26,7 @@ class VkTemplate(BaseExtractor):
         params["vk_path"] = {
             "desc_key": "-",
             "type": "string",
-            "default": config.get("vk.vk_path", "vk.com"),
+            "default": env.get("vk.vk_path", "vk.com"),
             "assert": {
                 "assert_not_null": True,
             },

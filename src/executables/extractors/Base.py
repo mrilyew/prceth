@@ -106,7 +106,10 @@ class BaseExtractor(Executable):
 
         for MOVE_ENTITY in return_entities:        
             if MOVE_ENTITY.self_name == "entity" and MOVE_ENTITY.file != None:
-                MOVE_ENTITY.file.moveTempDir()
+                try:
+                    MOVE_ENTITY.file.moveTempDir()
+                except:
+                    pass
     
     # Typical preview
     def thumbnail(self, entity, args={}, temp_dir = None):
