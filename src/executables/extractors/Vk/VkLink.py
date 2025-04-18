@@ -35,8 +35,8 @@ class VkLink(VkTemplate):
 
         ENTITY = self._entityFromJson({
             "internal_content": __json,
-            "source": f"url:{__json.get("url")}",
-            "unlisted": self.passed_params.get("unlisted") == 1,
+            "source": f"url:{__json.get('url')}",
+            "unlisted": self.passed_params.get('unlisted') == 1,
             "suggested_name": f"Vk Attached link",
         })
 

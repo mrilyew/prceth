@@ -98,7 +98,7 @@ class VkPost(VkTemplate):
             post["relative_attachments"] = {}
             post["relative_copy_history"] = {}
 
-            ITEM_ID = f"{post.get("owner_id")}_{post.get("id")}"
+            ITEM_ID = f"{post.get('owner_id')}_{post.get('id')}"
 
             post.pop("track_code", None)
             post.pop("hash", None)
@@ -134,7 +134,7 @@ class VkPost(VkTemplate):
                         __linked_files.append(__attachment_class_entity)
                         post["relative_attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_entity.id}"
                     else:
-                        ATTACHMENT_ID = f"{__attachment_object.get("owner_id")}_{__attachment_object.get("id")}"
+                        ATTACHMENT_ID = f"{__attachment_object.get('owner_id')}_{__attachment_object.get('id')}"
                         logger.log(message=f"Recieved attachment {str(__attachment_type)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
                         
                         __attachment_class_dec = __attachment_class(need_preview=self.need_preview)
@@ -158,7 +158,7 @@ class VkPost(VkTemplate):
             if post.get("copy_history") != None and self.passed_params.get("download_reposts") == True:
                 for key, repost in enumerate(post.get("copy_history")):
                     try:
-                        REPOST_ID = f"{repost.get("owner_id")}_{repost.get("id")}"
+                        REPOST_ID = f"{repost.get('owner_id')}_{repost.get('id')}"
                         if repost == None:
                             continue
                         

@@ -61,7 +61,7 @@ class VkVideo(VkTemplate):
             FILE = None
             video["site"] = self.passed_params.get("vk_path")
 
-            VIDEO_ID  = f"{video.get("owner_id")}_{video.get("id")}"
+            VIDEO_ID  = f"{video.get('owner_id')}_{video.get('id')}"
             VIDEO_NAME = video.get("title")
             ORIGINAL_NAME = f"{utils.validName(VIDEO_NAME)}.mp4"
 

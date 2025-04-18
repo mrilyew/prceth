@@ -1,5 +1,6 @@
 from resources.Globals import consts, os, file_manager, Path
 
+# DEPRECATED
 class AssetsCacheStorage():
     def __init__(self):
         self.path = consts["storage"] + "\\assets_originals"

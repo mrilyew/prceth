@@ -51,11 +51,11 @@ class VkArticle(VkTemplate):
         __entities_list = []
         for article in __article_response:
             article["site"] = self.passed_params.get("vk_path")
-            __SOURCE  = f"url:{article.get("url")}"
+            __SOURCE  = f"url:{article.get('url')}"
             __TITLE = article.get("title")
             __PUBLICATION = article.get("published_date")
 
-            logger.log(message=f"Recieved article {article.get("url")}",section="VkAttachments",name="message")
+            logger.log(message=f"Recieved article {article.get('url')}",section="VkAttachments",name="message")
 
             ENTITY = self._entityFromJson({
                 "source": __SOURCE,

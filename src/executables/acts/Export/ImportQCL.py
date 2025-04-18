@@ -85,7 +85,7 @@ class ImportQCL(BaseAct):
         __DB.close()
 
         for NEW_ITEM in mk:
-            logger.log(message=f"Inserting Entity {NEW_ITEM.get("hash")}",section="AImportQCL")
+            logger.log(message=f"Inserting Entity {NEW_ITEM.get('hash')}",section="AImportQCL")
             q = Entity.create(**NEW_ITEM)
             q.save()
 

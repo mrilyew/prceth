@@ -94,9 +94,9 @@ class VkAlbum(VkTemplate):
         for album in albums:
             album["site"] = self.passed_params.get("vk_path")
 
-            __ITEM_ID  = f"{album.get("owner_id")}_{album.get("id")}"
+            __ITEM_ID  = f"{album.get('owner_id')}_{album.get('id')}"
             __SOURCE   = f"vk:album{__ITEM_ID}"
-            SUGGESTED_NAME = f"{album.get("title")} ({album.get("owner_id")}_{album.get("id")})"
+            SUGGESTED_NAME = f"{album.get('title')} ({album.get('owner_id')}_{album.get('id')})"
             logger.log(message=f"Recieved album {__ITEM_ID}",section="VkCollection",name="message")
 
             ALBUM_ENTITY = self._entityFromJson({

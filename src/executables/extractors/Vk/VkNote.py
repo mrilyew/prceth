@@ -61,7 +61,7 @@ class VkNote(VkTemplate):
 
         __entities_list = []
         for note in notes:
-            __ITEM_ID  = f"{note.get("owner_id")}_{note.get("id")}"
+            __ITEM_ID  = f"{note.get('owner_id')}_{note.get('id')}"
             __SOURCE   = f"vk:note{__ITEM_ID}"
 
             logger.log(message=f"Recieved note {__ITEM_ID}",section="VkAttachments",name="message")

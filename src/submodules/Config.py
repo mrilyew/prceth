@@ -4,7 +4,7 @@ from resources.literal.DefaultSettings import DefaultSettings
 class Config():
     def __init__(self, file_name = 'config.json'):
         self.default_settings = DefaultSettings
-        path_to_config = f"{consts["cwd"]}/storage/settings/{file_name}"
+        path_to_config = f"{consts['cwd']}/storage/settings/{file_name}"
         # path_to_config = f"your/custom/path/..."
 
         self.path = path_to_config

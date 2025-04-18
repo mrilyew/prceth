@@ -58,7 +58,7 @@ class VkPoll(VkTemplate):
             poll["site"] = self.passed_params.get("vk_path")
 
             # TODO: background downloader
-            __ITEM_ID  = f"{poll.get("owner_id")}_{poll.get("id")}"
+            __ITEM_ID  = f"{poll.get('owner_id')}_{poll.get('id')}"
             __SOURCE   = f"vk:poll{__ITEM_ID}"
 
             logger.log(message=f"Recieved poll {__ITEM_ID}",section="VkAttachments",name="message")

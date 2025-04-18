@@ -21,10 +21,10 @@ class Logger():
 
         # Keep=True: appends current time to file name.
         if self.keep:
-            self.path = f"{consts['storage']}/logs/{now.strftime("%Y-%m-%d_%H-%M-%S")}.log"
+            self.path = f"{consts['storage']}/logs/{now.strftime('%Y-%m-%d_%H-%M-%S')}.log"
         # Keep=False: creates log files per day.
         else:
-            self.path = f"{consts['storage']}/logs/{now.strftime("%Y-%m-%d")}.log"
+            self.path = f"{consts['storage']}/logs/{now.strftime('%Y-%m-%d')}.log"
         
         # Checking if file exists. If no, creating.
         if not os.path.exists(self.path):

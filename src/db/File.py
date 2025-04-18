@@ -174,7 +174,7 @@ class File(BaseModel):
             "hash": self.hash,
             "upper_hash": self.getUpperHashDirPath(),
         }
-        _["relative_path"] = f"/{_.get("upper_hash")}/{_.get("hash")}"
+        _["relative_path"] = f"/{_.get('upper_hash')}/{_.get('hash')}"
         
         return _
 

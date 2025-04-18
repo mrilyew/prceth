@@ -31,7 +31,7 @@ class VkGraffiti(VkTemplate):
         
         __json["site"] = self.passed_params.get("vk_path")
 
-        __ITEM_ID  = f"{__json.get("owner_id")}_{__json.get("id")}"
+        __ITEM_ID  = f"{__json.get('owner_id')}_{__json.get('id')}"
         __SOURCE   = f"vk:graffiti{__ITEM_ID}"
 
         logger.log(message=f"Recieved graffiti {__ITEM_ID}",section="VkAttachments",name="message")
@@ -70,7 +70,7 @@ class VkGraffiti(VkTemplate):
             "source": __SOURCE,
             "internal_content": __json,
             "unlisted": self.passed_params.get("unlisted") == 1,
-            "suggested_name": f"Graffiti {__json.get("id")}",
+            "suggested_name": f"Graffiti {__json.get('id')}",
             "file": __FILE,
         })
 

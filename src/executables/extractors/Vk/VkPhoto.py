@@ -51,8 +51,8 @@ class VkPhoto(VkTemplate):
         for photo in final_photos_objects:
             photo["site"] = self.passed_params.get("vk_path")
 
-            PHOTO_ID = f"{photo.get("owner_id")}_{photo.get("id")}"
-            ORIGINAL_NAME = f"photo_{PHOTO_ID}_{photo.get("date")}.jpg"
+            PHOTO_ID = f"{photo.get('owner_id')}_{photo.get('id')}"
+            ORIGINAL_NAME = f"photo_{PHOTO_ID}_{photo.get('date')}.jpg"
             
             logger.log(message=f"Recieved photo {PHOTO_ID}",section="VK",name="message")
         

@@ -53,7 +53,7 @@ class VkIdentity(VkTemplate):
                 else:
                     group_ids.append(abs(__id))
 
-            logger.log(message=f"Got ids +{",".join(str(x) for x in user_ids)}, -{",".join(str(x) for x in group_ids)}")
+            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}")
 
             if len(user_ids) > 0:
                 __users_response = await __vkapi.call("users.get", {"user_ids": ",".join(str(x) for x in user_ids), "fields": ",".join(consts["vk.user_fields"])})
@@ -78,7 +78,7 @@ class VkIdentity(VkTemplate):
             TEMP_DIR = self.allocateTemp()
             ORIGINAL_NAME = "avatar.jpg"
             SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
-            
+
             URL = json.get("photo_max")
             if URL == None:
                 raise NotFoundException("ava not found")
@@ -138,12 +138,12 @@ class VkIdentity(VkTemplate):
             linked_files = []
 
             if identity.get("vkapi_type") == "user":
-                name = f"@vk_user: {identity.get("first_name")} {identity.get("last_name")}"
-                source = f"vk:id{identity.get("id")}"
+                name = f"@vk_user: {identity.get('first_name')} {identity.get('last_name')}"
+                source = f"vk:id{identity.get('id')}"
                 reg_date = identity.get("reg_date", None)
             else:
-                name = f"@vk_club: {identity.get("name")}"
-                source = f"vk:group{identity.get("id")}"
+                name = f"@vk_club: {identity.get('name')}"
+                source = f"vk:group{identity.get('id')}"
             
             if self.passed_params.get("download_avatar") == True:
                 try:

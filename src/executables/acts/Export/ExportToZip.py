@@ -14,7 +14,7 @@ class ExportToZip(BaseAct):
 
         __EXPORTS_PATH = os.path.join(consts["tmp"], "exports")
         __SAVE_PATH = args.get("save_path", __EXPORTS_PATH)
-        __FILE_NAME = f"col{i.id}_{datetime.now().strftime("%Y-%m-%d-%H-%M-%S")}"
+        __FILE_NAME = f"col{i.id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
         __FILE_EXT_NAME = __FILE_NAME + ".zips"
         __SAVE_DIR_PATH = os.path.join(__EXPORTS_PATH, __FILE_NAME)
         __SAVE_STORAGE_PATH = os.path.join(__SAVE_DIR_PATH, "entities")

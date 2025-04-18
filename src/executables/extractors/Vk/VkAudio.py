@@ -58,7 +58,7 @@ class VkAudio(VkTemplate):
         for audio in __audio_response:
             audio["site"] = self.passed_params.get("vk_path")
 
-            __ITEM_ID = f"{audio.get("owner_id")}_{audio.get("id")}"
+            __ITEM_ID = f"{audio.get('owner_id')}_{audio.get('id')}"
             __SOURCE  = f"vk:audio{__ITEM_ID}"
 
             logger.log(message=f"Recieved audio {__ITEM_ID}",section="VkAttachments",name="message")
@@ -67,7 +67,7 @@ class VkAudio(VkTemplate):
             ___OUT_EXT  = "mp3"
             ___OUT_SIZE = 0
 
-            AUDIO_NAME = f"{audio.get("artist")} — {audio.get("title")}"
+            AUDIO_NAME = f"{audio.get('artist')} — {audio.get('title')}"
             AUDIO_UPLOAD_NAME = utils.validName(AUDIO_NAME) + f".{___OUT_EXT}"
 
             if self.passed_params.get("download_file") == True:
