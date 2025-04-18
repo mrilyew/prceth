@@ -47,8 +47,8 @@ from core.Logger import logger
 from submodules.Files.FileManager import file_manager 
 from core.Utils import utils
 from submodules.Web.HTMLFormatter import HTMLFormatter
-from core.DownloadManager import download_manager
-from resources.AssetsCacheStorage import assets_cache_storage
+from submodules.Web.DownloadManager import download_manager
+from submodules.Files.AssetsCacheStorage import assets_cache_storage
 from submodules.Web.WebCrawler import Crawler
 from submodules.WebServices.VkApi import VkApi
 from db.BaseModel import db, BaseModel

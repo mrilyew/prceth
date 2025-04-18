@@ -54,7 +54,8 @@ class Logger():
             message_to_write = f"{current_time} [{name}] [{section}] {message}\n"
         
         self.file.seek(0, os.SEEK_END)
-        self.file.write(message_to_write.replace("\n", "\\n"))
+        #self.file.write(message_to_write.replace("\n", "\\n"))
+        self.file.write(message_to_write)
 
         if is_console == True:
             if name == "error":

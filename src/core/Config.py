@@ -1,5 +1,5 @@
 from resources.Globals import json, os, consts
-from resources.literal.DefaultSettings import DefaultSettings
+from resources.DefaultSettings import DefaultSettings
 
 class Config():
     def __init__(self, file_name: str = 'config.json'):
