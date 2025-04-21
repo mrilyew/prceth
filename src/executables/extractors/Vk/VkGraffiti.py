@@ -1,4 +1,4 @@
-from resources.Globals import Path, download_manager, logger, os
+from resources.Globals import Path, download_manager, logger, os, utils
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Exceptions import NotFoundException
 
@@ -36,15 +36,7 @@ class VkGraffiti(VkTemplate):
 
         logger.log(message=f"Recieved graffiti {__ITEM_ID}",section="VkAttachments",name="message")
         
-        max_size = -1
-        for key in __json:
-            try:
-                if key != None and key.startswith("photo_"):
-                    cur = int(key.split("_")[1])
-                    if cur > max_size:
-                        max_size = cur
-            except:
-                continue
+        max_size = utils.findHighestInDict(__json, "photo_")
 
         if self.passed_params.get("download_file") == True:
             __FILE = None

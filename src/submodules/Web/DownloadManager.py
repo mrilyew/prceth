@@ -1,7 +1,7 @@
 from resources.Globals import asyncio, aiohttp, os, time, logger, Path, consts, config
 
 class DownloadManager():
-    def __init__(self, max_concurrent_downloads=3, speed_limit_kbps=None):
+    def __init__(self, max_concurrent_downloads=3, speed_limit_kbps=config.get("web.max_speed")):
         self.queue = []
         self.max_concurrent_downloads = max_concurrent_downloads
         self.speed_limit_kbps = speed_limit_kbps
@@ -10,6 +10,7 @@ class DownloadManager():
             "User-Agent": config.get("web.useragent")
         }
         self.__timeout = consts["net.global_timeout"]
+        self.__hooks = []
     
     async def addDownload(self, end, dir):
         try:
@@ -50,7 +51,7 @@ class DownloadManager():
                 if HTTP_REQUEST_STATUS == 404 or HTTP_REQUEST_STATUS == 403:
                     raise FileNotFoundError('File not found')
                 
-                if Path(DOWNLOAD_DIR).is_file():
+                if DOWNLOAD_DIR != None and Path(DOWNLOAD_DIR).is_file():
                     logger.log(section="AsyncDownloadManager", name="message", message=f"{DOWNLOAD_URL} already downloaded, didn't.")
                     return response
 
@@ -58,24 +59,26 @@ class DownloadManager():
                 queue_element["downloaded"] = 0
                 queue_element["size"] = int(response.headers.get("Content-Length", 0))
                 queue_element["start_time"] = start_time
-                with open(DOWNLOAD_DIR, 'wb') as f:
-                    async for chunk in response.content.iter_chunked(1024):
-                        #await queue_element["pause_flag"].wait() TODO FIX !!!!!!!!!!!
-                        f.write(chunk)
+                if DOWNLOAD_DIR != None:
+                    with open(DOWNLOAD_DIR, 'wb') as f:
+                        async for chunk in response.content.iter_chunked(1024):
+                            #await queue_element["pause_flag"].wait() TODO FIX !!!!!!!!!!!
+                            f.write(chunk)
 
-                        elapsed_time = time.time() - start_time
-                        expected_time = len(chunk)
-                        queue_element["downloaded"] += expected_time
+                            elapsed_time = time.time() - start_time
+                            expected_time = len(chunk)
+                            queue_element["downloaded"] += expected_time
 
-                        #if consts["context"] == "cli":
-                            #pfrint(f"Downloaded {queue_element["downloaded"]} from {queue_element["size"]}")
-                        
-                        if self.speed_limit_kbps:
-                            expected_time = expected_time / (self.speed_limit_kbps * 1024)
-                            if expected_time > elapsed_time:
-                                await asyncio.sleep(expected_time - elapsed_time)
+                            #if consts["context"] == "cli":
+                                #pfrint(f"Downloaded {queue_element["downloaded"]} from {queue_element["size"]}")
+                            
+                            if self.speed_limit_kbps:
+                                expected_time = expected_time / (self.speed_limit_kbps * 1024)
+                                if expected_time > elapsed_time:
+                                    await asyncio.sleep(expected_time - elapsed_time)
+                    
+                    logger.log(section="AsyncDownloadManager", name="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 
-                logger.log(section="AsyncDownloadManager", name="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 return response
     
     def __findDownloadByURL(self, url):

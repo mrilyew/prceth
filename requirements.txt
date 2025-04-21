@@ -25,3 +25,4 @@ fake-useragent==2.0.3
 flask[async]
 m3u8==6.0.0
 ffmpeg-python==0.2.0
+yt-dlp

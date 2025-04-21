@@ -2,9 +2,7 @@ src/dev
 *__pycache__
 env/
 venv/
-src/storage/tmp/chrome/chromedriver.exe
-src/storage/tmp/chrome/LICENSE.chromedriver
-src/storage/tmp/*
+src/storage/tmp/chrome/*
 src/storage/binary/*
 src/storage/assets_originals/*
 src/storage/main.db
@@ -15,6 +13,8 @@ src/storage/dbs/*
 src/storage/tmp/files/*
 src/storage/exports/*
 src/storage/settings/*
+!src/storage/tmp/internal/.gitkeep
+src/storage/tmp/internal/*
 !src/storage/tmp/files/.gitkeep
 src/storage/logs/*.log
 src/executables/extractors/Custom/*

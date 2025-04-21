@@ -13,6 +13,11 @@ class VkVideo(VkTemplate):
             "desc_key": "-",
             "type": "string",
         }
+        params["quality"] = {
+            "desc_key": "-",
+            "type": "string",
+            "default": "max",
+        }
         params["download_file"] = {
             "desc_key": "-",
             "type": "bool",
@@ -64,28 +69,57 @@ class VkVideo(VkTemplate):
             VIDEO_ID  = f"{video.get('owner_id')}_{video.get('id')}"
             VIDEO_NAME = video.get("title")
             ORIGINAL_NAME = f"{utils.validName(VIDEO_NAME)}.mp4"
+            VIDEO_PAGE_URL = f"https://vkvideo.ru/video{VIDEO_ID}"
 
             logger.log(message=f"Recieved video {VIDEO_ID}",section="VkAttachments",name="message")
-        
+
             IS_DIRECT = video.get("platform") == None
             if IS_DIRECT:
-                if self.passed_params.get("download_file") == True:
-                    TEMP_DIR = self.allocateTemp()
-                    SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
+                try:
+                    if self.passed_params.get("download_file") == True:
+                        QUALITY = self.passed_params.get("quality")
+                        TEMP_DIR = self.allocateTemp()
+                        SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
 
-                    if video.get("files") != None:
-                        VIDEO_URL = video.get("files").get("mp4_480")
-                        # TODO hls download
-                        if "srcIp=" not in VIDEO_URL:
-                            logger.log(message=f"Video {VIDEO_ID} contains direct mp4; downloading",section="VkAttachments",name="message")
-                            HTTP_REQUEST = await download_manager.addDownload(end=VIDEO_URL,dir=SAVE_PATH)
-                            FILE = self._fileFromJson({
-                                "extension": "mp4",
-                                "upload_name": ORIGINAL_NAME,
-                                "filesize": SAVE_PATH.stat().st_size,
-                            })
-                        else:
-                            logger.log(message=f"Video {VIDEO_ID} has HLS; downloading",section="VkAttachments",name="message")
+                        try:
+                            if video.get("files") != None:
+                                FILES_LIST = video.get("files")
+                                MAX_QUALITY = utils.findHighestInDict(FILES_LIST, "mp4_")
+                                VIDEO_URL = None
+                                HLS_URL = FILES_LIST.get("hls")
+                                if QUALITY == "max":
+                                    VIDEO_URL = FILES_LIST.get(f"mp4_{MAX_QUALITY}")
+                                else:
+                                    VIDEO_URL = FILES_LIST.get(f"mp4_{QUALITY}")
+                                
+                                if VIDEO_URL == None:
+                                    raise NotFoundException(f"Video {VIDEO_ID}: not found mp4")
+                                
+                                if "srcIp=" not in VIDEO_URL:
+                                    logger.log(message=f"Video {VIDEO_ID} contains direct mp4; downloading",section="VkAttachments",name="message")
+                                    HTTP_REQUEST = await download_manager.addDownload(end=VIDEO_URL,dir=SAVE_PATH)
+                                else:
+                                    raise Exception("-")
+                            else:
+                                raise NotFoundException(f"Video {VIDEO_ID} doesn't has files")
+                        except:
+                            from submodules.Media.YtDlpWrapper import YtDlpWrapper
+                            logger.log(message=f"Making direct download via yt-dlp...",section="VkAttachments",name="message")
+                            params = {"outtmpl": str(SAVE_PATH)}
+                            if QUALITY != "max":
+                                params["format"] = f"url{QUALITY}"
+                            
+                            with YtDlpWrapper(params).ydl as ydl:
+                                info = ydl.extract_info(VIDEO_PAGE_URL, download=True)
+
+                        FILE = self._fileFromJson({
+                            "extension": "mp4",
+                            "upload_name": ORIGINAL_NAME,
+                            "filesize": SAVE_PATH.stat().st_size,
+                        })
+                        video["relative_file"] = f"__lcms|file_{FILE.id}"
+                except Exception as __e:
+                    logger.logException(__e, section="VkAttachments",noConsole=False)
             else:
                 logger.log(message=f"Video {VIDEO_ID} is from another platform ({video.get("platform")})",section="VkAttachments",name="message")
             

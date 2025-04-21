@@ -19,6 +19,10 @@ DefaultSettings = {
         "type": "int",
         "default_value": 7856,
     },
+    "web.max_speed": {
+        "type": "int",
+        "default_value": 2000, # kbs
+    },
     "flask.debug": {
         "type": "int",
         "default_value": 1,

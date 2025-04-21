@@ -164,6 +164,8 @@ class VkIdentity(VkTemplate):
                     linked_files.append(__file)
                 except NotFoundException:
                     pass
+                except TypeError:
+                    pass
                 except Exception as _e:
                     logger.logException(_e,section="Vk",noConsole=False)
             

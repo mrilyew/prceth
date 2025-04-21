@@ -30,7 +30,7 @@ class VkAudio(VkTemplate):
     
     async def __recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
-        return await __vkapi.call("audio.get", {"audio_ids": ",".join(item_ids), "extended": 1})
+        return await __vkapi.call("audio.getById", {"audios": ",".join(item_ids), "extended": 1})
     
     async def run(self, args):
         __audio_response = None
@@ -79,8 +79,18 @@ class VkAudio(VkTemplate):
                 else:
                     # Todo HLS
                     if ".m3u8" in audio.get("url"):
+                        from submodules.Media.YtDlpWrapper import YtDlpWrapper
+
                         logger.log(message=f"Found .m3u8 of audio {__ITEM_ID}",section="VkAudio",name="message")
-                        pass
+                        params = {"outtmpl": str(___SAVE_PATH)}
+                        with YtDlpWrapper(params).ydl as ydl:
+                            info = ydl.extract_info(audio.get("url"), download=True)
+
+                        FILE = self._fileFromJson({
+                            "extension": ___OUT_EXT,
+                            "upload_name": AUDIO_UPLOAD_NAME,
+                            "filesize": ___SAVE_PATH.stat().st_size,
+                        })
                     else:
                         logger.log(message=f"Downloading raw .mp3 of audio {__ITEM_ID}",section="VkAudio",name="message")
 

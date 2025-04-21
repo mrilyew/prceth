@@ -51,8 +51,8 @@ class BaseExtractor(Executable):
             for t_dir in self.temp_dirs:
                 try:
                     file_manager.rmdir(t_dir)
-                except:
-                    pass
+                except Exception:
+                    logger.logException(t_dir, "Extractor", noConsole=False)
     
     def _fileFromJson(self, json_data, _temp_dir = None):
         from db.File import File

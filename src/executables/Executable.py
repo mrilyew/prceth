@@ -1,4 +1,4 @@
-from resources.Globals import storage, utils
+from resources.Globals import storage, utils, consts
 from db.Entity import Entity
 
 class Executable:
@@ -94,5 +94,10 @@ class Executable:
     def allocateTemp(self):
         _dir = storage.makeTemporaryCollectionDir(self.temp_dir_prefix)
         self.temp_dirs.append(_dir)
+
+        return _dir
+
+    def mainTempDir(self):
+        _dir = consts.get("tmp")
 
         return _dir

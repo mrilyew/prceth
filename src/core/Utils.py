@@ -270,4 +270,17 @@ class Utils():
         else:
             return input_data
 
+    def findHighestInDict(self, json, key_name = "photo_"):
+        max_size = -1
+        for key in json:
+            try:
+                if key != None and key.startswith(key_name):
+                    cur = int(key.replace(key_name, ""))
+                    if cur > max_size:
+                        max_size = cur
+            except:
+                continue
+    
+        return max_size
+        
 utils = Utils()
