@@ -14,6 +14,7 @@ class File(BaseModel):
     extension = TextField(null=True,default="json") # File extension
     filesize = BigIntegerField(default=0) # Size of file
     metadata = TextField(null=True,default=None)
+    link = TextField(default=None)
     #dir_filesize = BigIntegerField(default=0) # Size of dir
 
     def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_entity_id_to_start = True):
@@ -128,14 +129,16 @@ class File(BaseModel):
     def getPath(self):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
-
+        if getattr(self, "link") != None:
+            return self.link
+        
         COLLECTION_PATH = os.path.join(STORAGE_PATH, "files", HASH[0:2])
         END_DIR = os.path.join(COLLECTION_PATH, HASH)
         if self.temp_dir != None:
             END_DIR = self.temp_dir
         
         ENTITY_PATH = os.path.join(END_DIR, str(self.upload_name))
-
+        
         return ENTITY_PATH
     
     def getFsFileName(self):
@@ -192,6 +195,9 @@ class File(BaseModel):
         __file.filesize = json_input.get("filesize")
         if temp_dir != None or json_input.get("temp_dir") != None:
             __file.temp_dir = temp_dir
+        
+        if json_input.get("link") != None:
+            __file.link = json_input.get("link")
         
         # TODO handle async
         if json_input.get("take_metadata", False) == True:

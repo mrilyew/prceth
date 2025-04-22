@@ -16,7 +16,7 @@ class VkSection(VkTemplate):
         params["section"] = {
             "desc_key": "-",
             "type": "array",
-            "values": ["photos", "wall", "album", "board", "fave", "post_comments", "video_comments", "board", "photo_comments", "photo_all_comments", "video_comments", "notes_comments"],
+            "values": ["photos", "wall", "album", "board", "fave", "post_comments", "video_comments", "board", "photo_comments", "photo_all_comments", "video_comments", "notes_comments", "messages"],
             "assertion": {
                 "assert_not_null": True,
             },
@@ -62,7 +62,7 @@ class VkSection(VkTemplate):
             "default": "*",
             "assertion": {
                 "only_when": [
-                    {"section": ["wall"]},
+                    {"section": ["wall", "messages"]},
                     {
                         "section": ["fave"],
                         "item_id": "post"
@@ -76,7 +76,7 @@ class VkSection(VkTemplate):
             "default": "photo",
             "assertion": {
                 "only_when": [
-                    {"section": ["wall"]},
+                    {"section": ["wall", "messages"]},
                     {
                         "section": ["fave"],
                         "item_id": "post"
@@ -90,7 +90,7 @@ class VkSection(VkTemplate):
             "default": True,
             "assertion": {
                 "only_when": [
-                    {"section": ["wall"]},
+                    {"section": ["wall", "messages"]},
                     {
                         "section": ["fave"],
                         "item_id": "post"
@@ -104,7 +104,7 @@ class VkSection(VkTemplate):
             "default": False,
             "assertion": {
                 "only_when": [
-                    {"section": ["wall"]},
+                    {"section": ["wall", "messages"]},
                     {
                         "section": ["fave"],
                         "item_id": "post"
@@ -118,7 +118,7 @@ class VkSection(VkTemplate):
             "default": True,
             "assertion": {
                 "only_when": [
-                    {"section": ["album"]}
+                    {"section": ["album", "messages"]}
                 ]
             }
         }
@@ -190,6 +190,7 @@ class VkSection(VkTemplate):
         from executables.extractors.Vk.VkArticle import VkArticle
         from executables.extractors.Vk.VkLink import VkLink
         from executables.extractors.Vk.VkComment import VkComment
+        from executables.extractors.Vk.VkMessage import VkMessage
 
         # Making first call
         match(self.passed_params.get("section")):
@@ -347,6 +348,18 @@ class VkSection(VkTemplate):
                 __extractor = VkComment
                 
                 __collection["suggested_name"] = __suggested_name
+            case "messages":
+                __method = "messages.getHistory"
+                __count_call = await __vkapi.call(__method, {"peer_id": item_id_collection, "count": 1})
+                __extractor = VkMessage
+                __pass_params = {
+                    "peer_id": item_id_collection, 
+                    "extended": 1
+                }
+                __extractor_params["download_attachments_json_list"] = self.passed_params.get("download_attachments_json_list")
+                __extractor_params["download_attachments_file_list"] = self.passed_params.get("download_attachments_file_list")
+                __extractor_params["download_reposts"] = self.passed_params.get("download_reposts")
+                __collection["suggested_name"] = f"Vk Conversation {item_id_collection}"
             case _:
                 raise InvalidPassedParam("invalid section")
         

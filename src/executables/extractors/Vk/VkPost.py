@@ -99,6 +99,10 @@ class VkPost(VkTemplate):
             post["relative_copy_history"] = {}
 
             ITEM_ID = f"{post.get('owner_id')}_{post.get('id')}"
+            __SOURCE = "vk:wall"+ITEM_ID
+            if self.vk_type == "message":
+                ITEM_ID = f"{post.get('peer_id', post.get("from_id"))}_{post.get('id')}"
+                __SOURCE = "vk:message"+ITEM_ID
 
             post.pop("track_code", None)
             post.pop("hash", None)
@@ -109,9 +113,13 @@ class VkPost(VkTemplate):
             for key, attachment in enumerate(post.get("attachments", [])):
                 try:
                     __attachment_type = attachment.get("type")
+                    __attachment_class_name = __attachment_type
                     __attachment_object = attachment.get(__attachment_type)
                     if __attachment_object == None:
                         continue
+                    
+                    if __attachment_type == "wall":
+                        __attachment_class_name = "post"
                     
                     should_download_json = DOWNLOAD_JSON_LIST[0] == "*" or __attachment_type in DOWNLOAD_JSON_LIST
                     should_download_file = DOWNLOAD_FILE_LIST[0] == "*" or __attachment_type in DOWNLOAD_FILE_LIST
@@ -119,23 +127,23 @@ class VkPost(VkTemplate):
                     if should_download_json == False:
                         continue
                     
-                    __attachment_class = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_type.title()}"))
+                    __attachment_class = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_class_name.title()}"))
                     if __attachment_class == None:
-                        logger.log(message="Recieved unknown attachment: " + str(__attachment_type),section="VkAttachments",name="message")
+                        logger.log(message="Recieved unknown attachment: " + str(__attachment_class_name),section="VkAttachments",name="message")
 
                         __attachment_class_unknown = JsonObject()
                         __attachment_class_unknown.setArgs({
-                            "json_object": post["attachments"][key][__attachment_type],
+                            "json_object": post["attachments"][key][__attachment_class_name],
                         })
 
                         __attachment_class_unknown_entities = await __attachment_class_unknown.execute({})
                         __attachment_class_entity = __attachment_class_unknown_entities.get("entities")[0]
 
                         __linked_files.append(__attachment_class_entity)
-                        post["relative_attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_entity.id}"
+                        post["relative_attachments"][key][__attachment_class_name] = f"__lcms|entity_{__attachment_class_entity.id}"
                     else:
                         ATTACHMENT_ID = f"{__attachment_object.get('owner_id')}_{__attachment_object.get('id')}"
-                        logger.log(message=f"Recieved attachment {str(__attachment_type)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
+                        logger.log(message=f"Recieved attachment {str(__attachment_class_name)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
                         
                         __attachment_class_dec = __attachment_class(need_preview=self.need_preview)
                         __attachment_class_return = await __attachment_class_dec.fastGetEntity(params={
@@ -149,7 +157,7 @@ class VkPost(VkTemplate):
                         },args=args)
 
                         __linked_files.append(__attachment_class_return[0])
-                        post["relative_attachments"][key][__attachment_type] = f"__lcms|entity_{__attachment_class_return[0].id}"
+                        post["relative_attachments"][key][__attachment_class_name] = f"__lcms|entity_{__attachment_class_return[0].id}"
                 except ModuleNotFoundError:
                     pass
                 except Exception as ___e___:
@@ -192,7 +200,7 @@ class VkPost(VkTemplate):
                 post["copy_owner"] = utils.find_owner(post.get("copy_owner_id"), __PROFILES, __GROUPS)
 
             ENTITY = self._entityFromJson({
-                "source": "vk:wall"+ITEM_ID,
+                "source": __SOURCE,
                 "suggested_name": f"VK {self.vk_type.title()} {str(ITEM_ID)}",
                 "internal_content": post,
                 "linked_files": __linked_files,

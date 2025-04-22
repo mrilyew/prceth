@@ -233,6 +233,9 @@ class Entity(BaseModel):
         if json_input.get("linked_files") != None:
             __out = []
             for item in json_input.get("linked_files"):
+                if item == None:
+                    continue
+                
                 __out.append(f"{item.self_name}_{item.id}")
             
             if len(__out) > 0:
