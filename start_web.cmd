@@ -1,3 +1,3 @@
 @echo off
-VENV.bat
+venv.cmd
 python web.py

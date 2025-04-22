@@ -17,7 +17,7 @@ Difault — набор классов и функций для создания 
 Чтобы зайти в CLI, напишите:
 ```
 cd [папка установки]
-VENV.bat
+venv.cmd
 python cli.py --act [имя метода] ...
 ```
 
@@ -26,7 +26,7 @@ python cli.py --act [имя метода] ...
 Для запуска web-сервера Flask нужно написать:
 ```
 cd [папка установки]
-VENV.bat
+venv.cmd
 python web.py
 ```
 

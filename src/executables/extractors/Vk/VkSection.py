@@ -1,4 +1,4 @@
-from resources.Globals import config, VkApi, logger, utils, math, asyncio
+from resources.Globals import config, VkApi, logger, utils, math, asyncio, copy
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Exceptions import InvalidPassedParam
 
@@ -374,16 +374,17 @@ class VkSection(VkTemplate):
                 break
 
             logger.log(message=f"{time + 1}/{__times} time of items recieving; {offset} offset",section="VkCollection",name="message")
-           
+
             __pass_params["count"] = __per_page
             __pass_params["offset"] = offset
             __time_call = await __vkapi.call(__method, __pass_params)
-            
+
             __items = __time_call.get(__dict_name)
             '''if len(__items) < 1:
                 logger.log(message=f"Time {time + 1}/{__times}: no items. Probaly broken count. Exiting...",section="VkCollection",name="message")
                 break'''
 
+            __tasks = []
             for item in __items:
                 if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
                     break
@@ -405,18 +406,15 @@ class VkSection(VkTemplate):
                 
                 __extractor.setArgs(__extractor_params)
 
-                try:
-                    executed = await __extractor.execute({})
-                    for ___item in executed.get("entities"):
-                        __final_entities.append(___item)
-                except Exception as ___e:
-                    logger.logException(input_exception=___e,section="VkCollection",noConsole=False)
-                    pass
+                __task = asyncio.create_task(self._execute_sub(copy.deepcopy(__extractor),__final_entities))
+                __tasks.append(__task)
 
-                if self.passed_params.get("download_timeout") != 0:
-                    await asyncio.sleep(self.passed_params.get("download_timeout"))
+                #if self.passed_params.get("download_timeout") != 0:
+                #    await asyncio.sleep(self.passed_params.get("download_timeout"))
 
                 __downloaded_count += 1
+            
+            await asyncio.gather(*__tasks, return_exceptions=True)
             
             if self.passed_params.get("api_timeout") != 0:
                 await asyncio.sleep(self.passed_params.get("api_timeout"))

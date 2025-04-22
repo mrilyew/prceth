@@ -171,3 +171,13 @@ class BaseExtractor(Executable):
             raise x
 
         return EXTRACTOR_RESULTS
+
+    async def _execute_sub(self, extractor, final_array_link):
+        try:
+            executed = await extractor.execute({})
+            for ___item in executed.get("entities"):
+                final_array_link.append(___item)
+        except Exception as ___e:
+            logger.logException(input_exception=___e,section="Extractor",noConsole=False)
+            pass
+
