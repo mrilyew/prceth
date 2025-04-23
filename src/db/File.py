@@ -14,7 +14,7 @@ class File(BaseModel):
     extension = TextField(null=True,default="json") # File extension
     filesize = BigIntegerField(default=0) # Size of file
     metadata = TextField(null=True,default=None)
-    link = TextField(default=None)
+    link = TextField(null=True,default=None)
     #dir_filesize = BigIntegerField(default=0) # Size of dir
 
     def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_entity_id_to_start = True):

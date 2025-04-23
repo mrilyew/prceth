@@ -12,6 +12,10 @@ class DownloadManager():
         self.__timeout = consts["net.global_timeout"]
         self.__hooks = []
     
+    def __selfDownloadHook(self, d):
+        print(d.get("status"))
+        print(d.get("percentage"))
+
     async def addDownload(self, end, dir):
         try:
             self.queue.append({
@@ -68,15 +72,35 @@ class DownloadManager():
                             elapsed_time = time.time() - start_time
                             expected_time = len(chunk)
                             queue_element["downloaded"] += expected_time
+                            if queue_element.get("size", 0) != 0:
+                                queue_element["percentage"] = (queue_element.get("downloaded") / queue_element.get("size")) * 100
 
                             #if consts["context"] == "cli":
                                 #pfrint(f"Downloaded {queue_element["downloaded"]} from {queue_element["size"]}")
+                            
+                            for hook in self.__hooks:
+                                try:
+                                    hook_dict = queue_element.copy()
+                                    hook_dict["status"] = "downloading"
+
+                                    hook(hook_dict)
+                                except:
+                                    pass
                             
                             if self.speed_limit_kbps:
                                 expected_time = expected_time / (self.speed_limit_kbps * 1024)
                                 if expected_time > elapsed_time:
                                     await asyncio.sleep(expected_time - elapsed_time)
-                    
+
+                    for hook in self.__hooks:
+                        try:
+                            hook_dict = queue_element.copy()
+                            hook_dict["status"] = "success"
+
+                            hook(hook_dict)
+                        except:
+                            pass
+
                     logger.log(section="AsyncDownloadManager", name="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 
                 return response

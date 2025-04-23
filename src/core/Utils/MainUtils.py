@@ -2,8 +2,11 @@ from resources.Globals import contextmanager, secrets, os, urlparse, platform, s
 from collections import defaultdict
 import re
 
-class Utils():
+class MainUtils():
     def parse_args(self):
+        '''
+        Parses sys.argv to array.
+        '''
         args = sys.argv
         parsed_args = {}
         key = None
@@ -28,6 +31,9 @@ class Utils():
         return parsed_args
     
     def parse_params(self, input_data):
+        '''
+        Parses url params.
+        '''
         params = {}
         params_arr = input_data.split('&')
         for param in params_arr:
@@ -40,6 +46,11 @@ class Utils():
         return params
     
     def random_int(self, min, max):
+        '''
+        Makes random integer.
+
+        Params: min, max
+        '''
         return random.randint(min, max)
     
     def parse_json(self, text):
@@ -48,13 +59,13 @@ class Utils():
         except:
             return {}
     
-    def str_to_path(self, path):
-        return Path(path)
-    
     def remove_protocol(self, strr):
         return strr.replace("https://", "").replace("http://", "").replace("ftp://", "")
 
     def find_owner(self, id, profiles, groups):
+        '''
+        Gets owner by id from "profiles" and "groups" arrays.
+        '''
         search_array = profiles
         if id < 0:
             search_array = groups
@@ -64,26 +75,23 @@ class Utils():
                 return item
             
         return None
-    
-    def fast_get_request(self, url: str ='', user_agent=''):
-        result = requests.get(url, headers={
-            'User-Agent': user_agent
-        })
-        parsed_result = None
-        if result.headers.get('content-type').index('application/json') != -1:
-            parsed_result = json.loads(result.content)
 
-        return parsed_result
-    
-    def proc_strtr(self, text, length = 0, multipoint = True):
+    # УГАДАЙ ОТКУДА :)
+    def proc_strtr(self, text: str, length: int = 0, multipoint: bool = True):
+        '''
+        Cuts string to "length"
+        '''
         newString = text[:length]
 
         if multipoint == False:
             return newString
         
         return newString + ("..." if text != newString else "")
-    
+
     def parse_entity(self, input_string: str, allowed_entities = ["entity", "collection"]):
+        '''
+        Recieves entities and collections by string
+        '''
         from db.Entity import Entity
         from db.Collection import Collection
 
@@ -234,6 +242,9 @@ class Utils():
         __class._meta.database = old_db
     
     def validName(self, text):
+        '''
+        Creates saveable name (removes forbidden in NTFS characters)
+        '''
         safe_filename = re.sub(r'[\\/*?:"<>| ]', '_', text)
         safe_filename = re.sub(r'_+', '_', safe_filename)
         safe_filename = safe_filename.strip('_')
@@ -283,4 +294,4 @@ class Utils():
     
         return max_size
         
-utils = Utils()
+utils = MainUtils()

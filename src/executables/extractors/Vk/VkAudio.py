@@ -1,5 +1,5 @@
 from executables.extractors.Vk.VkTemplate import VkTemplate
-from resources.Globals import os, download_manager, VkApi, Path, asyncio, utils, logger
+from resources.Globals import os, download_manager, VkApi, Path, asyncio, utils, logger, media_utils
 from resources.Exceptions import NotFoundException
 
 class VkAudio(VkTemplate):
@@ -91,6 +91,9 @@ class VkAudio(VkTemplate):
                 # Todo HLS
                 if ".m3u8" in item.get("url"):
                     from submodules.Media.YtDlpWrapper import YtDlpWrapper
+
+                    if media_utils.isFFMPEGInstalled() == False:
+                        raise LibNotInstalledException("ffmpeg is not installed")
 
                     logger.log(message=f"Found .m3u8 of audio {__ITEM_ID}",section="VkAudio",name="message")
                     params = {"outtmpl": str(___SAVE_PATH)}

@@ -1,6 +1,6 @@
 from executables.extractors.Vk.VkTemplate import VkTemplate
-from resources.Globals import VkApi, Path, os, logger, download_manager, utils, asyncio
-from resources.Exceptions import NotFoundException
+from resources.Globals import VkApi, Path, os, logger, download_manager, utils, asyncio, media_utils
+from resources.Exceptions import NotFoundException, LibNotInstalledException
 
 # Downloads photo from vk.com using api.
 class VkVideo(VkTemplate):
@@ -102,10 +102,10 @@ class VkVideo(VkTemplate):
                                 VIDEO_URL = FILES_LIST.get(f"mp4_{MAX_QUALITY}")
                             else:
                                 VIDEO_URL = FILES_LIST.get(f"mp4_{QUALITY}")
-                            
+
                             if VIDEO_URL == None:
                                 raise NotFoundException(f"Video {VIDEO_ID}: not found mp4")
-                            
+
                             if "srcIp=" not in VIDEO_URL:
                                 logger.log(message=f"Video {VIDEO_ID} contains direct mp4; downloading",section="VkAttachments",name="message")
                                 HTTP_REQUEST = await download_manager.addDownload(end=VIDEO_URL,dir=SAVE_PATH)
@@ -115,11 +115,15 @@ class VkVideo(VkTemplate):
                             raise NotFoundException(f"Video {VIDEO_ID} doesn't has files")
                     except:
                         from submodules.Media.YtDlpWrapper import YtDlpWrapper
+                        
+                        if media_utils.isFFMPEGInstalled() == False:
+                            raise LibNotInstalledException("ffmpeg is not installed")
+
                         logger.log(message=f"Making direct download via yt-dlp...",section="VkAttachments",name="message")
                         params = {"outtmpl": str(SAVE_PATH)}
                         if QUALITY != "max":
                             params["format"] = f"url{QUALITY}"
-                        
+
                         with YtDlpWrapper(params).ydl as ydl:
                             info = ydl.extract_info(VIDEO_PAGE_URL, download=True)
 
@@ -129,6 +133,8 @@ class VkVideo(VkTemplate):
                         "filesize": SAVE_PATH.stat().st_size,
                     })
                     item["relative_file"] = f"__lcms|file_{FILE.id}"
+            except LibNotInstalledException as _libe:
+                raise _libe
             except Exception as __e:
                 logger.logException(__e, section="VkAttachments",noConsole=False)
         else:

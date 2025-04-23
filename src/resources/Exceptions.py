@@ -25,3 +25,7 @@ class ExtractorException(Exception):
 class AccessDeniedException(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+class LibNotInstalledException(Exception):
+    def __init__(self, message):
+        super().__init__(message)
