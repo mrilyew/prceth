@@ -1,4 +1,4 @@
-from resources.Globals import VkApi, utils, logger
+from resources.Globals import VkApi, utils, logger, asyncio
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Exceptions import NotFoundException
 
@@ -31,7 +31,7 @@ class VkNote(VkTemplate):
 
         return params
 
-    async def __recieveById(self, item_ids):
+    async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         __item_id = item_ids[0].split("_")
 
@@ -44,7 +44,7 @@ class VkNote(VkTemplate):
 
         if self.passed_params.get("__json_info") == None:
             try:
-                notes = await self.__recieveById(item_ids)
+                notes = await self.recieveById(item_ids)
             except:
                 notes = None
         else:
@@ -60,26 +60,33 @@ class VkNote(VkTemplate):
             raise NotFoundException("note not found")
 
         __entities_list = []
+        __tasks = []
         for note in notes:
-            __ITEM_ID  = f"{note.get('owner_id')}_{note.get('id')}"
-            __SOURCE   = f"vk:note{__ITEM_ID}"
+            __task = asyncio.create_task(self.__item(note, __entities_list))
+            __tasks.append(__task)
 
-            logger.log(message=f"Recieved note {__ITEM_ID}",section="VkAttachments",name="message")
-
-            note["site"] = self.passed_params.get("vk_path")
-            __note_index = note.copy()
-            __note_index["text"] = utils.proc_strtr(__note_index.get("text"), self.passed_params.get("indexation_text_cut"))
-
-            ENTITY = self._entityFromJson({
-                "source": __SOURCE,
-                "indexation_content": __note_index,
-                "internal_content": note,
-                "unlisted": self.passed_params.get("unlisted") == 1,
-                "suggested_name": utils.proc_strtr(note.get("title"), 1000),
-                "declared_created_at": note.get("date"),
-            })
-            __entities_list.append(ENTITY)
+        await asyncio.gather(*__tasks, return_exceptions=False)
 
         return {
             "entities": __entities_list
         }
+
+    async def __item(self, item, link_entities):
+        __ITEM_ID  = f"{item.get('owner_id')}_{item.get('id')}"
+        __SOURCE   = f"vk:note{__ITEM_ID}"
+
+        logger.log(message=f"Recieved note {__ITEM_ID}",section="VkAttachments",name="message")
+
+        item["site"] = self.passed_params.get("vk_path")
+        __note_index = item.copy()
+        __note_index["text"] = utils.proc_strtr(__note_index.get("text"), self.passed_params.get("indexation_text_cut"))
+
+        ENTITY = self._entityFromJson({
+            "source": __SOURCE,
+            "indexation_content": __note_index,
+            "internal_content": item,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+            "suggested_name": utils.proc_strtr(item.get("title"), 1000),
+            "declared_created_at": item.get("date"),
+        })
+        link_entities.append(ENTITY)

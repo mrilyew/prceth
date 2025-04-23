@@ -11,7 +11,7 @@ class TVideo(BaseThumbnail):
             "photo": []
         }
 
-        path = os.path.join(self.save_dir, file.upload_name)
+        path = file.getPath()
         if params.get("preview_file"):
             path = params.get("preview_file")
         

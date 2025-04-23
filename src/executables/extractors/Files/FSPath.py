@@ -42,6 +42,7 @@ class FSPath(BaseExtractor):
         INPUT_FILE_NAME  = INPUT_PATH.name
         INPUT_FILE_EXT   = str(INPUT_PATH.suffix[1:]) # remove dot
         MOVE_TO = Path(TEMP_DIR + '\\' + INPUT_FILE_NAME)
+        LINK = None
 
         # Creating entity
         # Copying and leaving original file
@@ -50,12 +51,13 @@ class FSPath(BaseExtractor):
         # Copying and removing original file
         elif self.passed_params.get("type") == 'move':
             file_manager.moveFile(INPUT_PATH, MOVE_TO)
-        # Making a symlink to original file
+        # Making a link to original file
         elif self.passed_params.get("type") == 'link':
-            file_manager.symlinkFile(INPUT_PATH, MOVE_TO)
+            LINK = str(INPUT_PATH)
+            #file_manager.symlinkFile(INPUT_PATH, MOVE_TO)
         else:
             raise InvalidPassedParam("Invalid \"type\"")
-        
+
         # Catching metadata
         __OUTPUT_METADATA = {
             "export_as": str(self.passed_params.get("type")),
@@ -65,19 +67,18 @@ class FSPath(BaseExtractor):
             "extension": INPUT_FILE_EXT,
             "upload_name": INPUT_FILE_NAME,
             "filesize": FILE_SIZE,
-        })
+            "link": LINK,
+        }, TEMP_DIR)
         ENTITY = self._entityFromJson({
             "source": "path:"+str(INPUT_PATH),
             "internal_content": __OUTPUT_METADATA,
             "file": FILE
         })
-        
+
         return {
-            "entities": [
-                ENTITY
-            ],
+            "entities": [ENTITY],
         }
-    
+
     def describeSource(self, INPUT_ENTITY):
         return {"type": "api", "data": {
             "source": INPUT_ENTITY.orig_source

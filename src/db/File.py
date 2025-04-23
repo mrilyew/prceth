@@ -131,14 +131,14 @@ class File(BaseModel):
         HASH = self.hash
         if getattr(self, "link") != None:
             return self.link
-        
+
         COLLECTION_PATH = os.path.join(STORAGE_PATH, "files", HASH[0:2])
         END_DIR = os.path.join(COLLECTION_PATH, HASH)
         if self.temp_dir != None:
             END_DIR = self.temp_dir
-        
+
         ENTITY_PATH = os.path.join(END_DIR, str(self.upload_name))
-        
+
         return ENTITY_PATH
     
     def getFsFileName(self):

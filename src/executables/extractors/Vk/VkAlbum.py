@@ -59,7 +59,7 @@ class VkAlbum(VkTemplate):
 
         return params
     
-    async def __recieveById(self, item_ids):
+    async def recieveById(self, item_ids):
         ids = item_ids[0].split("_")
         return await self.__vkapi.call("photos.getAlbums", {"owner_id": ids[0], "album_ids": ids[1], "need_covers": 1, "photo_sizes": 1})
 
@@ -71,7 +71,7 @@ class VkAlbum(VkTemplate):
         album_ids = __album_ids.split(",")
         if self.passed_params.get("__json_info") == None:
             try:
-                __albums_resp = await self.__recieveById(album_ids)
+                __albums_resp = await self.recieveById(album_ids)
                 if __albums_resp.get("items"):
                     albums = __albums_resp.get("items")
             except:
@@ -83,99 +83,39 @@ class VkAlbum(VkTemplate):
                     albums = [__albums_resp]
             except:
                 albums = None
-        
+
         if albums == None or len(albums) < 1:
             raise NotFoundException("album not found")
-        
+
         if self.passed_params.get("download_photos") == True:
-            logger.log(message="Bro! This method is deprecated! Use Vk.VkSection instead!",section="VkCollection",name="deprecated")
+            logger.log(message="This method is deprecated. Use Vk.VkSection instead!",section="VkCollection",name="deprecated")
 
         __entities_list = []
-        for album in albums:
-            album["site"] = self.passed_params.get("vk_path")
+        __tasks = []
+        for item in albums:
+            __task = asyncio.create_task(self.__item(item, __entities_list))
+            __tasks.append(__task)
 
-            __ITEM_ID  = f"{album.get('owner_id')}_{album.get('id')}"
-            __SOURCE   = f"vk:album{__ITEM_ID}"
-            SUGGESTED_NAME = f"{album.get('title')} ({album.get('owner_id')}_{album.get('id')})"
-            logger.log(message=f"Recieved album {__ITEM_ID}",section="VkCollection",name="message")
+        await asyncio.gather(*__tasks, return_exceptions=False)
 
-            ALBUM_ENTITY = self._entityFromJson({
-                "source": __SOURCE,
-                "internal_content": album,
-                "unlisted": 1,
-                "suggested_name": SUGGESTED_NAME,
-                "suggested_description": album.get("description"),
-                "declared_created_at": album.get("date"),
-            })
+        return {
+            "entities": __entities_list
+        }
 
-            photos_list = []
-            if self.passed_params.get("download_photos") == True:
-                __per_page = self.passed_params.get("per_page")
-                __count = album.get("size")
-                __downloaded_count = 0
-                times = math.ceil(__count / __per_page)
-                vphoto_ext = VkPhoto(need_preview=self.need_preview)
+    async def __item(self, item, link_entities):
+        item["site"] = self.passed_params.get("vk_path")
 
-                for time in range(0, times):
-                    OFFSET = __per_page * time
+        __ITEM_ID  = f"{item.get('owner_id')}_{item.get('id')}"
+        __SOURCE   = f"vk:album{__ITEM_ID}"
+        SUGGESTED_NAME = f"{item.get('title')} ({item.get('owner_id')}_{item.get('id')})"
+        logger.log(message=f"Recieved album {__ITEM_ID}",section="VkCollection",name="message")
 
-                    logger.log(message=f"{time + 1}/{times} time of photos recieving; {OFFSET} offset",section="VkCollection",name="message")
-
-                    _ID = __ITEM_ID.split("_")
-                    photos_api = await self.__vkapi.call("photos.get", {"owner_id": _ID[0], 
-                                                                        "album_id": _ID[1], 
-                                                                        "rev": int(self.passed_params.get("rev")), 
-                                                                        "extended": 1,
-                                                                        "photo_sizes": 1,
-                                                                        "offset": OFFSET,
-                                                                        "count": __per_page})
-                    
-                    for photo_item in photos_api.get("items"):
-                        if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
-                            break
-                        
-                        __PHOTO_ID = str(photo_item.get("owner_id")) + "_" + str(photo_item.get("id"))
-                        vphoto_ext.setArgs({
-                            "unlisted": 0,
-                            "item_id": __PHOTO_ID,
-                            "__json_info": photo_item,
-                            "access_token": self.passed_params.get("access_token"),
-                            "api_url": self.passed_params.get("api_url"),
-                            "vk_path": self.passed_params.get("vk_path"),
-                            "download_file": self.passed_params.get("download_file"),
-                        })
-
-                        try:
-                            executed = await vphoto_ext.execute({})
-                            for __photo in executed.get("entities"):
-                                photos_list.append(__photo)
-                                
-                        except Exception:
-                            pass
-                        
-                        if self.passed_params.get("download_timeout") != 0:
-                            await asyncio.sleep(self.passed_params.get("download_timeout"))
-
-                        __downloaded_count += 1
-                    
-                    if self.passed_params.get("api_timeout") != 0:
-                        await asyncio.sleep(self.passed_params.get("api_timeout"))
-            
-                await vphoto_ext.postRun(return_entities=photos_list)
-                del vphoto_ext
-            
-            if len(photos_list) > 0:
-                __entities_list.append(ALBUM_ENTITY)
-                fnl = {
-                    "entities": __entities_list,
-                    "collection": {
-                        "suggested_name": SUGGESTED_NAME,
-                        "suggested_description": album.get("description"),
-                        "declared_created_at": album.get("date"),
-                    },
-                }
-                return fnl
-            else:
-                return {
-                    "entities": [ALBUM_ENTITY]
-                }
+        ALBUM_ENTITY = self._entityFromJson({
+            "source": __SOURCE,
+            "internal_content": item,
+            "unlisted": 1,
+            "suggested_name": SUGGESTED_NAME,
+            "suggested_description": item.get("description"),
+            "declared_created_at": item.get("date"),
+        })
+        link_entities.append(ALBUM_ENTITY)

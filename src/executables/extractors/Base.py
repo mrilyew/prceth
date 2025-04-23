@@ -119,27 +119,27 @@ class BaseExtractor(Executable):
     def thumbnail(self, entity, args={}, temp_dir = None):
         if self.need_preview == False:
             return None
-        
+
         from resources.Globals import ThumbnailsRepository
         __FILE = entity.file
         if __FILE == None:
             return None
-        
+
         ext = __FILE.extension
         if args.get("preview_file"):
             ext = utils.get_ext(args.get("preview_file"))
-        
+
         thumb = (ThumbnailsRepository()).getByFormat(ext)
         if thumb == None:
             return None
-        
+
         if temp_dir == None:
             temp_dir = __FILE.temp_dir
-        
+
         #thumb_class = thumb(save_dir=__FILE.getDirPath())
         thumb_class = thumb(save_dir=temp_dir)
         return thumb_class.run(file=__FILE,params=args)
-    
+
     async def fastGetEntity(self, params, args):
         from db.File import File
 
@@ -172,12 +172,12 @@ class BaseExtractor(Executable):
 
         return EXTRACTOR_RESULTS
 
-    async def _execute_sub(self, extractor, final_array_link):
+    async def _execute_sub(self, extractor, extractor_params, array_link):
         try:
+            extractor.setArgs(extractor_params)
             executed = await extractor.execute({})
             for ___item in executed.get("entities"):
-                final_array_link.append(___item)
+                array_link.append(___item)
         except Exception as ___e:
             logger.logException(input_exception=___e,section="Extractor",noConsole=False)
             pass
-

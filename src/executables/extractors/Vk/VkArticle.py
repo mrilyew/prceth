@@ -1,4 +1,4 @@
-from resources.Globals import VkApi, logger
+from resources.Globals import VkApi, logger, asyncio
 from executables.extractors.Vk.VkTemplate import VkTemplate
 from resources.Exceptions import NotFoundException
 
@@ -22,7 +22,7 @@ class VkArticle(VkTemplate):
 
         return params
             
-    async def __recieveById(self, item_ids):
+    async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("articles.getByLink", {"links": ",".join(item_ids), "extended": 1})
     
@@ -32,7 +32,7 @@ class VkArticle(VkTemplate):
         item_ids = __item_ids.split(",")
         if self.passed_params.get("__json_info") == None:
             try:
-                __article_response = await self.__recieveById(item_ids)
+                __article_response = await self.recieveById(item_ids)
                 if __article_response.get("items") != None:
                     __article_response = __article_response.get("items")
             except:
@@ -47,26 +47,33 @@ class VkArticle(VkTemplate):
 
         if __article_response == None or len(__article_response) < 1:
             raise NotFoundException("article not found")
-        
+
         __entities_list = []
-        for article in __article_response:
-            article["site"] = self.passed_params.get("vk_path")
-            __SOURCE  = f"url:{article.get('url')}"
-            __TITLE = article.get("title")
-            __PUBLICATION = article.get("published_date")
+        __tasks = []
+        for item in __article_response:
+            __task = asyncio.create_task(self.__item(item, __entities_list))
+            __tasks.append(__task)
 
-            logger.log(message=f"Recieved article {article.get('url')}",section="VkAttachments",name="message")
-
-            ENTITY = self._entityFromJson({
-                "source": __SOURCE,
-                "internal_content": article,
-                "suggested_name": __TITLE,
-                "file": None,
-                "unlisted": self.passed_params.get("unlisted") == 1,
-                "declared_created_at": __PUBLICATION,
-            })
-            __entities_list.append(ENTITY)
+        await asyncio.gather(*__tasks, return_exceptions=False)
 
         return {
             "entities": __entities_list
         }
+
+    async def __item(self, item, link_entities):
+        item["site"] = self.passed_params.get("vk_path")
+        __SOURCE  = f"url:{item.get('url')}"
+        __TITLE = item.get("title")
+        __PUBLICATION = item.get("published_date")
+
+        logger.log(message=f"Recieved article {item.get('url')}",section="VkAttachments",name="message")
+
+        ENTITY = self._entityFromJson({
+            "source": __SOURCE,
+            "internal_content": item,
+            "suggested_name": __TITLE,
+            "file": None,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+            "declared_created_at": __PUBLICATION,
+        })
+        link_entities.append(ENTITY)

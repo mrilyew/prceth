@@ -6,7 +6,7 @@ class VkComment(VkPost):
     category = 'Vk'
     vk_type = "comment"
 
-    async def __recieveById(self, post_ids):
+    async def recieveById(self, post_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         
         comment_id = post_ids[0].split("_")

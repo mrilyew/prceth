@@ -1,5 +1,5 @@
 from executables.extractors.Vk.VkTemplate import VkTemplate
-from resources.Globals import os, download_manager, VkApi, Path, config, utils, logger
+from resources.Globals import os, download_manager, VkApi, Path, asyncio, utils, logger
 from resources.Exceptions import NotFoundException
 
 class VkAudio(VkTemplate):
@@ -28,7 +28,7 @@ class VkAudio(VkTemplate):
 
         return params
     
-    async def __recieveById(self, item_ids):
+    async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("audio.getById", {"audios": ",".join(item_ids), "extended": 1})
     
@@ -38,7 +38,7 @@ class VkAudio(VkTemplate):
         item_ids = __item_ids.split(",")
         if self.passed_params.get("__json_info") == None:
             try:
-                __audio_response = await self.__recieveById(item_ids)
+                __audio_response = await self.recieveById(item_ids)
                 if __audio_response.get("items") != None:
                     __audio_response = __audio_response.get("items")
             except:
@@ -55,65 +55,72 @@ class VkAudio(VkTemplate):
             raise NotFoundException("audio not found")
         
         __entities_list = []
-        for audio in __audio_response:
-            audio["site"] = self.passed_params.get("vk_path")
+        __tasks = []
+        for item in __audio_response:
+            __task = asyncio.create_task(self.__item(item, __entities_list))
+            __tasks.append(__task)
 
-            __ITEM_ID = f"{audio.get('owner_id')}_{audio.get('id')}"
-            __SOURCE  = f"vk:audio{__ITEM_ID}"
-
-            logger.log(message=f"Recieved audio {__ITEM_ID}",section="VkAttachments",name="message")
-
-            FILE = None
-            ___OUT_EXT  = "mp3"
-            ___OUT_SIZE = 0
-
-            AUDIO_NAME = f"{audio.get('artist')} — {audio.get('title')}"
-            AUDIO_UPLOAD_NAME = utils.validName(AUDIO_NAME) + f".{___OUT_EXT}"
-
-            if self.passed_params.get("download_file") == True:
-                TEMP_DIR = self.allocateTemp()
-                ___SAVE_PATH = Path(os.path.join(TEMP_DIR, AUDIO_UPLOAD_NAME))
-
-                if audio.get("url") == None:
-                    logger.log(message=f"Audio {__ITEM_ID} does not contains url to file",section="VkAudio",name="error")
-                else:
-                    # Todo HLS
-                    if ".m3u8" in audio.get("url"):
-                        from submodules.Media.YtDlpWrapper import YtDlpWrapper
-
-                        logger.log(message=f"Found .m3u8 of audio {__ITEM_ID}",section="VkAudio",name="message")
-                        params = {"outtmpl": str(___SAVE_PATH)}
-                        with YtDlpWrapper(params).ydl as ydl:
-                            info = ydl.extract_info(audio.get("url"), download=True)
-
-                        FILE = self._fileFromJson({
-                            "extension": ___OUT_EXT,
-                            "upload_name": AUDIO_UPLOAD_NAME,
-                            "filesize": ___SAVE_PATH.stat().st_size,
-                        })
-                    else:
-                        logger.log(message=f"Downloading raw .mp3 of audio {__ITEM_ID}",section="VkAudio",name="message")
-
-                        DOWNLOAD_URL = audio.get("url")
-                        HTTP_REQUEST = await download_manager.addDownload(end=DOWNLOAD_URL,dir=___SAVE_PATH)
-                        ___OUT_SIZE = ___SAVE_PATH.stat().st_size
-
-                        FILE = self._fileFromJson({
-                            "extension": ___OUT_EXT,
-                            "upload_name": AUDIO_UPLOAD_NAME,
-                            "filesize": ___OUT_SIZE,
-                        })
-            
-            ENTITY = self._entityFromJson({
-                "source": __SOURCE,
-                "internal_content": audio,
-                "suggested_name": AUDIO_NAME,
-                "file": FILE,
-                "unlisted": self.passed_params.get("unlisted") == 1,
-                "declared_created_at": audio.get("date"),
-            })
-            __entities_list.append(ENTITY)
+        await asyncio.gather(*__tasks, return_exceptions=False)
         
         return {
             "entities": __entities_list
         }
+
+    async def __item(self, item, link_entities):
+        item["site"] = self.passed_params.get("vk_path")
+
+        __ITEM_ID = f"{item.get('owner_id')}_{item.get('id')}"
+        __SOURCE  = f"vk:audio{__ITEM_ID}"
+
+        logger.log(message=f"Recieved audio {__ITEM_ID}",section="VkAttachments",name="message")
+
+        FILE = None
+        ___OUT_EXT  = "mp3"
+        ___OUT_SIZE = 0
+
+        AUDIO_NAME = f"{item.get('artist')} — {item.get('title')}"
+        AUDIO_UPLOAD_NAME = utils.validName(AUDIO_NAME) + f".{___OUT_EXT}"
+
+        if self.passed_params.get("download_file") == True:
+            TEMP_DIR = self.allocateTemp()
+            ___SAVE_PATH = Path(os.path.join(TEMP_DIR, AUDIO_UPLOAD_NAME))
+
+            if item.get("url") == None:
+                logger.log(message=f"Audio {__ITEM_ID} does not contains url to file",section="VkAudio",name="error")
+            else:
+                # Todo HLS
+                if ".m3u8" in item.get("url"):
+                    from submodules.Media.YtDlpWrapper import YtDlpWrapper
+
+                    logger.log(message=f"Found .m3u8 of audio {__ITEM_ID}",section="VkAudio",name="message")
+                    params = {"outtmpl": str(___SAVE_PATH)}
+                    with YtDlpWrapper(params).ydl as ydl:
+                        info = ydl.extract_info(item.get("url"), download=True)
+
+                    FILE = self._fileFromJson({
+                        "extension": ___OUT_EXT,
+                        "upload_name": AUDIO_UPLOAD_NAME,
+                        "filesize": ___SAVE_PATH.stat().st_size,
+                    })
+                else:
+                    logger.log(message=f"Downloading raw .mp3 of audio {__ITEM_ID}",section="VkAudio",name="message")
+
+                    DOWNLOAD_URL = item.get("url")
+                    HTTP_REQUEST = await download_manager.addDownload(end=DOWNLOAD_URL,dir=___SAVE_PATH)
+                    ___OUT_SIZE = ___SAVE_PATH.stat().st_size
+
+                    FILE = self._fileFromJson({
+                        "extension": ___OUT_EXT,
+                        "upload_name": AUDIO_UPLOAD_NAME,
+                        "filesize": ___OUT_SIZE,
+                    })
+
+        ENTITY = self._entityFromJson({
+            "source": __SOURCE,
+            "internal_content": item,
+            "suggested_name": AUDIO_NAME,
+            "file": FILE,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+            "declared_created_at": item.get("date"),
+        })
+        link_entities.append(ENTITY)

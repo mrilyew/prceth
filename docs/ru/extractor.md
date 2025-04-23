@@ -146,3 +146,17 @@ class Template(BaseExtractor):
 #### Выполнение других экстракторов
 
 В `run()` можно выполнить другой экстрактор. Для этого может пригодится метод `fastGetEntity()`, но он не рекомендуется. Пример его использования можно найти в Vk.VkPost на 168 строке.
+
+#### asyncio.gather
+
+Для одновременного выполнения действий выполнения другого экстрактора создайте массив __tasks, в который будут помещаться элементы вида:
+
+```
+task = asyncio.create_task(self._execute_sub(__extractor, copy.deepcopy(__extractor_params), __final_entities))
+```
+
+После создания задач передайте:
+
+```
+await asyncio.gather(*tasks, return_exceptions=False)
+```

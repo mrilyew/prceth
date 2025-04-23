@@ -4,7 +4,7 @@ from db.Entity import Entity
 
 class MoveBrokenTempDirs(BaseAct):
     name = 'MoveBrokenTempDirs'
-    category = 'export'
+    category = 'storage'
     accepts = 'string'
 
     def execute(self, i: str, args):

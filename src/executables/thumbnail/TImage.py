@@ -7,7 +7,7 @@ class TImage(BaseThumbnail):
 
     def run(self, file, params={}):
         size = (200, 200)
-        path = os.path.join(self.save_dir, file.upload_name)
+        path = file.getPath()
         __previews = {
             "photo": []
         }

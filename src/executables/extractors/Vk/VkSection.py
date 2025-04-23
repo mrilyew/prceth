@@ -403,24 +403,21 @@ class VkSection(VkTemplate):
                 if __extract_type == True:
                     __type = item.get("type")
                     __extractor_params["__json_info"] = item.get(__type)
-                
-                __extractor.setArgs(__extractor_params)
 
-                __task = asyncio.create_task(self._execute_sub(copy.deepcopy(__extractor),__final_entities))
+                __task = asyncio.create_task(self._execute_sub(__extractor, copy.deepcopy(__extractor_params), __final_entities))
                 __tasks.append(__task)
 
                 #if self.passed_params.get("download_timeout") != 0:
                 #    await asyncio.sleep(self.passed_params.get("download_timeout"))
 
                 __downloaded_count += 1
-            
-            await asyncio.gather(*__tasks, return_exceptions=True)
+
+            await asyncio.gather(*__tasks, return_exceptions=False)
             
             if self.passed_params.get("api_timeout") != 0:
                 await asyncio.sleep(self.passed_params.get("api_timeout"))
             
         #await __extractor.postRun(return_entities=__final_entities)
-        del __extractor
 
         return {
             "entities": __final_entities,

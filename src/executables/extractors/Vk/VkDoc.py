@@ -1,7 +1,6 @@
 from executables.extractors.Vk.VkTemplate import VkTemplate
-from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger
+from resources.Globals import os, download_manager, VkApi, Path, asyncio, logger
 from resources.Exceptions import NotFoundException
-from db.File import File
 
 # Downloads document from vk.com using api.
 class VkDoc(VkTemplate):
@@ -30,7 +29,7 @@ class VkDoc(VkTemplate):
 
         return params
     
-    async def __recieveById(self, item_ids):
+    async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("docs.getById", {"docs": ",".join(item_ids), "extended": 1})
     
@@ -41,7 +40,7 @@ class VkDoc(VkTemplate):
         item_ids = __item_ids.split(",")
 
         if self.passed_params.get("__json_info") == None:
-            DOCS_RESPONSE = await self.__recieveById(item_ids)
+            DOCS_RESPONSE = await self.recieveById(item_ids)
         else:
             try:
                 DOCS_RESPONSE = self.passed_params.get("__json_info")
@@ -54,50 +53,57 @@ class VkDoc(VkTemplate):
             raise NotFoundException("doc not found")
         
         __entities_list = []
-        for DOC in DOCS_RESPONSE:
-            DOC["site"] = self.passed_params.get("vk_path")
+        __tasks = []
+        for item in DOCS_RESPONSE:
+            __task = asyncio.create_task(self.__item(item, __entities_list))
+            __tasks.append(__task)
 
-            __ITEM_ID, __SOURCE = [None, None]
-            if __ITEM_ID == None:
-                if DOC.get("owner_id") == None:
-                    __ITEM_ID = "url:" + DOC.get("private_url")
-                    __SOURCE  = __ITEM_ID
-                else:
-                    __ITEM_ID  = f"{DOC.get('owner_id')}_{DOC.get('id')}"
-                    __SOURCE   = f"vk:doc{__ITEM_ID}"
-            else:
-                __SOURCE = f"vk:doc{__ITEM_ID}"
-
-            logger.log(message=f"Recieved document {__ITEM_ID}",section="VkAttachments",name="message")
-
-            item_EXT  = DOC.get("ext")
-            item_TEXT = DOC.get("title") + "." + item_EXT
-            item_URL  = DOC.get("url")
-            item_SIZE = DOC.get("size", 0)
-            
-            FILE = None
-            if self.passed_params.get("download_file") == True:
-                TEMP_DIR = self.allocateTemp()
-
-                save_path = Path(os.path.join(TEMP_DIR, item_TEXT))
-                HTTP_REQUEST = await download_manager.addDownload(end=item_URL,dir=save_path)
-                FILE = self._fileFromJson({
-                    "extension": item_EXT,
-                    "upload_name": item_TEXT,
-                    "filesize": item_SIZE,
-                })
-
-            ENTITY = self._entityFromJson({
-                "file": FILE,
-                "suggested_name": item_TEXT,
-                "source": __SOURCE,
-                "internal_content": DOC,
-                "unlisted": self.passed_params.get("unlisted") == 1,
-                "declared_created_at": DOC.get("date"),
-            })
-
-            __entities_list.append(ENTITY)
+        await asyncio.gather(*__tasks, return_exceptions=False)
 
         return {
             "entities": __entities_list
         }
+
+    async def __item(self, item, link_entities):
+        item["site"] = self.passed_params.get("vk_path")
+
+        __ITEM_ID, __SOURCE = [None, None]
+        if __ITEM_ID == None:
+            if item.get("owner_id") == None:
+                __ITEM_ID = "url:" + item.get("private_url")
+                __SOURCE  = __ITEM_ID
+            else:
+                __ITEM_ID  = f"{item.get('owner_id')}_{item.get('id')}"
+                __SOURCE   = f"vk:doc{__ITEM_ID}"
+        else:
+            __SOURCE = f"vk:doc{__ITEM_ID}"
+
+        logger.log(message=f"Recieved document {__ITEM_ID}",section="VkAttachments",name="message")
+
+        item_EXT  = item.get("ext")
+        item_TEXT = item.get("title") + "." + item_EXT
+        item_URL  = item.get("url")
+        item_SIZE = item.get("size", 0)
+        
+        FILE = None
+        if self.passed_params.get("download_file") == True:
+            TEMP_DIR = self.allocateTemp()
+
+            save_path = Path(os.path.join(TEMP_DIR, item_TEXT))
+            HTTP_REQUEST = await download_manager.addDownload(end=item_URL,dir=save_path)
+            FILE = self._fileFromJson({
+                "extension": item_EXT,
+                "upload_name": item_TEXT,
+                "filesize": item_SIZE,
+            })
+
+        ENTITY = self._entityFromJson({
+            "file": FILE,
+            "suggested_name": item_TEXT,
+            "source": __SOURCE,
+            "internal_content": item,
+            "unlisted": self.passed_params.get("unlisted") == 1,
+            "declared_created_at": item.get("date"),
+        })
+
+        link_entities.append(ENTITY)

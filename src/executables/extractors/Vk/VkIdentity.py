@@ -1,6 +1,5 @@
-from resources.Globals import os, VkApi, logger, consts, Path, download_manager
+from resources.Globals import os, VkApi, logger, consts, Path, download_manager, asyncio
 from executables.extractors.Vk.VkTemplate import VkTemplate
-from executables.extractors.Vk.VkPhoto import VkPhoto
 from resources.Exceptions import NotFoundException
 
 class VkIdentity(VkTemplate):
@@ -33,6 +32,48 @@ class VkIdentity(VkTemplate):
         }
 
         return params
+
+    async def __download_avatar(self, json):
+        TEMP_DIR = self.allocateTemp()
+        ORIGINAL_NAME = "avatar.jpg"
+        SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
+
+        URL = json.get("photo_max")
+        if URL == None:
+            raise NotFoundException("ava not found")
+        
+        await download_manager.addDownload(dir=SAVE_PATH,end=URL)
+        
+        __file = self._fileFromJson({
+            "extension": "jpg",
+            "upload_name": ORIGINAL_NAME,
+            "filesize": SAVE_PATH.stat().st_size,
+        }, TEMP_DIR)
+
+        return __file
+
+    async def __download_cover(self, json):
+        TEMP_DIR = self.allocateTemp()
+        ORIGINAL_NAME = "cover.jpg"
+        SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
+
+        cover = json.get("cover")
+        if cover == None or len(cover.get("images")) < 1:
+            raise NotFoundException("cover not found")
+        
+        images = cover.get("images")
+        images_ = sorted(images, key=lambda x: (x['width'] is None, x['width']))
+        image = images_[0]
+        
+        await download_manager.addDownload(dir=SAVE_PATH,end=image.get("url"))
+
+        __file = self._fileFromJson({
+            "extension": "jpg",
+            "upload_name": ORIGINAL_NAME,
+            "filesize": SAVE_PATH.stat().st_size,
+        }, TEMP_DIR)
+
+        return __file
 
     async def run(self, args):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
@@ -74,48 +115,6 @@ class VkIdentity(VkTemplate):
                     else:
                         __groups_response.append(__item)
         
-        async def __download_avatar(json):
-            TEMP_DIR = self.allocateTemp()
-            ORIGINAL_NAME = "avatar.jpg"
-            SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
-
-            URL = json.get("photo_max")
-            if URL == None:
-                raise NotFoundException("ava not found")
-            
-            await download_manager.addDownload(dir=SAVE_PATH,end=URL)
-            
-            __file = self._fileFromJson({
-                "extension": "jpg",
-                "upload_name": ORIGINAL_NAME,
-                "filesize": SAVE_PATH.stat().st_size,
-            }, TEMP_DIR)
-
-            return __file
-                
-        async def __download_cover(json):
-            TEMP_DIR = self.allocateTemp()
-            ORIGINAL_NAME = "cover.jpg"
-            SAVE_PATH = Path(os.path.join(TEMP_DIR, ORIGINAL_NAME))
-
-            cover = json.get("cover")
-            if cover == None or len(cover.get("images")) < 1:
-                raise NotFoundException("cover not found")
-            
-            images = cover.get("images")
-            images_ = sorted(images, key=lambda x: (x['width'] is None, x['width']))
-            image = images_[0]
-            
-            await download_manager.addDownload(dir=SAVE_PATH,end=image.get("url"))
-
-            __file = self._fileFromJson({
-                "extension": "jpg",
-                "upload_name": ORIGINAL_NAME,
-                "filesize": SAVE_PATH.stat().st_size,
-            }, TEMP_DIR)
-
-            return __file
-        
         if __users_response != None:
             for user in __users_response:
                 user["vkapi_type"] = "user"
@@ -129,55 +128,64 @@ class VkIdentity(VkTemplate):
             for club in __groups_response.get("groups"):
                 club["vkapi_type"] = "club"
                 groups.append(club)
-        
-        entities = []
-        for identity in groups + users:
-            name = ""
-            source = ""
-            reg_date = None
-            linked_files = []
 
-            if identity.get("vkapi_type") == "user":
-                name = f"@vk_user: {identity.get('first_name')} {identity.get('last_name')}"
-                source = f"vk:id{identity.get('id')}"
-                reg_date = identity.get("reg_date", None)
-            else:
-                name = f"@vk_club: {identity.get('name')}"
-                source = f"vk:group{identity.get('id')}"
-            
-            if self.passed_params.get("download_avatar") == True:
-                try:
-                    __file = await __download_avatar(identity)
-                    __file.moveTempDir()
-                    identity["relative_photo_max_orig"] = f"__lcms|file_{__file.id}"
+        __entities_list = []
+        __tasks = []
+        for item in groups + users:
+            __task = asyncio.create_task(self.__item(item, __entities_list))
+            __tasks.append(__task)
 
-                    linked_files.append(__file)
-                except Exception as _e:
-                    logger.logException(_e,section="Vk",noConsole=False)
-                            
-            if self.passed_params.get("download_cover") == True:
-                try:
-                    __file = await __download_cover(identity)
-                    __file.moveTempDir()
-                    identity["relative_cover"] = f"__lcms|file_{__file.id}"
-                    
-                    linked_files.append(__file)
-                except NotFoundException:
-                    pass
-                except TypeError:
-                    pass
-                except Exception as _e:
-                    logger.logException(_e,section="Vk",noConsole=False)
-            
-            ENTITY = self._entityFromJson({
-                "source": source,
-                "suggested_name": name,
-                "internal_content": identity,
-                "declared_created_at": reg_date,
-                "linked_files": linked_files,
-            })
-            entities.append(ENTITY)
+        await asyncio.gather(*__tasks, return_exceptions=False)
         
         return {
-            "entities": entities
+            "entities": __entities_list
         }
+
+    async def __item(self, item, link_entities):
+        name = ""
+        source = ""
+        reg_date = None
+        linked_files = []
+
+        if item.get("vkapi_type") == "user":
+            name = f"@vk_user: {item.get('first_name')} {item.get('last_name')}"
+            source = f"vk:id{item.get('id')}"
+            reg_date = item.get("reg_date", None)
+        else:
+            name = f"@vk_club: {item.get('name')}"
+            source = f"vk:group{item.get('id')}"
+        
+        if self.passed_params.get("download_avatar") == True:
+            try:
+                __file = await self.__download_avatar(item)
+                __file.moveTempDir()
+                item["relative_photo_max_orig"] = f"__lcms|file_{__file.id}"
+
+                linked_files.append(__file)
+            except Exception as _e:
+                logger.logException(_e,section="Vk",noConsole=False)
+                        
+        if self.passed_params.get("download_cover") == True:
+            try:
+                __file = await self.__download_cover(item)
+                __file.moveTempDir()
+                item["relative_cover"] = f"__lcms|file_{__file.id}"
+                
+                linked_files.append(__file)
+            except NotFoundException:
+                pass
+            except TypeError:
+                pass
+            except Exception as _e:
+                logger.logException(_e,section="Vk",noConsole=False)
+        
+        logger.log(f"Got identity {item.get("vkapi_type")}{item.get('id')}",section="Vk",name="success")
+
+        ENTITY = self._entityFromJson({
+            "source": source,
+            "suggested_name": name,
+            "internal_content": item,
+            "declared_created_at": reg_date,
+            "linked_files": linked_files,
+        })
+        link_entities.append(ENTITY)
