@@ -1,12 +1,12 @@
 from executables.thumbnail.Base import BaseThumbnail
-from resources.Globals import VideoFileClip, Image, math, consts, utils, os
+from resources.Globals import VideoFileClip, Image, math, config, utils, os
 
 class TVideo(BaseThumbnail):
     name = 'TVideo'
     accept = ["mp4", "mov"]
 
     def run(self, file, params={}):
-        size = (200, 200)
+        size = (config.get("thumbnail.width"), config.get("thumbnail.height"))
         __previews = {
             "photo": []
         }
@@ -24,8 +24,8 @@ class TVideo(BaseThumbnail):
                 __new_prev = os.path.join(self.save_dir, f"{__hash}_thumb_{i}.jpg")
                 __previews["photo"].append({
                     "path": f"{__hash}_thumb_{i}.jpg",
-                    "width": 200,
-                    "height": 200
+                    "width": config.get("thumbnail.width"),
+                    "height": config.get("thumbnail.height")
                 })
                 
                 i_duration = i * frag_len

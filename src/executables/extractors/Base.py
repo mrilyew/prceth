@@ -4,7 +4,6 @@ from executables.Executable import Executable
 
 class BaseExtractor(Executable):
     name = 'base'
-    unsaved_entities = []
 
     def __init__(self, temp_dir=None, del_dir_on_fail=True, need_preview=True, write_mode=2):
         self.passed_params = {}
@@ -53,36 +52,7 @@ class BaseExtractor(Executable):
                     file_manager.rmdir(t_dir)
                 except Exception:
                     logger.logException(t_dir, "Extractor", noConsole=False)
-    
-    def _fileFromJson(self, json_data, _temp_dir = None):
-        from db.File import File
 
-        if _temp_dir == None:
-            _temp_dir = self.temp_dirs[-1]
-
-        return File.fromJson(json_data, _temp_dir)
-    
-    def _entityFromJson(self, json_data, make_preview = True):
-        json_data["extractor_name"] = self.name
-        __entity = Entity.fromJson(json_data, self.passed_params)
-        # rewrite TODO
-        if make_preview == True:
-            thumb_result = self.thumbnail(entity=__entity,args=json_data)
-            if thumb_result != None:
-                __entity.preview = json.dumps(thumb_result)
-
-        self.unsaved_entities.append(__entity)
-        if self.write_mode == 2:
-            __entity.save()
-            logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")
-        
-        return __entity
-    
-    def _collectionFromJson(self, json_data):
-        from db.Collection import Collection
-
-        return Collection.fromJson(json_data, self.passed_params)
-        
     async def run(self, args):
         pass
     
@@ -114,45 +84,6 @@ class BaseExtractor(Executable):
                     MOVE_ENTITY.file.moveTempDir()
                 except:
                     pass
-    
-    # Typical preview
-    def thumbnail(self, entity, args={}, temp_dir = None):
-        if self.need_preview == False:
-            return None
-
-        from resources.Globals import ThumbnailsRepository
-        __FILE = entity.file
-        if __FILE == None:
-            return None
-
-        ext = __FILE.extension
-        if args.get("preview_file"):
-            ext = utils.get_ext(args.get("preview_file"))
-
-        thumb = (ThumbnailsRepository()).getByFormat(ext)
-        if thumb == None:
-            return None
-
-        if temp_dir == None:
-            temp_dir = __FILE.temp_dir
-
-        #thumb_class = thumb(save_dir=__FILE.getDirPath())
-        thumb_class = thumb(save_dir=temp_dir)
-        return thumb_class.run(file=__FILE,params=args)
-
-    async def fastGetEntity(self, params, args):
-        from db.File import File
-
-        RETURN_ENTITIES = []
-        self.setArgs(params)
-        EXTRACTOR_RESULTS = await self.execute({})
-        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
-            ENTITY.save()
-            RETURN_ENTITIES.append(ENTITY)
-            #if ENTITY.file != None:
-            #    ENTITY.file.moveTempDir()
-
-        return RETURN_ENTITIES
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "none", "data": {
@@ -171,13 +102,3 @@ class BaseExtractor(Executable):
             raise x
 
         return EXTRACTOR_RESULTS
-
-    async def _execute_sub(self, extractor, extractor_params, array_link):
-        try:
-            extractor.setArgs(extractor_params)
-            executed = await extractor.execute({})
-            for ___item in executed.get("entities"):
-                array_link.append(___item)
-        except Exception as ___e:
-            logger.logException(input_exception=___e,section="Extractor",noConsole=False)
-            pass

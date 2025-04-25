@@ -1,12 +1,12 @@
 from executables.thumbnail.Base import BaseThumbnail
-from resources.Globals import Image, consts, utils, os
+from resources.Globals import Image, config, utils, os
 
 class TImage(BaseThumbnail):
     name = 'TImage'
     accept = ["jpg", "png", "jpeg", "bmp", "gif", "tiff"]
 
     def run(self, file, params={}):
-        size = (200, 200)
+        size = (config.get("thumbnail.width"), config.get("thumbnail.height"))
         path = file.getPath()
         __previews = {
             "photo": []
@@ -31,8 +31,8 @@ class TImage(BaseThumbnail):
             __new_prev = os.path.join(self.save_dir, f"{__hash}_thumb.jpg")
             __previews["photo"].append({
                 "path": f"{__hash}_thumb.jpg",
-                "width": 200,
-                "height": 200
+                "width": config.get("thumbnail.width"),
+                "height": config.get("thumbnail.height")
             })
 
             new_img.save(__new_prev)

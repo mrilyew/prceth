@@ -1,9 +1,9 @@
-from resources.Globals import consts, Path, utils
 from db.Collection import Collection
 from db.Entity import Entity
 from db.File import File
+from executables.Executable import Executable
 
-class BaseAct:
+class BaseAct(Executable):
     name = 'base'
     category = 'base'
     accepts = 'entity' # | collection | both | string TODO заменить both на |

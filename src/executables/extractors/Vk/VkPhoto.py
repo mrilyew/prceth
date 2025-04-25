@@ -111,5 +111,5 @@ class VkPhoto(VkTemplate):
             "internal_content": item,
             "unlisted": self.passed_params.get("unlisted") == 1,
             "declared_created_at": item.get("date"),
-        }, TEMP_DIR)
+        })
         link_entities.append(ENTITY)

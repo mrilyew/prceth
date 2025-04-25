@@ -58,6 +58,12 @@ class MainUtils():
             return json.loads(text)
         except:
             return {}
+        
+    def dump_json(self, text):
+        try:
+            return json.dumps(text)
+        except:
+            return {}
     
     def remove_protocol(self, strr):
         return strr.replace("https://", "").replace("http://", "").replace("ftp://", "")
@@ -186,13 +192,13 @@ class MainUtils():
         return secrets.token_urlsafe(__bytes)
     
     def typicalPluginsList(self, folder: str):
-        dir = f"{consts['executable']}\\{folder}"
+        dir = f"{consts.get('executable')}\\{folder}"
 
         return Path(dir).rglob('*.py')
     
     def getExecutableList(self, folder: str = "extractors"):
         __exit = []
-        __base_path = Path(f"{consts['executable']}\\{folder}")
+        __base_path = Path(f"{consts.get('executable')}\\{folder}")
         __plugins = Path(__base_path).rglob('*.py')
         for plugin in __plugins:
             if plugin.name == '__init__.py' or plugin.name == '__pycache__' or plugin.name == "Base.py":

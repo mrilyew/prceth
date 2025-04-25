@@ -1,4 +1,4 @@
-from resources.Globals import datetime, os, consts, traceback, Path
+from resources.Globals import datetime, os, consts, traceback, Path, config
 
 class Logger():
     def __init__(self, keep: bool=False):
@@ -36,7 +36,7 @@ class Logger():
         return True
     
     def log(self, message: str = "Undefined", section: str = "App", name: str = "message", noConsole: bool = False):
-        if section in consts["logger.skip_categories"]:
+        if section in config.get("logger.skip_categories"):
             return
         
         # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS", etc.

@@ -1,46 +1,63 @@
 DefaultSettings = {
     "ui.lang": {
         "type": "string",
-        "default_value": 'en',
+        "default": 'en',
     },
     "ui.name": {
         "type": "string",
-        "default_value": "Difault",
+        "default": "Difault",
     },
     "web.useragent": {
         "type": "string",
-        "default_value": 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
+        "default": 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
     },
     "web.host": {
         "type": "string",
-        "default_value": "127.0.0.1",
+        "default": "127.0.0.1",
     },
     "web.port": {
         "type": "int",
-        "default_value": 7856,
+        "default": 7856,
     },
     "web.max_speed": {
         "type": "int",
-        "default_value": 2000, # kbs
+        "default": 2000, # kbs
     },
     "flask.debug": {
         "type": "int",
-        "default_value": 1,
+        "default": 1,
     },
     "flask.frontend": {
         "type": "string",
-        "default_value": "default",
+        "default": "default",
     },
     "extractor.cache_assets": {
         "type": "int",
-        "default_value": 0, # If 1, on NT you should run CMD with admin privelegies
+        "default": 0, # If 1, on NT you should run CMD with admin privelegies
     },
     "storage.path": {
         "type": "string",
-        "default_value": "?cwd?\\storage" # /src -> /storage
+        "default": "?cwd?\\storage" # /src -> /storage
     },
     "db.path": {
         "type": "string",
         "default_value": "storage/dbs/main.db"
-    }
+    },
+    "net.timeout": {
+        "type": "int",
+        "default": 1000
+    },
+    "logger.skip_categories": {
+        "type": "object",
+        "default": []
+    },
+    # Thumbnails
+    "thumbnail.width": {
+        "type": "int",
+        "default": 200,
+    },
+    "thumbnail.height": {
+        "type": "int",
+        "default": 200,
+    },
 }

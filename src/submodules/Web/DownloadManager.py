@@ -9,7 +9,7 @@ class DownloadManager():
         self.__headers = {
             "User-Agent": config.get("web.useragent")
         }
-        self.__timeout = consts["net.global_timeout"]
+        self.__timeout = config.get("net.timeout")
         self.__hooks = []
     
     def __selfDownloadHook(self, d):
