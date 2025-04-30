@@ -1,5 +1,7 @@
 from peewee import TextField, IntegerField, AutoField, BooleanField, TimestampField, DeferredForeignKey, JOIN
-from resources.Globals import BaseModel, consts, time, model_to_dict, reduce, operator, json, os
+from resources.Globals import BaseModel, consts, time, operator, json, os
+from playhouse.shortcuts import model_to_dict
+from functools import reduce
 
 class Collection(BaseModel):
     self_name = 'collection'

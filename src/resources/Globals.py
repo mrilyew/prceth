@@ -22,17 +22,8 @@ import asyncio
 import aiohttp
 import secrets
 import copy
-from fake_useragent import UserAgent as FakeUserAgent
-from PIL import Image, ImageOps
-from moviepy import VideoFileClip
-from playhouse.shortcuts import model_to_dict
-from hachoir.parser import createParser
-from hachoir.metadata import extractMetadata
-from urllib.parse import urlparse
-from urllib.parse import urlencode
 from pathlib import Path
 from datetime import datetime
-from functools import reduce
 from contextlib import contextmanager
 
 # Internal classes

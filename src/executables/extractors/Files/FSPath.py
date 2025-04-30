@@ -1,4 +1,4 @@
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Base.Base import BaseExtractor
 from resources.Globals import Path, file_manager, utils
 from resources.Exceptions import InvalidPassedParam, NotPassedException
 from db.File import File

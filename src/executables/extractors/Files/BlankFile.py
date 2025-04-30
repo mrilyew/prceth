@@ -1,4 +1,4 @@
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Base.Base import BaseExtractor
 from resources.Globals import file_manager, utils
 from db.File import File
 

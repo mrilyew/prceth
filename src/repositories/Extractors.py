@@ -1,19 +1,19 @@
 from resources.Globals import importlib, utils, logger, Path, consts
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Base.Base import BaseExtractor
 
 class Extractors:
     def getByName(self, extractor_name):
         try:
             module = importlib.import_module(f'executables.extractors.{extractor_name}')
             __class = getattr(module, extractor_name.split(".")[-1])
-            if __class.category == "template":
+            if __class.isRunnable() == False:
                 return None
             
             return __class
         except ModuleNotFoundError:
             return None
         except Exception as ee:
-            logger.logException(ee, "Extractors")
+            logger.logException(ee, "Extractors", silent=False)
             return None
 
     def getList(self, show_hidden=False):

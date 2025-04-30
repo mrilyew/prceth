@@ -6,7 +6,7 @@ from executables.Executable import Executable
 class BaseAct(Executable):
     name = 'base'
     category = 'base'
-    accepts = 'entity' # | collection | both | string TODO заменить both на |
+    accepts = 'entity'
 
     def __init__(self, temp_dir=None):
         self.temp_dir = temp_dir
@@ -18,22 +18,23 @@ class BaseAct(Executable):
             if self.accepts == "string":
                 return main_input
             
-            p1, p2 = main_input.split("_", 1)
-            if (p1 != "entity" and p1 != "collection"):
+            ____split = main_input.split("_", 1)
+            if len(____split) == 1:
+                ____split = (self.accepts, ____split[0])
+
+            p1, p2 = ____split
+
+            if p1 not in ["entity", "collection", "both"]:
                 return None
-            
-            if p1 == None:
-                p2 = p1
-                p1 = self.accepts
-            
+
             if p1 == "entity":
-                if self.accepts != "entity" or self.accepts != "both":
+                if self.accepts not in ["entity", "both"]:
                     return None
                 
                 __ent = Entity.get(int(p2))
                 return __ent
             elif p1 == "collection":
-                if self.accepts != "collection" or self.accepts != "both":
+                if self.accepts not in ["collection", "both"]:
                     return None
                 
                 __ent = Collection.get(int(p2))
@@ -44,13 +45,14 @@ class BaseAct(Executable):
                 
                 __ent = File.get(int(p2))
                 return __ent
-        except Exception:
+        except Exception as __e:
+            print(__e)
             return None
         
     def cleanup(self, entity):
         pass
     
-    def execute(self, i, args):
+    async def execute(self, i, args):
         return {}
 
     def describe(self):

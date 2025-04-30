@@ -106,7 +106,7 @@ async def __cliMain():
             for item in items:
                 print(str(item.describe()))
         case 'acts.run':
-            print(api.runAct(args))
+            print(await api.runAct(args))
         case 'services.get':
             items = api.getServices(args)
             for item in items:
@@ -118,7 +118,4 @@ async def __cliMain():
             print('Unknown "--act" passed')
             exit(-14)
 
-try:
-    loop.run_until_complete(__cliMain())
-except KeyboardInterrupt:
-    asyncio.sleep(10)
+loop.run_until_complete(__cliMain())

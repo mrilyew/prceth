@@ -1,9 +1,12 @@
 from resources.Globals import datetime, os, consts, traceback, Path, config
+from colorama import Fore, init as ColoramaInit
 
 class Logger():
     def __init__(self, keep: bool=False):
+        ColoramaInit()
+
         self.keep = keep
-        self.dir = Path(f"{consts['storage']}/logs")
+        self.dir = Path(f"{consts.get('storage')}/logs")
         if self.dir.is_dir() == False:
             self.dir.mkdir()
 
@@ -21,10 +24,10 @@ class Logger():
 
         # Keep=True: appends current time to file name.
         if self.keep:
-            self.path = f"{consts['storage']}/logs/{now.strftime('%Y-%m-%d_%H-%M-%S')}.log"
+            self.path = f"{consts.get('storage')}/logs/{now.strftime('%Y-%m-%d_%H-%M-%S')}.log"
         # Keep=False: creates log files per day.
         else:
-            self.path = f"{consts['storage']}/logs/{now.strftime('%Y-%m-%d')}.log"
+            self.path = f"{consts.get('storage')}/logs/{now.strftime('%Y-%m-%d')}.log"
         
         # Checking if file exists. If no, creating.
         if not os.path.exists(self.path):
@@ -35,7 +38,7 @@ class Logger():
 
         return True
     
-    def log(self, message: str = "Undefined", section: str = "App", name: str = "message", noConsole: bool = False):
+    def log(self, message: str = "Undefined", section: str = "App", name: str = "message", silent: bool = False):
         if section in config.get("logger.skip_categories"):
             return
         
@@ -45,7 +48,7 @@ class Logger():
         self.__log_file_check()
         now = datetime.now()
 
-        is_console = consts.get("context") == "cli" and noConsole == False
+        is_console = consts.get("context") == "cli" and silent == False
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
         message = message.replace("\n", "\\n")
         message_to_write = f"{current_time} [{section}] {message}\n"
@@ -67,8 +70,8 @@ class Logger():
             else:
                 print(message_to_write.replace("\n", ""))
 
-    def logException(self, input_exception, section: str ="App", noConsole: bool =True):
+    def logException(self, input_exception, section: str ="App", silent: bool =True):
         exp = str(input_exception) + traceback.format_exc()
-        self.log(section=section, message=type(input_exception).__name__ + " " + exp, name="error", noConsole=noConsole)
+        self.log(section=section, message=type(input_exception).__name__ + " " + exp, name="error", silent=silent)
 
 logger = Logger()

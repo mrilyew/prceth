@@ -1,9 +1,10 @@
-from resources.Globals import os, utils, consts, logger, Path, zipfile, wget, time, requests, assets_cache_storage, file_manager, config, HTMLFormatter, download_manager, FakeUserAgent
+from resources.Globals import os, utils, consts, logger, Path, zipfile, wget, time, requests, assets_cache_storage, file_manager, config, HTMLFormatter, download_manager
 from resources.Exceptions import NotInstalledException
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from urllib.parse import urljoin
+from fake_useragent import UserAgent as FakeUserAgent
 import re
 
 class Crawler():

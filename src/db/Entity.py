@@ -1,6 +1,7 @@
-from resources.Globals import Path, os, consts, time, model_to_dict, operator, reduce, utils, BaseModel, json5, json, file_manager, logger
+from resources.Globals import Path, os, consts, time, operator, utils, BaseModel, json5, json, file_manager, logger
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
 from db.File import File
+from functools import reduce
 
 class Entity(BaseModel):
     self_name = 'entity'
@@ -25,7 +26,7 @@ class Entity(BaseModel):
                                     # 1 - main info is from "type_sub" (jsonистый объект)
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0) # Is softly deleted
-    author = TextField(null=True,default=consts['pc_fullname']) # Author of entity
+    author = TextField(null=True,default=consts.get('pc_fullname')) # Author of entity
     declared_created_at = TimestampField(default=time.time())
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True)
@@ -41,7 +42,7 @@ class Entity(BaseModel):
     def file(self):
         if self.file_id == None:
             return None
-        
+
         if self.__cached_file != None:
             return self.__cached_file
 
@@ -108,7 +109,7 @@ class Entity(BaseModel):
                 linked_array.append(_e)
 
         except Exception as ____e:
-            logger.logException(input_exception=____e,section="Entity",noConsole=False)
+            logger.logException(input_exception=____e,section="Entity",silent=False)
             return []
         
         self.__cachedLinkedEntities = linked_array
@@ -124,7 +125,7 @@ class Entity(BaseModel):
         try:
             frontend_data = json5.loads(getattr(self, "frontend_data", "{}"))
         except Exception as wx:
-            logger.logException(wx,noConsole=True)
+            logger.logException(wx,silent=True)
             frontend_data = "{}"
         
         fnl = {
@@ -271,3 +272,48 @@ class Entity(BaseModel):
     def saveInfoToJson(self, dir):
         with open(os.path.join(dir, f"data_{self.id}.json"), "w", encoding='utf8') as json_file:
             json_file.write(json.dumps(self.getApiStructure(sensitive=True), indent=2, ensure_ascii=False))
+    
+    async def export(self, export_dir, linked_params = {}, recursion = 0):
+        if recursion > 5:
+            return
+        if export_dir.is_dir() == False:
+            export_dir.mkdir()
+        
+        linked_dir = Path(os.path.join(str(export_dir), str(self.id) + "_linked"))         
+        __file = self.file
+        if __file != None and type(__file) != list:
+            await __file.export(export_dir)
+
+        if linked_params.get("export_linked", True) == True:
+            linked_entities = self.getLinkedEntities()
+            if linked_params.get("linked_to_main_dir", True) == True:
+                linked_dir = export_dir
+
+            if len(linked_entities) > 0:
+                try:
+                    if linked_dir.exists() == False:
+                        linked_dir.mkdir()
+                except FileExistsError:
+                    pass
+
+                for LINKED in linked_entities:
+                    linked_entity_dir = Path(os.path.join(str(linked_dir), str(LINKED.id)))
+                    if linked_params.get("linked_to_subdirs") == False:
+                        linked_entity_dir = linked_dir
+
+                    try:
+                        if linked_entity_dir.exists() == False:
+                            linked_entity_dir.mkdir()
+                    except FileExistsError:
+                        pass
+
+                    if LINKED.self_name == "entity":
+                        await LINKED.export(linked_entity_dir, {}, recursion + 1)
+                    else:
+                        await LINKED.export(linked_entity_dir)
+
+                    logger.log(f"Exported {LINKED.self_name} {LINKED.id}", section="Export",name="success")
+
+        logger.log(f"Exported entity {self.id}", section="Export",name="success")
+        if linked_params.get("export_save_json_to_dir", True):
+            self.saveInfoToJson(dir=str(export_dir))

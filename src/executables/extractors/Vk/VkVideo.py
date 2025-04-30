@@ -1,9 +1,9 @@
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Globals import VkApi, Path, os, logger, download_manager, utils, asyncio, media_utils
 from resources.Exceptions import NotFoundException, LibNotInstalledException
 
 # Downloads photo from vk.com using api.
-class VkVideo(VkTemplate):
+class VkVideo(VkBase):
     name = 'VkVideo'
     category = 'Vk'
 
@@ -136,7 +136,7 @@ class VkVideo(VkTemplate):
             except LibNotInstalledException as _libe:
                 raise _libe
             except Exception as __e:
-                logger.logException(__e, section="VkAttachments",noConsole=False)
+                logger.logException(__e, section="VkAttachments",silent=False)
         else:
             logger.log(message=f"Video {VIDEO_ID} is from another platform ({item.get("platform")})",section="VkAttachments",name="message")
         

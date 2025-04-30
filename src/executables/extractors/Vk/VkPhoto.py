@@ -1,9 +1,9 @@
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger, asyncio
 from resources.Exceptions import NotFoundException
 
 # Downloads photo from vk.com using api.
-class VkPhoto(VkTemplate):
+class VkPhoto(VkBase):
     name = 'VkPhoto'
     category = 'Vk'
 

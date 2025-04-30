@@ -1,5 +1,7 @@
-from resources.Globals import contextmanager, secrets, os, urlparse, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
+from resources.Globals import contextmanager, secrets, os, platform, sys, random, json, consts, Path, requests, mimetypes, wget, zipfile
 from collections import defaultdict
+from urllib.parse import urlparse
+from urllib.parse import urlencode
 import re
 
 class MainUtils():
@@ -241,11 +243,16 @@ class MainUtils():
         return OUTPUT_NAME, OUTPUT_NAME_EXT
     
     @contextmanager
-    def overrideDb(self, __class, __db):
-        old_db = __class._meta.database
-        __class._meta.database = __db
+    def overrideDb(self, __classes = [], __db = None):
+        old_db = None
+        for __class in __classes:
+            old_db = __class._meta.database
+            __class._meta.database = __db
+        
         yield
-        __class._meta.database = old_db
+
+        for __class in __classes:
+            __class._meta.database = old_db
     
     def validName(self, text):
         '''

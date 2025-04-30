@@ -1,8 +1,8 @@
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Base.Base import BaseExtractor
 from resources.Globals import env, consts
 
-class VkTemplate(BaseExtractor):
-    name = 'VkTemplate'
+class VkBase(BaseExtractor):
+    name = 'VkBase'
     category = 'template'
     
     def defineConsts(self):

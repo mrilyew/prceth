@@ -1,4 +1,4 @@
-from executables.extractors.Base import BaseExtractor
+from executables.extractors.Base.Base import BaseExtractor
 
 class JsonObject(BaseExtractor):
     name = 'JsonObject'

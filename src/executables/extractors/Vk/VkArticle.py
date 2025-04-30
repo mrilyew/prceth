@@ -1,8 +1,8 @@
 from resources.Globals import VkApi, logger, asyncio
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
-class VkArticle(VkTemplate):
+class VkArticle(VkBase):
     name = 'VkArticle'
     category = 'Vk'
 

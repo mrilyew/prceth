@@ -1,9 +1,9 @@
 from resources.Globals import VkApi, asyncio, logger, Path, download_manager, os
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
 # Downloads document from vk.com using api.
-class VkPoll(VkTemplate):
+class VkPoll(VkBase):
     name = 'VkPoll'
     category = 'Vk'
     hidden = True

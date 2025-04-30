@@ -7,6 +7,6 @@ class AdditionalMetadata(BaseAct):
     category = 'metadata'
     allow_type = 'entity'
 
-    def execute(self, i, args=None):
+    async def execute(self, i, args=None):
         # TODO videos, audios, docx
         return {}

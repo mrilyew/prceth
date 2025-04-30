@@ -1,8 +1,8 @@
 from resources.Globals import os, VkApi, logger, consts, Path, download_manager, asyncio
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
-class VkIdentity(VkTemplate):
+class VkIdentity(VkBase):
     name = 'VkIdentity'
     category = 'Vk'
 
@@ -163,7 +163,7 @@ class VkIdentity(VkTemplate):
 
                 linked_files.append(__file)
             except Exception as _e:
-                logger.logException(_e,section="Vk",noConsole=False)
+                logger.logException(_e,section="Vk",silent=False)
                         
         if self.passed_params.get("download_cover") == True:
             try:
@@ -177,7 +177,7 @@ class VkIdentity(VkTemplate):
             except TypeError:
                 pass
             except Exception as _e:
-                logger.logException(_e,section="Vk",noConsole=False)
+                logger.logException(_e,section="Vk",silent=False)
         
         logger.log(f"Got identity {item.get("vkapi_type")}{item.get('id')}",section="Vk",name="success")
 

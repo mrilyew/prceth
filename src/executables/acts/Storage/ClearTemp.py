@@ -6,7 +6,7 @@ class ClearTemp(BaseAct):
     category = 'storage'
     accepts = 'string'
 
-    def execute(self, i: str, args):
+    async def execute(self, i: str, args):
         TMP_FILES_DIR = os.path.join(consts["tmp"], "files")
 
         for tmp_dir, _ in os.walk(TMP_FILES_DIR):

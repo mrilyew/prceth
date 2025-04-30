@@ -67,34 +67,25 @@ class File(BaseModel):
             FULL_HASH_DIRECTORY = Path(storage.makeHashDir(self.hash, only_return=True))
             Path(TMP_DIR).rename(FULL_HASH_DIRECTORY)
 
-    def saveToDir(self, save_dir, move_type = 1, prefix = ""):
+    def saveToDir(self, save_dir, prefix = ""):
         from resources.Globals import storage
 
         CURRENT_FILE_PATH = Path(self.getDirPath())
         OUTPUT_FILE_PATH = save_dir
-        OUTPUT_FILE_ENTITY_PATH = Path(os.path.join(OUTPUT_FILE_PATH, str(self.id)))
 
         NEW_MAIN_FILE_NAME = str(self.upload_name)
         NEW_MAIN_FILE_NAME = prefix + NEW_MAIN_FILE_NAME
         
         NEW_MAIN_FILE_NAME = NEW_MAIN_FILE_NAME.replace("thumb", "th_umb") #БЫДЛОКОД
-        if move_type == 0: # Just rename
-            CURRENT_MAIN_FILE_PATH = Path(os.path.join(OUTPUT_FILE_PATH, NEW_MAIN_FILE_NAME))
-            Path(CURRENT_FILE_PATH).rename(CURRENT_MAIN_FILE_PATH)
-        elif move_type == 1:
-            __list = os.listdir(CURRENT_FILE_PATH)
-            __count = len(__list)
-            FILES_LENGTH = __count
-            try:
-                if FILES_LENGTH > 0:
-                    OUTPUT_FILE_ENTITY_PATH_ = OUTPUT_FILE_ENTITY_PATH
-                    if FILES_LENGTH == 1:
-                        OUTPUT_FILE_ENTITY_PATH_ = Path(os.path.join(OUTPUT_FILE_PATH))
-                    
-                    shutil.copytree(str(CURRENT_FILE_PATH), str(OUTPUT_FILE_ENTITY_PATH_), ignore=ignore_patterns('*_thumb.*'), dirs_exist_ok = True)
-                    Path(os.path.join(OUTPUT_FILE_ENTITY_PATH_, self.getFsFileName())).rename(os.path.join(OUTPUT_FILE_ENTITY_PATH_, NEW_MAIN_FILE_NAME))
-            except Exception as __e__:
-                logger.logException(__e__, "File")
+        __list = os.listdir(CURRENT_FILE_PATH)
+        __count = len(__list)
+        FILES_LENGTH = __count
+        try:
+            if FILES_LENGTH > 0:
+                shutil.copytree(str(CURRENT_FILE_PATH), str(OUTPUT_FILE_PATH), ignore=ignore_patterns('*_thumb.*'), dirs_exist_ok = True)
+                Path(os.path.join(OUTPUT_FILE_PATH, self.getFsFileName())).rename(os.path.join(OUTPUT_FILE_PATH, NEW_MAIN_FILE_NAME))
+        except Exception as __e__:
+            logger.logException(__e__, "File")
         
     def getApiStructure(self):
         fnl = {
@@ -220,3 +211,6 @@ class File(BaseModel):
         main_metadata.update(ext_metadata_arr)
 
         self.metadata = json.dumps(main_metadata)
+
+    async def export(self, dir, prefix = ""):
+        self.saveToDir(save_dir=dir,prefix=prefix)

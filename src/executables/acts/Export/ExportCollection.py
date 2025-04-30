@@ -1,14 +1,12 @@
-from resources.Globals import consts, os, Path, datetime, utils, logger, file_manager, zipfile, json
-from executables.acts.Base import BaseAct
-from repositories.Acts import Acts
+from executables.acts.Export.ExportEntity import ExportEntity
 from db.Collection import Collection
 
-class CollectionToFS(BaseAct):
-    name = 'CollectionToFS'
+class ExportCollection(ExportEntity):
+    name = 'ExportCollection'
     category = 'export'
     accepts = 'string'
 
-    def execute(self, i: str, args):
+    async def execute(self, i: str, args = {}):
         collection_ids = str(i).split(",")
         entities = []
         entity_ids = []
@@ -24,8 +22,10 @@ class CollectionToFS(BaseAct):
         for __entity in entities:
             entity_ids.append(str(__entity.id))
         
-        fs_act = (Acts().getByName(act_name="Export.EntityToFS"))()
-        export_res = fs_act.execute(i=",".join(entity_ids),args=args)
+        fs_act = ExportEntity()
+        fs_act.setArgs(self.passed_params)
+
+        export_res = await fs_act.execute(i=",".join(entity_ids))
 
         DESTINATION_DIR = export_res.get("destination")
         for coll in collections:

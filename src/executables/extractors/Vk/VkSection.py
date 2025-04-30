@@ -1,8 +1,8 @@
 from resources.Globals import config, VkApi, logger, utils, math, asyncio, copy
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import InvalidPassedParam
 
-class VkSection(VkTemplate):
+class VkSection(VkBase):
     name = 'VkSection'
     category = 'Vk'
     manual_params = True
@@ -416,7 +416,7 @@ class VkSection(VkTemplate):
             
             if self.passed_params.get("api_timeout") != 0:
                 await asyncio.sleep(self.passed_params.get("api_timeout"))
-            
+
         #await __extractor.postRun(return_entities=__final_entities)
 
         return {

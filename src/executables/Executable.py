@@ -1,4 +1,4 @@
-from resources.Globals import storage, utils, consts, logger, DeclarableArgs
+from resources.Globals import storage, utils, consts, logger, DeclarableArgs, file_manager
 from db.Entity import Entity
 
 class Executable:
@@ -56,6 +56,12 @@ class Executable:
 
         return _dir
 
+    def removeAllocatedTemp(self, dir_name):
+        try:
+            file_manager.rmdir(dir_name)
+        except Exception:
+            logger.logException(dir_name, "Extractor", silent=False)
+
     def mainTempDir(self):
         _dir = consts.get("tmp")
 
@@ -68,7 +74,7 @@ class Executable:
             for ___item in executed.get("entities"):
                 array_link.append(___item)
         except Exception as ___e:
-            logger.logException(input_exception=___e,section="Extractor",noConsole=False)
+            logger.logException(input_exception=___e,section="Extractor",silent=False)
             pass
 
     # TODO убрать?
@@ -101,7 +107,6 @@ class Executable:
             ext = utils.get_ext(args.get("preview_file"))
 
         thumb = (ThumbnailsRepository()).getByFormat(ext)
-        print(thumb)
         if thumb == None:
             return None
 
@@ -133,7 +138,12 @@ class Executable:
         if self.write_mode == 2:
             __entity.save()
             logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")
-        
+
+        try:
+            __entity.file.moveTempDir()
+        except:
+            pass
+
         return __entity
     
     def _collectionFromJson(self, json_data):

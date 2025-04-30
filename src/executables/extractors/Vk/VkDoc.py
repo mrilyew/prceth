@@ -1,9 +1,9 @@
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Globals import os, download_manager, VkApi, Path, asyncio, logger
 from resources.Exceptions import NotFoundException
 
 # Downloads document from vk.com using api.
-class VkDoc(VkTemplate):
+class VkDoc(VkBase):
     name = 'VkDoc'
     category = 'Vk'
 

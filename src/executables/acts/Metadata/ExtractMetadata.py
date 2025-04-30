@@ -1,13 +1,14 @@
 from executables.acts.Base import BaseAct
 from hachoir.core import config
-from resources.Globals import utils, createParser, extractMetadata
+from hachoir.parser import createParser
+from hachoir.metadata import extractMetadata
 
 class ExtractMetadata(BaseAct):
     name = "ExtractMetadata"
     category = "metadata"
     accepts = "file"
 
-    def execute(self, i, args={}):
+    async def execute(self, i, args={}):
         config.quiet = True
 
         EXPORT_TYPE = args.get("INPUT_TYPE", "file")

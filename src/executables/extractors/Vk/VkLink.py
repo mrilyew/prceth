@@ -1,8 +1,8 @@
 from resources.Globals import Path, download_manager, logger, os
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
-class VkLink(VkTemplate):
+class VkLink(VkBase):
     name = 'VkLink'
     category = 'Vk'
     hidden = True

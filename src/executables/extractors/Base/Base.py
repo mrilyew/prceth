@@ -1,5 +1,4 @@
-from resources.Globals import storage, os, utils, file_manager, json, logger
-from db.Entity import Entity
+from resources.Globals import file_manager, logger
 from executables.Executable import Executable
 
 class BaseExtractor(Executable):
@@ -16,6 +15,10 @@ class BaseExtractor(Executable):
         self.need_preview = need_preview
         self.write_mode = int(write_mode)
         self.defineConsts()
+
+    @classmethod
+    def isRunnable(cls):
+        return cls.category.lower() not in ["template", "base"] and getattr(cls, "hidden", False) == False
 
     def defineConsts(self):
         pass
@@ -51,11 +54,11 @@ class BaseExtractor(Executable):
                 try:
                     file_manager.rmdir(t_dir)
                 except Exception:
-                    logger.logException(t_dir, "Extractor", noConsole=False)
+                    logger.logException(t_dir, "Extractor", silent=False)
 
     async def run(self, args):
         pass
-    
+
     async def postRun(self, return_entities):
         if self.write_mode == 1:
             try:
@@ -76,13 +79,6 @@ class BaseExtractor(Executable):
                     logger.log(f"Saved entity {str(unsaved_entity.id)} 👍",section="EntitySaveMechanism",name="success")
                 except Exception as _x:
                     print(_x)
-                    pass
-
-        for MOVE_ENTITY in return_entities:        
-            if MOVE_ENTITY.self_name == "entity" and MOVE_ENTITY.file != None:
-                try:
-                    MOVE_ENTITY.file.moveTempDir()
-                except:
                     pass
 
     def describeSource(self, INPUT_ENTITY):

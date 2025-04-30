@@ -1,5 +1,7 @@
 from executables.thumbnail.Base import BaseThumbnail
-from resources.Globals import VideoFileClip, Image, math, config, utils, os
+from resources.Globals import math, config, utils, os
+from PIL import Image
+from moviepy import VideoFileClip
 
 class TVideo(BaseThumbnail):
     name = 'TVideo'

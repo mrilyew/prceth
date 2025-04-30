@@ -9,8 +9,6 @@ class VkApi():
         self.__token = token
         self.__endpoint = endpoint
 
-        consts["vk_secret_useragent"] = ""
-
     async def call(self, method, params):
         params["access_token"] = self.__token
         params["v"] = 5.221

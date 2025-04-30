@@ -1,8 +1,8 @@
 from resources.Globals import Path, download_manager, logger, os, utils
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
-class VkGraffiti(VkTemplate):
+class VkGraffiti(VkBase):
     name = 'VkGraffiti'
     category = 'Vk'
     hidden = True

@@ -1,9 +1,9 @@
 from resources.Globals import VkApi, utils, logger, asyncio
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
 # Downloads document from vk.com using api.
-class VkNote(VkTemplate):
+class VkNote(VkBase):
     name = 'VkNote'
     category = 'Vk'
     hidden = True

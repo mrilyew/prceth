@@ -287,7 +287,7 @@ class Api():
         except KeyboardInterrupt:
             pass
         except Exception as __ee:
-            logger.log(message=f"Extractor {__extractor_input_name} returned error: {str(__ee)}",noConsole=True)
+            logger.log(message=f"Extractor {__extractor_input_name} returned error: {str(__ee)}",silent=True)
             raise __ee
         
         ENTITIES_COUNT = len(EXTRACTOR_RESULTS.get("entities"))
@@ -349,7 +349,7 @@ class Api():
         acts = ActsRepository().getList(search_type=__search_type,show_hidden=__show_hidden)
 
         return acts
-    def runAct(self, params):
+    async def runAct(self, params):
         assert "name" in params, "name not passed"
 
         __act_name = params.get("name")
@@ -360,8 +360,9 @@ class Api():
         OUT_ACT = __act_res()
         ACT_MAIN_INPUT = OUT_ACT.parseMainInput(main_input=__act_main)
         assert ACT_MAIN_INPUT != None, f"{__act_res.accepts} not found"
+        OUT_ACT.setArgs(params)
 
-        ACT_F = OUT_ACT.execute(args=params,i=ACT_MAIN_INPUT)
+        ACT_F = await OUT_ACT.execute(i=ACT_MAIN_INPUT,args=params)
 
         return {"results": ACT_F}
     def getServices(self, params):

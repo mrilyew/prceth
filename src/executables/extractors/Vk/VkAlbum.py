@@ -1,9 +1,9 @@
 from resources.Globals import config, VkApi, logger, utils, math, asyncio
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from executables.extractors.Vk.VkPhoto import VkPhoto
 from resources.Exceptions import NotFoundException
 
-class VkAlbum(VkTemplate):
+class VkAlbum(VkBase):
     name = 'VkAlbum'
     category = 'Vk'
 

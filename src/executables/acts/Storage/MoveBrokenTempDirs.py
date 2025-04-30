@@ -7,7 +7,7 @@ class MoveBrokenTempDirs(BaseAct):
     category = 'storage'
     accepts = 'string'
 
-    def execute(self, i: str, args):
+    async def execute(self, i: str, args):
         TMP_FILES_DIR = os.path.join(consts["tmp"], "files")
         DESTINATION = i
 
@@ -15,7 +15,7 @@ class MoveBrokenTempDirs(BaseAct):
             for file in files:
                 src_path = os.path.join(root, file)
 
-                if os.path.dirname(src_path) == DESTINATION:
+                if os.path.dirname(src_path) == DESTINATION or file == ".gitkeep":
                     continue
                 
                 base, extension = os.path.splitext(file)

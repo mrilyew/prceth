@@ -1,8 +1,8 @@
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from resources.Globals import os, download_manager, VkApi, Path, asyncio, utils, logger, media_utils
 from resources.Exceptions import NotFoundException, LibNotInstalledException
 
-class VkAudio(VkTemplate):
+class VkAudio(VkBase):
     name = 'VkAudio'
     category = 'Vk'
     

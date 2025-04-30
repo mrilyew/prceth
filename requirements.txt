@@ -1,5 +1,6 @@
 Brotli==1.1.0
 certifi==2024.8.30
+colorama
 charset-normalizer==3.3.2
 hachoir==3.3.0
 idna==3.10

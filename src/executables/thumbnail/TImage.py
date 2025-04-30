@@ -1,5 +1,6 @@
 from executables.thumbnail.Base import BaseThumbnail
-from resources.Globals import Image, config, utils, os
+from PIL import Image
+from resources.Globals import config, utils, os
 
 class TImage(BaseThumbnail):
     name = 'TImage'

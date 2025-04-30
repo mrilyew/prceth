@@ -1,9 +1,9 @@
-from executables.extractors.Vk.VkTemplate import VkTemplate
+from executables.extractors.Vk.VkBase import VkBase
 from executables.extractors.Files.JsonObject import JsonObject
 from resources.Globals import VkApi, json, utils, ExtractorsRepository, logger, asyncio
 from resources.Exceptions import NotFoundException
 
-class VkPost(VkTemplate):
+class VkPost(VkBase):
     name = 'VkPost'
     category = 'Vk'
     vk_type = "post"
