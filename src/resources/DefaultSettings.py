@@ -37,7 +37,7 @@ DefaultSettings = {
     },
     "storage.path": {
         "type": "string",
-        "default": "?cwd?\\storage" # /src -> /storage
+        "default": "?cwd?\\storage" # cwd -> /storage
     },
     "db.path": {
         "type": "string",

@@ -2,14 +2,27 @@ from resources.Globals import os, consts, Path, utils
 
 class Storage:
     def __init__(self):
-        self.storage_dir = consts["storage"]
-        self.tmp_dir = consts["tmp"]
-        self.tmp_coll_dir = os.path.join(self.tmp_dir, "files")
-        if Path(self.tmp_dir).is_dir() == False:
-            Path(self.tmp_dir).mkdir()
+        self.storage_dir = consts.get("storage")
+        self.tmp_dir = consts.get("tmp")
+        self.tmp_dir_files = os.path.join(self.tmp_dir, "files")
+        self.tmp_dir_exports = os.path.join(self.tmp_dir, "exports")
+        self.tmp_dir_exports = os.path.join(self.tmp_dir, "exports")
 
-        if Path(self.tmp_coll_dir).is_dir() == False:
-            Path(self.tmp_coll_dir).mkdir()
+        self.settings_dir = os.path.join(self.storage_dir, "settings")
+        self.files_dir = os.path.join(self.storage_dir, "files")
+        self.binary_dir = os.path.join(self.storage_dir, "binary")
+
+        if True:
+            if Path(self.tmp_dir).is_dir() == False:
+                Path(self.tmp_dir).mkdir()
+                Path(self.tmp_dir_files).mkdir()
+                Path(self.tmp_dir_exports).mkdir()
+
+            if Path(self.files_dir).is_dir() == False:
+                Path(self.files_dir).mkdir()
+
+            if Path(self.binary_dir).is_dir() == False:
+                Path(self.binary_dir).mkdir()
 
     def makeTemporaryCollectionDir(self, temp_dir_prefix = None):
         #rand = utils.random_int(1, 1000000) * -1

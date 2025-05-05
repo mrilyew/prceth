@@ -21,3 +21,5 @@ Tasks:
 - [ ] Подмена "created_at" у файла на тот что в таблице
 - [ ] Поддержка bash
 - [ ] При прерывании на Ctrl+C не терять прогресс
+- [ ] Хуки выполнения executable
+- [ ] Выполнение executable в subprocess, вынести из AsyncDownloadManager

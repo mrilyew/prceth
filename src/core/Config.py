@@ -48,8 +48,8 @@ class Config():
 
     def __set_consts(self):
         consts["storage"] = self.get("storage.path").replace("?cwd?", os.getcwd())
-        consts["tmp"] = os.path.join(consts["storage"], "tmp")
-        consts["binary"] = os.path.join(consts["storage"], "binary")
+        consts["tmp"] = os.path.join(consts.get('storage'), "tmp")
+        consts["binary"] = os.path.join(consts.get('storage'), "binary")
 
     def get(self, option: str, default: str = None):
         return self.out_params.get(option, default)

@@ -41,9 +41,6 @@ class IterableBase(BaseCollectionable):
             "suggested_name": f"Iterable {self.passed_params.get("start")}-{self.passed_params.get("end")}",
         }
 
-    def _getCollectionName(self):
-        return 
-
     async def run(self, args):
         self.entity_list = []
 
