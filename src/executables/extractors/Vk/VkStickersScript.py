@@ -19,8 +19,10 @@ class VkStickersScript(IterableBase):
 
         return params
 
-    def _getCollectionName(self):
-        return f"Vk Stickers Images {self.passed_params.get("start")}-{self.passed_params.get("end")}"
+    def _collection(self):
+        return {
+            "suggested_name": f"Vk Stickers Images {self.passed_params.get("start")}-{self.passed_params.get("end")}",
+        }
 
     async def _iterableAction(self, i):
         PATH_URL = (f"https://vk.com/sticker/1-{str(i)}-{str(self.passed_params.get("size"))}.png")

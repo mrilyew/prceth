@@ -150,9 +150,32 @@ class VkSection(VkBase):
                 ]
             }
         }
-        
+
         return params
+
+    def _collection(self):
+        __item_ids = self.passed_params.get("item_id")
+        item_id_collection = __item_ids.split(",")[0]
+
+        __collection = {
+            "suggested_name": f"Vk Collection {item_id_collection}",
+        }
+
+        match(self.passed_params.get("section")):
+            case "photos":
+                __collection["suggested_name"] = f"Vk Photos {item_id_collection}"
+            case "wall":
+                __collection["suggested_name"] = f"Vk Wall {item_id_collection}"
+            case "album":             
+                __collection["suggested_name"] = f"Vk Album {item_id_collection}"
+            case "post_comments":
+                __suggested_name = f"Vk Comments from {self.passed_params.get("section").replace("_comments", "")} {item_id_collection}"
+                __collection["suggested_name"] = __suggested_name
+            case "messages":
+                __collection["suggested_name"] = f"Vk Conversation {item_id_collection}"
     
+        return __collection
+
     async def run(self, args):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         __total_count = 0
@@ -179,10 +202,6 @@ class VkSection(VkBase):
         __item_ids = self.passed_params.get("item_id")
         item_id_collection = __item_ids.split(",")[0]
 
-        __collection = {
-            "suggested_name": f"Vk Collection {item_id_collection}",
-        }
-
         from executables.extractors.Vk.VkPhoto import VkPhoto
         from executables.extractors.Vk.VkPost import VkPost
         from executables.extractors.Vk.VkIdentity import VkIdentity
@@ -203,7 +222,6 @@ class VkSection(VkBase):
                     "extended": 1,
                     "photo_sizes": 1
                 }
-                __collection["suggested_name"] = f"Vk Photos {item_id_collection}"
             case "wall":
                 __method = "wall.get"
                 __temp_final_params = {"owner_id": item_id_collection, "count": 1}
@@ -224,8 +242,6 @@ class VkSection(VkBase):
                 }
                 if self.passed_params.get("filter") != None:
                     __pass_params["filter"] = self.passed_params.get("filter")
-                
-                __collection["suggested_name"] = f"Vk Wall {item_id_collection}"
             case "album":
                 __method = "photos.get"
                 __spl = item_id_collection.split("_")
@@ -249,8 +265,6 @@ class VkSection(VkBase):
                 }
                 __count_call = await __vkapi.call(__method, {"owner_id": __owner_id, "album_id": __item_id, "count": 1})
                 __extractor = VkPhoto
-                
-                __collection["suggested_name"] = f"Vk Album {item_id_collection}"
             case "fave":
                 min_group_fields = "activity,photo_100,photo_200,photo_50,is_member,is_closed,description,members_count,is_subscribed"
                 min_user_fields = "photo_50,online,photo_max,last_seen"
@@ -298,7 +312,6 @@ class VkSection(VkBase):
                 __spl = item_id_collection.split("_")
                 __owner_id = __spl[0]
                 __item_id =  __spl[1]
-                __suggested_name = ""
 
                 __pass_params = {
                     "need_likes": 1, 
@@ -346,8 +359,6 @@ class VkSection(VkBase):
 
                 __count_call = await __vkapi.call(__method, __temp_params)
                 __extractor = VkComment
-                
-                __collection["suggested_name"] = __suggested_name
             case "messages":
                 __method = "messages.getHistory"
                 __count_call = await __vkapi.call(__method, {"peer_id": item_id_collection, "count": 1})
@@ -359,7 +370,6 @@ class VkSection(VkBase):
                 __extractor_params["download_attachments_json_list"] = self.passed_params.get("download_attachments_json_list")
                 __extractor_params["download_attachments_file_list"] = self.passed_params.get("download_attachments_file_list")
                 __extractor_params["download_reposts"] = self.passed_params.get("download_reposts")
-                __collection["suggested_name"] = f"Vk Conversation {item_id_collection}"
             case _:
                 raise InvalidPassedParam("invalid section")
         
@@ -420,6 +430,5 @@ class VkSection(VkBase):
         #await __extractor.postRun(return_entities=__final_entities)
 
         return {
-            "entities": __final_entities,
-            "collection": __collection
+            "entities": __final_entities
         }

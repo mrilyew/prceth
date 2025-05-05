@@ -74,7 +74,7 @@ class VkPost(VkBase):
             __POST_RESPONSE = self.passed_params.get("__json_info", None)
             self.__profiles = __POST_RESPONSE.get("__json_profiles")
             self.__groups = __POST_RESPONSE.get("__json_groups")
-        
+
         __POST_ITEMS = []
         try:
             if __POST_RESPONSE.get("items") != None:
@@ -117,7 +117,7 @@ class VkPost(VkBase):
         item.pop("hash", None)
 
         logger.log(message=f"Recieved {self.vk_type} {ITEM_ID}",section="VK",name="message")
-        
+
         __linked_files = []
         for key, attachment in enumerate(item.get("attachments", [])):
             try:
@@ -153,7 +153,7 @@ class VkPost(VkBase):
                 else:
                     ATTACHMENT_ID = f"{__attachment_object.get('owner_id')}_{__attachment_object.get('id')}"
                     logger.log(message=f"Recieved attachment {str(__attachment_class_name)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
-                    
+
                     __attachment_class_dec = __attachment_class(need_preview=self.need_preview)
                     __attachment_class_return = await __attachment_class_dec.fastGetEntity(params={
                         "unlisted": 1,
@@ -178,7 +178,7 @@ class VkPost(VkBase):
                     REPOST_ID = f"{repost.get('owner_id')}_{repost.get('id')}"
                     if repost == None:
                         continue
-                    
+
                     logger.log(message=f"Found repost {key}",section="VKPost",name="message")
 
                     __vk_post_extractor = VkPost(need_preview=self.need_preview)
@@ -200,7 +200,7 @@ class VkPost(VkBase):
                     pass
                 except Exception as ___e___:
                     logger.logException(___e___, "VkAttachments")
-        
+
         if item.get("from_id") != None and self.__profiles != None:
             item["from"] = utils.find_owner(item.get("from_id"), self.__profiles, self.__groups)
         if item.get("owner_id") != None and self.__profiles != None:

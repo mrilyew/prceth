@@ -43,7 +43,14 @@ class ExportEntity(BaseAct):
         return params
 
     async def execute(self, i: str, args = {}):
-        entities_ids = i.split(",")
+        entities_ids = []
+        if "range" in i:
+            _i = i.replace("range(", "").replace(")", "")
+            __i = _i.split(",")
+            entities_ids = list(range(int(__i[0]), int(__i[1])))
+        else:
+            entities_ids = i.split(",")
+
         entities = []
 
         __iterator = 0

@@ -7,6 +7,7 @@ class Executable:
     passed_params = {}
     temp_dir_prefix = None
     params = {}
+    after_save_actions = {}
     temp_dirs = []
     unsaved_entities = []
     manual_params = False
@@ -41,7 +42,7 @@ class Executable:
 
         if self.manual_params == True:
             self.passed_params.update(args)
-            
+
     def describe(self):
         return {
             "id": self.name,
@@ -144,8 +145,18 @@ class Executable:
         except:
             pass
 
+        if self.after_save_actions.get("collections", None) != None:
+            for coll in self.after_save_actions.get("collections"):
+                if coll == None:
+                    continue
+
+                try:
+                    coll.addItem(__entity)
+                except:
+                    pass
+
         return __entity
-    
+
     def _collectionFromJson(self, json_data):
         from db.Collection import Collection
 

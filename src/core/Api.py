@@ -280,6 +280,22 @@ class Api():
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__del_dir_on_fail,write_mode=__write_mode)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = None
+        EXTRACTOR_COLLECTION = None
+
+        __new_coll = EXTRACTOR_INSTANCE._collection()
+        if __new_coll != None:
+            EXTRACTOR_COLLECTION = EXTRACTOR_INSTANCE._collectionFromJson(__new_coll)
+
+        __coll = None
+        if collection_id != None:
+            __coll = Collection.get(collection_id)
+            if __coll == None:
+                logger.log(section="EntitySaveMechanism", name="error", message="Collection not found, not adding.")
+
+        EXTRACTOR_INSTANCE.after_save_actions = {
+            "collections": [EXTRACTOR_COLLECTION, __coll]
+        }
+
         try:
             EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
             if EXTRACTOR_RESULTS == None:
@@ -302,38 +318,7 @@ class Api():
         
         await EXTRACTOR_INSTANCE.postRun(return_entities=RETURN_ENTITIES)
 
-        if EXTRACTOR_RESULTS.get("collection") != None:
-            col = EXTRACTOR_INSTANCE._collectionFromJson(EXTRACTOR_RESULTS.get("collection"))
-            for i_entity in EXTRACTOR_RESULTS.get("entities"):
-                try:
-                    col.addItem(i_entity)
-                except:
-                    pass
-
-            #RETURN_ENTITIES.append(col)
-                
-        if collection_id != None:
-            POST_COLLECTION = Collection.get(collection_id)
-            if POST_COLLECTION == None:
-                logger.log(section="App", name="Entity Uploader", message="Collection not found, not adding.")
-            else:
-                for _ENT in RETURN_ENTITIES:
-                    try:
-                        POST_COLLECTION.addItem(_ENT)
-                    except:
-                        pass
-
-        if __export_folder != None:
-            if col != None:
-                __act = (ActsRepository().getByName("Export.CollectionToFS"))()
-                __act.execute(i=col.id,args={"dir": __export_folder})
-            else:
-                items_id = []
-                for __e in EXTRACTOR_RESULTS.get("entities"):
-                    items_id.append(str(__e.id))
-                
-                __act = (ActsRepository().getByName("Export.EntityToFS"))()
-                __act.execute(i=",".join(items_id),args={"dir": __export_folder})
+        # __export_folder will be run on frontend
 
         return RETURN_ENTITIES
     def getExtractors(self, params):

@@ -1,9 +1,9 @@
-from executables.extractors.Base.Base import BaseExtractor
+from executables.extractors.Base.BaseCollectionable import BaseCollectionable
 from resources.Globals import asyncio, logger
 from db.File import File
 
 # ЖИРИНОВСКИЙ СЧИТАЕТ, 1234
-class IterableBase(BaseExtractor):
+class IterableBase(BaseCollectionable):
     name = 'IterableBase'
     category = 'base'
 
@@ -36,8 +36,13 @@ class IterableBase(BaseExtractor):
 
         return params
 
+    def _collection(self):
+        return {
+            "suggested_name": f"Iterable {self.passed_params.get("start")}-{self.passed_params.get("end")}",
+        }
+
     def _getCollectionName(self):
-        return f"Iterable {self.passed_params.get("start")}-{self.passed_params.get("end")}"
+        return 
 
     async def run(self, args):
         self.entity_list = []
@@ -52,9 +57,6 @@ class IterableBase(BaseExtractor):
 
         return {
             "entities": self.entity_list,
-            "collection": {
-                "suggested_name": self._getCollectionName(),
-            },
         }
 
     async def _iterableAction(self, i):

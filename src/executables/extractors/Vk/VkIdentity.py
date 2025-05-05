@@ -154,7 +154,7 @@ class VkIdentity(VkBase):
         else:
             name = f"@vk_club: {item.get('name')}"
             source = f"vk:group{item.get('id')}"
-        
+
         if self.passed_params.get("download_avatar") == True:
             try:
                 __file = await self.__download_avatar(item)
@@ -164,7 +164,7 @@ class VkIdentity(VkBase):
                 linked_files.append(__file)
             except Exception as _e:
                 logger.logException(_e,section="Vk",silent=False)
-                        
+
         if self.passed_params.get("download_cover") == True:
             try:
                 __file = await self.__download_cover(item)
