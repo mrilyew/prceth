@@ -1,25 +1,51 @@
 from executables.extractors.Base.Base import BaseExtractor
-from resources.Globals import Path, file_manager, utils, json
-from resources.Exceptions import InvalidPassedParam, NotPassedException
-from db.File import File
+from resources.Globals import json
 
 class Scratch(BaseExtractor):
     name = 'Scratch'
     category = 'Files'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "Пустота",
+                "en": "Scratch"
+            },
+            "definition": {
+                "ru": "Запись из ничего",
+                "en": "Entity from scratch"
+            }
+        }
+    }
 
     def declare():
         params = {}
         params["suggested_name"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Название",
+                    "en": "Name",
+                }
+            },
             "type": "string",
         }
         params["declared_created_at"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Возможная дата создания",
+                    "en": "Declared creation date",
+                }
+            },
             "desc_key": "-",
             "type": "int",
             "default": 1234,
         }
         params["internal_content"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "JSON контент",
+                    "en": "JSON content",
+                }
+            },
             "type": "string",
             "default": "{}",
         }

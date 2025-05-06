@@ -23,3 +23,4 @@ Tasks:
 - [ ] При прерывании на Ctrl+C не терять прогресс
 - [ ] Хуки выполнения executable
 - [ ] Выполнение executable в subprocess, вынести из AsyncDownloadManager
+- [ ] Буфер выполнения операции

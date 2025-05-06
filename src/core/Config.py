@@ -1,10 +1,10 @@
-from resources.Globals import json, os, consts
+from resources.Globals import json, os, consts, Path
 from resources.DefaultSettings import DefaultSettings
 
 class Config():
     def __init__(self, file_name: str = 'config.json', fallback = DefaultSettings):
         self.default_settings = fallback
-        self.path = f"{consts.get('cwd')}/storage/settings/{file_name}"
+        self.path = f"{str(Path(consts.get('cwd')).parent)}/storage/settings/{file_name}"
         self.__load_path(self.path)
         self.__pass_declarable()
 
@@ -47,7 +47,7 @@ class Config():
         self.file.truncate()
 
     def __set_consts(self):
-        consts["storage"] = self.get("storage.path").replace("?cwd?", os.getcwd())
+        consts["storage"] = self.get("storage.path").replace("?cwd?", str(Path(os.getcwd()).parent))
         consts["tmp"] = os.path.join(consts.get('storage'), "tmp")
         consts["binary"] = os.path.join(consts.get('storage'), "binary")
 

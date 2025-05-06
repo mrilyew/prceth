@@ -9,10 +9,21 @@ class Executable:
     params = {}
     after_save_actions = {}
     temp_dirs = []
-    unsaved_entities = []
+    entities_buffer = []
     manual_params = False
     need_preview = False
+    already_declared = False
     write_mode = 2
+    docs = {
+        "description": {
+            "name": {
+                "en": "Executable root"
+            },
+            "definition": {
+                "en": "Executable root description"
+            }
+        }
+    }
 
     def declare():
         params = {}
@@ -20,12 +31,17 @@ class Executable:
         return params
 
     def recursiveDeclare(self):
+        if getattr(self, "already_declared", False) == True:
+            return None
+
         for __sub_class in self.__class__.__mro__:
             if hasattr(__sub_class, "declare") == False:
                 continue
 
             new_params = __sub_class.declare()
             self.params.update(new_params)
+
+        self.already_declared = True
 
     def setArgs(self, args):
         self.params = {}
@@ -135,7 +151,7 @@ class Executable:
             if thumb_result != None:
                 __entity.preview = utils.dump_json(thumb_result)
 
-        self.unsaved_entities.append(__entity)
+        self.entities_buffer.append(__entity)
         if self.write_mode == 2:
             __entity.save()
             logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")

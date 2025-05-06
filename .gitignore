@@ -12,9 +12,9 @@ storage/files/*
 storage/dbs/*
 !storage/dbs/.gitkeep
 storage/tmp/files/*
+!storage/tmp/files/.gitkeep
 storage/exports/*
 storage/settings/*
-!storage/tmp/files/.gitkeep
 !storage/tmp/exports/.gitkeep
 !storage/tmp/chrome/.gitkeep
 storage/tmp/internal/*

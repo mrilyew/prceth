@@ -1,5 +1,5 @@
 from core.Api import api
-from resources.Globals import utils, asyncio, loop, Path
+from resources.Globals import utils, asyncio, loop, json
 from resources.DbPrefetch import prefetch__db
 
 prefetch__db()
@@ -100,7 +100,7 @@ async def __cliMain():
         case 'extractors.get':
             items = api.getExtractors(args)
             for item in items:
-                print(str(item.describe()))
+                print(json.dumps(item.describe(), indent=4, ensure_ascii=False))
         case 'acts.get':
             items = api.getActs(args)
             for item in items:

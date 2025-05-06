@@ -6,18 +6,54 @@ from db.File import File
 class FSPath(BaseExtractor):
     name = 'FSPath'
     category = 'Files'
-    
+    docs = {
+        "description": {
+            "name": {
+                "ru": "Ссылка на файл",
+                "en": "Link to file"
+            },
+            "definition": {
+                "ru": "Создает запись из локального пути",
+                "en": "Creates entity from local path"
+            }
+        }
+    }
+
     def declare():
         params = {}
         params["path"] = {
-            "desc_key": "extractor_key_desc_path_path",
+            "docs": {
+                "definition": {
+                    "ru": "Путь к файлу",
+                    "en": "Path to the file",
+                }
+            },
             "type": "string",
             "assertion": {
                 "assert_not_null": True,
             },
         }
         params["type"] = {
-            "desc_key": "extractor_key_desc_path_text",
+            "docs": {
+                "definition": {
+                    "ru": "Тип перемещения",
+                    "en": "Path to the file",
+                },
+                "values": {
+                    "copy": {
+                        "ru": "Копирует файл в папку хранения",
+                        "en": "Copies file to storage directory"
+                    },
+                    "move": {
+                        "ru": "Перемещает файл в папку хранения",
+                        "en": "Moves file to storage directory"
+                    },
+                    "link": {
+                        "ru": "Создаёт виртуальную ссылку на локальный путь",
+                        "en": "Creates virtual link to local path"
+                    }
+                }
+            },
             "type": "array",
             "values": ["copy", "move", "link"],
             "default": "copy",

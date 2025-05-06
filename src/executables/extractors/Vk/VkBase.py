@@ -4,7 +4,19 @@ from resources.Globals import env, consts
 class VkBase(BaseExtractor):
     name = 'VkBase'
     category = 'template'
-    
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK объект",
+                "en": "VK object"
+            },
+            "definition": {
+                "ru": "Шаблон объекта из vk.com",
+                "en": "Object template from vk.com"
+            }
+        }
+    }
+
     def defineConsts(self):
         super().defineConsts()
 
@@ -14,7 +26,13 @@ class VkBase(BaseExtractor):
     def declare():
         params = {}
         params["access_token"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Токен авторизации, полученный через OAuth или альтернативные методы",
+                    "en": "Auth token that recieved from OAuth or another methods",
+                }
+            },
+            "env_property": "vk.access_token",
             "type": "string",
             "default": env.get("vk.access_token", None),
             "assert": {
@@ -22,7 +40,13 @@ class VkBase(BaseExtractor):
             },
         }
         params["api_url"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Эндпоинт на API ВК",
+                    "en": "Endpoint to VK API",
+                }
+            },
+            "env_property": "vk.api_url",
             "type": "string",
             "default": env.get("vk.api_url", "api.vk.com/method"),
             "assert": {
@@ -30,7 +54,13 @@ class VkBase(BaseExtractor):
             },
         }
         params["vk_path"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Ссылка на VK",
+                    "en": "Link to VK",
+                }
+            },
+            "env_property": "vk.vk_path",
             "type": "string",
             "default": env.get("vk.vk_path", "vk.com"),
             "assert": {

@@ -6,22 +6,49 @@ class BlankFile(BaseExtractor):
     name = 'BlankFile'
     category = 'Files'
     hidden = True
+    docs = {
+        "description": {
+            "name": {
+                "ru": "Пустой файл",
+                "en": "Blank File"
+            },
+            "definition": {
+                "ru": "Создаёт текстовый файл",
+                "en": "Creates text file"
+            }
+        }
+    }
 
     def declare():
         params = {}
         params["extension"] = {
-            "desc_key": "extractor_key_desc_blank_extension",
+            "docs": {
+                "definition": {
+                    "ru": "Расширение файла",
+                    "en": "File extension",
+                }
+            },
             "default": "txt",
             "type": "string",
             "maxlength": 6,
         }
         params["text"] = {
-            "desc_key": "extractor_key_desc_blank_text",
+            "docs": {
+                "definition": {
+                    "ru": "Текст файла",
+                    "en": "File's content",
+                }
+            },
             "type": "string",
             "default": "",
         }
         params["__original_name"] = {
-            "desc_key": "original_name_key_desc_blank_text",
+            "docs": {
+                "definition": {
+                    "ru": "Название файла",
+                    "en": "File's name",
+                }
+            },
             "type": "string",
             "default": f"blank.txt",
             "hidden": True,

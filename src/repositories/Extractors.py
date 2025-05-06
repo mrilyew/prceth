@@ -27,8 +27,11 @@ class Extractors:
                     if isinstance(item, type) and issubclass(item, BaseExtractor) and item.name.find('base') == -1:
                         if not show_hidden and getattr(item, "hidden", False):
                             continue
+                        
+                        __i = item()
+                        __i.recursiveDeclare()
 
-                        __exit.append(item())
+                        __exit.append(__i)
             except ModuleNotFoundError:
                 return None
             except ImportError as e:

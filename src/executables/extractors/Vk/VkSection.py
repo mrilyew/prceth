@@ -6,42 +6,128 @@ class VkSection(VkBase):
     name = 'VkSection'
     category = 'Vk'
     manual_params = True
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Раздел",
+                "en": "VK Section"
+            },
+            "definition": {
+                "ru": "Шаблон объекта из vk.com",
+                "en": "Object template from vk.com"
+            }
+        }
+    }
 
     def declare():
         params = {}
-        params["item_id"] = { # For fave — string name of section
-            "desc_key": "-", 
+        params["item_id"] = {
+            "docs": {
+                "definition": {
+                    "ru": "ID объекта/пользователя/группы. Если \"section\" = \"fave\" — название секции",
+                    "en": "ID of object/user/group. If \"section\" = \"fave\" — name of fave section",
+                },
+            },
             "type": "string",
         }
         params["section"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Название секции",
+                    "en": "Name of section",
+                },
+                "values": {
+                    "photos": {
+                        "ru": "Все фотографии пользователя/группы",
+                        "en": "All photos of user/group"
+                    },
+                    "wall": {
+                        "ru": "Все посты со стены пользователя/группы",
+                        "en": "All posts from user/group"
+                    },
+                    "album": {
+                        "ru": "Фотографии из альбома",
+                        "en": "Photos from album"
+                    },
+                    "board": {
+                        "ru": "Все комментарии из обсуждения",
+                        "en": "All comments from board"
+                    },
+                    "fave": {
+                        "ru": "Весь контент из закладок",
+                        "en": "Content from fave",
+                    },
+                    "post_comments": {
+                        "ru": "Все комментарии под постом",
+                        "en": "All comments below post",
+                    },
+                    "video_comments": {
+                        "ru": "Все комментарии под видео",
+                        "en": "All comments below video",
+                    },
+                    "photo_comments": {
+                        "ru": "Все комментарии под фото",
+                        "en": "All comments below photo",
+                    },
+                    "photo_all_comments": {
+                        "ru": "Все комментарии под альбомом",
+                        "en": "All comments below album",
+                    },
+                    "notes_comments": {
+                        "ru": "Все комментарии под заметкой",
+                        "en": "All comments below note",
+                    },
+                    "messages": {
+                        "ru": "Все сообщения из беседы",
+                        "en": "All messages from discussion",
+                    },
+                }
+            },
             "type": "array",
-            "values": ["photos", "wall", "album", "board", "fave", "post_comments", "video_comments", "board", "photo_comments", "photo_all_comments", "video_comments", "notes_comments", "messages"],
+            "values": ["photos", "wall", "album", "board", "fave", "post_comments", "video_comments", "photo_comments", "photo_all_comments", "notes_comments", "messages"],
             "assertion": {
                 "assert_not_null": True,
             },
         }
-        params["download_timeout"] = {
-            "desc_key": "-",
-            "type": "int",
-            "default": 0,
-        }
         params["api_timeout"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Таймаут между вызовами API",
+                    "en": "Timeout before API calls",
+                },
+            },
             "type": "int",
             "default": 0,
         }
         params["limit"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Лимит полученных записей",
+                    "en": "Limit of recieved entities",
+                },
+            },
             "desc_key": "-",
             "type": "int",
             "default": 0,
         }
         params["per_page"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Число полученных записей при каждом вызове",
+                    "en": "Number of recieved entities by every call",
+                },
+            },
             "desc_key": "-",
             "type": "int",
             "default": 100
         }
         params["start_range"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Номер первой итерации",
+                    "en": "Number of first iteration",
+                },
+            },
             "desc_key": "-",
             "type": "int",
             "default": 0
@@ -57,7 +143,13 @@ class VkSection(VkBase):
             }
         }
         params["download_attachments_json_list"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Перечисленный через запятую список экспортируемых attachments",
+                    "en": "Number of first iteration",
+                },
+                "examples": ["*", "photo,video,audio,album,link,article"]
+            },
             "type": "string",
             "default": "*",
             "assertion": {

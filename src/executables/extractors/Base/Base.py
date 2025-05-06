@@ -62,7 +62,7 @@ class BaseExtractor(Executable):
     async def postRun(self, return_entities):
         if self.write_mode == 1:
             try:
-                ___ln = len(self.unsaved_entities)
+                ___ln = len(self.entities_buffer)
                 __msg = f"Saving total {str(___ln)} entities;"
                 if ___ln > 100:
                     __msg += " do not turn off your computer."
@@ -72,7 +72,7 @@ class BaseExtractor(Executable):
                 print(_x)
                 pass
 
-            for unsaved_entity in self.unsaved_entities:
+            for unsaved_entity in self.entities_buffer:
                 unsaved_entity.save()
 
                 try:
