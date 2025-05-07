@@ -17,7 +17,7 @@ class MoveBrokenTempDirs(BaseAct):
 
                 if os.path.dirname(src_path) == DESTINATION or file == ".gitkeep":
                     continue
-                
+
                 base, extension = os.path.splitext(file)
                 counter = 1
                 new_file = file
@@ -26,7 +26,7 @@ class MoveBrokenTempDirs(BaseAct):
                     new_file = f"{base}_{counter}{extension}"
                     dst_path = os.path.join(DESTINATION, new_file)
                     counter += 1
-                
+
                 shutil.move(src_path, dst_path)
 
         return {"destination": DESTINATION}

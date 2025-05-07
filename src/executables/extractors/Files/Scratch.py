@@ -35,7 +35,6 @@ class Scratch(BaseExtractor):
                     "en": "Declared creation date",
                 }
             },
-            "desc_key": "-",
             "type": "int",
             "default": 1234,
         }
@@ -51,7 +50,7 @@ class Scratch(BaseExtractor):
         }
 
         return params
-    
+
     async def run(self, args):
         ENTITY = self._entityFromJson({
             "source": "api:null",

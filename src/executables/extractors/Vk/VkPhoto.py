@@ -1,20 +1,33 @@
 from executables.extractors.Vk.VkBase import VkBase
-from resources.Globals import os, download_manager, VkApi, Path, json5, config, utils, logger, asyncio
-from resources.Exceptions import NotFoundException
+from resources.Globals import os, download_manager, VkApi, Path, logger, asyncio
 
 # Downloads photo from vk.com using api.
 class VkPhoto(VkBase):
     name = 'VkPhoto'
     category = 'Vk'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Фото",
+                "en": "VK Photo"
+            },
+            "definition": {
+                "ru": "Фотография из VK",
+                "en": "Metainfo about VK photo"
+            }
+        }
+    }
+    file_containment = {
+        "files_count": "1",
+        "files_extensions": ["jpg"]
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
@@ -22,23 +35,22 @@ class VkPhoto(VkBase):
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True
         }
 
         return params
-    
+
     async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("photos.getById", {"photos": ",".join(item_ids), "extended": 1, "photo_sizes": 1})
-    
+
     async def run(self, args):
         # TODO add check for real links like vk.com/photo1_1
         final_photos_objects = None
         i_photo_ids = self.passed_params.get("item_id")
         photo_ids = i_photo_ids.split(",")
-        
+
         if self.passed_params.get("__json_info") == None:
             assert len(photo_ids) > 0, "item_id's not passed"
             final_photos_objects = await self.recieveById(photo_ids)
@@ -46,7 +58,7 @@ class VkPhoto(VkBase):
             final_photos_objects = self.passed_params.get("__json_info")
             if type(final_photos_objects) == dict:
                 final_photos_objects = [final_photos_objects]
-        
+
         __entities_list = []
         __tasks = []
         for photo in final_photos_objects:
@@ -64,9 +76,9 @@ class VkPhoto(VkBase):
 
         PHOTO_ID = f"{item.get('owner_id')}_{item.get('id')}"
         ORIGINAL_NAME = f"photo_{PHOTO_ID}_{item.get('date')}.jpg"
-        
+
         logger.log(message=f"Recieved photo {PHOTO_ID}",section="VK",name="message")
-    
+
         # So, downloading photo
         PHOTO_URL = ""
         if item.get("orig_photo") != None:
@@ -85,7 +97,7 @@ class VkPhoto(VkBase):
                     PHOTO_URL = __optimal_size.get("url")
                 except Exception as ___e:
                     logger.logException(___e, section="Vk")
-        
+
         if self.passed_params.get("download_file") == True:
             __FILE = None
             try:
@@ -103,7 +115,7 @@ class VkPhoto(VkBase):
                 logger.log(message=f"Downloaded photo {PHOTO_ID}",section="VK",name="success")
             except FileNotFoundError as _ea:
                 logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
-            
+
         ENTITY = self._entityFromJson({
             "file": __FILE,
             "suggested_name": f"VK Photo {str(PHOTO_ID)}",

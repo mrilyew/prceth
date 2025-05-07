@@ -6,29 +6,43 @@ class VkLink(VkBase):
     name = 'VkLink'
     category = 'Vk'
     hidden = True
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Ссылка",
+                "en": "VK Link"
+            },
+            "definition": {
+                "ru": "Информация о прикреплённой ссылке из VK",
+                "en": "Info about attached link from VK"
+            }
+        },
+    }
+    file_containment = {
+        "files_count": "0-1",
+        "files_extensions": ["jpg"]
+    }
 
     def declare():
         params = {}
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "assertion": {
                 "assert_not_null": True
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True
         }
 
         return params
-        
+
     async def run(self, args):
         __json = self.passed_params.get("__json_info")
         if __json == None:
             raise NotFoundException("link not found")
-        
+
         __json["site"] = self.passed_params.get("vk_path")
 
         logger.log(message=f"Recieved attached link",section="VkAttachments",name="message")
@@ -60,7 +74,7 @@ class VkLink(VkBase):
                 except FileNotFoundError as _ea:
                     pass
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
-                
+
         ENTITY = self._entityFromJson({
             "internal_content": __json,
             "source": f"url:{__json.get('url')}",

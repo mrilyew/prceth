@@ -7,15 +7,25 @@ class VkNote(VkBase):
     name = 'VkNote'
     category = 'Vk'
     hidden = True
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Заметка",
+                "en": "VK Note"
+            },
+            "definition": {
+                "ru": "Информация о заметке VK",
+                "en": "Metainfo about VK note"
+            }
+        }
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
@@ -23,7 +33,6 @@ class VkNote(VkBase):
             }
         }
         params["indexation_text_cut"] = {
-            "desc_key": "-",
             "type": "int",
             "hidden": True,
             "default": 699,
@@ -36,7 +45,7 @@ class VkNote(VkBase):
         __item_id = item_ids[0].split("_")
 
         return await __vkapi.call("notes.getById", {"owner_id": __item_id[0], "note_id": __item_id[1]})
-    
+
     async def run(self, args):
         __item_ids = self.passed_params.get("item_id")
         item_ids = __item_ids.split(",")
@@ -52,10 +61,10 @@ class VkNote(VkBase):
                 notes = self.passed_params.get("__json_info")
             except:
                 pass
-        
+
         if type(notes) == dict:
             notes = [notes]
-        
+
         if notes == None or len(notes) < 1:
             raise NotFoundException("note not found")
 

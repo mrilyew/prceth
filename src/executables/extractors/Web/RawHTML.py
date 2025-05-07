@@ -12,11 +12,9 @@ class RawHTML(BaseExtractor):
         # TODO расписать
         params = {}
         params["url"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["html"] = {
-            "desc_key": "-",
             "type": "string",
             "assertion": {
                 "assert_not_null": True,

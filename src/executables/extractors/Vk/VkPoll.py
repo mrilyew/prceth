@@ -7,22 +7,35 @@ class VkPoll(VkBase):
     name = 'VkPoll'
     category = 'Vk'
     hidden = True
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Опрос",
+                "en": "VK Poll"
+            },
+            "definition": {
+                "ru": "Опрос из VK",
+                "en": "Metainfo about VK poll"
+            }
+        }
+    }
+    file_containment = {
+        "files_count": "0-1",
+        "files_extensions": ["jpg"]
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "vk_poll_desc",
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "assertion": {
                 "assert_link": "item_id"
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True
         }
@@ -57,7 +70,7 @@ class VkPoll(VkBase):
 
         if items == None or len(items) < 1:
             raise NotFoundException("poll not found")
-        
+
         __entities_list = []
         __tasks = []
         for poll in items:

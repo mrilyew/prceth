@@ -6,36 +6,50 @@ class VkGraffiti(VkBase):
     name = 'VkGraffiti'
     category = 'Vk'
     hidden = True
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Граффити",
+                "en": "VK Graffiti"
+            },
+            "definition": {
+                "ru": "Граффити из vk",
+                "en": "Graffiti from vk"
+            }
+        },
+    }
+    file_containment = {
+        "files_count": "1",
+        "files_extensions": ["png"]
+    }
 
     def declare():
         params = {}
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "assertion": {
                 "assert_not_null": True
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True
         }
 
         return params
-    
+
     async def run(self, args):
         __json = self.passed_params.get("__json_info")
         if __json == None:
             raise NotFoundException("graffiti not found")
-        
+
         __json["site"] = self.passed_params.get("vk_path")
 
         __ITEM_ID  = f"{__json.get('owner_id')}_{__json.get('id')}"
         __SOURCE   = f"vk:graffiti{__ITEM_ID}"
 
         logger.log(message=f"Recieved graffiti {__ITEM_ID}",section="VkAttachments",name="message")
-        
+
         max_size = utils.findHighestInDict(__json, "photo_")
 
         if self.passed_params.get("download_file") == True:
@@ -57,7 +71,7 @@ class VkGraffiti(VkBase):
                 logger.log(message=f"Downloaded graffiti {__ITEM_ID}",section="VK",name="success")
             except FileNotFoundError as _ea:
                 logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
-            
+
         ENTITY = self._entityFromJson({
             "source": __SOURCE,
             "internal_content": __json,

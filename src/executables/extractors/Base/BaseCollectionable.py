@@ -1,6 +1,4 @@
 from executables.extractors.Base.Base import BaseExtractor
-from resources.Globals import asyncio, logger
-from db.File import File
 
 class BaseCollectionable(BaseExtractor):
     name = 'BaseCollectionable'

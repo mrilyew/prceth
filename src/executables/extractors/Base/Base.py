@@ -4,7 +4,7 @@ from executables.Executable import Executable
 class BaseExtractor(Executable):
     name = 'base'
 
-    def __init__(self, temp_dir=None, del_dir_on_fail=True, need_preview=True, write_mode=2):
+    def __init__(self, del_dir_on_fail=True, need_preview=True, write_mode=None):
         self.passed_params = {}
         #if temp_dir != None:
             #self.temp_dir_prefix = temp_dir
@@ -13,12 +13,10 @@ class BaseExtractor(Executable):
         self.temp_dirs = []
         self.del_dir_on_fail = del_dir_on_fail
         self.need_preview = need_preview
-        self.write_mode = int(write_mode)
-        self.defineConsts()
+        if write_mode != None:
+            self.write_mode = write_mode
 
-    @classmethod
-    def isRunnable(cls):
-        return cls.category.lower() not in ["template", "base"] and getattr(cls, "hidden", False) == False
+        self.defineConsts()
 
     def defineConsts(self):
         pass
@@ -47,7 +45,7 @@ class BaseExtractor(Executable):
         }
 
         return params
-    
+
     def onFail(self):
         if self.del_dir_on_fail == True:
             for t_dir in self.temp_dirs:
@@ -58,28 +56,6 @@ class BaseExtractor(Executable):
 
     async def run(self, args):
         pass
-
-    async def postRun(self, return_entities):
-        if self.write_mode == 1:
-            try:
-                ___ln = len(self.entities_buffer)
-                __msg = f"Saving total {str(___ln)} entities;"
-                if ___ln > 100:
-                    __msg += " do not turn off your computer."
-                
-                logger.log(__msg,section="EntitySaveMechanism",name="success")
-            except Exception as _x:
-                print(_x)
-                pass
-
-            for unsaved_entity in self.entities_buffer:
-                unsaved_entity.save()
-
-                try:
-                    logger.log(f"Saved entity {str(unsaved_entity.id)} 👍",section="EntitySaveMechanism",name="success")
-                except Exception as _x:
-                    print(_x)
-                    pass
 
     def describeSource(self, INPUT_ENTITY):
         return {"type": "none", "data": {

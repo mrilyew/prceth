@@ -1,64 +1,45 @@
-from resources.Globals import config, VkApi, logger, utils, math, asyncio
+from resources.Globals import VkApi, logger, asyncio
 from executables.extractors.Vk.VkBase import VkBase
-from executables.extractors.Vk.VkPhoto import VkPhoto
 from resources.Exceptions import NotFoundException
 
 class VkAlbum(VkBase):
     name = 'VkAlbum'
     category = 'Vk'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Альбом",
+                "en": "VK Album"
+            },
+            "definition": {
+                "ru": "Метаинформация об альбоме VK",
+                "en": "Metainfo about VK Album"
+            }
+        },
+        "tags": ["deprecated"]
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "ID альбома",
+                    "en": "ID of album",
+                }
+            },
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
                 "assert_link": "item_id"
             }
         }
-        params["download_photos"] = {
-            "desc_key": "-",
-            "type": "bool",
-            "default": False
-        }
-        params["download_file"] = {
-            "desc_key": "-",
-            "type": "bool",
-            "default": True
-        }
-        params["rev"] = {
-            "desc_key": "-",
-            "type": "bool",
-            "default": True
-        }
-        params["download_timeout"] = {
-            "desc_key": "-",
-            "type": "int",
-            "default": 0, # for paranoic people
-        }
-        params["api_timeout"] = {
-            "desc_key": "-",
-            "type": "int",
-            "default": 0,
-        }
-        params["limit"] = {
-            "desc_key": "-",
-            "type": "int",
-            "default": 0,
-        }
-        params["per_page"] = {
-            "desc_key": "-",
-            "type": "int",
-            "default": 100
-        }
 
         return params
-    
+
     async def recieveById(self, item_ids):
         ids = item_ids[0].split("_")
         return await self.__vkapi.call("photos.getAlbums", {"owner_id": ids[0], "album_ids": ids[1], "need_covers": 1, "photo_sizes": 1})

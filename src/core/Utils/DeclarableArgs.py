@@ -79,7 +79,7 @@ class DeclarableArgs():
                 try:
                     __dict[param_name] = self.recieveValue(param_name, param_object)
                 except Exception as _y:
-                    print(_y)
+                    print("DeclarableArgs:" + str(_y))
                     if self.exc_type == "assert":
                         raise _y
                     else:

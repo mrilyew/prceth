@@ -6,15 +6,29 @@ from resources.Exceptions import NotFoundException
 class VkDoc(VkBase):
     name = 'VkDoc'
     category = 'Vk'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Документ",
+                "en": "VK Document"
+            },
+            "definition": {
+                "ru": "Документ из vk",
+                "en": "Document from vk"
+            }
+        },
+    }
+    file_containment = {
+        "files_count": "1",
+        "files_extensions": ["docx", "doc", "gif"]
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
@@ -22,17 +36,16 @@ class VkDoc(VkBase):
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True
         }
 
         return params
-    
+
     async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("docs.getById", {"docs": ",".join(item_ids), "extended": 1})
-    
+
     async def run(self, args):
         DOCS_RESPONSE = []
 
@@ -48,10 +61,10 @@ class VkDoc(VkBase):
                     DOCS_RESPONSE = [DOCS_RESPONSE]
             except:
                 DOCS_RESPONSE = None
-        
+
         if DOCS_RESPONSE == None or len(DOCS_RESPONSE) < 1:
             raise NotFoundException("doc not found")
-        
+
         __entities_list = []
         __tasks = []
         for item in DOCS_RESPONSE:
@@ -84,7 +97,7 @@ class VkDoc(VkBase):
         item_TEXT = item.get("title") + "." + item_EXT
         item_URL  = item.get("url")
         item_SIZE = item.get("size", 0)
-        
+
         FILE = None
         if self.passed_params.get("download_file") == True:
             TEMP_DIR = self.allocateTemp()

@@ -13,20 +13,17 @@ class ExportToZIP(BaseAct):
     def declare():
         params = {}
         params["dir"] = {
-            "desc_key": "-",
             "type": "string",
             "assert": {
                 "assert_not_null": True,
             },
         }
         params["compression"] = {
-            "desc_key": "-",
             "type": "array",
             "values": ["ZIP_LZMA", "ZIP_BZIP2", "ZIP_DEFLATED"],
             "default": "ZIP_DEFLATED"
         }
         params["pack_to_zip"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
         }

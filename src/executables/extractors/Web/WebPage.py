@@ -14,7 +14,6 @@ class WebPage(BaseExtractor):
     def declare():
         params = {}
         params["url"] = {
-            "desc_key": "-",
             "type": "string",
             "assertion": {
                 "assert_not_null": True,

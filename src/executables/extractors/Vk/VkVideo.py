@@ -10,21 +10,17 @@ class VkVideo(VkBase):
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["quality"] = {
-            "desc_key": "-",
             "type": "string",
             "default": "max",
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": False,
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {

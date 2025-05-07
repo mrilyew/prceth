@@ -27,7 +27,7 @@ class Storage:
     def makeTemporaryCollectionDir(self, temp_dir_prefix = None):
         #rand = utils.random_int(1, 1000000) * -1
         if temp_dir_prefix == None:
-            temp_dir_prefix = self.tmp_coll_dir
+            temp_dir_prefix = self.tmp_dir_files
         
         rand = utils.getRandomHash(64)
         path = Path(os.path.join(temp_dir_prefix, str(rand)))

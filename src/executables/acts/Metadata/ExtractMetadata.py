@@ -14,23 +14,23 @@ class ExtractMetadata(BaseAct):
         EXPORT_TYPE = args.get("INPUT_TYPE", "file")
         PATH = None
         assert i != None, "input file not passed"
-        
+
         if EXPORT_TYPE == "file":
             PATH = i.getPath()
         else:
             PATH = i
-        
+
         __PARSER = createParser(PATH)
         _metadata = None
         if not __PARSER:
             return []
-        
+
         with __PARSER:
             try:
                 _metadata = extractMetadata(__PARSER)
                 if _metadata == None:
                     raise ValueError
-                
+
                 return _metadata.exportPlaintext()
             except Exception as err:
                 return []

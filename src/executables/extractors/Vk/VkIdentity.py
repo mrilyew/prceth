@@ -5,25 +5,37 @@ from resources.Exceptions import NotFoundException
 class VkIdentity(VkBase):
     name = 'VkIdentity'
     category = 'Vk'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Профиль",
+                "en": "VK Identity"
+            },
+            "definition": {
+                "ru": "Информация о пользователе/группе из VK",
+                "en": "Info about user/group from VK"
+            }
+        },
+    }
+    file_containment = {
+        "files_count": "0-1",
+        "files_extensions": ["jpg"]
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["download_avatar"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
         }
         params["download_cover"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
@@ -41,9 +53,9 @@ class VkIdentity(VkBase):
         URL = json.get("photo_max")
         if URL == None:
             raise NotFoundException("ava not found")
-        
+
         await download_manager.addDownload(dir=SAVE_PATH,end=URL)
-        
+
         __file = self._fileFromJson({
             "extension": "jpg",
             "upload_name": ORIGINAL_NAME,
@@ -60,11 +72,11 @@ class VkIdentity(VkBase):
         cover = json.get("cover")
         if cover == None or len(cover.get("images")) < 1:
             raise NotFoundException("cover not found")
-        
+
         images = cover.get("images")
         images_ = sorted(images, key=lambda x: (x['width'] is None, x['width']))
         image = images_[0]
-        
+
         await download_manager.addDownload(dir=SAVE_PATH,end=image.get("url"))
 
         __file = self._fileFromJson({
@@ -102,7 +114,7 @@ class VkIdentity(VkBase):
                 __groups_response = await __vkapi.call("groups.getById", {"group_ids": ",".join(str(x) for x in group_ids), "fields": ",".join(consts["vk.group_fields"])})
         else:
             json_inf = self.passed_params.get("__json_info")
-        
+
             if type(json_inf) == dict:
                 if json_inf.get("first_name") != None:
                     __users_response.append(json_inf)
@@ -114,12 +126,12 @@ class VkIdentity(VkBase):
                         __users_response.append(__item)
                     else:
                         __groups_response.append(__item)
-        
+
         if __users_response != None:
             for user in __users_response:
                 user["vkapi_type"] = "user"
                 users.append(user)
-        
+
         if type(__groups_response) != "dict":
             for club in __groups_response:
                 club["vkapi_type"] = "club"
@@ -136,7 +148,7 @@ class VkIdentity(VkBase):
             __tasks.append(__task)
 
         await asyncio.gather(*__tasks, return_exceptions=False)
-        
+
         return {
             "entities": __entities_list
         }
@@ -170,7 +182,7 @@ class VkIdentity(VkBase):
                 __file = await self.__download_cover(item)
                 __file.moveTempDir()
                 item["relative_cover"] = f"__lcms|file_{__file.id}"
-                
+
                 linked_files.append(__file)
             except NotFoundException:
                 pass
@@ -178,7 +190,7 @@ class VkIdentity(VkBase):
                 pass
             except Exception as _e:
                 logger.logException(_e,section="Vk",silent=False)
-        
+
         logger.log(f"Got identity {item.get("vkapi_type")}{item.get('id')}",section="Vk",name="success")
 
         ENTITY = self._entityFromJson({

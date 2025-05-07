@@ -10,7 +10,7 @@ class BaseAct(Executable):
 
     def __init__(self, temp_dir=None):
         self.temp_dir = temp_dir
-    
+
     def parseMainInput(self, main_input):
         try:
             if main_input == None:

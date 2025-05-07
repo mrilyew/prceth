@@ -1,4 +1,4 @@
-from resources.Globals import config, VkApi, logger, utils, math, asyncio, copy
+from resources.Globals import VkApi, logger, math, asyncio, copy
 from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import InvalidPassedParam
 
@@ -106,7 +106,6 @@ class VkSection(VkBase):
                     "en": "Limit of recieved entities",
                 },
             },
-            "desc_key": "-",
             "type": "int",
             "default": 0,
         }
@@ -117,7 +116,6 @@ class VkSection(VkBase):
                     "en": "Number of recieved entities by every call",
                 },
             },
-            "desc_key": "-",
             "type": "int",
             "default": 100
         }
@@ -128,12 +126,10 @@ class VkSection(VkBase):
                     "en": "Number of first iteration",
                 },
             },
-            "desc_key": "-",
             "type": "int",
             "default": 0
         }
         params["filter"] = {
-            "desc_key": "-",
             "type": "string",
             "default": None,
             "assertion": {
@@ -163,7 +159,6 @@ class VkSection(VkBase):
             }
         }
         params["download_attachments_file_list"] = {
-            "desc_key": "-",
             "type": "string",
             "default": "photo",
             "assertion": {
@@ -177,7 +172,6 @@ class VkSection(VkBase):
             }
         }
         params["download_reposts"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
             "assertion": {
@@ -191,7 +185,6 @@ class VkSection(VkBase):
             }
         }
         params["download_comments"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": False,
             "assertion": {
@@ -205,7 +198,6 @@ class VkSection(VkBase):
             }
         }
         params["rev"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
             "assertion": {
@@ -215,7 +207,6 @@ class VkSection(VkBase):
             }
         }
         params["tag_id"] = {
-            "desc_key": "-",
             "type": "int",
             "assertion": {
                 "only_when": [
@@ -224,7 +215,6 @@ class VkSection(VkBase):
             }
         }
         params["comment_id"] = {
-            "desc_key": "-",
             "type": "int",
             "assertion": {
                 "only_when": [
@@ -233,7 +223,6 @@ class VkSection(VkBase):
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
             "assertion": {
@@ -265,7 +254,7 @@ class VkSection(VkBase):
                 __collection["suggested_name"] = __suggested_name
             case "messages":
                 __collection["suggested_name"] = f"Vk Conversation {item_id_collection}"
-    
+
         return __collection
 
     async def run(self, args):
@@ -347,7 +336,7 @@ class VkSection(VkBase):
                         __item_id = "wall"
                     case "000":
                         __item_id = "saved"
-                
+
                 __pass_params = {
                     "owner_id": __owner_id,
                     "album_id": __item_id,
@@ -389,7 +378,7 @@ class VkSection(VkBase):
                                 __extractor = VkArticle
                             case "link":
                                 __extractor = VkLink
-                
+
                 __extractor_params["download_avatar"] = self.passed_params.get("download_file")
                 __extractor_params["download_cover"] = self.passed_params.get("download_cover")
 
@@ -398,7 +387,7 @@ class VkSection(VkBase):
                 if self.passed_params.get("tag_id") != None:
                     __pass_params["tag_id"] = self.passed_params.get("tag_id")
                     _tmp_call["tag_id"] = self.passed_params.get("tag_id")
-                
+
                 __count_call = await __vkapi.call(__method, _tmp_call)
             case "post_comments" | "board" | "photo_comments" | "photo_all_comments" | "video_comments" | "notes_comments":
                 __spl = item_id_collection.split("_")
@@ -417,35 +406,29 @@ class VkSection(VkBase):
                         __pass_params["owner_id"] = __owner_id
                         __pass_params["post_id"] = __item_id
                         __method = "wall.getComments"
-                        __suggested_name = f"Vk Comments from post {item_id_collection}"
                         if self.passed_params.get("comment_id") != None:
                             __pass_params["comment_id"] = self.passed_params.get("comment_id")
                     case "board":
                         __pass_params["group_id"] = abs(__owner_id)
                         __pass_params["topic_id"] = __item_id
                         __method = "board.getComments"
-                        __suggested_name = f"Vk Comments from board {item_id_collection}"
                     case "notes_comments":
                         __pass_params["owner_id"] = __owner_id
                         __pass_params["note_id"] = __item_id
                         __method = "notes.getComments"
-                        __suggested_name = f"Vk Comments from note {item_id_collection}"
                     case "photo_all_comments":
                         __pass_params["owner_id"] = __owner_id
                         __pass_params["album_id"] = __item_id
                         __method = "photos.getAllComments"
-                        __suggested_name = f"Vk Comments from album {item_id_collection}"
                     case "photo_comments":
                         __pass_params["owner_id"] = __owner_id
                         __pass_params["photo_id"] = __item_id
                         __method = "photos.getComments"
-                        __suggested_name = f"Vk Comments from photo {item_id_collection}"
                     case "video_comments":
                         __pass_params["owner_id"] = __owner_id
                         __pass_params["video_id"] = __item_id
                         __method = "video.getComments"
-                        __suggested_name = f"Vk Comments from video {item_id_collection}"
-                
+
                 __temp_params = __pass_params
                 __temp_params["count"] = 1
 
@@ -464,7 +447,7 @@ class VkSection(VkBase):
                 __extractor_params["download_reposts"] = self.passed_params.get("download_reposts")
             case _:
                 raise InvalidPassedParam("invalid section")
-        
+
         __total_count = __count_call.get("count")
         __times = math.ceil(__total_count / __per_page)
         __extractor = __extractor(write_mode=self.write_mode)
@@ -490,12 +473,12 @@ class VkSection(VkBase):
             for item in __items:
                 if self.passed_params.get("limit") > 0 and (__downloaded_count > self.passed_params.get("limit")):
                     break
-                
+
                 item_id = str(item.get("owner_id")) + "_" + str(item.get("id"))
 
                 __extractor_params["item_id"] = item_id
                 __extractor_params["__json_info"] = item
-                
+
                 if __has_profile == True:
                     __extractor_params["__json_profiles"] = __time_call.get("profiles")
                     __extractor_params["__json_groups"] = __time_call.get("groups")
@@ -515,7 +498,7 @@ class VkSection(VkBase):
                 __downloaded_count += 1
 
             await asyncio.gather(*__tasks, return_exceptions=False)
-            
+
             if self.passed_params.get("api_timeout") != 0:
                 await asyncio.sleep(self.passed_params.get("api_timeout"))
 

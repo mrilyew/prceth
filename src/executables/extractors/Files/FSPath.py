@@ -63,16 +63,16 @@ class FSPath(BaseExtractor):
         }
 
         return params
-    
+
     async def run(self, args):
         TEMP_DIR = self.allocateTemp()
         INPUT_PATH = Path(self.passed_params.get("path"))
         if INPUT_PATH.exists() == False:
             raise FileNotFoundError("Path does not exists")
-        
+
         if INPUT_PATH.is_dir() == True:
             raise IsADirectoryError("Path is directory")
-        
+
         FILE_STAT = INPUT_PATH.stat()
         FILE_SIZE = FILE_STAT.st_size
         INPUT_FILE_NAME  = INPUT_PATH.name

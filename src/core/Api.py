@@ -267,23 +267,21 @@ class Api():
         # Text: Result will be saved at another dir
         __export_folder = __INPUT_ARGS.get("export_to_dir", None)
         __export_to_db = __export_folder == None
-        __custom_temp_dir = __INPUT_ARGS.get("custom_temp_dir", None)
         __del_dir_on_fail = int(__INPUT_ARGS.get("del_dir", "1")) == 1 and __export_to_db == True
-        __write_mode = int(__INPUT_ARGS.get("write_mode", "2"))
-        if __write_mode not in [1, 2]:
-            __write_mode = 2
-        
-        col = None
+        __write_mode = __INPUT_ARGS.get("write_mode", "save_after_creation")
+        if __write_mode not in ["save_after_creation", "save_after_end"]:
+            __write_mode = "save_after_creation"
+
         INSTANCE_CLASS = (ExtractorsRepository()).getByName(extractor_name=__extractor_input_name)
         assert INSTANCE_CLASS != None, "Extractor not found"
 
-        EXTRACTOR_INSTANCE = INSTANCE_CLASS(temp_dir=__custom_temp_dir,del_dir_on_fail=__del_dir_on_fail,write_mode=__write_mode)
+        EXTRACTOR_INSTANCE = INSTANCE_CLASS(del_dir_on_fail=__del_dir_on_fail,write_mode=__write_mode)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = None
         EXTRACTOR_COLLECTION = None
 
-        __new_coll = EXTRACTOR_INSTANCE._collection()
-        if __new_coll != None:
+        if getattr(EXTRACTOR_INSTANCE, "_collection", None) != None:
+            __new_coll = EXTRACTOR_INSTANCE._collection()
             EXTRACTOR_COLLECTION = EXTRACTOR_INSTANCE._collectionFromJson(__new_coll)
 
         __coll = None

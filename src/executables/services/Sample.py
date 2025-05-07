@@ -4,7 +4,6 @@ from resources.Globals import time
 class Sample(BaseService):
     name = 'Sample'
     name_key = "_"
-    desc_key = "_"
     interval = 10
     hidden = True
 

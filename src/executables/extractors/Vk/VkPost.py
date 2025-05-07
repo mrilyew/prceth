@@ -1,6 +1,6 @@
 from executables.extractors.Vk.VkBase import VkBase
 from executables.extractors.Files.JsonObject import JsonObject
-from resources.Globals import VkApi, json, utils, ExtractorsRepository, logger, asyncio
+from resources.Globals import VkApi, utils, logger, asyncio
 from resources.Exceptions import NotFoundException
 
 class VkPost(VkBase):
@@ -8,14 +8,28 @@ class VkPost(VkBase):
     category = 'Vk'
     vk_type = "post"
 
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Пост",
+                "en": "VK Post"
+            },
+            "definition": {
+                "ru": "Метаинформация о посте из VK и его прикрепления",
+                "en": "Metainfo about VK post and its attachments"
+            }
+        }
+    }
+    file_containment = {
+        "files_count": "0-10"
+    }
+
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
@@ -23,32 +37,26 @@ class VkPost(VkBase):
             }
         }
         params["__json_profiles"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
         }
         params["__json_groups"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
         }
         params["download_attachments_json_list"] = {
-            "desc_key": "-",
             "type": "string",
             "default": "*",
         }
         params["download_attachments_file_list"] = {
-            "desc_key": "-",
             "type": "string",
             "default": "photo",
         }
         params["download_reposts"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
         }
         params["download_comments"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": False,
         }
@@ -126,22 +134,21 @@ class VkPost(VkBase):
                 __attachment_object = attachment.get(__attachment_type)
                 if __attachment_object == None:
                     continue
-                
+
                 if __attachment_type == "wall":
                     __attachment_class_name = "post"
-                
+
                 should_download_json = DOWNLOAD_JSON_LIST[0] == "*" or __attachment_type in DOWNLOAD_JSON_LIST
                 should_download_file = DOWNLOAD_FILE_LIST[0] == "*" or __attachment_type in DOWNLOAD_FILE_LIST
-                
+
                 if should_download_json == False:
                     continue
-                
-                __attachment_class = (ExtractorsRepository().getByName(f"Vk.Vk{__attachment_class_name.title()}"))
+
+                __attachment_class = self.fork(f"Vk.Vk{__attachment_class_name.title()}")
                 if __attachment_class == None:
                     logger.log(message="Recieved unknown attachment: " + str(__attachment_class_name),section="VkAttachments",name="message")
 
-                    __attachment_class_unknown = JsonObject()
-                    __attachment_class_unknown.setArgs({
+                    __attachment_class_unknown = self.fork(JsonObject, {
                         "json_object": item["attachments"][key][__attachment_class_name],
                     })
 
@@ -154,8 +161,7 @@ class VkPost(VkBase):
                     ATTACHMENT_ID = f"{__attachment_object.get('owner_id')}_{__attachment_object.get('id')}"
                     logger.log(message=f"Recieved attachment {str(__attachment_class_name)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
 
-                    __attachment_class_dec = __attachment_class(need_preview=self.need_preview)
-                    __attachment_class_return = await __attachment_class_dec.fastGetEntity(params={
+                    __attachment_class.setArgs({
                         "unlisted": 1,
                         "item_id": ATTACHMENT_ID,
                         "__json_info": __attachment_object,
@@ -163,14 +169,15 @@ class VkPost(VkBase):
                         "api_url": self.passed_params.get("api_url"),
                         "vk_path": self.passed_params.get("vk_path"),
                         "download_file": should_download_file,
-                    },args={})
+                    })
+                    __attachment_class_return = await __attachment_class.execute({})
 
                     __linked_files.append(__attachment_class_return[0])
                     item["relative_attachments"][key][__attachment_class_name] = f"__lcms|entity_{__attachment_class_return[0].id}"
             except ModuleNotFoundError:
                 pass
             except Exception as ___e___:
-                logger.logException(___e___, "VkAttachments")
+                logger.logException(___e___, "VkAttachments", silent=False)
 
         if item.get("copy_history") != None and self.passed_params.get("download_reposts") == True:
             for key, repost in enumerate(item.get("copy_history")):
@@ -181,8 +188,7 @@ class VkPost(VkBase):
 
                     logger.log(message=f"Found repost {key}",section="VKPost",name="message")
 
-                    __vk_post_extractor = VkPost(need_preview=self.need_preview)
-                    __vk_post_entity = await __vk_post_extractor.fastGetEntity(params={
+                    __vk_post_extractor = self.fork(VkPost, {
                         "unlisted": 1,
                         "item_id": REPOST_ID,
                         "__json_info": repost,
@@ -192,7 +198,8 @@ class VkPost(VkBase):
                         "download_attachments_json_list": self.passed_params.get("download_attachments_json_list"),
                         "download_attachments_file_list": self.passed_params.get("download_attachments_file_list"),
                         "download_reposts": False,
-                    },args={})
+                    })
+                    __vk_post_entity = await __vk_post_extractor.execute({})
 
                     __linked_files.append(__vk_post_entity[0])
                     item["relative_copy_history"][key] = f"__lcms|entity_{__vk_post_entity[0].id}"

@@ -5,15 +5,31 @@ from resources.Exceptions import NotFoundException
 class VkArticle(VkBase):
     name = 'VkArticle'
     category = 'Vk'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Статья",
+                "en": "VK Article"
+            },
+            "definition": {
+                "ru": "Метаинформация о статье VK (сама статья только через страницу)",
+                "en": "Metainfo about VK Article"
+            }
+        }
+    }
 
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "ID статьи",
+                    "en": "ID of article",
+                }
+            },
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "assertion": {
                 "assert_link": "item_id"
@@ -25,7 +41,7 @@ class VkArticle(VkBase):
     async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("articles.getByLink", {"links": ",".join(item_ids), "extended": 1})
-    
+
     async def run(self, args):
         __article_response = None
         __item_ids = self.passed_params.get("item_id")

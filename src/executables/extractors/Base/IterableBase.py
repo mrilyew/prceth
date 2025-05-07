@@ -1,6 +1,5 @@
 from executables.extractors.Base.BaseCollectionable import BaseCollectionable
 from resources.Globals import asyncio, logger
-from db.File import File
 
 # ЖИРИНОВСКИЙ СЧИТАЕТ, 1234
 class IterableBase(BaseCollectionable):
@@ -11,7 +10,6 @@ class IterableBase(BaseCollectionable):
         params = {}
         params["start"] = {
             "type": "int",
-            "desc_key": "-",
             "default": 1,
             "assertion": {
                 "assert_not_null": True,
@@ -19,7 +17,6 @@ class IterableBase(BaseCollectionable):
         }
         params["end"] = {
             "type": "int",
-            "desc_key": "-",
             "default": 100,
             "assertion": {
                 "assert_not_null": True,
@@ -27,7 +24,6 @@ class IterableBase(BaseCollectionable):
         }
         params["timeout"] = {
             "type": "float",
-            "desc_key": "-",
             "default": 1,
             "assertion": {
                 "assert_not_null": True,

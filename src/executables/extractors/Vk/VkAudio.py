@@ -5,15 +5,35 @@ from resources.Exceptions import NotFoundException, LibNotInstalledException
 class VkAudio(VkBase):
     name = 'VkAudio'
     category = 'Vk'
-    
+    docs = {
+        "description": {
+            "name": {
+                "ru": "VK Аудиозапись",
+                "en": "VK Audio"
+            },
+            "definition": {
+                "ru": "Аудиофайл из vk",
+                "en": "Audio from vk"
+            }
+        },
+    }
+    file_containment = {
+        "files_count": "1",
+        "files_extensions": ["mp3"]
+    }
+
     def declare():
         params = {}
         params["item_id"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "ID аудиозаписи",
+                    "en": "ID of audio",
+                }
+            },
             "type": "string",
         }
         params["__json_info"] = {
-            "desc_key": "-",
             "type": "object",
             "hidden": True,
             "assertion": {
@@ -21,17 +41,22 @@ class VkAudio(VkBase):
             }
         }
         params["download_file"] = {
-            "desc_key": "-",
+            "docs": {
+                "definition": {
+                    "ru": "Скачивать ли аудиофайл (через yt-dlp)",
+                    "en": "Do download audio file (via yt-dlp)",
+                }
+            },
             "type": "bool",
             "default": True
         }
 
         return params
-    
+
     async def recieveById(self, item_ids):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         return await __vkapi.call("audio.getById", {"audios": ",".join(item_ids), "extended": 1})
-    
+
     async def run(self, args):
         __audio_response = None
         __item_ids = self.passed_params.get("item_id")
@@ -61,7 +86,7 @@ class VkAudio(VkBase):
             __tasks.append(__task)
 
         await asyncio.gather(*__tasks, return_exceptions=False)
-        
+
         return {
             "entities": __entities_list
         }

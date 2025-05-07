@@ -10,31 +10,25 @@ class ExportEntity(BaseAct):
     def declare():
         params = {}
         params["dir"] = {
-            "desc_key": "-",
             "type": "string",
         }
         params["export_json"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
         }
         params["dir_to_each_entity"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": True,
         }
         params["export_linked"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": False,
         }
         params["export_json"] = {
-            "desc_key": "-",
             "type": "bool",
             "default": False,
         }
         params["prefix_type"] = {
-            "desc_key": "-",
             "type": "array",
             "values": ["id", "order"],
             "default": "id"

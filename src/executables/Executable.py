@@ -1,4 +1,4 @@
-from resources.Globals import storage, utils, consts, logger, DeclarableArgs, file_manager
+from resources.Globals import storage, utils, consts, logger, DeclarableArgs, file_manager, config
 from db.Entity import Entity
 
 class Executable:
@@ -13,7 +13,7 @@ class Executable:
     manual_params = False
     need_preview = False
     already_declared = False
-    write_mode = 2
+    write_mode = "save_after_creation"
     docs = {
         "description": {
             "name": {
@@ -24,6 +24,13 @@ class Executable:
             }
         }
     }
+
+    @classmethod
+    def isRunnable(cls):
+        '''
+        Is this Executable can be runned or it's technical
+        '''
+        return cls.category.lower() not in ["template", "base"] and getattr(cls, "hidden", False) == False
 
     def declare():
         params = {}
@@ -59,13 +66,62 @@ class Executable:
         if self.manual_params == True:
             self.passed_params.update(args)
 
+    def manual(self):
+        manual = {}
+        __docs = getattr(self, "docs")
+        __params = getattr(self, "params")
+        __meta = __docs.get("description")
+        if __docs != None:
+            __name = __meta.get("name")
+            name = __name.get(config.get("ui.lang"), __name.get("en"))
+            __desc = __meta.get("definition")
+            desc = __desc.get(config.get("ui.lang"), __desc.get("en"))
+            manual["name"] = name
+            manual["definition"] = desc
+
+        manual["files"] = getattr(self, "file_containment", {})
+        manual["params"] = []
+
+        __enumerated_params = enumerate(__params)
+        if __params != None:
+            for param_index, param_name in __enumerated_params:
+                orig_param = __params.get(param_name)
+                orig_param["name"] = param_name
+
+                if orig_param.get("sensitive") == True:
+                    orig_param["default"] = "hidden"
+
+                param_docs = orig_param.get("docs")
+                if param_docs != None:
+                    param_definition = param_docs.get("definition")
+                    param_definition_text = param_definition.get(config.get("ui.lang"), param_definition.get("en"))
+                    orig_param["definition"] = param_definition_text
+
+                    del orig_param["docs"]
+
+                    param_values = param_docs.get("values")
+                    if param_values != None:
+                        __param_values = {}
+                        for val_index, val_name in enumerate(param_values):
+                            orig_val = param_values.get(val_name)
+                            orig_val_text = orig_val.get(config.get("ui.lang"), orig_val.get("en"))
+                            __param_values[val_name] = orig_val_text
+                        
+                        orig_param["values"] = __param_values
+
+                manual["params"].append(orig_param)
+    
+        return manual
+
     def describe(self):
-        return {
+        rt = {
             "id": self.name,
             "category": self.category,
             "hidden": getattr(self, "hidden", False),
-            "params": getattr(self, "params", {})
         }
+        rt["meta"] = self.manual()
+
+        return rt
 
     def allocateTemp(self):
         _dir = storage.makeTemporaryCollectionDir(self.temp_dir_prefix)
@@ -93,22 +149,25 @@ class Executable:
         except Exception as ___e:
             logger.logException(input_exception=___e,section="Extractor",silent=False)
             pass
-
-    # TODO убрать?
-    async def fastGetEntity(self, params, args):
-        from db.File import File
-
-        RETURN_ENTITIES = []
-        self.setArgs(params)
-        EXTRACTOR_RESULTS = await self.execute({})
-        for ENTITY in EXTRACTOR_RESULTS.get("entities"):
-            ENTITY.save()
-            RETURN_ENTITIES.append(ENTITY)
-            #if ENTITY.file != None:
-            #    ENTITY.file.moveTempDir()
-
-        return RETURN_ENTITIES
     
+    def fork(self, extractor_name_or_class, args = None):
+        from resources.Globals import ExtractorsRepository
+
+        _ext = None
+        if type(extractor_name_or_class) == str:
+            _ext = (ExtractorsRepository()).getByName(extractor_name_or_class)
+        else:
+            _ext = extractor_name_or_class
+
+        if _ext == None:
+            return None
+
+        ext = _ext(write_mode=self.write_mode,need_preview=self.need_preview)
+        if args != None:
+            ext.setArgs(args)
+
+        return ext
+
     # Typical preview
     def thumbnail(self, entity, args={}, temp_dir = None):
         if self.need_preview == False:
@@ -152,12 +211,20 @@ class Executable:
                 __entity.preview = utils.dump_json(thumb_result)
 
         self.entities_buffer.append(__entity)
-        if self.write_mode == 2:
-            __entity.save()
-            logger.log(f"Saved entity {str(__entity.id)} 👍",section="EntitySaveMechanism",name="success")
+        if self.write_mode == "save_after_creation":
+            self._entityPostRun(__entity)
 
+        return __entity
+
+    def _collectionFromJson(self, json_data):
+        from db.Collection import Collection
+
+        return Collection.fromJson(json_data, self.passed_params)
+
+    def _entityPostRun(self, entity):
+        entity.save()
         try:
-            __entity.file.moveTempDir()
+            entity.file.moveTempDir()
         except:
             pass
 
@@ -167,13 +234,24 @@ class Executable:
                     continue
 
                 try:
-                    coll.addItem(__entity)
+                    coll.addItem(entity)
                 except:
                     pass
 
-        return __entity
+        logger.log(f"Saved entity {str(entity.id)} 👍",section="EntitySaveMechanism",name="success")
 
-    def _collectionFromJson(self, json_data):
-        from db.Collection import Collection
+    async def postRun(self, return_entities):
+        if self.write_mode == "save_after_end":
+            try:
+                ___ln = len(self.entities_buffer)
+                __msg = f"Saving total {str(___ln)} entities;"
+                if ___ln > 100:
+                    __msg += " do not turn off your computer."
+                
+                logger.log(__msg,section="EntitySaveMechanism",name="success")
+            except Exception as _x:
+                print("PostRun:" + str(_x))
+                pass
 
-        return Collection.fromJson(json_data, self.passed_params)
+            for unsaved_entity in self.entities_buffer:
+                self._entityPostRun(unsaved_entity)
