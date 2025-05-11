@@ -17,10 +17,10 @@ class Executable:
     docs = {
         "description": {
             "name": {
-                "en": "Executable root"
+                "en": "No name passed"
             },
             "definition": {
-                "en": "Executable root description"
+                "en": "No description passed"
             }
         }
     }

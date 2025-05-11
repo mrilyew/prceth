@@ -1,5 +1,5 @@
 from resources.Globals import os, logger, asyncio, consts, datetime, zipfile, Path, utils, file_manager, json
-from executables.acts.Base import BaseAct
+from executables.acts.Base.Base import BaseAct
 from db.Collection import Collection
 from db.Entity import Entity
 from db.File import File
@@ -9,12 +9,24 @@ class ExportToZIP(BaseAct):
     name = 'ExportToZIP'
     category = 'export'
     accepts = 'collection'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "Экспорт в ZIP",
+                "en": "Export to ZIP"
+            },
+            "definition": {
+                "ru": "Копирует содержимое коллекции в zip",
+                "en": "Copies collection content to zip"
+            }
+        }
+    }
 
     def declare():
         params = {}
         params["dir"] = {
             "type": "string",
-            "assert": {
+            "assertion": {
                 "assert_not_null": True,
             },
         }

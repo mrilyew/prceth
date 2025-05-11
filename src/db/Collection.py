@@ -2,6 +2,7 @@ from peewee import TextField, IntegerField, AutoField, BooleanField, TimestampFi
 from resources.Globals import BaseModel, consts, time, operator, json, os
 from playhouse.shortcuts import model_to_dict
 from functools import reduce
+from peewee import fn
 
 class Collection(BaseModel):
     self_name = 'collection'
@@ -77,7 +78,7 @@ class Collection(BaseModel):
         self.save()
         to_switch.save()
 
-    def __fetchItems(self, query = None, columns_search = []):
+    def _fetchItems(self, query = None, columns_search = []):
         from db.Entity import Entity
         from db.Collection import Collection
         from db.Relation import Relation
@@ -136,13 +137,16 @@ class Collection(BaseModel):
 
         return items
 
-    def getItems(self, offset = 0, limit = 10, query = None, columns_search = []):
+    def getItems(self, offset = 0, limit = 10, query = None, columns_search = [], order = None):
         from db.Entity import Entity
 
-        items = self.__fetchItems(query=query,columns_search=columns_search)
+        items = self._fetchItems(query=query,columns_search=columns_search)
         items = items.offset(offset)
         if limit != None:
             items = items.limit(limit)
+
+        if order == "rand":
+            items = items.order_by(fn.Random())
 
         results = []
         for relation in items:
@@ -159,7 +163,7 @@ class Collection(BaseModel):
         self.save()'''
 
     def getItemsCount(self, query = None, columns_search = []):
-        items = self.__fetchItems(query=query,columns_search=columns_search)
+        items = self._fetchItems(query=query,columns_search=columns_search)
         
         return items.count()
 

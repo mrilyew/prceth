@@ -180,11 +180,11 @@ class Entity(BaseModel):
                     conditions.append((Entity.extractor_name.contains(query)))
                 case "author":
                     conditions.append((Entity.author.contains(query)))
-        
+
         if conditions:
             items = items.where(reduce(operator.or_, conditions))
-        
-        return items.order_by(Entity.id.desc())
+
+        return items
     
     @staticmethod
     def get(id):

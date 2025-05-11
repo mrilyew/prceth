@@ -21,7 +21,7 @@ class ExportCollection(ExportEntity):
                 entities.append(__entity)
         for __entity in entities:
             entity_ids.append(str(__entity.id))
-        
+
         fs_act = ExportEntity()
         fs_act.setArgs(self.passed_params)
 

@@ -1,11 +1,24 @@
 from resources.Globals import os, Path, asyncio
-from executables.acts.Base import BaseAct
+from executables.acts.Base.Base import BaseAct
 from db.Entity import Entity
 
 class ExportEntity(BaseAct):
     name = 'ExportEntity'
     category = 'export'
     accepts = 'string'
+
+    docs = {
+        "description": {
+            "name": {
+                "ru": "Экспорт записи",
+                "en": "Entity export"
+            },
+            "definition": {
+                "ru": "Копирует файлы и метаинформацию о записях в заданную директорию",
+                "en": "Copies files and metainfo about entities to provided directory"
+            }
+        }
+    }
 
     def declare():
         params = {}

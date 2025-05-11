@@ -36,7 +36,7 @@ class VkBase(BaseExtractor):
             "env_property": "vk.access_token",
             "type": "string",
             "default": env.get("vk.access_token", None),
-            "assert": {
+            "assertion": {
                 "assert_not_null": True,
             },
         }
@@ -50,7 +50,7 @@ class VkBase(BaseExtractor):
             "env_property": "vk.api_url",
             "type": "string",
             "default": env.get("vk.api_url", "api.vk.com/method"),
-            "assert": {
+            "assertion": {
                 "assert_not_null": True,
             },
         }
@@ -64,7 +64,7 @@ class VkBase(BaseExtractor):
             "env_property": "vk.vk_path",
             "type": "string",
             "default": env.get("vk.vk_path", "vk.com"),
-            "assert": {
+            "assertion": {
                 "assert_not_null": True,
             },
         }

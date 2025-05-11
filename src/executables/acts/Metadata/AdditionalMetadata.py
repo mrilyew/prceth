@@ -1,4 +1,4 @@
-from executables.acts.Base import BaseAct
+from executables.acts.Base.Base import BaseAct
 from hachoir.core import config
 from resources.Globals import utils
 

@@ -1,5 +1,5 @@
 from resources.Globals import consts, os, Path, shutil
-from executables.acts.Base import BaseAct
+from executables.acts.Base.Base import BaseAct
 from db.Entity import Entity
 
 class MoveBrokenTempDirs(BaseAct):

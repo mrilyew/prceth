@@ -1,5 +1,5 @@
 from resources.Globals import importlib, utils, logger
-from executables.acts.Base import BaseAct
+from executables.acts.Base.Base import BaseAct
 
 class Acts:
     def run(self, args, entity_dir, act_name):
@@ -37,11 +37,11 @@ class Acts:
                     if isinstance(item, type) and issubclass(item, BaseAct) and item.name.find('base') == -1 and item.name.find('Template') == -1:
                         if not show_hidden and getattr(item, "hidden", False):
                             continue
-                        
+
                         if getattr(item, "accepts", "all") == "entity":
                             if search_type == "collection" or search_type == "string":
                                 continue
-                            
+
                         if getattr(item, "accepts", "all") == "collection":
                             if search_type == "entity" or search_type == "string":
                                 continue
@@ -49,7 +49,7 @@ class Acts:
                         if getattr(item, "accepts", "all") == "string":
                             if search_type == "entity" or search_type == "collection":
                                 continue
-                        
+
                         __exit.append(item())
             except ImportError as e:
                 print(f"Error importing {module_name}: {e}")

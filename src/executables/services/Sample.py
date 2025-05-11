@@ -1,4 +1,4 @@
-from executables.services.Base import BaseService
+from executables.services.Base.Base import BaseService
 from resources.Globals import time
 
 class Sample(BaseService):

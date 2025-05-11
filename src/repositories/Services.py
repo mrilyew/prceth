@@ -1,5 +1,5 @@
 from resources.Globals import importlib, utils, logger, time
-from executables.services.Base import BaseService
+from executables.services.Base.Base import BaseService
 
 class Services:
     def run(self, args, service_name):

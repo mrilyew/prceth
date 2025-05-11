@@ -27,7 +27,7 @@ class JsonObject(BaseExtractor):
                 }
             },
             "type": "object",
-            "assert": {
+            "assertion": {
                 "assert_not_null": True,
             },
         }

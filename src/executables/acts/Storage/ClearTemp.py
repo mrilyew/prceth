@@ -1,5 +1,5 @@
 from resources.Globals import consts, os, file_manager
-from executables.acts.Base import BaseAct
+from executables.acts.Base.Base import BaseAct
 
 class ClearTemp(BaseAct):
     name = 'ClearTemp'

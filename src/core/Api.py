@@ -253,7 +253,7 @@ class Api():
         count = int(params.get("count", 10))
 
         fetch = Entity.fetchItems(query=query,columns_search=columns_search)
-        items = fetch.offset(offset).limit(count)
+        items = fetch.order_by(Entity.id.desc()).offset(offset).limit(count)
         count = fetch.count()
 
         return items, count
@@ -341,8 +341,11 @@ class Api():
         assert __act_res != None, "act not found"
 
         OUT_ACT = __act_res()
-        ACT_MAIN_INPUT = OUT_ACT.parseMainInput(main_input=__act_main)
-        assert ACT_MAIN_INPUT != None, f"{__act_res.accepts} not found"
+        ACT_MAIN_INPUT = None
+        if __act_res.accepts != "none":      
+            ACT_MAIN_INPUT = OUT_ACT.parseMainInput(main_input=__act_main)
+            assert ACT_MAIN_INPUT != None, f"{__act_res.accepts} not found"
+
         OUT_ACT.setArgs(params)
 
         ACT_F = await OUT_ACT.execute(i=ACT_MAIN_INPUT,args=params)
