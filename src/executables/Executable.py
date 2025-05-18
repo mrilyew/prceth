@@ -66,50 +66,18 @@ class Executable:
         if self.manual_params == True:
             self.passed_params.update(args)
 
+    def setPostActions(self, after_save_actions):
+        self.after_save_actions = after_save_actions
+
     def manual(self):
         manual = {}
         __docs = getattr(self, "docs")
         __params = getattr(self, "params")
         __meta = __docs.get("description")
-        if __docs != None:
-            __name = __meta.get("name")
-            name = __name.get(config.get("ui.lang"), __name.get("en"))
-            __desc = __meta.get("definition")
-            desc = __desc.get(config.get("ui.lang"), __desc.get("en"))
-            manual["name"] = name
-            manual["definition"] = desc
 
+        manual["description"] = __meta
         manual["files"] = getattr(self, "file_containment", {})
-        manual["params"] = []
-
-        __enumerated_params = enumerate(__params)
-        if __params != None:
-            for param_index, param_name in __enumerated_params:
-                orig_param = __params.get(param_name)
-                orig_param["name"] = param_name
-
-                if orig_param.get("sensitive") == True:
-                    orig_param["default"] = "hidden"
-
-                param_docs = orig_param.get("docs")
-                if param_docs != None:
-                    param_definition = param_docs.get("definition")
-                    param_definition_text = param_definition.get(config.get("ui.lang"), param_definition.get("en"))
-                    orig_param["definition"] = param_definition_text
-
-                    del orig_param["docs"]
-
-                    param_values = param_docs.get("values")
-                    if param_values != None:
-                        __param_values = {}
-                        for val_index, val_name in enumerate(param_values):
-                            orig_val = param_values.get(val_name)
-                            orig_val_text = orig_val.get(config.get("ui.lang"), orig_val.get("en"))
-                            __param_values[val_name] = orig_val_text
-                        
-                        orig_param["values"] = __param_values
-
-                manual["params"].append(orig_param)
+        manual["params"] = __params
     
         return manual
 
@@ -165,6 +133,8 @@ class Executable:
         ext = _ext(write_mode=self.write_mode,need_preview=self.need_preview)
         if args != None:
             ext.setArgs(args)
+
+        ext.setPostActions(self.after_save_actions)
 
         return ext
 

@@ -5,11 +5,12 @@ from db.Entity import Entity
 class MoveBrokenTempDirs(BaseAct):
     name = 'MoveBrokenTempDirs'
     category = 'storage'
-    accepts = 'string'
 
-    async def execute(self, i: str, args):
+    async def execute(self, args = {}):
+        raise Exception()
+
         TMP_FILES_DIR = os.path.join(consts["tmp"], "files")
-        DESTINATION = i
+        DESTINATION = ""
 
         for root, _, files in os.walk(TMP_FILES_DIR):
             for file in files:

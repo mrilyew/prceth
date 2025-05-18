@@ -4,9 +4,8 @@ from executables.acts.Base.Base import BaseAct
 class ClearTemp(BaseAct):
     name = 'ClearTemp'
     category = 'storage'
-    accepts = 'string'
 
-    async def execute(self, i: str, args):
+    async def execute(self, args = {}):
         TMP_FILES_DIR = os.path.join(consts["tmp"], "files")
 
         for tmp_dir, _ in os.walk(TMP_FILES_DIR):

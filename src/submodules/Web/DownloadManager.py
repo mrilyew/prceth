@@ -44,9 +44,9 @@ class DownloadManager():
         DOWNLOAD_URL = queue_element.get("url")
         DOWNLOAD_DIR = queue_element.get("dir")
 
+        logger.log(section="AsyncDownloadManager", name="message", message=f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
         async with self.semaphore:
             async with session.get(DOWNLOAD_URL, allow_redirects=True, headers=self.__headers) as response:
-                logger.log(section="AsyncDownloadManager", name="message", message=f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 HTTP_REQUEST_STATUS = response.status
 
                 #if HTTP_REQUEST_STATUS != 200:

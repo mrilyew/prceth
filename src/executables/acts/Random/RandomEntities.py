@@ -6,7 +6,6 @@ from peewee import fn
 class RandomEntities(BaseRandomizator):
     name = 'RandomEntities'
     category = 'random'
-    accepts = 'none'
     docs = {
         "description": {
             "name": {

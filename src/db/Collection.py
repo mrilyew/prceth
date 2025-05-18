@@ -5,6 +5,9 @@ from functools import reduce
 from peewee import fn
 
 class Collection(BaseModel):
+    '''
+    Model that represents collection of other entities. Refers to "Relation"
+    '''
     self_name = 'collection'
 
     id = AutoField() # Auto increment id.

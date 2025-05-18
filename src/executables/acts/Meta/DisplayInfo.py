@@ -4,7 +4,6 @@ from executables.acts.Base.Base import BaseAct
 class DisplayInfo(BaseAct):
     name = 'DisplayInfo'
     category = 'Meta'
-    accepts = 'none'
     docs = {
         "description": {
             "name": {
@@ -18,7 +17,7 @@ class DisplayInfo(BaseAct):
         }
     }
 
-    async def execute(self, i, args={}):
+    async def execute(self, args={}):
         return {
             "config": {
                 "current_db": config.get('db.path')

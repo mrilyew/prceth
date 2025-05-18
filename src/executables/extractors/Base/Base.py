@@ -74,3 +74,7 @@ class BaseExtractor(Executable):
             raise x
 
         return EXTRACTOR_RESULTS
+
+    @classmethod
+    def isCreatesCollection(cls):
+        return getattr(cls, "_collection", None) != None

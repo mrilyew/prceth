@@ -4,6 +4,17 @@ from db.File import File
 from functools import reduce
 
 class Entity(BaseModel):
+    '''
+    Model that represents unit of information.
+
+    Fields:
+    id: id of entity
+    internal_content: json content of entity
+    display_name: visual name of entity
+
+    Methods:
+
+    '''
     self_name = 'entity'
     __cached_file = None
     __cachedLinkedEntities = None
@@ -52,10 +63,6 @@ class Entity(BaseModel):
         return _fl
 
     def delete(self, delete_dir=False):
-        if delete_dir == True:
-            if self.file != None:
-                file_manager.rmdir(self.file.getDirPath())
-
         super().delete()
     
     def getCorrectSource(self):
@@ -75,7 +82,7 @@ class Entity(BaseModel):
         lods_ = json5.loads(internal_content)
         if recursive == True and recurse_level < 3:
             linked_files = self.getLinkedEntities()
-            lods_ = utils.replaceStringsInDict(input_data=lods_,link_to_linked_files=linked_files,recurse_level=recurse_level)
+            lods_ = utils.replace_strings_in_dicts(input_data=lods_,link_to_linked_files=linked_files,recurse_level=recurse_level)
 
         return lods_
 
@@ -220,7 +227,7 @@ class Entity(BaseModel):
             FINAL_ENTITY.internal_content = json.dumps(internal_content_, ensure_ascii=False)
         else:
             try:
-                internal_content_ = utils.clearJson(indexation_content_)
+                internal_content_ = utils.clear_json(indexation_content_)
                 FINAL_ENTITY.internal_content = json.dumps(internal_content_, ensure_ascii=False)
             except Exception:
                 FINAL_ENTITY.internal_content = json.dumps(indexation_content_, ensure_ascii=False)

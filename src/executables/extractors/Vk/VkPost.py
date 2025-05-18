@@ -1,6 +1,6 @@
 from executables.extractors.Vk.VkBase import VkBase
 from executables.extractors.Files.JsonObject import JsonObject
-from resources.Globals import VkApi, utils, logger, asyncio
+from resources.Globals import VkApi, logger, asyncio, media_utils
 from resources.Exceptions import NotFoundException
 
 class VkPost(VkBase):
@@ -209,11 +209,11 @@ class VkPost(VkBase):
                     logger.logException(___e___, "VkAttachments")
 
         if item.get("from_id") != None and self.__profiles != None:
-            item["from"] = utils.find_owner(item.get("from_id"), self.__profiles, self.__groups)
+            item["from"] = media_utils.find_owner(item.get("from_id"), self.__profiles, self.__groups)
         if item.get("owner_id") != None and self.__profiles != None:
-            item["owner"] = utils.find_owner(item.get("owner_id"), self.__profiles, self.__groups)
+            item["owner"] = media_utils.find_owner(item.get("owner_id"), self.__profiles, self.__groups)
         if item.get("copy_owner_id") != None and self.__profiles != None:
-            item["copy_owner"] = utils.find_owner(item.get("copy_owner_id"), self.__profiles, self.__groups)
+            item["copy_owner"] = media_utils.find_owner(item.get("copy_owner_id"), self.__profiles, self.__groups)
 
         ENTITY = self._entityFromJson({
             "source": __SOURCE,

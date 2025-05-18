@@ -75,7 +75,7 @@ class VkVideo(VkBase):
 
         VIDEO_ID  = f"{item.get('owner_id')}_{item.get('id')}"
         VIDEO_NAME = item.get("title")
-        ORIGINAL_NAME = f"{utils.validName(VIDEO_NAME)}.mp4"
+        ORIGINAL_NAME = f"{utils.valid_name(VIDEO_NAME)}.mp4"
         VIDEO_PAGE_URL = f"https://vkvideo.ru/video{VIDEO_ID}"
 
         logger.log(message=f"Recieved video {VIDEO_ID}",section="VkAttachments",name="message")
@@ -91,7 +91,7 @@ class VkVideo(VkBase):
                     try:
                         if item.get("files") != None:
                             FILES_LIST = item.get("files")
-                            MAX_QUALITY = utils.findHighestInDict(FILES_LIST, "mp4_")
+                            MAX_QUALITY = media_utils.find_highest_in_dict(FILES_LIST, "mp4_")
                             VIDEO_URL = None
                             HLS_URL = FILES_LIST.get("hls")
                             if QUALITY == "max":
@@ -112,7 +112,7 @@ class VkVideo(VkBase):
                     except:
                         from submodules.Media.YtDlpWrapper import YtDlpWrapper
                         
-                        if media_utils.isFFMPEGInstalled() == False:
+                        if media_utils.is_ffmpeg_installed() == False:
                             raise LibNotInstalledException("ffmpeg is not installed")
 
                         logger.log(message=f"Making direct download via yt-dlp...",section="VkAttachments",name="message")

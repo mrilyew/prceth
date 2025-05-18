@@ -1,5 +1,28 @@
 class DeclarableArgs():
+    '''
+    Class thats represents declarative arguments.\n
+
+    Takes input params and total list of params.\n
+
+    Methods:\n
+    recieveObjectByName()\n
+    recieveValue()\n
+    dict()\n
+    '''
     def __init__(self, compare_params: dict, out_args: dict, exc_type: str = "assert", is_free_settings: bool = False):
+        '''
+        compare_params: total declared params
+
+        out_args: input dict of params that will be compared with total params
+
+        exc_type:
+
+        "assert" — AssertException will be risen on exception (when \"type\" is \"array\")
+
+        "ignore" — Default value will be set on exception
+
+        is_free_settings: Values from passed args will be set
+        '''
         self.params = compare_params
         self.args = out_args
         self.exc_type = exc_type
@@ -12,13 +35,13 @@ class DeclarableArgs():
 
     def recieveValue(self, param_name: str, param_object: object):
         from resources.Globals import utils
+        
+        __value = self.args.get(param_name, param_object.get("default"))
 
         if param_object == None:
             if self.is_free_settings == True:
                 return __value
-        
-        __value = self.args.get(param_name, param_object.get("default"))
-        
+
         if __value != None:
             match(param_object.get("type")):
                 case "int":
@@ -79,7 +102,6 @@ class DeclarableArgs():
                 try:
                     __dict[param_name] = self.recieveValue(param_name, param_object)
                 except Exception as _y:
-                    print("DeclarableArgs:" + str(_y))
                     if self.exc_type == "assert":
                         raise _y
                     else:

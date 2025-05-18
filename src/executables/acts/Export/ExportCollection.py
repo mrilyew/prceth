@@ -4,10 +4,22 @@ from db.Collection import Collection
 class ExportCollection(ExportEntity):
     name = 'ExportCollection'
     category = 'export'
-    accepts = 'string'
 
-    async def execute(self, i: str, args = {}):
-        collection_ids = str(i).split(",")
+    def declare():
+        params = {}
+        params["collection_id"] = {
+            "type": "int",
+            "assertion": {
+                "assert_not_null": True,
+            },
+        }
+
+        return params
+
+    async def execute(self, args = {}):
+        _i_entities_ids = self.passed_params.get("collection_id")
+
+        collection_ids = str(_i_entities_ids).split(",")
         entities = []
         entity_ids = []
         collections = []
@@ -23,9 +35,11 @@ class ExportCollection(ExportEntity):
             entity_ids.append(str(__entity.id))
 
         fs_act = ExportEntity()
-        fs_act.setArgs(self.passed_params)
+        fs_act.setArgs(self.passed_params.update({
+            "ids": ",".join(entity_ids)
+        }))
 
-        export_res = await fs_act.execute(i=",".join(entity_ids))
+        export_res = await fs_act.execute()
 
         DESTINATION_DIR = export_res.get("destination")
         for coll in collections:

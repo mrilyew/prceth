@@ -53,7 +53,7 @@ class File(BaseModel):
                         if append_entity_id_to_start == True:
                             new_name_unsafe = str(self.id) + "_" + new_name_unsafe
                         
-                        new_name = utils.validName(new_name_unsafe)
+                        new_name = utils.valid_name(new_name_unsafe)
                         file_path = os.path.join(TMP_DIR, __list[0])
 
                         if os.path.isfile(file_path):
@@ -86,19 +86,26 @@ class File(BaseModel):
                 Path(os.path.join(OUTPUT_FILE_PATH, self.getFsFileName())).rename(os.path.join(OUTPUT_FILE_PATH, NEW_MAIN_FILE_NAME))
         except Exception as __e__:
             logger.logException(__e__, "File")
-        
+
+    # why two separate methods? idk
     def getApiStructure(self):
-        fnl = {
+        return self.getFormattedInfo()
+
+    def getFormattedInfo(self):
+        _ = {
             "extension": self.extension,
             "id": self.id,
             "upload_name": self.upload_name,
             "filesize": self.filesize,
-            "file_path": self.getPath(),
-            "dir_path": self.getDirPath(),
+            "dir": self.getDirPath(),
+            "main_file": self.getPath(), 
+            "hash": self.hash,
+            "upper_hash": self.getUpperHashDirPath(),
         }
+        _["relative_path"] = f"/{_.get('upper_hash')}/{_.get('hash')}"
+        
+        return _
 
-        return fnl
-    
     @staticmethod
     def get(id):
         if type(id) == int:
@@ -116,7 +123,7 @@ class File(BaseModel):
             except Exception as __egetexeption:
                 #print(__egetexeption)
                 return []
-    
+
     def getPath(self):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
@@ -158,20 +165,6 @@ class File(BaseModel):
 
         return COLLECTION_PATH
 
-    def getFormattedInfo(self):
-        _ = {
-            "extension": self.extension,
-            "upload_name": self.upload_name,
-            "filesize": self.filesize,
-            "dir": self.getDirPath(),
-            "main_file": self.getPath(), 
-            "hash": self.hash,
-            "upper_hash": self.getUpperHashDirPath(),
-        }
-        _["relative_path"] = f"/{_.get('upper_hash')}/{_.get('hash')}"
-        
-        return _
-
     @staticmethod
     def fromJson(json_input, temp_dir = None):
         __file = File()
@@ -203,6 +196,7 @@ class File(BaseModel):
 
         metadata_act = (ActsRepository().getByName("Metadata.ExtractMetadata"))()
         ext_metadata_act = (ActsRepository().getByName("Metadata.AdditionalMetadata"))()
+        metadata_act.setArgs()
 
         metadata_arr = metadata_act.execute(i=self)
         ext_metadata_arr = ext_metadata_act.execute(i=self)

@@ -1,4 +1,4 @@
-from resources.Globals import Path, download_manager, logger, os, utils
+from resources.Globals import Path, download_manager, logger, os, media_utils
 from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
@@ -50,7 +50,7 @@ class VkGraffiti(VkBase):
 
         logger.log(message=f"Recieved graffiti {__ITEM_ID}",section="VkAttachments",name="message")
 
-        max_size = utils.findHighestInDict(__json, "photo_")
+        max_size = media_utils.find_highest_in_dict(__json, "photo_")
 
         if self.passed_params.get("download_file") == True:
             __FILE = None

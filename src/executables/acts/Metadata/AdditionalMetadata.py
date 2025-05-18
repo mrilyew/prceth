@@ -5,8 +5,7 @@ from resources.Globals import utils
 class AdditionalMetadata(BaseAct):
     name = 'AdditionalMetadata'
     category = 'metadata'
-    allow_type = 'entity'
 
-    async def execute(self, i, args=None):
+    async def execute(self, args=None):
         # TODO videos, audios, docx
         return {}

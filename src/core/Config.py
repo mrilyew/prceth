@@ -2,7 +2,15 @@ from resources.Globals import json, os, consts, Path
 from resources.DefaultSettings import DefaultSettings
 
 class Config():
+    '''
+    Dict param->value comparer. Allows to recieve value by option name. Storages in %storage%/settings
+    '''
+
     def __init__(self, file_name: str = 'config.json', fallback = DefaultSettings):
+        '''
+        file_name: name of the file
+        fallback: params to compare
+        '''
         self.default_settings = fallback
         self.path = f"{str(Path(consts.get('cwd')).parent)}/storage/settings/{file_name}"
         self.__load_path(self.path)
@@ -52,9 +60,29 @@ class Config():
         consts["binary"] = os.path.join(consts.get('storage'), "binary")
 
     def get(self, option: str, default: str = None):
+        '''
+        Recieves option value by name.
+
+        Params:
+
+        option: name of the option
+
+        default: value that will be returned if param value is \"None\"
+        '''
+        
         return self.out_params.get(option, default)
     
     def set(self, option: str, value: str):
+        '''
+        Sets option in config file.
+
+        Params:
+
+        option: option name
+
+        value: value that will be set
+        '''
+
         if value == None:
             del self.json_values[option]
         else:
@@ -64,6 +92,10 @@ class Config():
         self.__pass_declarable()
 
     def reset(self):
+        '''
+        Clears config file.
+        '''
+
         self.file.seek(0)
         self.file.write("{}")
         self.file.truncate()

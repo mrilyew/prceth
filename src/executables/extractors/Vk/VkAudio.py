@@ -104,7 +104,7 @@ class VkAudio(VkBase):
         ___OUT_SIZE = 0
 
         AUDIO_NAME = f"{item.get('artist')} — {item.get('title')}"
-        AUDIO_UPLOAD_NAME = utils.validName(AUDIO_NAME) + f".{___OUT_EXT}"
+        AUDIO_UPLOAD_NAME = utils.valid_name(AUDIO_NAME) + f".{___OUT_EXT}"
 
         if self.passed_params.get("download_file") == True:
             TEMP_DIR = self.allocateTemp()
@@ -117,7 +117,7 @@ class VkAudio(VkBase):
                 if ".m3u8" in item.get("url"):
                     from submodules.Media.YtDlpWrapper import YtDlpWrapper
 
-                    if media_utils.isFFMPEGInstalled() == False:
+                    if media_utils.is_ffmpeg_installed() == False:
                         raise LibNotInstalledException("ffmpeg is not installed")
 
                     logger.log(message=f"Found .m3u8 of audio {__ITEM_ID}",section="VkAudio",name="message")

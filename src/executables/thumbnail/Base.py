@@ -1,6 +1,6 @@
 class BaseThumbnail:
     name = 'base'
-    accept = ["based"]
+    accept = ["none"]
 
     def __init__(self, save_dir=None):
         self.save_dir = save_dir

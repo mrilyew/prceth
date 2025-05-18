@@ -2,7 +2,15 @@ from resources.Globals import datetime, os, consts, traceback, Path, config
 from colorama import Fore, init as ColoramaInit
 
 class Logger():
+    '''
+    Module for logging of messages and printing them to console.
+    '''
     def __init__(self, keep: bool=False):
+        '''
+        Params:
+
+        keep: On True creates log file for app startup, on False create log file for current day.
+        '''
         ColoramaInit()
 
         self.keep = keep
@@ -39,12 +47,23 @@ class Logger():
         return True
     
     def log(self, message: str = "Undefined", section: str = "App", name: str = "message", silent: bool = False):
+        '''
+        Logs message.
+
+        Params:
+
+        message: Message that will printed to console and log file
+
+        section: Section from place that message was printed
+
+        name: Type of message ("success", "message", "deprecated" or "error")
+
+        silent: If True, no message will be displayed in the console
+        '''
+
         if section in config.get("logger.skip_categories"):
             return
-        
-        # Lets define "section"s: "App", "Config", "Extractor", "Act", "Service", "OS", etc.
-        # Name can be "success", "message" or "error".
-        # In "message" you should describe what you want to write.
+
         self.__log_file_check()
         now = datetime.now()
 
@@ -55,7 +74,7 @@ class Logger():
 
         if is_console == False:
             message_to_write = f"{current_time} [{name}] [{section}] {message}\n"
-        
+
         self.file.seek(0, os.SEEK_END)
         #self.file.write(message_to_write.replace("\n", "\\n"))
         self.file.write(message_to_write)

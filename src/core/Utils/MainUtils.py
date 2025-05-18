@@ -7,7 +7,7 @@ import re
 class MainUtils():
     def parse_args(self):
         '''
-        Parses sys.argv to array.
+        Parses sys.argv to dict.
         '''
         args = sys.argv
         parsed_args = {}
@@ -56,38 +56,39 @@ class MainUtils():
         return random.randint(min, max)
     
     def parse_json(self, text):
+        '''
+        Parses JSON from text
+        '''
         try:
             return json.loads(text)
         except:
             return {}
         
-    def dump_json(self, text):
+    def dump_json(self, obj):
+        '''
+        Serializes JSON object to text
+        '''
         try:
-            return json.dumps(text)
+            return json.dumps(obj)
         except:
             return {}
     
-    def remove_protocol(self, strr):
-        return strr.replace("https://", "").replace("http://", "").replace("ftp://", "")
+    def remove_protocol(self, link):
+        '''
+        Removes protocol from link.
+        '''
+        protocols = ["https", "http", "ftp"]
+        final_link = link
+        for protocol in protocols:
+            if final_link.startswith(protocol):
+                final_link.replace(f"{protocol}://", "")
 
-    def find_owner(self, id, profiles, groups):
-        '''
-        Gets owner by id from "profiles" and "groups" arrays.
-        '''
-        search_array = profiles
-        if id < 0:
-            search_array = groups
-        
-        for item in search_array:
-            if item.get('id') == abs(int(id)):
-                return item
-            
-        return None
+        return final_link
 
     # УГАДАЙ ОТКУДА :)
     def proc_strtr(self, text: str, length: int = 0, multipoint: bool = True):
         '''
-        Cuts string to "length"
+        Cuts string to "length".
         '''
         newString = text[:length]
 
@@ -98,7 +99,7 @@ class MainUtils():
 
     def parse_entity(self, input_string: str, allowed_entities = ["entity", "collection"]):
         '''
-        Recieves entities and collections by string
+        Recieves entities and collections by string.
         '''
         from db.Entity import Entity
         from db.Collection import Collection
@@ -158,38 +159,10 @@ class MainUtils():
         return file_output_ext
     
     def is_generated_ext(self, ext: str):
-        return ext in ["php", "html"]
-    
-    def getChromishPlatform(self):
-        arch = ""
-        system_arch = ""
-        system = platform.system().lower()
-        architecture = platform.machine().lower() 
+        extensions = ["php", "html"]
 
-        if architecture in ['x86_64', 'amd64']:
-            arch = '64'
-        elif architecture in ['i386', 'i686', 'x86']:
-            arch = '32'
-        elif architecture in ['arm64', 'aarch64']:
-            arch = 'arm64'
-        else:
-            arch = architecture
+        return ext in extensions
 
-        match system:
-            case "darwin":
-                if architecture in ['arm64', 'aarch64']:
-                    architecture = "arm64"
-                else:
-                    architecture = "x64"
-                
-                system_arch = f"mac-{architecture}"
-            case "windows":
-                system_arch = f"win{arch}"
-            case _:
-                system_arch = f"{system}{arch}"
-        
-        return system_arch
-    
     def getRandomHash(self, __bytes: int = 32):
         return secrets.token_urlsafe(__bytes)
     
@@ -213,11 +186,11 @@ class MainUtils():
         
         return __exit
     
-    def clearJson(self, __json):
+    def clear_json(self, __json):
         if isinstance(__json, dict):
-            return {key: self.clearJson(value) for key, value in __json.items() if isinstance(value, (dict, list, str))}
+            return {key: self.clear_json(value) for key, value in __json.items() if isinstance(value, (dict, list, str))}
         elif isinstance(__json, list):
-            return [self.clearJson(item) for item in __json if isinstance(item, (dict, list, str))]
+            return [self.clear_json(item) for item in __json if isinstance(item, (dict, list, str))]
         elif isinstance(__json, str):
             if __json.startswith("https://") == False and __json.startswith("http://") == False:
                 return __json
@@ -226,7 +199,7 @@ class MainUtils():
         else:
             return None
         
-    def nameFromURL(self, input_url):
+    def name_from_url(self, input_url):
         parsed_url = urlparse(input_url)
         path = parsed_url.path
 
@@ -243,7 +216,10 @@ class MainUtils():
         return OUTPUT_NAME, OUTPUT_NAME_EXT
     
     @contextmanager
-    def overrideDb(self, __classes = [], __db = None):
+    def override_db(self, __classes = [], __db = None):
+        '''
+        Overrides db for db entity
+        '''
         old_db = None
         for __class in __classes:
             old_db = __class._meta.database
@@ -254,7 +230,7 @@ class MainUtils():
         for __class in __classes:
             __class._meta.database = old_db
     
-    def validName(self, text):
+    def valid_name(self, text):
         '''
         Creates saveable name (removes forbidden in NTFS characters)
         '''
@@ -266,11 +242,11 @@ class MainUtils():
         
         return safe_filename
 
-    def replaceStringsInDict(self, input_data, link_to_linked_files, recurse_level = 0):
+    def replace_strings_in_dicts(self, input_data, link_to_linked_files, recurse_level = 0):
         if isinstance(input_data, dict):
-            return {key: self.replaceStringsInDict(value, link_to_linked_files) for key, value in input_data.items()}
+            return {key: self.replace_strings_in_dicts(value, link_to_linked_files) for key, value in input_data.items()}
         elif isinstance(input_data, list):
-            return [self.replaceStringsInDict(item, link_to_linked_files) for item in input_data]
+            return [self.replace_strings_in_dicts(item, link_to_linked_files) for item in input_data]
         elif isinstance(input_data, str):
             try:
                 if "__lcms|entity_" in input_data:
@@ -293,18 +269,5 @@ class MainUtils():
                 return input_data
         else:
             return input_data
-
-    def findHighestInDict(self, json, key_name = "photo_"):
-        max_size = -1
-        for key in json:
-            try:
-                if key != None and key.startswith(key_name):
-                    cur = int(key.replace(key_name, ""))
-                    if cur > max_size:
-                        max_size = cur
-            except:
-                continue
-    
-        return max_size
         
 utils = MainUtils()

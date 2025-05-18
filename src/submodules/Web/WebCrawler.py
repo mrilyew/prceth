@@ -1,4 +1,4 @@
-from resources.Globals import os, utils, consts, logger, Path, zipfile, wget, time, requests, assets_cache_storage, file_manager, config, HTMLFormatter, download_manager
+from resources.Globals import os, utils, consts, logger, Path, zipfile, media_utils, time, requests, assets_cache_storage, file_manager, config, HTMLFormatter, download_manager
 from resources.Exceptions import NotInstalledException
 from bs4 import BeautifulSoup
 from selenium import webdriver
@@ -39,7 +39,7 @@ class Crawler():
     
     # didnt tested on other platforms
     def checkWebDriver(self):
-        consts["__tmp_chrome_platform"] = utils.getChromishPlatform()
+        consts["__tmp_chrome_platform"] = media_utils.get_chrome_platform()
 
         self.__chrome_path = consts["binary"] +"\\chrome" # Main dir
         self.__webdriver_dir = f"{self.__chrome_path}\\chromedriver"

@@ -4,7 +4,6 @@ from executables.acts.Base.Base import BaseAct
 class NewExecutable(BaseAct):
     name = 'NewExecutable'
     category = 'new'
-    accepts = 'none'
     docs = {
         "description": {
             "name": {
@@ -21,6 +20,26 @@ class NewExecutable(BaseAct):
     def declare():
         params = {}
         params["type"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Тип создаваемого скрипта",
+                    "en": "Type of new script",
+                },
+                "values": {
+                    "act": {
+                        "ru": "Скрипт выполнения какого-либо действия",
+                        "en": "Script for doing some actions"
+                    },
+                    "extractor": {
+                        "ru": "Скрипт для извлечения какой-либо информации",
+                        "en": "Script for information extracting"
+                    },
+                    "service": {
+                        "ru": "Скрипт, выполняющийся раз в некоторое время",
+                        "en": "Script that runs sometimes"
+                    }
+                }
+            },
             "type": "array",
             "values": ["act", "extractor", "service"],
             "assertion": {
@@ -28,12 +47,24 @@ class NewExecutable(BaseAct):
             },
         }
         params["category"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Основная категория скрипта",
+                    "en": "Main category of script",
+                }
+            },
             "type": "string",
             "assertion": {
                 "assert_not_null": True,
             },
         }
         params["title"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Название скрипта",
+                    "en": "Name of the script",
+                }
+            },
             "type": "string",
             "assertion": {
                 "assert_not_null": True,
@@ -42,7 +73,7 @@ class NewExecutable(BaseAct):
 
         return params
 
-    async def execute(self, i, args={}):
+    async def execute(self, args={}):
         executables_folder = consts.get("executable")
         executables_folder_sub = os.path.join(executables_folder, self.passed_params.get("type") + "s")
         executables_folder_category = os.path.join(executables_folder_sub, self.passed_params.get("category"))

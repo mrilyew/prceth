@@ -45,7 +45,7 @@ DefaultSettings = {
     },
     "net.timeout": {
         "type": "int",
-        "default": 1000
+        "default": 100
     },
     "logger.skip_categories": {
         "type": "object",

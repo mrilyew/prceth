@@ -8,7 +8,6 @@ from peewee import Model, SqliteDatabase
 class ExportToZIP(BaseAct):
     name = 'ExportToZIP'
     category = 'export'
-    accepts = 'collection'
     docs = {
         "description": {
             "name": {
@@ -30,6 +29,12 @@ class ExportToZIP(BaseAct):
                 "assert_not_null": True,
             },
         }
+        params["collection_id"] = {
+            "type": "int",
+            "assertion": {
+                "assert_not_null": True,
+            },
+        }
         params["compression"] = {
             "type": "array",
             "values": ["ZIP_LZMA", "ZIP_BZIP2", "ZIP_DEFLATED"],
@@ -41,10 +46,13 @@ class ExportToZIP(BaseAct):
         }
         return params
 
-    async def execute(self, i: Collection, args = {}):
+    async def execute(self, args = {}):
+        __collection_id = self.passed_params.get("collection_id")
+        collection = Collection.get(__collection_id)
+
         __EXPORTS_TEMP_PATH = os.path.join(consts.get("tmp"), "exports")
         __SAVE_PATH = self.passed_params.get("dir", __EXPORTS_TEMP_PATH)
-        __FILE_NAME = f"col{i.id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
+        __FILE_NAME = f"col{collection.id}_{datetime.now().strftime('%Y-%m-%d-%H-%M-%S')}"
         __FILE_EXT_NAME = __FILE_NAME + ".zips",
         
         __SAVE_DIR_PATH = os.path.join(__EXPORTS_TEMP_PATH, __FILE_NAME)
@@ -77,9 +85,9 @@ class ExportToZIP(BaseAct):
 
         # DB Things
         __DB = SqliteDatabase(DATABASE_PATH)
-        __ITEMS = i.getItems(offset=0,limit=None)
+        __ITEMS = collection.getItems(offset=0,limit=None)
 
-        with utils.overrideDb([Entity, File], __DB):
+        with utils.override_db([Entity, File], __DB):
             __DB.connect()
             __DB.create_tables([Entity, File], safe=True)
 
@@ -108,13 +116,13 @@ class ExportToZIP(BaseAct):
         logger.log(message="Making \"INFO\" file",section="Export")
 
         __RES__ = {
-            "name": i.name,
-            "description": i.description,
-            "author": i.author,
-            "source": i.source,
-            "frontend_data": i.frontend_data,
-            "tags": i.tags,
-            #"flags": i.flags,
+            "name": collection.name,
+            "description": collection.description,
+            "author": collection.author,
+            "source": collection.source,
+            "frontend_data": collection.frontend_data,
+            "tags": collection.tags,
+            #"flags": collection.flags,
         }
 
         __INFO_FILE = open(os.path.join(__SAVE_DIR_PATH, "INFO"), 'w', encoding='utf-8')

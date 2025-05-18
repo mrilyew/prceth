@@ -3,7 +3,6 @@ from executables.acts.Base.Base import BaseAct
 class BaseRandomizator(BaseAct):
     name = 'baseRandomizer'
     category = 'base'
-    accepts = 'entity'
 
     def declare():
         params = {}
@@ -23,7 +22,7 @@ class BaseRandomizator(BaseAct):
 
         return params
 
-    async def execute(self, i, args={}):
+    async def execute(self, args={}):
         return {"entities": await self._returnItems()}
 
     async def _returnItems(self):

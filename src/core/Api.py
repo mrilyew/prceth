@@ -263,10 +263,8 @@ class Api():
         
         __extractor_input_name = __INPUT_ARGS.get("extractor") # Extractor that will be using for export
         collection_id = __INPUT_ARGS.get("collection_id", None) # Collection id to where entity will added
-        # None: Result will be saved as entity
-        # Text: Result will be saved at another dir
-        __export_folder = __INPUT_ARGS.get("export_to_dir", None)
-        __export_to_db = __export_folder == None
+        __create_need_collection = int(__INPUT_ARGS.get("create_need_collection", "1"))
+        __export_to_db = True
         __del_dir_on_fail = int(__INPUT_ARGS.get("del_dir", "1")) == 1 and __export_to_db == True
         __write_mode = __INPUT_ARGS.get("write_mode", "save_after_creation")
         if __write_mode not in ["save_after_creation", "save_after_end"]:
@@ -278,21 +276,23 @@ class Api():
         EXTRACTOR_INSTANCE = INSTANCE_CLASS(del_dir_on_fail=__del_dir_on_fail,write_mode=__write_mode)
         EXTRACTOR_INSTANCE.setArgs(__INPUT_ARGS)
         EXTRACTOR_RESULTS = None
-        EXTRACTOR_COLLECTION = None
+        EXTRACTOR_COLLECTIONS = []
 
-        if getattr(EXTRACTOR_INSTANCE, "_collection", None) != None:
+        if EXTRACTOR_INSTANCE.isCreatesCollection() and __create_need_collection == 1:
             __new_coll = EXTRACTOR_INSTANCE._collection()
-            EXTRACTOR_COLLECTION = EXTRACTOR_INSTANCE._collectionFromJson(__new_coll)
+            EXTRACTOR_COLLECTIONS.append(EXTRACTOR_INSTANCE._collectionFromJson(__new_coll))
 
         __coll = None
         if collection_id != None:
             __coll = Collection.get(collection_id)
             if __coll == None:
                 logger.log(section="EntitySaveMechanism", name="error", message="Collection not found, not adding.")
+            else:
+                EXTRACTOR_COLLECTIONS.append(__coll)
 
-        EXTRACTOR_INSTANCE.after_save_actions = {
-            "collections": [EXTRACTOR_COLLECTION, __coll]
-        }
+        EXTRACTOR_INSTANCE.setPostActions({
+            "collections": EXTRACTOR_COLLECTIONS
+        })
 
         try:
             EXTRACTOR_RESULTS = await EXTRACTOR_INSTANCE.execute(__INPUT_ARGS)
@@ -336,19 +336,13 @@ class Api():
         assert "name" in params, "name not passed"
 
         __act_name = params.get("name")
-        __act_main = params.get("i")
         __act_res = ActsRepository().getByName(act_name=__act_name)
         assert __act_res != None, "act not found"
 
         OUT_ACT = __act_res()
-        ACT_MAIN_INPUT = None
-        if __act_res.accepts != "none":      
-            ACT_MAIN_INPUT = OUT_ACT.parseMainInput(main_input=__act_main)
-            assert ACT_MAIN_INPUT != None, f"{__act_res.accepts} not found"
-
         OUT_ACT.setArgs(params)
 
-        ACT_F = await OUT_ACT.execute(i=ACT_MAIN_INPUT,args=params)
+        ACT_F = await OUT_ACT.execute(args=params)
 
         return {"results": ACT_F}
     def getServices(self, params):

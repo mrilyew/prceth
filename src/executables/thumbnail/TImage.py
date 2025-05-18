@@ -15,7 +15,7 @@ class TImage(BaseThumbnail):
 
         if params.get("preview_file"):
             path = self.save_dir + "/" + params.get("preview_file")
-        
+
         with Image.open(path) as img:
             __hash = utils.getRandomHash(8)
 
@@ -37,5 +37,5 @@ class TImage(BaseThumbnail):
             })
 
             new_img.save(__new_prev)
-        
+
         return __previews

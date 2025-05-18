@@ -24,7 +24,7 @@ class WebURL(BaseExtractor):
         TEMP_DIR = self.allocateTemp()
 
         PASSED_URL = self.passed_params.get("url")
-        name, ext = utils.nameFromURL(PASSED_URL)
+        name, ext = utils.name_from_url(PASSED_URL)
 
         # Making HTTP request
         save_path = Path(os.path.join(TEMP_DIR, "download.tmp"))
