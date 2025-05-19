@@ -26,7 +26,7 @@ class Acts:
         except Exception:
             return None
 
-    def getList(self, search_type:str = 'all',show_hidden:bool = False):
+    def getList(self, show_hidden: bool = False, search_category: str =None):
         __exit = []
         def __import(plugin_name):
             module_name = plugin_name
@@ -38,17 +38,8 @@ class Acts:
                         if not show_hidden and getattr(item, "hidden", False):
                             continue
 
-                        if getattr(item, "accepts", "all") == "entity":
-                            if search_type == "collection" or search_type == "string":
-                                continue
-
-                        if getattr(item, "accepts", "all") == "collection":
-                            if search_type == "entity" or search_type == "string":
-                                continue
-
-                        if getattr(item, "accepts", "all") == "string":
-                            if search_type == "entity" or search_type == "collection":
-                                continue
+                        if search_category != None and search_category != item.category:
+                            continue
 
                         __exit.append(item())
             except ImportError as e:

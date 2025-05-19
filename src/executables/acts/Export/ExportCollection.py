@@ -4,6 +4,34 @@ from db.Collection import Collection
 class ExportCollection(ExportEntity):
     name = 'ExportCollection'
     category = 'export'
+    docs = {
+        "description": {
+            "name": {
+                "ru": "Экспорт коллекции",
+                "en": "Collection export"
+            },
+            "definition": {
+                "ru": "Копирует записи из коллекции в переданную директорию",
+                "en": "Copies entities from collection to provided directory"
+            },
+        },
+        "returns": {
+            "destination": {
+                "end": True,
+                "type": "string",
+                "explanation": {
+                    "ru": "Папка, в которую были сохранены файлы",
+                    "en": "Folder where files was saved",
+                }
+            }
+        }
+    }
+
+    main_args = {
+        "list": ["dir", "ids"],
+        "type": "and",
+        "ignore": ["ids"]
+    }
 
     def declare():
         params = {}
@@ -13,6 +41,7 @@ class ExportCollection(ExportEntity):
                 "assert_not_null": True,
             },
         }
+        params["ids"] = None
 
         return params
 
@@ -25,6 +54,8 @@ class ExportCollection(ExportEntity):
         collections = []
         for coll_id in collection_ids:
             collections.append(Collection.get(int(coll_id)))
+
+        assert len(collections) > 0, "no collections found"
 
         for coll in collections:
             for __entity in coll.getItems(limit=None):

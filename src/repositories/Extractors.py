@@ -16,7 +16,7 @@ class Extractors:
             logger.logException(ee, "Extractors", silent=False)
             return None
 
-    def getList(self, show_hidden=False):
+    def getList(self, show_hidden: bool = False, search_category: str =None):
         __exit = []
         def __import(plugin_name):
             module_name = plugin_name
@@ -24,10 +24,13 @@ class Extractors:
                 module = importlib.import_module(module_name)
                 for item_name in dir(module):
                     item = getattr(module, item_name)
-                    if isinstance(item, type) and issubclass(item, BaseExtractor) and item.name.find('base') == -1:
+                    if isinstance(item, type) and issubclass(item, BaseExtractor) and item.category != "base":
                         if not show_hidden and getattr(item, "hidden", False):
                             continue
-                        
+
+                        if search_category != None and search_category != item.category:
+                            continue
+
                         __i = item()
                         __i.recursiveDeclare()
 

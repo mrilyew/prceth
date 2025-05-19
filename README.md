@@ -24,3 +24,4 @@ Tasks:
 - [ ] Выполнение executable в subprocess, вынести из AsyncDownloadManager
 - [ ] Обозначить тип вывода act в docs
 - [ ] Удаление файла при удалении модели
+- [ ] Перенос методов из api в acts

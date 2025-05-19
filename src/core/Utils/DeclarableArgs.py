@@ -58,6 +58,11 @@ class DeclarableArgs():
                         __value = utils.proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
                     else:
                         __value = str(__value)
+                case "csv":
+                    if type(__value) != list:
+                        __strs = __value.split(",")
+
+                        __value = __strs
                 case "object":
                     if type(__value) == str:
                         __value = utils.parse_json(__value)

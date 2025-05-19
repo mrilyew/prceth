@@ -1,4 +1,5 @@
 from executables.acts.Base.Base import BaseAct
+from resources.Globals import often_params
 from db.File import File
 from hachoir.core import config as HachoirConfig
 from hachoir.parser import createParser
@@ -29,24 +30,16 @@ class ExtractMetadata(BaseAct):
                 }
             ]
         },
-        "main_args": {
-            "list": ["path", "file_id"],
-            "type": "or",
-        },
+    }
+
+    main_args = {
+        "list": ["path", "file_id"],
+        "type": "or",
     }
 
     def declare():
         params = {}
-        params["path"] = {
-            "type": "string",
-            "default": None,
-            "docs": {
-                "definition": {
-                    "ru": "Путь к файлу",
-                    "en": "Path to file",
-                }
-            },
-        }
+        params["path"] = often_params.get("path")
         params["file_id"] = {
             "type": "int",
             "default": None,

@@ -1,9 +1,6 @@
 from executables.extractors.Base.Base import BaseExtractor
 
 class BaseCollectionable(BaseExtractor):
-    name = 'BaseCollectionable'
-    category = 'base'
-
     def _collection(self):
         return {
             "suggested_name": "N/A",

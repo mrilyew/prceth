@@ -16,10 +16,11 @@ class ExportEntity(BaseAct):
                 "en": "Copies files and metainfo about entities to provided directory"
             },
         },
-        "main_args": {
-            "list": ["dir", "ids"],
-            "type": "and",
-        }
+    }
+
+    main_args = {
+        "list": ["dir", "ids"],
+        "type": "and",
     }
 
     def declare():
@@ -53,7 +54,7 @@ class ExportEntity(BaseAct):
                     "en": "(1): Save info in JSON (like [id].json)",
                 }
             },
-            "default": True,
+            "default": False,
         }
         params["dir_to_each_entity"] = {
             "type": "bool",

@@ -96,7 +96,7 @@ class NewExecutable(BaseAct):
         wr += f"    def declare():\n"
         wr +=  "        params = {}\n\n"
         wr +=  "        return params\n\n"
-        wr +=  "    async def execute(self, i, args={}):\n"
+        wr +=  "    async def execute(self, args={}):\n"
         wr +=  "        pass\n\n"
 
         stream.write(wr)

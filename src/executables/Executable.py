@@ -3,7 +3,7 @@ from db.Entity import Entity
 
 class Executable:
     name = 'base'
-    category = 'template'
+    category = 'base'
     passed_params = {}
     temp_dir_prefix = None
     params = {}
@@ -24,6 +24,7 @@ class Executable:
             }
         }
     }
+    main_args = {}
 
     @classmethod
     def isRunnable(cls):
@@ -38,6 +39,8 @@ class Executable:
         return params
 
     def recursiveDeclare(self):
+        ignore_list = self.main_args.get('ignore', [])
+
         if getattr(self, "already_declared", False) == True:
             return None
 
@@ -45,8 +48,15 @@ class Executable:
             if hasattr(__sub_class, "declare") == False:
                 continue
 
+            final_params = {}
             new_params = __sub_class.declare()
-            self.params.update(new_params)
+            for i, name in enumerate(new_params):
+                if name in ignore_list:
+                    continue
+
+                final_params[name] = new_params.get(name)
+
+            self.params.update(final_params)
 
         self.already_declared = True
 
