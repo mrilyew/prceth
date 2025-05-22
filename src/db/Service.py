@@ -38,3 +38,7 @@ class Service(BaseModel):
         obj["created_at"] = self.created_at
 
         return obj
+    
+    @staticmethod
+    def get(id):
+        return Service.select().where(Service.id == id).get()

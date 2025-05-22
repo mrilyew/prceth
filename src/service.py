@@ -10,6 +10,7 @@ async def runService():
     assert "i" in args, "i not passed"
 
     __service_id = args.get("i")
+    __input_interval = args.get("interval")
     __service_settings = Service.get(__service_id)
 
     assert __service_settings != None, "service preset not found"
@@ -20,7 +21,12 @@ async def runService():
 
     OUT_SERV = __service_res()
     OUT_SERV.setConfig(__data)
-    OUT_SERV.interval = __service_settings.interval
+
+    if __input_interval == None:
+        OUT_SERV.interval = __service_settings.interval
+    else:
+        OUT_SERV.interval = __input_interval
+
     OUT_SERV.setArgs(args)
 
     try:
