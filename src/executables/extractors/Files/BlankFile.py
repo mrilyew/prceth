@@ -5,7 +5,7 @@ from db.File import File
 class BlankFile(BaseExtractor):
     name = 'BlankFile'
     category = 'Files'
-    hidden = True
+    #hidden = True
     docs = {
         "description": {
             "name": {

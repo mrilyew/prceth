@@ -87,7 +87,7 @@ class NewExecutable(BaseAct):
         new_class_category = self.passed_params.get("category")
 
         stream = open(str(executables_folder_file) + ".py", "w")
-        wr  = f"from resources.Globals import os, logger, asyncio, consts, config, Path, utils, file_manager, json\n"
+        wr  = f"from resources.Globals import os, logger, asyncio, consts, config, Path, utils, file_manager, json, often_params\n"
         wr += f"from executables.{self.passed_params.get("type")}s.Base.Base import {base_class}\n\n"
         wr += f"class {new_class_name}({base_class}):\n"
         wr += f"    name = '{new_class_name}'\n"
@@ -97,7 +97,7 @@ class NewExecutable(BaseAct):
         wr +=  "        params = {}\n\n"
         wr +=  "        return params\n\n"
         wr +=  "    async def execute(self, args={}):\n"
-        wr +=  "        pass\n\n"
+        wr +=  "        pass\n"
 
         stream.write(wr)
         stream.close()

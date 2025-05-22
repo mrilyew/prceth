@@ -1,42 +1,38 @@
-from resources.Globals import time, threading
+from resources.Globals import time, asyncio, logger
+from executables.Executable import Executable
 
-class BaseService:
+class BaseService(Executable):
     name = 'base'
-    interval = 10 # in seconds, can be set by 
+    config = {}
+    interval = 10
+    i = 0
 
-    def __init__(self, args=None):
-        self._stop_event = threading.Event()
-        self.start_time = time.time()
-        self.thread = None
-        if args == None:
-            args = {}
-        
-        if args.get("interval", None) != None:
-            self.interval = args.get("interval", None)
+    def __init__(self):
+        self.is_stopped = False
 
-    def start(self, args=None):
-        self.args = args
-        if self.thread is None:
-            self.thread = threading.Thread(target=self.action_wrapper)
-            self.thread.start()
-    
-    def action_wrapper(self):
-        while not self._stop_event.is_set():
-            print('Service "{0}" called action, sleeping for {1}s'.format(self.name, self.interval))
-            self.action()
-            time.sleep(self.interval)
-    
+    def setConfig(self, conf):
+        self.config = conf
+
+    async def start(self):
+        await self.action_wrapper()
+
+    async def action_wrapper(self):
+        while not self.is_stopped:
+            logger.log(message=f"Making call №{self.i}",name="message",section="Services")
+
+            try:
+                print(await self.execute(self.passed_params))
+            except Exception as e:
+                logger.logException(input_exception=e,section="Services",silent=False)
+
+            logger.log(message=f"Sleeping for {self.interval}",name="message",section="Services")
+
+            await asyncio.sleep(self.interval)
+
+            self.i = self.i+1
+
     def stop(self):
-        self._stop_event.set()
-        if self.thread is not None:
-            self.thread.join()
-            self.thread = None
-    
-    def action(self):
+        self.is_stopped = True
+
+    def execute(self, args = {}):
         pass
-    
-    def describe(self):
-        return {
-            "id": self.name,
-            "interval": self.interval,
-        }

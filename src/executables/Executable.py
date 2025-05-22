@@ -88,7 +88,7 @@ class Executable:
         manual["description"] = __meta
         manual["files"] = getattr(self, "file_containment", {})
         manual["params"] = __params
-    
+
         return manual
 
     def describe(self):
@@ -127,7 +127,7 @@ class Executable:
         except Exception as ___e:
             logger.logException(input_exception=___e,section="Extractor",silent=False)
             pass
-    
+
     def fork(self, extractor_name_or_class, args = None):
         from resources.Globals import ExtractorsRepository
 
@@ -172,7 +172,7 @@ class Executable:
         #thumb_class = thumb(save_dir=__FILE.getDirPath())
         thumb_class = thumb(save_dir=temp_dir)
         return thumb_class.run(file=__FILE,params=args)
-    
+
     def _fileFromJson(self, json_data, _temp_dir = None):
         from db.File import File
 

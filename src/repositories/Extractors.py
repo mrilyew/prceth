@@ -13,10 +13,10 @@ class Extractors:
         except ModuleNotFoundError:
             return None
         except Exception as ee:
-            logger.logException(ee, "Extractors", silent=False)
+            logger.logException(ee, "Executables", silent=False)
             return None
 
-    def getList(self, show_hidden: bool = False, search_category: str =None):
+    def getList(self, show_hidden: bool = False, search_category: str = None):
         __exit = []
         def __import(plugin_name):
             module_name = plugin_name
@@ -38,7 +38,7 @@ class Extractors:
             except ModuleNotFoundError:
                 return None
             except ImportError as e:
-                logger.log(message=f"Error importing {module_name}: {e}")
+                logger.log(message=f"Error importing {module_name}: {e}", name="Executables")
 
         for plugin in utils.getExecutableList("extractors"):
             __import(f"executables.extractors.{plugin}")

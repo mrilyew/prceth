@@ -2,20 +2,19 @@ from resources.Globals import importlib, utils, logger, time
 from executables.services.Base.Base import BaseService
 
 class Services:
-    def run(self, args, service_name):
-        module = importlib.import_module(f'executables.services.{service_name}')
-        instance = getattr(module, service_name)(args=args)
-
+    def getByName(self, service_name):
         try:
-            instance.start()
-        except Exception as e:
-            logger.logException(e)
-        
-        try:
-            while True:
-                time.sleep(1)
-        except KeyboardInterrupt:
-            instance.stop()
+            module = importlib.import_module(f'executables.services.{service_name}')
+            __class = getattr(module, service_name.split(".")[-1])
+            if __class.isRunnable() == False:
+                return None
+            
+            return __class
+        except ModuleNotFoundError:
+            return None
+        except Exception as ee:
+            logger.logException(ee, "Executables", silent=False)
+            return None
 
     def getList(self, show_hidden: bool = False, search_category: str = None):
         __exit = []
