@@ -64,12 +64,12 @@ class MainUtils():
         except:
             return {}
         
-    def dump_json(self, obj):
+    def dump_json(self, obj, indent=None):
         '''
         Serializes JSON object to text
         '''
         try:
-            return json.dumps(obj)
+            return json.dumps(obj,ensure_ascii=False,indent=indent)
         except:
             return {}
     

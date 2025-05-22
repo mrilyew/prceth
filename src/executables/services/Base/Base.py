@@ -1,4 +1,4 @@
-from resources.Globals import time, asyncio, logger
+from resources.Globals import utils, asyncio, logger
 from executables.Executable import Executable
 
 class BaseService(Executable):
@@ -18,14 +18,15 @@ class BaseService(Executable):
 
     async def action_wrapper(self):
         while not self.is_stopped:
-            logger.log(message=f"Making call №{self.i}",name="message",section="Services")
+            logger.log(message=f"Making run №{self.i + 1}",name="message",section="Services")
 
             try:
-                print(await self.execute(self.passed_params))
+                res = await self.execute(self.passed_params)
+                print(utils.dump_json(res,indent=4))
             except Exception as e:
                 logger.logException(input_exception=e,section="Services",silent=False)
 
-            logger.log(message=f"Sleeping for {self.interval}",name="message",section="Services")
+            logger.log(message=f"Sleeping for {self.interval}s",name="message",section="Services")
 
             await asyncio.sleep(self.interval)
 
