@@ -42,3 +42,7 @@ class Service(BaseModel):
     @staticmethod
     def get(id):
         return Service.select().where(Service.id == id).get()
+    
+    def updateData(self, json):
+        self.data = utils.dump_json(json)
+        self.save()

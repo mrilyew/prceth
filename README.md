@@ -13,7 +13,6 @@ Tasks:
 - [ ] exportToZip
 - [ ] importFromZip
 - [ ] Получение дополнительных метаданных из медиафайлов
-- [ ] Переписать Services с сохранением в db; запускать отдельным процессом
 - [ ] Service RSS
 - [ ] Service подписка на стену вк
 - [ ] Pre-execute

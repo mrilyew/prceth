@@ -10,8 +10,8 @@ async def runService():
     assert "i" in args, "i not passed"
 
     __service_id = args.get("i")
-    __input_interval = args.get("interval")
     __service_settings = Service.get(__service_id)
+    __input_interval = args.get("interval")
 
     assert __service_settings != None, "service preset not found"
     
@@ -21,22 +21,21 @@ async def runService():
 
     OUT_SERV = __service_res()
     OUT_SERV.setConfig(__data)
-
-    if __input_interval == None:
-        OUT_SERV.interval = __service_settings.interval
-    else:
-        OUT_SERV.interval = __input_interval
-
+    OUT_SERV.service_object = __service_settings
     OUT_SERV.setArgs(args)
 
-    try:
-        await OUT_SERV.start()
-    except Exception as e:
-        logger.logException(e)
+    interval = 0
+
+    if __input_interval == None:
+        interval = int(__service_settings.interval)
+    else:
+        interval = int(__input_interval)
 
     try:
         while True:
-            time.sleep(1)
+            await OUT_SERV.run()
+
+            await asyncio.sleep(interval)
     except KeyboardInterrupt:
         OUT_SERV.stop()
 

@@ -1,4 +1,4 @@
-from resources.Globals import utils, asyncio, logger
+from resources.Globals import utils, asyncio, logger, time
 from executables.Executable import Executable
 
 class BaseService(Executable):
@@ -6,6 +6,7 @@ class BaseService(Executable):
     config = {}
     interval = 10
     i = 0
+    service_object = None
 
     def __init__(self):
         self.is_stopped = False
@@ -13,24 +14,20 @@ class BaseService(Executable):
     def setConfig(self, conf):
         self.config = conf
 
-    async def start(self):
-        await self.action_wrapper()
+    async def run(self):
+        logger.log(message=f"Making run №{self.i + 1}",name="message",section="Services")
 
-    async def action_wrapper(self):
-        while not self.is_stopped:
-            logger.log(message=f"Making run №{self.i + 1}",name="message",section="Services")
+        try:
+            res = await self.execute(self.passed_params)
+            print(utils.dump_json(res,indent=4))
+        except Exception as e:
+            logger.logException(input_exception=e,section="Services",silent=False)
 
-            try:
-                res = await self.execute(self.passed_params)
-                print(utils.dump_json(res,indent=4))
-            except Exception as e:
-                logger.logException(input_exception=e,section="Services",silent=False)
+        logger.log(message=f"Sleeping for {self.interval}s",name="message",section="Services")
 
-            logger.log(message=f"Sleeping for {self.interval}s",name="message",section="Services")
+        await asyncio.sleep(self.interval)
 
-            await asyncio.sleep(self.interval)
-
-            self.i = self.i+1
+        self.i = self.i+1
 
     def stop(self):
         self.is_stopped = True
