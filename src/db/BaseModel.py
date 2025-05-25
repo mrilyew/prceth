@@ -1,7 +1,7 @@
 from peewee import Model, SqliteDatabase
-from core.Config import config
+from resources.Globals import config, consts
 
-DATABASE_PATH = config.get("db.path")
+DATABASE_PATH = config.get("db.path").replace("?cwd?", consts.get("cwd").replace("\\src", ""))
 db = SqliteDatabase(DATABASE_PATH)
 
 class BaseModel(Model):

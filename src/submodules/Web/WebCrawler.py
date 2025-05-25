@@ -41,7 +41,7 @@ class Crawler():
     def checkWebDriver(self):
         consts["__tmp_chrome_platform"] = media_utils.get_chrome_platform()
 
-        self.__chrome_path = consts["binary"] +"\\chrome" # Main dir
+        self.__chrome_path = consts['binary'] +"\\chrome" # Main dir
         self.__webdriver_dir = f"{self.__chrome_path}\\chromedriver"
         self.__webdriver = f"{self.__webdriver_dir}\\chromedriver.exe"
         self.__chrome_headless_dir = f"{self.__chrome_path}\\chrome-headless-shell"
@@ -90,15 +90,15 @@ class Crawler():
             zip_ref.extractall(os.path.join(consts["binary"], "chrome"))
 
         os.remove(__download_path_chrome) # Removing original file
-        Path(f"{consts["binary"]}/chrome/chromedriver-{consts["__tmp_chrome_platform"]}").rename(self.__webdriver_dir)
+        Path(f"{consts['binary']}/chrome/chromedriver-{consts["__tmp_chrome_platform"]}").rename(self.__webdriver_dir)
 
         # Downloading headless chrome
         __latest_driver_head_zip = await download_manager.addDownload(__chromedriver_headless_url, __download_path_head)
         with zipfile.ZipFile(__download_path_head, "r") as zip_ref:
-            zip_ref.extractall(os.path.join(consts["binary"], "chrome"))
+            zip_ref.extractall(os.path.join(consts['binary'], "chrome"))
 
         os.remove(__download_path_head)
-        Path(f"{consts["binary"]}/chrome/chrome-headless-shell-{consts["__tmp_chrome_platform"]}").rename(self.__chrome_headless_dir)
+        Path(f"{consts['binary']}/chrome/chrome-headless-shell-{consts["__tmp_chrome_platform"]}").rename(self.__chrome_headless_dir)
     
     def startChrome(self):
         ua = FakeUserAgent(platforms='desktop',min_version=120.0,os='Linux')

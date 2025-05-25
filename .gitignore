@@ -17,6 +17,7 @@ storage/exports/*
 storage/settings/*
 !storage/tmp/exports/.gitkeep
 !storage/tmp/chrome/.gitkeep
+!storage/settings/.gitkeep
 storage/tmp/internal/*
 !storage/tmp/files/.gitkeep
 storage/logs/*.log

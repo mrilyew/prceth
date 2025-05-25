@@ -41,7 +41,7 @@ DefaultSettings = {
     },
     "db.path": {
         "type": "string",
-        "default_value": "storage/dbs/main.db"
+        "default": "?cwd?/storage/dbs/main.db"
     },
     "net.timeout": {
         "type": "int",

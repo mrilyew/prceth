@@ -1,4 +1,4 @@
-from resources.Globals import db
+from resources.Globals import db, config
 from db.Collection import Collection
 from db.Entity import Entity
 from db.Relation import Relation

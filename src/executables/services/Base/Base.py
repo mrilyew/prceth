@@ -23,10 +23,6 @@ class BaseService(Executable):
         except Exception as e:
             logger.logException(input_exception=e,section="Services",silent=False)
 
-        logger.log(message=f"Sleeping for {self.interval}s",name="message",section="Services")
-
-        await asyncio.sleep(self.interval)
-
         self.i = self.i+1
 
     def stop(self):

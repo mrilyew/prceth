@@ -27,7 +27,7 @@ class File(BaseModel):
         #self.temp_dir = None
         # Renaming main file 
         MAIN_FILE_PATH = Path(TMP_DIR + '\\' + self.upload_name)
-        MAIN_FILE_PATH_NEW = f'{TMP_DIR}\\{str((str(self.hash) + '.' + self.extension))}'
+        MAIN_FILE_PATH_NEW = f"{TMP_DIR}\\{str((str(self.hash) + '.' + self.extension))}"
         if use_upload_name != False:
             MAIN_FILE_PATH_NEW = f'{TMP_DIR}\\{str(self.upload_name)}.{str(self.extension)}'
         

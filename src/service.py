@@ -34,6 +34,8 @@ async def runService():
     try:
         while True:
             await OUT_SERV.run()
+    
+            logger.log(message=f"Sleeping for {interval}s",name="message",section="Services")
 
             await asyncio.sleep(interval)
     except KeyboardInterrupt:
