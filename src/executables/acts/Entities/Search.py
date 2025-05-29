@@ -1,9 +1,9 @@
-from resources.Globals import os, logger, asyncio, consts, config, Path, utils, file_manager, json, often_params
+from resources.Globals import often_params
 from executables.acts.Base.Base import BaseAct
 from db.Entity import Entity
 
-class GetGlobalEntities(BaseAct):
-    name = 'GetGlobalEntities'
+class Search(BaseAct):
+    name = 'Search'
     category = 'Entities'
     docs = {}
 
@@ -24,7 +24,9 @@ class GetGlobalEntities(BaseAct):
 
     async def execute(self, args={}):
         columns_search = ['original_name', 'display_name']
-        for column in ['description', 'source', 'index', 'saved', 'author']:
+        __return_raw = self.passed_params.get("return_raw")
+
+        for column in ['description', 'source', 'internal_content', 'saved', 'author']:
             if column in self.passed_params.get("columns_search"):
                 columns_search.append(column)
         
@@ -41,6 +43,12 @@ class GetGlobalEntities(BaseAct):
         for item in items:
             final_items.append(item)
 
-        count = fetch.count()
+        final_lists = []
+        final_count = fetch.count()
+        for item in items:
+            if __return_raw == False:
+                final_lists.append(item.getApiStructure())
+            else:
+                final_lists.append(item)
 
-        return {"items": items, "count": count}
+        return {"items": final_lists, "count": final_count}

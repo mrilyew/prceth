@@ -102,8 +102,8 @@ class File(BaseModel):
             "hash": self.hash,
             "upper_hash": self.getUpperHashDirPath(),
         }
-        _["relative_path"] = f"/{_.get('upper_hash')}/{_.get('hash')}"
-        
+        _["relative_path"] = f"{_.get('upper_hash')}/{_.get('hash')}"
+
         return _
 
     @staticmethod
@@ -138,12 +138,12 @@ class File(BaseModel):
         ENTITY_PATH = os.path.join(END_DIR, str(self.upload_name))
 
         return ENTITY_PATH
-    
+
     def getFsFileName(self):
         HASH = self.hash
 
         return f"{HASH}.{str(self.extension)}"
-    
+
     def getUpperHashDirPath(self):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
@@ -152,7 +152,7 @@ class File(BaseModel):
         COLLECTION_PATH_OBJ = Path(COLLECTION_PATH)
 
         return COLLECTION_PATH
-    
+
     def getDirPath(self, need_check = False):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
@@ -174,7 +174,7 @@ class File(BaseModel):
             __file.hash = utils.getRandomHash(32)
         else:
             __file.hash = json_input.get("hash")
-        
+
         __file.upload_name = json_input.get("upload_name")
         __file.filesize = json_input.get("filesize")
         if temp_dir != None or json_input.get("temp_dir") != None:
@@ -186,11 +186,11 @@ class File(BaseModel):
         # TODO handle async
         if json_input.get("take_metadata", False) == True:
             __file.fillMeta()
-        
+
         __file.save()
 
         return __file
-    
+
     def fillMeta(self):
         from resources.Globals import ActsRepository
 

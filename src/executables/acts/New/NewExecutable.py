@@ -70,6 +70,19 @@ class NewExecutable(BaseAct):
                 "assert_not_null": True,
             },
         }
+        params["is_hidden"] = {
+            "docs": {
+                "definition": {
+                    "ru": "Добавить параметр 'hidden' к скрипту",
+                    "en": "Add 'hidden' param to script",
+                }
+            },
+            "type": "bool",
+            "default": False,
+            "assertion": {
+                "assert_not_null": True,
+            },
+        }
 
         return params
 
@@ -85,6 +98,10 @@ class NewExecutable(BaseAct):
         base_class = f"Base{self.passed_params.get("type").title()}"
         new_class_name = self.passed_params.get("title")
         new_class_category = self.passed_params.get("category")
+        execute_name = "execute"
+
+        if self.passed_params.get("type") == "extractor":
+            execute_name = "run"
 
         stream = open(str(executables_folder_file) + ".py", "w")
         wr  = f"from resources.Globals import os, logger, asyncio, consts, config, Path, utils, file_manager, json, often_params\n"
@@ -92,11 +109,14 @@ class NewExecutable(BaseAct):
         wr += f"class {new_class_name}({base_class}):\n"
         wr += f"    name = '{new_class_name}'\n"
         wr += f"    category = '{new_class_category}'\n"
-        wr +=  "    docs = {}\n\n"
+        wr +=  "    docs = {}\n"
+        if self.passed_params.get("is_hidden") == True:
+            wr += "    hidden = True\n"
+        wr += "\n"
         wr += f"    def declare():\n"
         wr +=  "        params = {}\n\n"
         wr +=  "        return params\n\n"
-        wr +=  "    async def execute(self, args={}):\n"
+        wr +=  "    async def "+execute_name+"(self, args={}):\n"
         wr +=  "        pass\n"
 
         stream.write(wr)

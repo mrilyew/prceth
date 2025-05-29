@@ -22,6 +22,7 @@ import asyncio
 import aiohttp
 import secrets
 import copy
+import xmltodict
 from pathlib import Path
 from datetime import datetime
 from contextlib import contextmanager

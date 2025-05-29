@@ -19,6 +19,26 @@ often_definitions["path_to_file"] = {
     "ru": "Путь к файлу",
     "en": "Path to file",
 }
+often_definitions["xml_code"] = {
+    "ru": "XML код",
+    "en": "XML code",
+}
+often_definitions["save_original_xml"] = {
+    "ru": "Сохранять оригинальный XML",
+    "en": "Save original XML",
+}
+often_definitions["simple_source"] = {
+    "ru": "Источник",
+    "en": "Source",
+}
+often_definitions["xml_parsed_code"] = {
+    "ru": "Уже спаршенный xml если таковой имеется",
+    "en": "Already parsed xml if you have it",
+}
+often_definitions["suggested_name"] = {
+    "ru": "Предлагаемое название записи",
+    "en": "Suggested name of entity",
+}
 
 often_params = {}
 often_params["count_default_10"] = {
@@ -60,5 +80,45 @@ often_params["path"] = {
     "default": None,
     "docs": {
         "definition": often_definitions.get("path_to_file")
+    },
+}
+often_params["xml_explain"] = {
+    "docs": {
+        "definition": often_definitions.get("xml_code")
+    },
+    "type": "string",
+}
+often_params["xml_parsed_explain"] = {
+    "docs": {
+        "definition": often_definitions.get("xml_parsed_code")
+    },
+    "type": "object",
+}
+often_params["save_original_xml"] = {
+    "docs": {
+        "definition": often_definitions.get("save_original_xml")
+    },
+    "default": False,
+    "type": "bool",
+    "assertion": {
+        "assert_not_null": True,
+    },
+}
+often_params["simple_source"] = {
+    "docs": {
+        "definition": often_definitions.get("simple_source")
+    },
+    "type": "string",
+    "assertion": {
+        "assert_not_null": True,
+    },
+}
+often_params["suggested_name"] = {
+    "docs": {
+        "definition": often_definitions.get("suggested_name")
+    },
+    "type": "string",
+    "assertion": {
+        "assert_not_null": True,
     },
 }

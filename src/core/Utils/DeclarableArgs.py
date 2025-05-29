@@ -35,7 +35,7 @@ class DeclarableArgs():
 
     def recieveValue(self, param_name: str, param_object: object):
         from resources.Globals import utils
-        
+
         __value = self.args.get(param_name, param_object.get("default"))
 
         if param_object == None:
@@ -64,7 +64,9 @@ class DeclarableArgs():
 
                         __value = __strs
                 case "object":
-                    if type(__value) == str:
+                    if type(__value) == list:
+                        pass
+                    elif type(__value) == str:
                         __value = utils.parse_json(__value)
                     elif type(__value) == dict or type(__value) == object:
                         if param_object.get("default") != None:

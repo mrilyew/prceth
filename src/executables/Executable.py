@@ -1,4 +1,5 @@
 from resources.Globals import storage, utils, consts, logger, DeclarableArgs, file_manager, config
+from resources.Exceptions import ExecutableArgumentsException
 from db.Entity import Entity
 
 class Executable:
@@ -70,11 +71,57 @@ class Executable:
         if MAX_OUTPUT_CHECK_PARAMS == None:
             return
 
+        if getattr(self, "main_args") != None:
+            MAIN_ARG_TYPE = self.main_args.get("type")
+
+            if MAIN_ARG_TYPE == "and":
+                for _arg in self.main_args.get("list"):
+                    if _arg not in args:
+                        raise ExecutableArgumentsException(f"Argument \"{_arg}\" not passed")
+            elif MAIN_ARG_TYPE == "or" or MAIN_ARG_TYPE == "strict_or":
+                passed_list_need = 0
+                for _arg in self.main_args.get("list", []):
+                    if _arg in args:
+                        passed_list_need += 1
+
+                if passed_list_need == 0:
+                    raise ExecutableArgumentsException(f"Need at least 1 required argument")
+
+                if MAIN_ARG_TYPE == "strict_or" and passed_list_need > 1:
+                    raise ExecutableArgumentsException(f"Pass only 1 required argument (cuz \"strict_or\")")
+
         decl = DeclarableArgs(MAX_OUTPUT_CHECK_PARAMS, args)
-        self.passed_params.update(decl.dict())
+
+        try:
+            self.passed_params.update(decl.dict())
+        except Exception as _j:
+            if len(MAX_OUTPUT_CHECK_PARAMS) < 2:
+                if consts.get("context") == "cli":
+                    print("Usage:\n")
+
+                    print(self.getUsageString(), end="")
+                    exit()
+                else:
+                    raise _j
+            else:
+                raise _j
 
         if self.manual_params == True:
             self.passed_params.update(args)
+
+    def getUsageString(self):
+        _p = ""
+        for id, param in enumerate(getattr(self, "params", {})):
+            __lang = config.get("ui.lang")
+            __param = getattr(self, "params", {}).get(param)
+            __docs = __param.get("docs")
+            if __docs != None:
+                __definition = __docs.get("definition")
+                __values = __docs.get("values")
+
+                _p += (f"{param}: {__definition.get(__lang, __definition.get("en"))}\n")
+
+        return _p
 
     def setPostActions(self, after_save_actions):
         self.after_save_actions = after_save_actions
@@ -129,6 +176,15 @@ class Executable:
             pass
 
     def fork(self, extractor_name_or_class, args = None):
+        '''
+        Creates new executable by passed name or class.
+
+        Params:
+
+        extractor_name_or_class — full name or class of executable instance
+
+        args — dict that will be passed to "setArgs"
+        '''
         from resources.Globals import ExtractorsRepository
 
         _ext = None
