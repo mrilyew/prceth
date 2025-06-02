@@ -28,8 +28,7 @@ class RegularExecution(BaseService):
 
         assert executable != None, "executable not found"
 
-        __exec = executable()
-        __exec.setArgs(args=pass_args)
+        __exec = self.fork(executable, pass_args)
 
         res = await __exec.execute(args=pass_args)
 

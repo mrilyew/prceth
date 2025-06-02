@@ -63,6 +63,7 @@ class Executable:
 
     def setArgs(self, args):
         self.params = {}
+        #self.passed_params = {} # Resetting
 
         # Catching params from parent executables
         self.recursiveDeclare()

@@ -30,3 +30,6 @@ class BaseService(Executable):
 
     def execute(self, args = {}):
         pass
+
+    def terminate(self):
+        exit(-1)

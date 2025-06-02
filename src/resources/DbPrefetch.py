@@ -6,6 +6,8 @@ from db.Stat import Stat
 from db.File import File
 from db.Service import Service
 
+# db connection is located at db/BaseModel.py string 4
+
 def prefetch__db():
     db.connect()
     db.create_tables([Collection, Entity, Relation, Stat, File, Service], safe=True)

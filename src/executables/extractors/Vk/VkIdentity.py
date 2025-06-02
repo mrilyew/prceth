@@ -90,7 +90,6 @@ class VkIdentity(VkBase):
     async def run(self, args):
         __vkapi = VkApi(token=self.passed_params.get("access_token"),endpoint=self.passed_params.get("api_url"))
         identities_id_string = self.passed_params.get("item_id", "")
-        IDENTITIES_IDS = identities_id_string.split(",")
         users   = []
         groups  = []
         __users_response, __groups_response = [[], []]
@@ -98,6 +97,7 @@ class VkIdentity(VkBase):
         if self.passed_params.get("__json_info") == None:
             user_ids = []
             group_ids = []
+            IDENTITIES_IDS = identities_id_string.split(",")
 
             for IDENTITY_ID in IDENTITIES_IDS:
                 __id = int(IDENTITY_ID)
