@@ -1,11 +1,12 @@
 ## Difault
 
-Pythonical app for creating virtual collections with internet content
+Python app/framework for creating virtual collections with web content
 
 Wt. [docs](docs/ru/README.md)
-<!--![Difault work scheme](readme/scheme.jpg)-->
 
-Tasks:
+![Difault work scheme](readme/s_cli.png)
+
+Задачи:
 
 - [ ] Переписать web crawler
 - [ ] Web.crawler: переписать работу как на archive.is (убирать js)
@@ -15,7 +16,6 @@ Tasks:
 - [ ] Получение дополнительных метаданных из медиафайлов
 - [ ] Service подписка на стену вк
 - [ ] Pre-execute
-- [ ] Перерисовать схему
 - [ ] Подмена "created_at" у файла на тот что в таблице
 - [ ] Поддержка bash
 - [ ] Хуки выполнения executable
@@ -23,4 +23,10 @@ Tasks:
 - [ ] Удаление файла при удалении модели
 - [ ] Заменить indexation_content_string на генерируемую колонку
 - [ ] Выбор подключения базы данных
-- [ ] Создаваемая экстрактором коллекция создаётся перед выполнением
+- [ ] Рефактор получения коллекции из экстрактора
+- [ ] Приведение экзекьютеблов к общему виду
+- [ ] Вынести логику базы данных в класс
+- [ ] Вынести приложение в класс
+- [ ] Рефактор асинхронности
+- [ ] Хранить сервисы в отдельной бд
+- [ ] Разделить метод execute и run
