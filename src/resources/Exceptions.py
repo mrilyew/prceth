@@ -29,3 +29,7 @@ class LibNotInstalledException(Exception):
 class ExecutableArgumentsException(Exception):
     def __init__(self, message):
         super().__init__(message)
+
+class AbstractClassException(Exception):
+    def __init__(self, message):
+        super().__init__(message)

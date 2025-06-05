@@ -1,3 +1,5 @@
+from resources.Exceptions import AbstractClassException
+
 class Representation:
     common_category = "none"
 
@@ -5,7 +7,7 @@ class Representation:
         self.extractWheel()
 
     def extractWheel(self):
-        pass
+        raise AbstractClassException("This is abstract representation")
 
     @classmethod
     def listMethods(self):
