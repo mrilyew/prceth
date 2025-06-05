@@ -5,11 +5,20 @@ import importlib
 
 class ExecutableRepository:
     class_type = None
+    folder_name = "executables"
+
+    def __category(self):
+        if self.class_type == None:
+            return ''
+
+        repo_type = self.class_type.__name__ 
+
+        return f".{repo_type.replace("Base", "").lower()}s"
 
     def __import(self, plugin_name):
-        repo_type = self.class_type.__name__ 
         try:
-            __module = importlib.import_module(f'executables.{repo_type.replace("Base", "").lower()}s.{plugin_name}')
+            __module_name = f'{self.folder_name}{self.__category()}.{plugin_name}'
+            __module = importlib.import_module(__module_name)
             __class = getattr(__module, plugin_name.split(".")[-1])
 
             if __class.canBeExecuted() == False:
@@ -19,7 +28,7 @@ class ExecutableRepository:
         except Exception as _ex:
             logger.logException(_ex, "Repositories", silent=False)
 
-            return None
+            raise _ex
 
     def getByName(self, plugin_name):
         return self.__import(plugin_name)
