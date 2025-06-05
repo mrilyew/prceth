@@ -1,7 +1,7 @@
-from executables.acts.Export.ExportEntity import ExportEntity
+from executables.acts.Export.ExportContentUnit import ExportContentUnit
 from db.Collection import Collection
 
-class ExportCollection(ExportEntity):
+class ExportCollection(ExportContentUnit):
     name = 'ExportCollection'
     category = 'export'
     docs = {
@@ -38,7 +38,7 @@ class ExportCollection(ExportEntity):
         params["collection_id"] = {
             "type": "int",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["ids"] = None
@@ -50,7 +50,7 @@ class ExportCollection(ExportEntity):
 
         collection_ids = str(_i_entities_ids).split(",")
         entities = []
-        entity_ids = []
+        ContentUnit_ids = []
         collections = []
         for coll_id in collection_ids:
             collections.append(Collection.get(int(coll_id)))
@@ -58,16 +58,16 @@ class ExportCollection(ExportEntity):
         assert len(collections) > 0, "no collections found"
 
         for coll in collections:
-            for __entity in coll.getItems(limit=None):
-                if __entity.self_name == "collection": # TODO
+            for __ContentUnit in coll.getItems(limit=None):
+                if __ContentUnit.self_name == "collection": # TODO
                     continue
-                entities.append(__entity)
-        for __entity in entities:
-            entity_ids.append(str(__entity.id))
+                entities.append(__ContentUnit)
+        for __ContentUnit in entities:
+            ContentUnit_ids.append(str(__ContentUnit.id))
 
-        fs_act = ExportEntity()
+        fs_act = ExportContentUnit()
         fs_act.setArgs(self.passed_params.update({
-            "ids": ",".join(entity_ids)
+            "ids": ",".join(ContentUnit_ids)
         }))
 
         export_res = await fs_act.execute()

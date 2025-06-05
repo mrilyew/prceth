@@ -90,7 +90,7 @@ class VkNote(VkBase):
         __note_index = item.copy()
         __note_index["text"] = utils.proc_strtr(__note_index.get("text"), self.passed_params.get("indexation_text_cut"))
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "indexation_content": __note_index,
             "internal_content": item,
@@ -98,4 +98,4 @@ class VkNote(VkBase):
             "suggested_name": utils.proc_strtr(item.get("title"), 1000),
             "declared_created_at": item.get("date"),
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

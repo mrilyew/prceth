@@ -16,7 +16,7 @@ class BaseRandomizator(BaseAct):
                 }
             },
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
@@ -33,5 +33,5 @@ class BaseRandomizator(BaseAct):
 
         return fnl
 
-    async def _recieveItems(self):
+    async def _recieveItems(self)->list:
         return []

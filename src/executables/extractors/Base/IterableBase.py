@@ -12,21 +12,21 @@ class IterableBase(BaseCollectionable):
             "type": "int",
             "default": 1,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
         params["end"] = {
             "type": "int",
             "default": 100,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
         params["timeout"] = {
             "type": "float",
             "default": 1,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
 
@@ -38,7 +38,7 @@ class IterableBase(BaseCollectionable):
         }
 
     async def run(self, args):
-        self.entity_list = []
+        self.ContentUnit_list = []
 
         for i in range(self.passed_params.get("start"), self.passed_params.get("end")):
             try:
@@ -49,7 +49,7 @@ class IterableBase(BaseCollectionable):
             await asyncio.sleep(self.passed_params.get("timeout"))
 
         return {
-            "entities": self.entity_list,
+            "entities": self.ContentUnit_list,
         }
 
     async def _iterableAction(self, i):

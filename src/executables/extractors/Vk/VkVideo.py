@@ -128,7 +128,7 @@ class VkVideo(VkBase):
                         "upload_name": ORIGINAL_NAME,
                         "filesize": SAVE_PATH.stat().st_size,
                     })
-                    item["relative_file"] = f"__lcms|file_{FILE.id}"
+                    item["relative_file"] = f"__$|file_{FILE.id}"
             except LibNotInstalledException as _libe:
                 raise _libe
             except Exception as __e:
@@ -136,7 +136,7 @@ class VkVideo(VkBase):
         else:
             logger.log(message=f"Video {VIDEO_ID} is from another platform ({item.get("platform")})",section="VkAttachments",name="message")
         
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "suggested_name": VIDEO_NAME,
             "source": "vk:video"+str(VIDEO_ID),
             "internal_content": item,
@@ -144,4 +144,4 @@ class VkVideo(VkBase):
             "unlisted": self.passed_params.get("unlisted") == 1,
             "declared_created_at": item.get("date"),
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

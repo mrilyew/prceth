@@ -37,7 +37,7 @@ class VkBase(BaseExtractor):
             "type": "string",
             "default": env.get("vk.access_token", None),
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["api_url"] = {
@@ -51,7 +51,7 @@ class VkBase(BaseExtractor):
             "type": "string",
             "default": env.get("vk.api_url", "api.vk.com/method"),
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["vk_path"] = {
@@ -65,7 +65,7 @@ class VkBase(BaseExtractor):
             "type": "string",
             "default": env.get("vk.vk_path", "vk.com"),
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
@@ -74,7 +74,16 @@ class VkBase(BaseExtractor):
     async def run(self, args):
         pass
 
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "vk", "data": {
-            "source": f"https://{INPUT_ENTITY.getFormattedInfo().get('vk_path')}/" + INPUT_ENTITY.orig_source
-        }}
+    def __find_owner(self, id, profiles, groups):
+        '''
+        Gets owner by id from "profiles" and "groups" arrays.
+        '''
+        search_array = profiles
+        if id < 0:
+            search_array = groups
+
+        for item in search_array:
+            if item.get('id') == abs(int(id)):
+                return item
+
+        return None

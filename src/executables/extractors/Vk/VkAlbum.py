@@ -91,7 +91,7 @@ class VkAlbum(VkBase):
         SUGGESTED_NAME = f"{item.get('title')} ({item.get('owner_id')}_{item.get('id')})"
         logger.log(message=f"Recieved album {__ITEM_ID}",section="VkCollection",name="message")
 
-        ALBUM_ENTITY = self._entityFromJson({
+        ALBUM_ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "internal_content": item,
             "unlisted": 1,
@@ -99,4 +99,4 @@ class VkAlbum(VkBase):
             "suggested_description": item.get("description"),
             "declared_created_at": item.get("date"),
         })
-        link_entities.append(ALBUM_ENTITY)
+        link_entities.append(ALBUM_ContentUnit)

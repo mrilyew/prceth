@@ -1,7 +1,7 @@
 from resources.Globals import os, logger, asyncio, consts, datetime, zipfile, Path, utils, file_manager, json
 from executables.acts.Base.Base import BaseAct
 from db.Collection import Collection
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
 from db.File import File
 from peewee import Model, SqliteDatabase
 
@@ -26,13 +26,13 @@ class ExportToZIP(BaseAct):
         params["dir"] = {
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["collection_id"] = {
             "type": "int",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["compression"] = {
@@ -87,23 +87,23 @@ class ExportToZIP(BaseAct):
         __DB = SqliteDatabase(DATABASE_PATH)
         __ITEMS = collection.getItems(offset=0,limit=None)
 
-        with utils.override_db([Entity, File], __DB):
+        with utils.override_db([ContentUnit, File], __DB):
             __DB.connect()
-            __DB.create_tables([Entity, File], safe=True)
+            __DB.create_tables([ContentUnit, File], safe=True)
 
             logger.log(message="Created DB and entities table",section="Export")
 
             for ITEM in __ITEMS:
                 ___ID = ITEM.id
 
-                logger.log(message=f"Inserting Entity №{___ID}",section="Export")
+                logger.log(message=f"Inserting ContentUnit №{___ID}",section="Export")
                 
                 __data = ITEM.__dict__["__data__"]
                 __data.pop('id')
                 ITEM.insert(__data).execute()
 
                 # TODO: Linked
-                logger.log(message=f"Copying Entity №{___ID} files",section="Export")
+                logger.log(message=f"Copying ContentUnit №{___ID} files",section="Export")
                 '''
                 HASH = ITEM.hash
                 __hash_path = os.path.join(__SAVE_STORAGE_PATH, HASH)

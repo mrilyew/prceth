@@ -50,14 +50,14 @@ class RSSItem(BaseExtractor):
             __name = __xml.get("title")
             __date = datetime.strptime(__xml.get("pubDate"), "%a, %d %b %Y %H:%M:%S %z")
 
-            ENTITY = self._entityFromJson({
+            ContentUnit = self._ContentUnitFromJson({
                 "source": self.passed_params.get("source", "api:xml"),
                 "suggested_name": __name,
                 "declared_created_at": __date.timestamp(),
                 "internal_content": internal_content,
             })
 
-            __LIST.append(ENTITY)
+            __LIST.append(ContentUnit)
 
         return {
             "entities": __LIST

@@ -28,7 +28,7 @@ class VkLink(VkBase):
         params["__json_info"] = {
             "type": "object",
             "assertion": {
-                "assert_not_null": True
+                "not_null": True
             }
         }
         params["download_file"] = {
@@ -68,14 +68,14 @@ class VkLink(VkBase):
                         "filesize": FILE_SIZE,
                     }, TEMP_DIR)
 
-                    __json["relative_photo"] = f"__lcms|file_{__FILE.id}"
+                    __json["relative_photo"] = f"__$|file_{__FILE.id}"
 
                     logger.log(message=f"Downloaded link's photo {PHOTO_ID}",section="VK",name="success")
                 except FileNotFoundError as _ea:
                     pass
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "internal_content": __json,
             "source": f"url:{__json.get('url')}",
             "unlisted": self.passed_params.get('unlisted') == 1,
@@ -84,5 +84,5 @@ class VkLink(VkBase):
         })
 
         return {
-            "entities": [ENTITY]
+            "entities": [ContentUnit]
         }

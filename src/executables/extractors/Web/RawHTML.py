@@ -17,7 +17,7 @@ class RawHTML(BaseExtractor):
         params["html"] = {
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
 
@@ -67,7 +67,7 @@ class RawHTML(BaseExtractor):
             "upload_name": ORIGINAL_NAME,
             "filesize": len(__html),
         })
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": SOURCE,
             "internal_content": WEB_META,
             "preview_file": "screenshot.png",
@@ -76,7 +76,7 @@ class RawHTML(BaseExtractor):
 
         return {
             "entities": [
-                ENTITY
+                ContentUnit
             ]
         }
     
@@ -91,8 +91,3 @@ class RawHTML(BaseExtractor):
         
         if getattr(self, "crawler", None):
             del self.crawler
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "api", "data": {
-            "source": INPUT_ENTITY.orig_source
-        }}

@@ -153,10 +153,10 @@ class VkPost(VkBase):
                     })
 
                     __attachment_class_unknown_entities = await __attachment_class_unknown.execute({})
-                    __attachment_class_entity = __attachment_class_unknown_entities.get("entities")[0]
+                    __attachment_class_ContentUnit = __attachment_class_unknown_entities.get("entities")[0]
 
-                    __linked_files.append(__attachment_class_entity)
-                    item["relative_attachments"][key][__attachment_class_name] = f"__lcms|entity_{__attachment_class_entity.id}"
+                    __linked_files.append(__attachment_class_ContentUnit)
+                    item["relative_attachments"][key][__attachment_class_name] = f"__$|ContentUnit_{__attachment_class_ContentUnit.id}"
                 else:
                     ATTACHMENT_ID = f"{__attachment_object.get('owner_id')}_{__attachment_object.get('id')}"
                     logger.log(message=f"Recieved attachment {str(__attachment_class_name)} {ATTACHMENT_ID}",section="VkAttachments",name="message")
@@ -173,7 +173,7 @@ class VkPost(VkBase):
                     __attachment_class_return = await __attachment_class.execute({})
 
                     __linked_files.append(__attachment_class_return[0])
-                    item["relative_attachments"][key][__attachment_class_name] = f"__lcms|entity_{__attachment_class_return[0].id}"
+                    item["relative_attachments"][key][__attachment_class_name] = f"__$|ContentUnit_{__attachment_class_return[0].id}"
             except ModuleNotFoundError:
                 pass
             except Exception as ___e___:
@@ -199,10 +199,10 @@ class VkPost(VkBase):
                         "download_attachments_file_list": self.passed_params.get("download_attachments_file_list"),
                         "download_reposts": False,
                     })
-                    __vk_post_entity = await __vk_post_extractor.execute({})
+                    __vk_post_ContentUnit = await __vk_post_extractor.execute({})
 
-                    __linked_files.append(__vk_post_entity[0])
-                    item["relative_copy_history"][key] = f"__lcms|entity_{__vk_post_entity[0].id}"
+                    __linked_files.append(__vk_post_ContentUnit[0])
+                    item["relative_copy_history"][key] = f"__$|ContentUnit_{__vk_post_ContentUnit[0].id}"
                 except ModuleNotFoundError:
                     pass
                 except Exception as ___e___:
@@ -215,7 +215,7 @@ class VkPost(VkBase):
         if item.get("copy_owner_id") != None and self.__profiles != None:
             item["copy_owner"] = media_utils.find_owner(item.get("copy_owner_id"), self.__profiles, self.__groups)
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "suggested_name": f"VK {self.vk_type.title()} {str(ITEM_ID)}",
             "internal_content": item,
@@ -223,4 +223,4 @@ class VkPost(VkBase):
             "unlisted": self.passed_params.get("unlisted") == 1,
             "declared_created_at": item.get("date"),
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

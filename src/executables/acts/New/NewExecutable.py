@@ -43,7 +43,7 @@ class NewExecutable(BaseAct):
             "type": "array",
             "values": ["act", "extractor", "service"],
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["category"] = {
@@ -55,7 +55,7 @@ class NewExecutable(BaseAct):
             },
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["title"] = {
@@ -67,7 +67,7 @@ class NewExecutable(BaseAct):
             },
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["is_hidden"] = {
@@ -80,7 +80,7 @@ class NewExecutable(BaseAct):
             "type": "bool",
             "default": False,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 

@@ -5,7 +5,7 @@ DefaultSettings = {
     },
     "ui.name": {
         "type": "string",
-        "default": "Difault",
+        "default": "Prethmeta",
     },
     "web.useragent": {
         "type": "string",
@@ -17,7 +17,7 @@ DefaultSettings = {
     },
     "web.port": {
         "type": "int",
-        "default": 7856,
+        "default": 7782,
     },
     "web.max_speed": {
         "type": "int",
@@ -31,17 +31,17 @@ DefaultSettings = {
         "type": "string",
         "default": "default",
     },
-    "extractor.cache_assets": {
-        "type": "int",
-        "default": 0, # If 1, on NT you should run CMD with admin privelegies
-    },
-    "storage.path": {
+    "storage.root_path": {
         "type": "string",
-        "default": "?cwd?\\storage" # cwd -> /storage
+        "default": "?cwd?/storage" # cwd -> /storage
     },
-    "db.path": {
+    "db.sqlite_content_path": {
         "type": "string",
-        "default": "?cwd?/storage/dbs/main.db"
+        "default": "?cwd?/storage/dbs/content.db"
+    },
+    "db.sqlite_instance_path": {
+        "type": "string",
+        "default": "?cwd?/storage/dbs/instance.db"
     },
     "net.timeout": {
         "type": "int",
@@ -50,6 +50,10 @@ DefaultSettings = {
     "logger.skip_categories": {
         "type": "object",
         "default": []
+    },
+    "logger.skip_file": {
+        "type": "int",
+        "default": 0,
     },
     # Thumbnails
     "thumbnail.width": {

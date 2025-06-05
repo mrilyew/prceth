@@ -1,10 +1,10 @@
-## Difault
+## Prethmeta
 
 Python app/framework for creating virtual collections with web content
 
 Wt. [docs](docs/ru/README.md)
 
-![Difault work scheme](readme/s_cli.png)
+![Prethmeta work scheme](readme/s_cli.png)
 
 Задачи:
 
@@ -29,4 +29,7 @@ Wt. [docs](docs/ru/README.md)
 - [ ] Вынести приложение в класс
 - [ ] Рефактор асинхронности
 - [ ] Хранить сервисы в отдельной бд
+- [ ] Разделениее программной бд и хранилища данных
 - [ ] Разделить метод execute и run
+- [ ] Рефактор хранилища
+- [ ] Разгрузка globals

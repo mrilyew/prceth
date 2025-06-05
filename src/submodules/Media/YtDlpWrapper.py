@@ -18,6 +18,5 @@ class YtDlpWrapper:
         self.ydl_opts = {'quiet': True, 'progress_hooks': [self.download_hook], "ratelimit": float(config.get("web.max_speed")) * 1024}
         #self.ydl_opts["quiet"] = False
         self.ydl_opts.update(opts)
-        #print(self.ydl_opts)
 
         self.ydl = yt_dlp.YoutubeDL(self.ydl_opts)

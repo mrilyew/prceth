@@ -1,15 +1,18 @@
-from resources.Globals import consts, BaseModel, Path, os, utils, shutil, logger, json
-from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
+import os, shutil, json
+from resources.Consts import consts
+from app.App import logger
+from pathlib import Path
+from peewee import Model, TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 from shutil import ignore_patterns
 
 # File is not a file, its a directory with main file and secondary files.
 # So the dir and main file names as hash
-class File(BaseModel):
+class File(Model):
     self_name = 'file'
     temp_dir = ''
 
     id = AutoField() # ABSOLUTE ID
-    hash = TextField(null=True) # Entity hash
+    hash = TextField(null=True) # ContentUnit hash
     upload_name = TextField(index=True,default='N/A') # Upload name (with extension)
     extension = TextField(null=True,default="json") # File extension
     filesize = BigIntegerField(default=0) # Size of file
@@ -17,7 +20,7 @@ class File(BaseModel):
     link = TextField(null=True,default=None)
     #dir_filesize = BigIntegerField(default=0) # Size of dir
 
-    def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_entity_id_to_start = True):
+    def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_ContentUnit_id_to_start = True):
         from resources.Globals import storage
         
         TMP_DIR = self.temp_dir
@@ -50,7 +53,7 @@ class File(BaseModel):
                         pass
                     elif len(__list) == 1:
                         new_name_unsafe = str(self.upload_name)
-                        if append_entity_id_to_start == True:
+                        if append_ContentUnit_id_to_start == True:
                             new_name_unsafe = str(self.id) + "_" + new_name_unsafe
                         
                         new_name = utils.valid_name(new_name_unsafe)
@@ -121,7 +124,6 @@ class File(BaseModel):
 
                 return __arr
             except Exception as __egetexeption:
-                #print(__egetexeption)
                 return []
 
     def getPath(self):
@@ -135,9 +137,9 @@ class File(BaseModel):
         if self.temp_dir != None:
             END_DIR = self.temp_dir
 
-        ENTITY_PATH = os.path.join(END_DIR, str(self.upload_name))
+        ContentUnit_PATH = os.path.join(END_DIR, str(self.upload_name))
 
-        return ENTITY_PATH
+        return ContentUnit_PATH
 
     def getFsFileName(self):
         HASH = self.hash
@@ -171,7 +173,7 @@ class File(BaseModel):
         __file.extension = json_input.get("extension")
 
         if json_input.get("hash") == None:
-            __file.hash = utils.getRandomHash(32)
+            __file.hash = utils.get_random_hash(32)
         else:
             __file.hash = json_input.get("hash")
 

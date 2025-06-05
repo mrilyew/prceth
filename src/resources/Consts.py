@@ -1,4 +1,5 @@
-from resources.Globals import platform, os
+from pathlib import Path
+import platform, os
 
 consts = {}
 
@@ -12,8 +13,8 @@ consts["pc_user"] = os.getlogin()
 consts["pc_fullname"] = consts["pc_name"] + ", " + consts["pc_user"]
 
 # Runtime
-consts["cwd"] = os.getcwd()
-consts["executable"] = os.path.join(consts["cwd"], "executables")
+consts["cwd"] = Path(os.getcwd())
+consts["executables"] = Path(os.path.join(consts.get('cwd'), "executables"))
 
 # Config
 consts["config.hidden"] = 1

@@ -110,7 +110,7 @@ class VkDoc(VkBase):
                 "filesize": item_SIZE,
             })
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "file": FILE,
             "suggested_name": item_TEXT,
             "source": __SOURCE,
@@ -119,4 +119,4 @@ class VkDoc(VkBase):
             "declared_created_at": item.get("date"),
         })
 
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

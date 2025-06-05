@@ -1,7 +1,7 @@
 from resources.Globals import os, logger, asyncio, consts, config, Path, utils, file_manager, json
 from executables.acts.Base.Base import BaseAct
 from db.Collection import Collection
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
 
 class CreateCollection(BaseAct):
     name = 'CreateCollection'
@@ -33,23 +33,23 @@ class CreateCollection(BaseAct):
             "type": "string",
             "default": None,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
         return params
 
     async def execute(self, args={}):
-        preview_entity = None
+        preview_ContentUnit = None
         add_after = None
         collection_name = self.passed_params.get("name")
 
         assert len(collection_name) > 0, "name is too short"
 
         if "preview_id" in self.passed_params:
-            __preview_entity = Entity.get(int(self.passed_params.get("preview_id")))
-            if __preview_entity != None:
-                preview_entity = __preview_entity
+            __preview_ContentUnit = ContentUnit.get(int(self.passed_params.get("preview_id")))
+            if __preview_ContentUnit != None:
+                preview_ContentUnit = __preview_ContentUnit
 
         if "to_add" in self.passed_params:
             __add_collection = Collection.get(int(self.passed_params.get("to_add")))
@@ -63,8 +63,8 @@ class CreateCollection(BaseAct):
         if self.passed_params.get('frontend_data') != None:
             col.frontend_data = self.passed_params.get('frontend_data')
 
-        if preview_entity != None:
-            col.preview_id = preview_entity.id
+        if preview_ContentUnit != None:
+            col.preview_id = preview_ContentUnit.id
 
         col.order = Collection.getAllCount()
         if add_after != None:

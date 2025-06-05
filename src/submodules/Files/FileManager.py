@@ -1,45 +1,5 @@
-from resources.Globals import win32file, win32api, os, shutil, Path
-
-class FileInfo():
-    def __init__(self, entry, extended = False):
-        self.name = entry.name
-        self.path = entry.path
-        self.type = 'file'
-        self.extended = extended
-        if entry.is_dir():
-            self.type = 'dir'
-        elif entry.is_symlink():
-            self.type = 'symlink'
-
-        if extended == True:
-            stat = entry.stat()
-            self.size = stat.st_size
-            self.created_time = stat.st_ctime
-            self.modified_time = stat.st_mtime
-            self.accessed_time = stat.st_atime
-            self.owner = stat.st_uid
-            self.group = stat.st_gid
-            self.permissions = stat.st_mode
-
-    def takeInfo(self):
-        base = {
-            "name": self.name,
-            "path": self.path,
-            "type": self.type,
-            "extended": self.extended,
-            "type": self.type
-        }
-        
-        if(self.extended == True):
-            base['size'] = self.size
-            base['created_time'] = self.created_time
-            base['modified_time'] = self.modified_time
-            base['accessed_time'] = self.accessed_time
-            base['owner'] = self.owner
-            base['group'] = self.group
-            base['permissions'] = self.permissions
-
-        return base
+from pathlib import Path
+import win32file, win32api, os, shutil
 
 class FileManager():
     def __init__(self):
@@ -96,7 +56,6 @@ class FileManager():
 
         path.rmdir()
 
-    # https://stackoverflow.com/questions/1868714/how-do-i-copy-an-entire-directory-of-files-into-an-existing-directory-using-pyth
     def copytree(self, src, dst, symlinks=False, ignore=None):
         for item in os.listdir(src):
             s = os.path.join(src, item)

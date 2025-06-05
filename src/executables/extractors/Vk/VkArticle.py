@@ -84,7 +84,7 @@ class VkArticle(VkBase):
 
         logger.log(message=f"Recieved article {item.get('url')}",section="VkAttachments",name="message")
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "internal_content": item,
             "suggested_name": __TITLE,
@@ -92,4 +92,4 @@ class VkArticle(VkBase):
             "unlisted": self.passed_params.get("unlisted") == 1,
             "declared_created_at": __PUBLICATION,
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

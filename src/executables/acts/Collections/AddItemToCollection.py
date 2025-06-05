@@ -1,6 +1,6 @@
 from executables.acts.Base.Base import BaseAct
 from resources.Exceptions import NotPassedException, NotFoundException
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
 from db.Collection import Collection
 
 class AddItemToCollection(BaseAct):
@@ -28,13 +28,13 @@ class AddItemToCollection(BaseAct):
         params["collection_id"] = {
             "type": "int",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
-        params["entity_id"] = {
+        params["ContentUnit_id"] = {
             "type": "int",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
@@ -42,17 +42,17 @@ class AddItemToCollection(BaseAct):
 
     async def execute(self, args={}):
         collection_id = self.passed_params.get("collection_id")
-        entity_id = self.passed_params.get("entity_id")
+        ContentUnit_id = self.passed_params.get("ContentUnit_id")
 
-        assert collection_id != None and entity_id != None, "collection_id and entity_id are not passed"
+        assert collection_id != None and ContentUnit_id != None, "collection_id and ContentUnit_id are not passed"
 
         collection = Collection.get(collection_id)
-        entity = Entity.get(entity_id)
+        ContentUnit = ContentUnit.get(ContentUnit_id)
 
         assert collection != None, "collection not found"
-        assert entity != None, "entity not found"
+        assert ContentUnit != None, "ContentUnit not found"
 
-        collection.addItem(entity)
+        collection.addItem(ContentUnit)
 
         return {
             "success": 1

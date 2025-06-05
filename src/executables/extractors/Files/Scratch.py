@@ -12,7 +12,7 @@ class Scratch(BaseExtractor):
             },
             "definition": {
                 "ru": "Запись из ничего",
-                "en": "Entity from scratch"
+                "en": "ContentUnit from scratch"
             }
         }
     }
@@ -52,7 +52,7 @@ class Scratch(BaseExtractor):
         return params
 
     async def run(self, args):
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": "api:null",
             "suggested_name": self.passed_params.get("suggested_name"),
             "declared_created_at": int(self.passed_params.get("declared_created_at")),
@@ -60,5 +60,5 @@ class Scratch(BaseExtractor):
         })
 
         return {
-            "entities": [ENTITY],
+            "entities": [ContentUnit],
         }

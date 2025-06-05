@@ -1,15 +1,15 @@
 from resources.Globals import os, Path, asyncio
 from executables.acts.Base.Base import BaseAct
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
 
-class ExportEntity(BaseAct):
-    name = 'ExportEntity'
+class ExportContentUnit(BaseAct):
+    name = 'ExportContentUnit'
     category = 'export'
     docs = {
         "description": {
             "name": {
                 "ru": "Экспорт записи",
-                "en": "Entity export"
+                "en": "ContentUnit export"
             },
             "definition": {
                 "ru": "Копирует файлы и метаинформацию о записях в заданную директорию",
@@ -43,7 +43,7 @@ class ExportEntity(BaseAct):
                 }
             },
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
         params["export_json"] = {
@@ -56,12 +56,12 @@ class ExportEntity(BaseAct):
             },
             "default": False,
         }
-        params["dir_to_each_entity"] = {
+        params["dir_to_each_ContentUnit"] = {
             "type": "bool",
             "docs": {
                 "definition": {
                     "ru": "(1): Для каждой записи будет выделена директория",
-                    "en": "(1): There will be separate directory for each entity",
+                    "en": "(1): There will be separate directory for each ContentUnit",
                 }
             },
             "default": True,
@@ -86,7 +86,7 @@ class ExportEntity(BaseAct):
                 "values": {
                     "id": {
                         "ru": "Ставить id записи в префикс",
-                        "en": "Set entity id in prefix"
+                        "en": "Set ContentUnit id in prefix"
                     },
                     "order": {
                         "ru": "Ставить итератор в префикс",
@@ -123,7 +123,7 @@ class ExportEntity(BaseAct):
         entities = []
 
         __iterator = 0
-        dir_to_each_entity = self.passed_params.get("dir_to_each_entity")
+        dir_to_each_ContentUnit = self.passed_params.get("dir_to_each_ContentUnit")
         prefix_type = self.passed_params.get("prefix_type")
         export_linked = self.passed_params.get("export_linked")
         export_folder = self.passed_params.get("dir", None)
@@ -131,8 +131,8 @@ class ExportEntity(BaseAct):
 
         assert export_folder != None, "dir not passed"
 
-        for entity in Entity.get(entities_ids):
-            entities.append(entity)
+        for ContentUnit in ContentUnit.get(entities_ids):
+            entities.append(ContentUnit)
 
         assert len(entities) > 0, "no entities"
 
@@ -143,25 +143,25 @@ class ExportEntity(BaseAct):
 
         is_async = self.passed_params.get("is_async")
 
-        for entity in entities:
-            entity_dir = str(dir_path)
-            if dir_to_each_entity == True:
+        for ContentUnit in entities:
+            ContentUnit_dir = str(dir_path)
+            if dir_to_each_ContentUnit == True:
                 match(prefix_type):
                     case "id":
-                        entity_dir = os.path.join(str(dir_path), str(entity.id))
+                        ContentUnit_dir = os.path.join(str(dir_path), str(ContentUnit.id))
                     case "order":
-                        entity_dir = os.path.join(str(dir_path), str(__iterator))
+                        ContentUnit_dir = os.path.join(str(dir_path), str(__iterator))
 
             if is_async:
-                __task = asyncio.create_task(entity.export(Path(entity_dir), linked_params={
-                    "dir_to_each_entity": dir_to_each_entity,
+                __task = asyncio.create_task(ContentUnit.export(Path(ContentUnit_dir), linked_params={
+                    "dir_to_each_ContentUnit": dir_to_each_ContentUnit,
                     "export_linked": export_linked,
                     "export_save_json_to_dir": export_save_json_to_dir,
                 }))
                 __tasks.append(__task)
             else:
-                await entity.export(Path(entity_dir), linked_params={
-                    "dir_to_each_entity": dir_to_each_entity,
+                await ContentUnit.export(Path(ContentUnit_dir), linked_params={
+                    "dir_to_each_ContentUnit": dir_to_each_ContentUnit,
                     "export_linked": export_linked,
                     "export_save_json_to_dir": export_save_json_to_dir,
                 })

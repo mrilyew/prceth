@@ -28,7 +28,7 @@ class VkGraffiti(VkBase):
         params["__json_info"] = {
             "type": "object",
             "assertion": {
-                "assert_not_null": True
+                "not_null": True
             }
         }
         params["download_file"] = {
@@ -72,7 +72,7 @@ class VkGraffiti(VkBase):
             except FileNotFoundError as _ea:
                 logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "internal_content": __json,
             "unlisted": self.passed_params.get("unlisted") == 1,
@@ -81,5 +81,5 @@ class VkGraffiti(VkBase):
         })
 
         return {
-            "entities": [ENTITY]
+            "entities": [ContentUnit]
         }

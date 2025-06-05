@@ -28,7 +28,7 @@ class VkStickersScript(IterableBase):
             "type": "int",
             "default": 512,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
         params["type"] = {
@@ -36,7 +36,7 @@ class VkStickersScript(IterableBase):
             "values": ["stickers", "gifts"],
             "default": "stickers",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
@@ -58,6 +58,6 @@ class VkStickersScript(IterableBase):
             "make_preview": 0,
         })
         __ent_res = await __EXTR.execute({})
-        self.entity_list.append(__ent_res.get("entities")[0])
+        self.ContentUnit_list.append(__ent_res.get("entities")[0])
 
         logger.log(f"Downloaded URL {PATH_URL}", "IterableBase!VkStickers", "success")

@@ -1,5 +1,5 @@
 class ExportManager():
-    def saveEntity(self):
+    def saveContentUnit(self):
         pass
 
 export_manager = ExportManager()

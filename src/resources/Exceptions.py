@@ -1,4 +1,4 @@
-class ApiException(Exception):
+class WebServiceApiException(Exception):
     def __init__(self, message):
         super().__init__(message)
 
@@ -15,10 +15,6 @@ class NotPassedException(Exception):
         super().__init__(message)
 
 class NotInstalledException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
-
-class ExtractorException(Exception):
     def __init__(self, message):
         super().__init__(message)
 

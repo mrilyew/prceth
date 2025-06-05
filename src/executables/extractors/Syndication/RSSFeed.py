@@ -18,7 +18,7 @@ class RSSFeed(BaseExtractor):
             },
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["save_original_xml"] = {
@@ -31,7 +31,7 @@ class RSSFeed(BaseExtractor):
             "default": False,
             "type": "bool",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 

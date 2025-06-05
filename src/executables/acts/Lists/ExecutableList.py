@@ -44,7 +44,7 @@ class ExecutableList(BaseAct):
                 }
             },
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
         return params

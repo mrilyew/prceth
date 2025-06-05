@@ -37,7 +37,7 @@ often_definitions["xml_parsed_code"] = {
 }
 often_definitions["suggested_name"] = {
     "ru": "Предлагаемое название записи",
-    "en": "Suggested name of entity",
+    "en": "Suggested name of ContentUnit",
 }
 
 often_params = {}
@@ -48,7 +48,7 @@ often_params["count_default_10"] = {
         "definition": often_definitions.get("count")
     },
     "assertion": {
-        "assert_not_null": True,
+        "not_null": True,
     },
 }
 often_params["offset_default_0"] = {
@@ -58,7 +58,7 @@ often_params["offset_default_0"] = {
         "definition": often_definitions.get("offset")
     },
     "assertion": {
-        "assert_not_null": True,
+        "not_null": True,
     },
 }
 often_params["return_raw"] = {
@@ -101,7 +101,7 @@ often_params["save_original_xml"] = {
     "default": False,
     "type": "bool",
     "assertion": {
-        "assert_not_null": True,
+        "not_null": True,
     },
 }
 often_params["simple_source"] = {
@@ -110,7 +110,7 @@ often_params["simple_source"] = {
     },
     "type": "string",
     "assertion": {
-        "assert_not_null": True,
+        "not_null": True,
     },
 }
 often_params["suggested_name"] = {
@@ -119,6 +119,6 @@ often_params["suggested_name"] = {
     },
     "type": "string",
     "assertion": {
-        "assert_not_null": True,
+        "not_null": True,
     },
 }

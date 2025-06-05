@@ -2,14 +2,14 @@ from resources.Globals import os, VkApi, logger, consts, Path, download_manager,
 from executables.extractors.Vk.VkBase import VkBase
 from resources.Exceptions import NotFoundException
 
-class VkIdentity(VkBase):
-    name = 'VkIdentity'
+class VkIdContentUnit(VkBase):
+    name = 'VkIdContentUnit'
     category = 'Vk'
     docs = {
         "description": {
             "name": {
                 "ru": "VK Профиль",
-                "en": "VK Identity"
+                "en": "VK IdContentUnit"
             },
             "definition": {
                 "ru": "Информация о пользователе/группе из VK",
@@ -99,8 +99,8 @@ class VkIdentity(VkBase):
             group_ids = []
             IDENTITIES_IDS = identities_id_string.split(",")
 
-            for IDENTITY_ID in IDENTITIES_IDS:
-                __id = int(IDENTITY_ID)
+            for IDContentUnit_ID in IDENTITIES_IDS:
+                __id = int(IDContentUnit_ID)
                 if __id > 0:
                     user_ids.append(__id)
                 else:
@@ -171,7 +171,7 @@ class VkIdentity(VkBase):
             try:
                 __file = await self.__download_avatar(item)
                 __file.moveTempDir()
-                item["relative_photo_max_orig"] = f"__lcms|file_{__file.id}"
+                item["relative_photo_max_orig"] = f"__$|file_{__file.id}"
 
                 linked_files.append(__file)
             except Exception as _e:
@@ -181,7 +181,7 @@ class VkIdentity(VkBase):
             try:
                 __file = await self.__download_cover(item)
                 __file.moveTempDir()
-                item["relative_cover"] = f"__lcms|file_{__file.id}"
+                item["relative_cover"] = f"__$|file_{__file.id}"
 
                 linked_files.append(__file)
             except NotFoundException:
@@ -191,13 +191,13 @@ class VkIdentity(VkBase):
             except Exception as _e:
                 logger.logException(_e,section="Vk",silent=False)
 
-        logger.log(f"Got identity {item.get("vkapi_type")}{item.get('id')}",section="Vk",name="success")
+        logger.log(f"Got idContentUnit {item.get("vkapi_type")}{item.get('id')}",section="Vk",name="success")
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": source,
             "suggested_name": name,
             "internal_content": item,
             "declared_created_at": reg_date,
             "linked_files": linked_files,
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

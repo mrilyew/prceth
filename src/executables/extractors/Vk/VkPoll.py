@@ -111,14 +111,14 @@ class VkPoll(VkBase):
                         "filesize": FILE_SIZE,
                     }, TEMP_DIR)
 
-                    item["relative_photo"] = f"__lcms|file_{__FILE.id}"
+                    item["relative_photo"] = f"__$|file_{__FILE.id}"
 
                     logger.log(message=f"Downloaded poll {__ITEM_ID} background",section="VK",name="success")
             except FileNotFoundError as _ea:
                 pass
                 logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "internal_content": item,
             "unlisted": self.passed_params.get("unlisted") == 1,
@@ -126,4 +126,4 @@ class VkPoll(VkBase):
             "suggested_name": item.get("question"),
             "linked_files": [__FILE],
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

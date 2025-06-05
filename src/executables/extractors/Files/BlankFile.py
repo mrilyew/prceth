@@ -67,7 +67,7 @@ class BlankFile(BaseExtractor):
             "upload_name": self.passed_params.get("__original_name"),
             "filesize": len(self.passed_params.get("text").encode('utf-8')),
         })
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": "api:blank",
             "suggested_name": "blank.txt",
             "internal_content": {
@@ -79,11 +79,6 @@ class BlankFile(BaseExtractor):
 
         return {
             "entities": [
-                ENTITY
+                ContentUnit
             ],
         }
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "api", "data": {
-            "source": INPUT_ENTITY.orig_source
-        }}

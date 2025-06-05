@@ -1,23 +1,20 @@
-from resources.Globals import utils, loop, ActsRepository, utils
-from resources.DbPrefetch import prefetch__db
+from app.App import app
+from utils.MainUtils import dump_json
+from repositories.ActsRepository import ActsRepository
 
-prefetch__db()
+async def ___runAct():
+    assert "i" in app.argv, "pass the name of act as --i"
 
-args = utils.parse_args()
+    __act_name_input = app.argv.get("i")
+    act_class = ActsRepository().getByName(plugin_name=__act_name_input)
 
-async def runAct():
-    assert "i" in args, "pass the name of act as --i"
+    assert act_class != None, "act not found"
 
-    __act_name = args.get("i")
-    __act_res = ActsRepository().getByName(act_name=__act_name)
+    act = act_class()
+    act.setArgs(app.argv)
 
-    assert __act_res != None, "act not found"
+    act_response = await act.safeExecute(args=app.argv)
 
-    out_act = __act_res()
-    out_act.setArgs(args)
+    print(dump_json(act_response, indent=4))
 
-    ACT_F = await out_act.execute(args=args)
-
-    print(utils.dump_json(ACT_F, indent=4))
-
-loop.run_until_complete(runAct())
+app.loop.run_until_complete(___runAct())

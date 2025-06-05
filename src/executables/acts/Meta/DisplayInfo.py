@@ -1,5 +1,5 @@
-from resources.Globals import config
 from executables.acts.Base.Base import BaseAct
+from app.App import app, db_connection
 
 class DisplayInfo(BaseAct):
     name = 'DisplayInfo'
@@ -20,10 +20,8 @@ class DisplayInfo(BaseAct):
 
     async def execute(self, args={}):
         return {
-            "config": {
-                "current_db": config.get('db.path'),
-            },
-            "other": {
-                "passed_args": self.passed_params
+            "input": {
+                "passed_args": self.passed_params,
+                "argv": app.argv,
             }
         }

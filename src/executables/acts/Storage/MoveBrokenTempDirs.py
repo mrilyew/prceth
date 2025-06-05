@@ -1,6 +1,6 @@
 from resources.Globals import consts, os, Path, shutil
 from executables.acts.Base.Base import BaseAct
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
 
 class MoveBrokenTempDirs(BaseAct):
     name = 'MoveBrokenTempDirs'

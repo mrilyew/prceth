@@ -14,7 +14,7 @@ class FSPath(BaseExtractor):
             },
             "definition": {
                 "ru": "Создает запись из локального пути",
-                "en": "Creates entity from local path"
+                "en": "Creates ContentUnit from local path"
             }
         }
     }
@@ -30,7 +30,7 @@ class FSPath(BaseExtractor):
             },
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["type"] = {
@@ -58,7 +58,7 @@ class FSPath(BaseExtractor):
             "values": ["copy", "move", "link"],
             "default": "copy",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
@@ -80,7 +80,7 @@ class FSPath(BaseExtractor):
         MOVE_TO = Path(TEMP_DIR + '\\' + INPUT_FILE_NAME)
         LINK = None
 
-        # Creating entity
+        # Creating ContentUnit
         # Copying and leaving original file
         if self.passed_params.get("type") == 'copy':
             file_manager.copyFile(INPUT_PATH, MOVE_TO)
@@ -105,17 +105,12 @@ class FSPath(BaseExtractor):
             "filesize": FILE_SIZE,
             "link": LINK,
         }, TEMP_DIR)
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": "path:"+str(INPUT_PATH),
             "internal_content": __OUTPUT_METADATA,
             "file": FILE
         })
 
         return {
-            "entities": [ENTITY],
+            "entities": [ContentUnit],
         }
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "api", "data": {
-            "source": INPUT_ENTITY.orig_source
-        }}

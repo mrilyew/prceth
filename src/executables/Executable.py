@@ -1,20 +1,21 @@
-from resources.Globals import storage, utils, consts, logger, DeclarableArgs, file_manager, config
+from submodules.Files.FileManager import file_manager
+from resources.Consts import consts
+from app.App import config, storage, logger
+from utils.MainUtils import get_ext, dump_json
 from resources.Exceptions import ExecutableArgumentsException
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
+from declarable.DeclarableArgs import DeclarableArgs
 
 class Executable:
     name = 'base'
     category = 'base'
     passed_params = {}
-    temp_dir_prefix = None
     params = {}
     after_save_actions = {}
     temp_dirs = []
     entities_buffer = []
     manual_params = False
-    need_preview = False
     already_declared = False
-    write_mode = "save_after_creation"
     docs = {
         "description": {
             "name": {
@@ -25,16 +26,90 @@ class Executable:
             }
         }
     }
+    events = {
+        "success": [],
+        "afterSave": [],
+        "error": [],
+    }
     main_args = {}
 
+    def __init__(self):
+        def __onerror(exception):
+            logger.logException(exception, section="Executables")
+
+        def __onsuccess():
+            try:
+                ___ln = len(self.entities_buffer)
+                __msg = f"Saving total {str(___ln)} entities;"
+                if ___ln > 100:
+                    __msg += " do not turn off your computer."
+
+                logger.log(__msg,section="ContentUnitSaveMechanism",name="success")
+            except Exception as _x:
+                print("PostRun:" + str(_x))
+                pass
+
+            for unsaved_ContentUnit in self.entities_buffer:
+                self._ContentUnitPostRun(unsaved_ContentUnit)
+
+        self.events.get("error").append(__onerror)
+        #self.events.get("success").append(__onsuccess)
+
+    # Execution
+
+    async def execute(self, args):
+        pass
+    
+    async def safeExecute(self, args):
+        res = None
+
+        try:
+            res = await self.execute(args=args)
+        except Exception as x:
+            logger.logException(x, section="Executables")
+            self.onFail()
+
+            raise x
+
+        return res
+
+    # Events
+
+    async def onError(self, exception: Exception):
+        for __closure in self.events.get("error"):
+            await __closure(exception)
+
+    async def onAfterSave(self, entities):
+        for __closure in self.events.get("afterSave"):
+            await __closure(entities)
+
+    async def onSuccess(self):
+        for __closure in self.events.get("success"):
+            await __closure()
+
+    # Comparisons
+
     @classmethod
-    def isRunnable(cls):
+    def isAbstract(cls):
+        return cls.category.lower() in ["template", "base"]
+
+    @classmethod
+    def isHidden(cls):
+        return getattr(cls, "hidden", False) == True
+
+    @classmethod
+    def canBeExecuted(cls):
         '''
         Is this Executable can be runned or it's technical
         '''
-        return cls.category.lower() not in ["template", "base"] and getattr(cls, "hidden", False) == False
+        return cls.isAbstract() == False and cls.isHidden() == False
+
+    # Arguments
 
     def declare():
+        '''
+        Method that defines dictionary of current executable args
+        '''
         params = {}
 
         return params
@@ -110,6 +185,37 @@ class Executable:
         if self.manual_params == True:
             self.passed_params.update(args)
 
+    # Factory
+
+    def fork(self, extractor_name_or_class, args = None):
+        '''
+        Creates new executable by passed name or class.
+
+        Params:
+
+        extractor_name_or_class — full name or class of executable instance
+
+        args — dict that will be passed to "setArgs"
+        '''
+        from repositories.ExtractorsRepository import ExtractorsRepository
+
+        _ext = None
+        if type(extractor_name_or_class) == str:
+            _ext = (ExtractorsRepository()).getByName(extractor_name_or_class)
+        else:
+            _ext = extractor_name_or_class
+
+        if _ext == None:
+            return None
+
+        ext = _ext()
+        if args != None:
+            ext.setArgs(args)
+
+        return ext
+
+    # Documentation
+
     def getUsageString(self):
         _p = ""
         for id, param in enumerate(getattr(self, "params", {})):
@@ -123,9 +229,6 @@ class Executable:
                 _p += (f"{param}: {__definition.get(__lang, __definition.get("en"))}\n")
 
         return _p
-
-    def setPostActions(self, after_save_actions):
-        self.after_save_actions = after_save_actions
 
     def manual(self):
         manual = {}
@@ -149,23 +252,6 @@ class Executable:
 
         return rt
 
-    def allocateTemp(self):
-        _dir = storage.makeTemporaryCollectionDir(self.temp_dir_prefix)
-        self.temp_dirs.append(_dir)
-
-        return _dir
-
-    def removeAllocatedTemp(self, dir_name):
-        try:
-            file_manager.rmdir(dir_name)
-        except Exception:
-            logger.logException(dir_name, "Extractor", silent=False)
-
-    def mainTempDir(self):
-        _dir = consts.get("tmp")
-
-        return _dir
-
     async def _execute_sub(self, extractor, extractor_params, array_link):
         try:
             extractor.setArgs(extractor_params)
@@ -175,120 +261,3 @@ class Executable:
         except Exception as ___e:
             logger.logException(input_exception=___e,section="Extractor",silent=False)
             pass
-
-    def fork(self, extractor_name_or_class, args = None):
-        '''
-        Creates new executable by passed name or class.
-
-        Params:
-
-        extractor_name_or_class — full name or class of executable instance
-
-        args — dict that will be passed to "setArgs"
-        '''
-        from resources.Globals import ExtractorsRepository
-
-        _ext = None
-        if type(extractor_name_or_class) == str:
-            _ext = (ExtractorsRepository()).getByName(extractor_name_or_class)
-        else:
-            _ext = extractor_name_or_class
-
-        if _ext == None:
-            return None
-
-        ext = _ext(write_mode=self.write_mode,need_preview=self.need_preview)
-        if args != None:
-            ext.setArgs(args)
-
-        ext.setPostActions(self.after_save_actions)
-
-        return ext
-
-    # Typical preview
-    def thumbnail(self, entity, args={}, temp_dir = None):
-        if self.need_preview == False:
-            return None
-
-        from resources.Globals import ThumbnailsRepository
-        __FILE = entity.file
-        if __FILE == None:
-            return None
-
-        ext = __FILE.extension
-        if args.get("preview_file"):
-            ext = utils.get_ext(args.get("preview_file"))
-
-        thumb = (ThumbnailsRepository()).getByFormat(ext)
-        if thumb == None:
-            return None
-
-        if temp_dir == None:
-            temp_dir = __FILE.temp_dir
-
-        #thumb_class = thumb(save_dir=__FILE.getDirPath())
-        thumb_class = thumb(save_dir=temp_dir)
-        return thumb_class.run(file=__FILE,params=args)
-
-    def _fileFromJson(self, json_data, _temp_dir = None):
-        from db.File import File
-
-        if _temp_dir == None:
-            _temp_dir = self.temp_dirs[-1]
-
-        return File.fromJson(json_data, _temp_dir)
-    
-    def _entityFromJson(self, json_data, make_preview = True):
-        json_data["extractor_name"] = self.name
-        __entity = Entity.fromJson(json_data, self.passed_params)
-        # rewrite TODO
-        if make_preview == True:
-            thumb_result = self.thumbnail(entity=__entity,args=json_data)
-            if thumb_result != None:
-                __entity.preview = utils.dump_json(thumb_result)
-
-        self.entities_buffer.append(__entity)
-        if self.write_mode == "save_after_creation":
-            self._entityPostRun(__entity)
-
-        return __entity
-
-    def _collectionFromJson(self, json_data):
-        from db.Collection import Collection
-
-        return Collection.fromJson(json_data, self.passed_params)
-
-    def _entityPostRun(self, entity):
-        entity.save()
-        try:
-            entity.file.moveTempDir()
-        except:
-            pass
-
-        if self.after_save_actions.get("collections", None) != None:
-            for coll in self.after_save_actions.get("collections"):
-                if coll == None:
-                    continue
-
-                try:
-                    coll.addItem(entity)
-                except:
-                    pass
-
-        logger.log(f"Saved entity {str(entity.id)} 👍",section="EntitySaveMechanism",name="success")
-
-    async def postRun(self, return_entities):
-        if self.write_mode == "save_after_end":
-            try:
-                ___ln = len(self.entities_buffer)
-                __msg = f"Saving total {str(___ln)} entities;"
-                if ___ln > 100:
-                    __msg += " do not turn off your computer."
-                
-                logger.log(__msg,section="EntitySaveMechanism",name="success")
-            except Exception as _x:
-                print("PostRun:" + str(_x))
-                pass
-
-            for unsaved_entity in self.entities_buffer:
-                self._entityPostRun(unsaved_entity)

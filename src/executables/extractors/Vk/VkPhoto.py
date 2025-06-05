@@ -116,7 +116,7 @@ class VkPhoto(VkBase):
             except FileNotFoundError as _ea:
                 logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",name="error")
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "file": __FILE,
             "suggested_name": f"VK Photo {str(PHOTO_ID)}",
             "source": "vk:photo"+str(PHOTO_ID),
@@ -124,4 +124,4 @@ class VkPhoto(VkBase):
             "unlisted": self.passed_params.get("unlisted") == 1,
             "declared_created_at": item.get("date"),
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

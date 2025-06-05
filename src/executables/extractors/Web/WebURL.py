@@ -14,7 +14,7 @@ class WebURL(BaseExtractor):
         params["url"] = {
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
@@ -55,7 +55,7 @@ class WebURL(BaseExtractor):
                 "upload_name": JOINED_FILE_NAME,
                 "filesize": file_size,
             })
-            ENTITY = self._entityFromJson({
+            ContentUnit = self._ContentUnitFromJson({
                 "file": FILE,
                 "source": "url:"+self.passed_params.get("url"),
                 "internal_content": output_metadata,
@@ -63,15 +63,10 @@ class WebURL(BaseExtractor):
 
             return {
                 "entities": [
-                    ENTITY
+                    ContentUnit
                 ],
             }
         except Exception as exc:
             self.removeAllocatedTemp(TEMP_DIR)
 
             raise exc
-
-    def describeSource(self, INPUT_ENTITY):
-        return {"type": "url", "data": {
-            "source": INPUT_ENTITY.orig_source
-        }}

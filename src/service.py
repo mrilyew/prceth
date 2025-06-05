@@ -1,11 +1,3 @@
-from resources.Globals import utils, asyncio, loop, json, ServicesRepository, logger, time
-from resources.DbPrefetch import prefetch__db
-from db.Service import Service
-
-prefetch__db()
-
-args = utils.parse_args()
-
 async def runService():
     assert "i" in args, "i not passed"
 

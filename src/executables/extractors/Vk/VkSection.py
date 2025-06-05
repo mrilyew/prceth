@@ -86,7 +86,7 @@ class VkSection(VkBase):
             "type": "array",
             "values": ["photos", "wall", "album", "board", "fave", "post_comments", "video_comments", "photo_comments", "photo_all_comments", "notes_comments", "messages"],
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["api_timeout"] = {
@@ -285,7 +285,7 @@ class VkSection(VkBase):
 
         from executables.extractors.Vk.VkPhoto import VkPhoto
         from executables.extractors.Vk.VkPost import VkPost
-        from executables.extractors.Vk.VkIdentity import VkIdentity
+        from executables.extractors.Vk.VkIdContentUnit import VkIdContentUnit
         from executables.extractors.Vk.VkVideo import VkVideo
         from executables.extractors.Vk.VkArticle import VkArticle
         from executables.extractors.Vk.VkLink import VkLink
@@ -357,7 +357,7 @@ class VkSection(VkBase):
                         __pass_params = {
                             "type": self.passed_params.get("item_id"),
                         }
-                        __extractor = VkIdentity
+                        __extractor = VkIdContentUnit
                     case "post" | "video" | "article" | "link":
                         __method = "fave.get"
                         __pass_params = {

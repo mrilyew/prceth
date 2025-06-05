@@ -3,7 +3,7 @@
 Executable — класс, реализующий паттерн Command и выполняющий определённое действие. Бывает четырёх типов:
 
 - [`act`](act.md) — выполняет определённое действие и возвращает результат
-- [`extractor`](extractor.md) — собирает информацию и возвращает в формате [записи](../db/entity.md)
+- [`extractor`](extractor.md) — собирает информацию и возвращает в формате [записи](../db/ContentUnit.md)
 - [`service`](service.md) — выполняется раз в определённое время
 - [`thumbnail`](thumbnail.md) — создаёт превью из файла
 
@@ -15,7 +15,7 @@ Executable — класс, реализующий паттерн Command и вы
 
 **_fileFromJson({})**
 
-**_entityFromJson({})**
+**_ContentUnitFromJson({})**
 
 **_collectionFromJson({})**
 

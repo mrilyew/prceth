@@ -1,6 +1,6 @@
 from executables.acts.Base.BaseRandomizator import BaseRandomizator
 from db.Collection import Collection
-from db.Entity import Entity
+from db.ContentUnit import ContentUnit
 from peewee import fn
 
 class RandomEntities(BaseRandomizator):
@@ -31,7 +31,7 @@ class RandomEntities(BaseRandomizator):
             },
             "default": False,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
         params["collection_id"] = {
@@ -50,18 +50,18 @@ class RandomEntities(BaseRandomizator):
     async def _returnItems(self):
         entities = await self._recieveItems()
         fnl = []
-        for entity in entities:
+        for ContentUnit in entities:
             if self.passed_params.get("raw_models") == True:
-                fnl.append(entity)
+                fnl.append(ContentUnit)
             else:
-                fnl.append(entity.getApiStructure())
+                fnl.append(ContentUnit.getApiStructure())
 
         return fnl
 
     async def _recieveItems(self):
         __ = None
         if self.passed_params.get("collection_id") == None:
-            __ = Entity.fetchItems().order_by(fn.Random()).limit(self.passed_params.get('limit'))
+            __ = ContentUnit.fetchItems().order_by(fn.Random()).limit(self.passed_params.get('limit'))
         else:
             _col = Collection.get(self.passed_params.get("collection_id"))
             assert _col != None, 'invalid collection_id'

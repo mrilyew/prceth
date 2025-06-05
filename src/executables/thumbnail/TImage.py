@@ -17,7 +17,7 @@ class TImage(BaseThumbnail):
             path = self.save_dir + "/" + params.get("preview_file")
 
         with Image.open(path) as img:
-            __hash = utils.getRandomHash(8)
+            __hash = utils.get_random_hash(8)
 
             img.thumbnail(size, Image.LANCZOS)
             new_img = Image.new('RGB', size, (0, 0, 0))

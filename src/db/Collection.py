@@ -1,10 +1,11 @@
-from peewee import TextField, IntegerField, AutoField, BooleanField, TimestampField, DeferredForeignKey, JOIN
-from resources.Globals import BaseModel, consts, time, operator, json, os
+from peewee import Model, TextField, IntegerField, AutoField, BooleanField, TimestampField, DeferredForeignKey, JOIN
+import time, operator, json, os
+from resources.Consts import consts
 from playhouse.shortcuts import model_to_dict
 from functools import reduce
 from peewee import fn
 
-class Collection(BaseModel):
+class Collection(Model):
     '''
     Model that represents collection of other entities. Refers to "Relation"
     '''
@@ -17,7 +18,7 @@ class Collection(BaseModel):
     author = TextField(null=True,default=consts['pc_fullname']) # Author of collection.
     source = TextField(null=True) # Source of content (URL or path).
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
-    preview_id = TextField(null=True) # Id of entity that taken for traditional preview.
+    preview_id = TextField(null=True) # Id of ContentUnit that taken for traditional preview.
     tags = TextField(index=True,null=True) # Csv tags.
     flags = IntegerField(default=0) # Flags.
     unlisted = BooleanField(default=0)
@@ -82,21 +83,21 @@ class Collection(BaseModel):
         to_switch.save()
 
     def _fetchItems(self, query = None, columns_search = []):
-        from db.Entity import Entity
+        from db.ContentUnit import ContentUnit
         from db.Collection import Collection
         from db.Relation import Relation
 
-        DeferredForeignKey.resolve(Entity)
+        DeferredForeignKey.resolve(ContentUnit)
         DeferredForeignKey.resolve(Collection)
 
         items = (Relation
-        .select(Relation, Collection, Entity)
+        .select(Relation, Collection, ContentUnit)
         .where(Relation.parent_collection_id == self.id)
         .join(Collection, on=(Relation.child_collection_id == Collection.id), join_type=JOIN.LEFT_OUTER)
         .switch(Relation)
-        .join(Entity, on=(Relation.child_entity_id == Entity.id), join_type=JOIN.LEFT_OUTER)
+        .join(ContentUnit, on=(Relation.child_ContentUnit_id == ContentUnit.id), join_type=JOIN.LEFT_OUTER)
         .order_by(Relation.order)
-        .where(Entity.deleted == 0))
+        .where(ContentUnit.deleted == 0))
         
         if query != None:
             query = query
@@ -106,33 +107,33 @@ class Collection(BaseModel):
                 match column:
                     case "original_name":
                         conditions.append(
-                            (Entity.original_name.contains(query)) | 
+                            (ContentUnit.original_name.contains(query)) | 
                             (Collection.name.contains(query))
                         )
                     case "display_name":
                         conditions.append(
-                            (Entity.display_name.contains(query))
+                            (ContentUnit.display_name.contains(query))
                         )
                     case "description":
                         conditions.append(
                             (Collection.description.contains(query)) |
-                            (Entity.description.contains(query))
+                            (ContentUnit.description.contains(query))
                         )
                     case "source":
                         conditions.append(
-                            (Entity.source.contains(query))
+                            (ContentUnit.source.contains(query))
                         )
                     case "index":
                         conditions.append(
-                            (Entity.index_content.contains(query))
+                            (ContentUnit.index_content.contains(query))
                         )
                     case "saved":
                         conditions.append(
-                            (Entity.extractor_name.contains(query))
+                            (ContentUnit.extractor_name.contains(query))
                         )
                     case "author":
                         conditions.append(
-                            (Entity.author.contains(query)) |
+                            (ContentUnit.author.contains(query)) |
                             (Collection.author.contains(query))
                         )
             if conditions:
@@ -141,7 +142,7 @@ class Collection(BaseModel):
         return items
 
     def getItems(self, offset = 0, limit = 10, query = None, columns_search = [], order = None):
-        from db.Entity import Entity
+        from db.ContentUnit import ContentUnit
 
         items = self._fetchItems(query=query,columns_search=columns_search)
         items = items.offset(offset)
@@ -156,8 +157,8 @@ class Collection(BaseModel):
             if relation.child_collection_id:
                 results.append(Collection(**model_to_dict(relation.child_collection_id)))
 
-            if relation.child_entity_id:
-                results.append(Entity(**model_to_dict(relation.child_entity_id)))
+            if relation.child_ContentUnit_id:
+                results.append(ContentUnit(**model_to_dict(relation.child_ContentUnit_id)))
         
         return results
     
@@ -170,45 +171,45 @@ class Collection(BaseModel):
         
         return items.count()
 
-    def addItem(self, entity):
+    def addItem(self, ContentUnit):
         from db.Relation import Relation
 
-        if(self.hasItem(entity)):
+        if(self.hasItem(ContentUnit)):
             raise ValueError('Collection has that item')
 
         rel = Relation()
         rel.parent_collection_id = self.id
-        if entity.__class__.__name__ == 'Collection':
-            rel.child_collection_id = entity.id
-        if entity.__class__.__name__ == 'Entity':
-            rel.child_entity_id = entity.id
+        if ContentUnit.__class__.__name__ == 'Collection':
+            rel.child_collection_id = ContentUnit.id
+        if ContentUnit.__class__.__name__ == 'ContentUnit':
+            rel.child_ContentUnit_id = ContentUnit.id
 
         rel.save()
 
-    def removeItem(self, entity, delete_entity=True):
+    def removeItem(self, ContentUnit, delete_ContentUnit=True):
         from db.Relation import Relation
 
-        if(not self.hasItem(entity)):
-            raise ValueError("Error: entity does not belows to collection")
+        if(not self.hasItem(ContentUnit)):
+            raise ValueError("Error: ContentUnit does not belows to collection")
 
         rel = Relation.delete().where(Relation.parent_collection_id == self.id)
-        if entity.__class__.__name__ == 'Collection':
-            rel = rel.where(Relation.child_collection_id == entity.id)
-        if entity.__class__.__name__ == 'Entity':
-            rel = rel.where(Relation.child_entity_id == entity.id)
+        if ContentUnit.__class__.__name__ == 'Collection':
+            rel = rel.where(Relation.child_collection_id == ContentUnit.id)
+        if ContentUnit.__class__.__name__ == 'ContentUnit':
+            rel = rel.where(Relation.child_ContentUnit_id == ContentUnit.id)
 
         rel.execute()
-        if delete_entity == True:
-            entity.delete()
+        if delete_ContentUnit == True:
+            ContentUnit.delete()
 
-    def hasItem(self, entity):
+    def hasItem(self, ContentUnit):
         from db.Relation import Relation
 
         rel = Relation.select().where(Relation.parent_collection_id == self.id)
-        if entity.__class__.__name__ == 'Collection':
-            rel = rel.where(Relation.child_collection_id == entity.id)
-        if entity.__class__.__name__ == 'Entity':
-            rel = rel.where(Relation.child_entity_id == entity.id)
+        if ContentUnit.__class__.__name__ == 'Collection':
+            rel = rel.where(Relation.child_collection_id == ContentUnit.id)
+        if ContentUnit.__class__.__name__ == 'ContentUnit':
+            rel = rel.where(Relation.child_ContentUnit_id == ContentUnit.id)
         
         return rel.count() > 0
 

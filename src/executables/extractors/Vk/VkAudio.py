@@ -143,7 +143,7 @@ class VkAudio(VkBase):
                         "filesize": ___OUT_SIZE,
                     })
 
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": __SOURCE,
             "internal_content": item,
             "suggested_name": AUDIO_NAME,
@@ -151,4 +151,4 @@ class VkAudio(VkBase):
             "unlisted": self.passed_params.get("unlisted") == 1,
             "declared_created_at": item.get("date"),
         })
-        link_entities.append(ENTITY)
+        link_entities.append(ContentUnit)

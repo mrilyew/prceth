@@ -22,7 +22,7 @@ class TVideo(BaseThumbnail):
             frag_len = (duration / 10)
 
             for i in range(0, 10):
-                __hash = utils.getRandomHash(8)
+                __hash = utils.get_random_hash(8)
                 __new_prev = os.path.join(self.save_dir, f"{__hash}_thumb_{i}.jpg")
                 __previews["photo"].append({
                     "path": f"{__hash}_thumb_{i}.jpg",

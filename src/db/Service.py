@@ -1,7 +1,8 @@
-from peewee import SmallIntegerField, BigIntegerField, TextField, AutoField, TimestampField
-from resources.Globals import BaseModel, time, utils
+from peewee import SmallIntegerField, BigIntegerField, TextField, AutoField, TimestampField, Model
+from utils.MainUtils import parse_json, dump_json
+import time
 
-class Service(BaseModel):
+class Service(Model):
     self_name = 'service'
 
     class Meta:
@@ -19,12 +20,12 @@ class Service(BaseModel):
     def getData(self):
         __data = self.data
 
-        return utils.parse_json(__data)
+        return parse_json(__data)
 
     def getFrontendData(self):
         __data = self.frontend_data
 
-        return utils.parse_json(__data) 
+        return parse_json(__data) 
 
     def getApiStructure(self):
         obj = {}
@@ -44,5 +45,5 @@ class Service(BaseModel):
         return Service.select().where(Service.id == id).get()
     
     def updateData(self, json):
-        self.data = utils.dump_json(json)
+        self.data = dump_json(json)
         self.save()

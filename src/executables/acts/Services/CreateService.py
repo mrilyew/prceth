@@ -12,7 +12,7 @@ class CreateService(BaseAct):
         params["class_name"] = {
             "type": "string",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
         params["display_name"] = {
@@ -22,7 +22,7 @@ class CreateService(BaseAct):
             "type": "int",
             "default": 60,
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             }
         }
 

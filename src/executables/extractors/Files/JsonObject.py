@@ -12,7 +12,7 @@ class JsonObject(BaseExtractor):
             },
             "definition": {
                 "ru": "Создаёт запись из JSON",
-                "en": "Creates entity from JSON"
+                "en": "Creates ContentUnit from JSON"
             }
         }
     }
@@ -28,14 +28,14 @@ class JsonObject(BaseExtractor):
             },
             "type": "object",
             "assertion": {
-                "assert_not_null": True,
+                "not_null": True,
             },
         }
 
         return params
 
     async def run(self, args):
-        ENTITY = self._entityFromJson({
+        ContentUnit = self._ContentUnitFromJson({
             "source": "api:json",
             "suggested_name": "file.json",
             "internal_content": self.passed_params.get("json_object"),
@@ -43,6 +43,6 @@ class JsonObject(BaseExtractor):
 
         return {
             "entities": [
-                ENTITY
+                ContentUnit
             ],
         }
