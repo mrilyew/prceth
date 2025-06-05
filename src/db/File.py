@@ -21,7 +21,7 @@ class File(Model):
     #dir_filesize = BigIntegerField(default=0) # Size of dir
 
     def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_ContentUnit_id_to_start = True):
-        from resources.Globals import storage
+        from app.App import storage
         
         TMP_DIR = self.temp_dir
         if TMP_DIR == None:
@@ -71,7 +71,7 @@ class File(Model):
             Path(TMP_DIR).rename(FULL_HASH_DIRECTORY)
 
     def saveToDir(self, save_dir, prefix = ""):
-        from resources.Globals import storage
+        from app.App import storage
 
         CURRENT_FILE_PATH = Path(self.getDirPath())
         OUTPUT_FILE_PATH = save_dir
@@ -194,7 +194,7 @@ class File(Model):
         return __file
 
     def fillMeta(self):
-        from resources.Globals import ActsRepository
+        from repositories.ActsRepository import ActsRepository
 
         metadata_act = (ActsRepository().getByName("Metadata.ExtractMetadata"))()
         ext_metadata_act = (ActsRepository().getByName("Metadata.AdditionalMetadata"))()

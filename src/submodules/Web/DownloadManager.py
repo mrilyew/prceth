@@ -1,4 +1,8 @@
-from resources.Globals import asyncio, aiohttp, os, time, logger, Path, consts, config
+from app.App import logger
+from pathlib import Path
+from resources.Consts import consts
+from app.App import config
+import asyncio, aiohttp, os, time
 
 class DownloadManager():
     def __init__(self, max_concurrent_downloads=3, speed_limit_kbps=config.get("web.max_speed")):

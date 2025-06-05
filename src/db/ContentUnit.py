@@ -29,7 +29,8 @@ class ContentUnit(Model):
 
     # Data
     internal_content = TextField(null=True,default=None) # JSON data
-    extractor_name = TextField(null=True,default='base') # Extractor that was used for ContentUnit
+    representation = TextField(null=True,default='base')
+    extractor_name = TextField(null=True,default=None) # Extractor that was used for creation
     preview = TextField(null=True) # Preview in json format
 
     # Meta

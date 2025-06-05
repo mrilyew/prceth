@@ -1,5 +1,6 @@
 from executables.extractors.Base.BaseCollectionable import BaseCollectionable
-from resources.Globals import asyncio, logger
+from app.App import logger
+import asyncio
 
 # ЖИРИНОВСКИЙ СЧИТАЕТ, 1234
 class IterableBase(BaseCollectionable):

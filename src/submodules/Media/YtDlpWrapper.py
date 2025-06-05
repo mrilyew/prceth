@@ -1,4 +1,4 @@
-from resources.Globals import logger, config
+from app.App import logger, config
 import yt_dlp
 
 class YtDlpWrapper:

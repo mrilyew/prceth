@@ -1,5 +1,13 @@
-from resources.Globals import os, logger, asyncio, consts, config, Path, utils, file_manager, json, often_params, ActsRepository, ExtractorsRepository
 from executables.services.Base.Base import BaseService
+from utils.MainUtils import parse_json
+from pathlib import Path
+from app.App import logger
+from resources.Consts import consts
+from submodules.Files import FileManager
+from repositories.ActsRepository import ActsRepository
+from repositories.ExtractorsRepository import ExtractorsRepository
+from app.App import config
+import os, json, asyncio
 
 class RegularExecution(BaseService):
     name = 'RegularExecution'
@@ -17,7 +25,7 @@ class RegularExecution(BaseService):
         assert executable_type != None, "executable_type is not passed in \"data\""
 
         executable_name = self.config.get("executable_name")
-        pass_args = utils.parse_json(self.config.get("pass_args", "{}"))
+        pass_args = parse_json(self.config.get("pass_args", "{}"))
 
         executable = None
         match(executable_type):

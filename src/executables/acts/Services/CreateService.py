@@ -1,6 +1,9 @@
-from resources.Globals import ServicesRepository, logger, asyncio, consts, config, Path, utils, file_manager, json
 from executables.acts.Base.Base import BaseAct
+from repositories.ServicesRepository import ServicesRepository
+from app.App import logger
 from db.Service import Service
+from resources.Consts import consts
+import asyncio, json
 
 class CreateService(BaseAct):
     name = 'CreateService'

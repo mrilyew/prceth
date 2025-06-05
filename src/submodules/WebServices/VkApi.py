@@ -1,4 +1,6 @@
-from resources.Globals import consts, logger, aiohttp, asyncio
+from resources.Consts import consts
+from app.App import logger
+import aiohttp, asyncio
 
 class VkApiException(Exception):
     def __init__(self, message):

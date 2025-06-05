@@ -1,5 +1,7 @@
-from resources.Globals import utils, asyncio, logger, time
+from utils.MainUtils import dump_json
+from app.App import logger
 from executables.Executable import Executable
+import asyncio, time
 
 class BaseService(Executable):
     name = 'base'
