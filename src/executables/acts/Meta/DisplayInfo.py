@@ -1,18 +1,13 @@
 from executables.acts.Base.Base import BaseAct
+from resources.Descriptions import descriptions
 from app.App import app, db_connection
 
 class DisplayInfo(BaseAct):
     name = 'DisplayInfo'
     category = 'Meta'
     docs = {
-        "name": {
-            "ru": "Показ информации",
-            "en": "Display information"
-        },
-        "definition": {
-            "ru": "Показывает информацию из конфига и констант",
-            "en": "Shows info from config and consts"
-        }
+        "name": descriptions.get('__info_showing'),
+        "definition": descriptions.get('__shows_info_from_config_and_consts'),
     }
 
     async def execute(self, args = {}):
