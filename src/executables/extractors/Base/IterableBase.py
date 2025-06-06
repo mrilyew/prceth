@@ -35,19 +35,19 @@ class IterableBase(BaseCollectionable):
 
     def _collection(self):
         return {
-            "suggested_name": f"Iterable {self.passed_params.get("start")}-{self.passed_params.get("end")}",
+            "suggested_name": f"Iterable {args.get("start")}-{args.get("end")}",
         }
 
     async def run(self, args):
         self.ContentUnit_list = []
 
-        for i in range(self.passed_params.get("start"), self.passed_params.get("end")):
+        for i in range(args.get("start"), args.get("end")):
             try:
                 await self._iterableAction(i)
             except Exception as ____e:
                 logger.logException(____e, "IterableBase", silent=False)
 
-            await asyncio.sleep(self.passed_params.get("timeout"))
+            await asyncio.sleep(args.get("timeout"))
 
         return {
             "entities": self.ContentUnit_list,

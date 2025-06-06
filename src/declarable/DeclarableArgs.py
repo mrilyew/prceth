@@ -25,13 +25,13 @@ class DeclarableArgs():
 
         is_free_settings: Values from passed args will be set
         '''
-        self.params = comparing_options
+        self.comparing = comparing_options
         self.args = passed_options
         self.exc_type = exc_type
         self.is_free_settings = is_free_settings
 
     def recieveObjectByName(self, param_name: str):
-        param_object = self.params.get(param_name)
+        param_object = self.comparing.get(param_name)
 
         return param_object
 
@@ -92,7 +92,7 @@ class DeclarableArgs():
 
             if __assertion.get("assert_link") != None:
                 new_param_name = __assertion.get("assert_link")
-                new_param_object = self.params.get(new_param_name)
+                new_param_object = self.comparing.get(new_param_name)
 
                 assert __value != None or self.args.get(new_param_name, new_param_object.get("default")) != None, f"{new_param_name} or {param_name} not passed"
 
@@ -103,7 +103,7 @@ class DeclarableArgs():
             for index, param_name in enumerate(self.args):
                 __dict[param_name] = self.args.get(param_name)
         else:
-            for index, param_name in enumerate(self.params):
+            for index, param_name in enumerate(self.comparing):
                 param_object = self.recieveObjectByName(param_name)
 
                 try:

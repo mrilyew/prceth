@@ -6,15 +6,13 @@ class MethodsList(BaseAct):
     name = 'MethodsList'
     category = 'Representations'
     docs = {
-        "description": {
-            "name": {
-                "ru": ":)",
-                "en": ":)"
-            },
-            "definition": {
-                "ru": ":)",
-                "en": ":)"
-            }
+        "name": {
+            "ru": ":)",
+            "en": ":)"
+        },
+        "definition": {
+            "ru": ":)",
+            "en": ":)"
         }
     }
 
@@ -33,8 +31,8 @@ class MethodsList(BaseAct):
 
         return params
 
-    async def execute(self, args={}):
-        __repr = RepresentationsRepository().getByName(self.passed_params.get('representation'))
+    async def execute(self, args = {}):
+        __repr = RepresentationsRepository().getByName(args.get('representation'))
 
         return {
             "methods": __repr.rawListMethods()

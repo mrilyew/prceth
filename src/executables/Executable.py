@@ -2,14 +2,11 @@ from submodules.Files.FileManager import file_manager
 from resources.Consts import consts
 from app.App import config, storage, logger
 from utils.MainUtils import get_ext, dump_json
-from resources.Exceptions import ExecutableArgumentsException
 from db.ContentUnit import ContentUnit
-from declarable.DeclarableArgs import DeclarableArgs
+from declarable.ArgsValidator import ArgsValidator
 from executables.Runnable import Runnable
 
 class Executable(Runnable):
-    params = {}
-    passed_params = {}
     after_save_actions = {}
     temp_dirs = []
     entities_buffer = []
@@ -20,7 +17,7 @@ class Executable(Runnable):
         "afterSave": [],
         "error": [],
     }
-    main_args = {}
+    declaration_cfg = {}
 
     def __init__(self):
         def __onerror(exception):
@@ -48,15 +45,17 @@ class Executable(Runnable):
 
     async def execute(self, args):
         pass
-    
-    async def safeExecute(self, args):
+
+    async def safeExecute(self, args: dict)->dict:
         res = None
 
         try:
-            res = await self.execute(args=args)
+            __validated_args = ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)
+
+            res = await self.execute(args=__validated_args)
         except Exception as x:
             logger.logException(x, section="Executables")
-            self.onFail()
+            self.onError(x)
 
             raise x
 
@@ -75,104 +74,6 @@ class Executable(Runnable):
     async def onSuccess(self):
         for __closure in self.events.get("success"):
             await __closure()
-
-    # Comparisons
-
-    @classmethod
-    def isAbstract(cls):
-        return cls.category.lower() in ["template", "base"]
-
-    @classmethod
-    def isHidden(cls):
-        return getattr(cls, "hidden", False) == True
-
-    @classmethod
-    def canBeExecuted(cls):
-        '''
-        Is this Executable can be runned or it's technical
-        '''
-        return cls.isAbstract() == False and cls.isHidden() == False
-
-    # Arguments
-
-    def declare():
-        '''
-        Method that defines dictionary of current executable args
-        '''
-        params = {}
-
-        return params
-
-    def recursiveDeclare(self):
-        ignore_list = self.main_args.get('ignore', [])
-
-        if getattr(self, "already_declared", False) == True:
-            return None
-
-        for __sub_class in self.__class__.__mro__:
-            if hasattr(__sub_class, "declare") == False:
-                continue
-
-            final_params = {}
-            new_params = __sub_class.declare()
-            for i, name in enumerate(new_params):
-                if name in ignore_list:
-                    continue
-
-                final_params[name] = new_params.get(name)
-
-            self.params.update(final_params)
-
-        self.already_declared = True
-
-    def setArgs(self, args):
-        self.params = {}
-        #self.passed_params = {} # Resetting
-
-        # Catching params from parent executables
-        self.recursiveDeclare()
-
-        MAX_OUTPUT_CHECK_PARAMS = self.params
-        if MAX_OUTPUT_CHECK_PARAMS == None:
-            return
-
-        if getattr(self, "main_args") != None:
-            MAIN_ARG_TYPE = self.main_args.get("type")
-
-            if MAIN_ARG_TYPE == "and":
-                for _arg in self.main_args.get("list"):
-                    if _arg not in args:
-                        raise ExecutableArgumentsException(f"Argument \"{_arg}\" not passed")
-            elif MAIN_ARG_TYPE == "or" or MAIN_ARG_TYPE == "strict_or":
-                passed_list_need = 0
-                for _arg in self.main_args.get("list", []):
-                    if _arg in args:
-                        passed_list_need += 1
-
-                if passed_list_need == 0:
-                    raise ExecutableArgumentsException(f"Need at least 1 required argument")
-
-                if MAIN_ARG_TYPE == "strict_or" and passed_list_need > 1:
-                    raise ExecutableArgumentsException(f"Pass only 1 required argument (cuz \"strict_or\")")
-
-        decl = DeclarableArgs(MAX_OUTPUT_CHECK_PARAMS, args)
-
-        try:
-            self.passed_params.update(decl.dict())
-        except Exception as _j:
-            if len(MAX_OUTPUT_CHECK_PARAMS) < 2:
-                if consts.get("context") == "cli":
-                    print("Usage:\n")
-
-                    print(self.getUsageString(), end="")
-                    exit()
-                else:
-                    raise _j
-            else:
-                raise _j
-
-        if self.manual_params == True:
-            self.passed_params.update(args)
 
     # Factory
 

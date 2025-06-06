@@ -20,7 +20,7 @@ class BaseService(Executable):
         logger.log(message=f"Making run №{self.i + 1}",name="message",section="Services")
 
         try:
-            res = await self.execute(self.passed_params)
+            res = await self.execute(args)
             print(utils.dump_json(res,indent=4))
         except Exception as e:
             logger.logException(input_exception=e,section="Services",silent=False)

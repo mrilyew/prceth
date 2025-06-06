@@ -34,7 +34,7 @@ class Extract(BaseAct):
         return params
 
     async def execute(self, args={}):
-        __repr = RepresentationsRepository().getByName(self.passed_params.get('representation'))
+        __repr = RepresentationsRepository().getByName(args.get('representation'))
 
         return {
             "res": 1

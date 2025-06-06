@@ -11,7 +11,6 @@ async def ___runAct():
     assert act_class != None, "act not found"
 
     act = act_class()
-    act.setArgs(app.argv)
 
     act_response = await act.safeExecute(args=app.argv)
 
