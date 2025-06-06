@@ -5,6 +5,7 @@ from resources.Consts import consts
 from utils.MainUtils import dump_json, parse_json, replace_link_gaps, get_random_hash, clear_json, json_values_to_string, parse_db_entities
 from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
 from db.StorageUnit import StorageUnit
+from db.ContentUnitRelation import ContentUnitRelation
 from db.BaseModel import BaseModel
 from functools import reduce
 from app.App import logger
@@ -50,7 +51,6 @@ class ContentUnit(BaseModel):
 
     # Files
     su_id = IntegerField(null=True) # File id
-    links = TextField(null=True) # Files list
 
     # Visibility
     unlisted = BooleanField(index=True,default=0)
@@ -60,6 +60,8 @@ class ContentUnit(BaseModel):
     __cachedLinks = {}
     __cached_su = {}
     __cached_content = None
+
+    # Properties
 
     @property
     def json_content(self):
@@ -83,33 +85,31 @@ class ContentUnit(BaseModel):
         
         return _fl
 
-    def delete(self):
-        # TODO additional options
-        super().delete()
+    @property
+    def linked_units(self):
+        if self.__cachedLinks != None:
+            return self.__cachedLinks
+
+        ids = []
+        for unit in self._linksSelection():
+            ids.append(unit.child)
+
+        _out = ContentUnitRelation.get(ids)
+        self.__cachedLinks = _out
+
+        return _out
+
+    # Recievation
 
     def formatted_data(self, recursive = False, recurse_level = 0):
         loaded_content = self.json_content
 
         if recursive == True and recurse_level < 3:
             loaded_content = replace_link_gaps(input_data=loaded_content,
-                                               link_to_linked_files=self.linked_entities,
+                                               link_to_linked_files=self.linked_units,
                                                recurse_level=recurse_level)
 
         return loaded_content
-
-    @property
-    def linked_entities(self):
-        if self.__cachedLinks != None:
-            return self.__cachedLinks
-
-        if self.links == None:
-            return []
-
-        _out = parse_db_entities(self.links)
-
-        self.__cachedLinks = _out
-
-        return _out
 
     def api_structure(self, sensitive=False):
         tags = ",".split(self.tags)
@@ -152,6 +152,8 @@ class ContentUnit(BaseModel):
 
         return fnl
 
+    # Factory
+
     @staticmethod
     def fromJson(json_input):
         out = ContentUnit()
@@ -174,16 +176,16 @@ class ContentUnit(BaseModel):
             out.unlisted = 1
 
         if json_input.get("links") != None:
-            __out = []
+            __links = []
             for item in json_input.get("links"):
                 if item == None:
                     continue
 
-                __out.append(f"{item.self_name}_{item.id}")
+                __links.append(item)
+                out.addLink(item)
 
-            if len(__out) > 0:
-                out.links = ",".join(__out)
-                out.__cachedLinks = json_input.get("linked_files")
+            if len(__links) > 0:
+                out.__cachedLinks = __links
 
         out.extractor = json_input.get("extractor")
         out.representation = json_input.get("representation")
@@ -212,3 +214,37 @@ class ContentUnit(BaseModel):
             out.save()
 
         return out
+
+    # Links
+
+    def addLink(self, cu):
+        _link = ContentUnitRelation()
+        _link.parent = self.id
+        _link.child = cu.id
+
+        _link.save()
+
+    def removeLink(self, cu):
+        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == cu.id)
+
+        _link.delete()
+
+    def _linksSelection(self):
+        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id)
+
+        return _links
+
+    def bifurcation(self, level=0, maximum=3):
+        connections = {}
+
+        __links = self.linked_units
+        for link in __links:
+            connections[level] = link.bifurcation(level+1, maximum)
+
+        return connections
+
+    # Actions
+
+    def delete(self):
+        # TODO additional options
+        super().delete()
