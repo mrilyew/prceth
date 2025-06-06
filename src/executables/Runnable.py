@@ -69,3 +69,14 @@ class Runnable:
 
     def validate(self, args: dict)->dict:
         return ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)
+
+    def self_insert(self, json_data: dict)->dict:
+        '''
+        You can append 'extractor' or 'representation' key there
+        '''
+
+        return json_data
+
+    @property
+    def full_name(self):
+        return self.category + '.' + self.__class__.__name__

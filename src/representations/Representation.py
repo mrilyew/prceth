@@ -15,16 +15,18 @@ class Representation(Runnable):
         if __wheel_method == None:
             raise SuitableExtractMethodNotFound('Not found suitable extractor for current args')
 
-        return await __wheel_method()
+        __res = await __wheel_method(i)
+
+        return __res
 
     def extractWheel(self):
         raise AbstractClassException("This is abstract representation")
 
     async def safeExtract(self, i: dict = {})->dict:
-        res = None
         __args = self.validate(i)
+        __res = await self.extract(i=__args)
 
-        return await self.extract(i=__args)
+        return __res
 
     @classmethod
     def rawListMethods(cls):
@@ -37,3 +39,8 @@ class Representation(Runnable):
                 __out.append(__method)
 
         return __out
+
+    def self_insert(self, json_data: dict):
+        json_data['representation'] = self.full_name
+
+        return json_data

@@ -25,9 +25,7 @@ class Executable(Runnable):
         pass
 
     async def safeExecute(self, args: dict)->dict:
-        res = await self.execute(self.validate(args))
-
-        return res
+        return await self.execute(self.validate(args))
 
     # Events
 
@@ -95,6 +93,11 @@ class Executable(Runnable):
         rt["meta"] = self.manual()
 
         return rt
+
+    def self_insert(self, json_data: dict):
+        json_data['extractor'] = self.full_name
+
+        return json_data
 
     async def _execute_sub(self, extractor, extractor_params, array_link):
         try:

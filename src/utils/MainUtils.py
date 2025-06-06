@@ -61,19 +61,13 @@ def parse_json(text):
     '''
     Parses JSON from text
     '''
-    try:
-        return json.loads(text)
-    except:
-        return {}
+    return json.loads(text)
     
 def dump_json(obj, indent=None):
     '''
     Serializes JSON object to text
     '''
-    try:
-        return json.dumps(obj,ensure_ascii=False,indent=indent)
-    except:
-        return {}
+    return json.dumps(obj,ensure_ascii=False,indent=indent)
 
 def remove_protocol(link):
     '''

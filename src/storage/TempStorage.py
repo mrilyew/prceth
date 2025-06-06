@@ -11,3 +11,6 @@ class TempStorage(StorageItem):
         rand_path.mkdir(exist_ok=True)
 
         return rand_path
+
+    def subDir(self, dir: str):
+        return TempStorage(self.root, "/".join([str(self.dir), dir]))

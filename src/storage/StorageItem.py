@@ -14,14 +14,17 @@ class StorageItem:
     def subDir(self, dir: str):
         return StorageItem(self.root, "/".join([str(self.dir), dir]))
 
-    def allocateHash(self, hash, only_return = False):
-        __main_hash_path = os.path.join(self.storage_dir, "files", hash[0:2])
+    def allocateHash(self, hash, only_return = True):
+        __main_hash_path = os.path.join(self.dir, hash[0:2])
         os.makedirs(__main_hash_path, exist_ok=True)
 
         __hash_path = os.path.join(__main_hash_path, hash)
+        if only_return == True:
+            return Path(__hash_path)
+
         os.makedirs(__hash_path, exist_ok=True)
 
-        return __hash_path
+        return Path(__hash_path)
 
     def path(self):
         return self.dir

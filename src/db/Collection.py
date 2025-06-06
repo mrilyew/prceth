@@ -1,11 +1,11 @@
-from peewee import Model, TextField, IntegerField, AutoField, BooleanField, TimestampField, DeferredForeignKey, JOIN
+from peewee import fn, TextField, IntegerField, AutoField, BooleanField, TimestampField, DeferredForeignKey, JOIN
 import time, operator, json, os
 from resources.Consts import consts
 from playhouse.shortcuts import model_to_dict
 from functools import reduce
-from peewee import fn
+from db.BaseModel import BaseModel
 
-class Collection(Model):
+class Collection(BaseModel):
     '''
     Model that represents collection of other entities. Refers to "Relation"
     '''

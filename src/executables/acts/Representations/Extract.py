@@ -37,9 +37,16 @@ class Extract(BaseAct):
         return params
 
     async def execute(self, i = {}):
-        __repr = RepresentationsRepository().getByName(i.get('representation'))
-        await __repr().safeExtract(i)
+        representationClass = RepresentationsRepository().getByName(i.get('representation'))
+        __ents = await representationClass().safeExtract(i)
+        __all_items = []
+
+        for item in __ents:
+            item.save()
+
+            __item = item.api_structure()
+            __all_items.append(__item)
 
         return {
-            "res": 1
+            "entities": __all_items
         }
