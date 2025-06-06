@@ -1,7 +1,8 @@
 from resources.Exceptions import AbstractClassException
+from executables.Runnable import Runnable
 
-class Representation:
-    common_category = "none"
+class Representation(Runnable):
+    category = "base"
 
     def extract(self, i = {}):
         __wheel = self.extractWheel()
@@ -22,11 +23,3 @@ class Representation:
                 __out.append(__method)
 
         return __out
-    
-    @classmethod
-    def isAbstract(cls):
-        return cls.common_category.lower() in ["none", "base"]
-
-    @classmethod
-    def canBeExecuted(cls):
-        return cls.isAbstract() == False

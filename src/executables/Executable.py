@@ -5,27 +5,16 @@ from utils.MainUtils import get_ext, dump_json
 from resources.Exceptions import ExecutableArgumentsException
 from db.ContentUnit import ContentUnit
 from declarable.DeclarableArgs import DeclarableArgs
+from executables.Runnable import Runnable
 
-class Executable:
-    name = 'base'
-    category = 'base'
-    passed_params = {}
+class Executable(Runnable):
     params = {}
+    passed_params = {}
     after_save_actions = {}
     temp_dirs = []
     entities_buffer = []
     manual_params = False
     already_declared = False
-    docs = {
-        "description": {
-            "name": {
-                "en": "No name passed"
-            },
-            "definition": {
-                "en": "No description passed"
-            }
-        }
-    }
     events = {
         "success": [],
         "afterSave": [],

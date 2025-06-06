@@ -4,7 +4,7 @@ from submodules.Files.FileManager import file_manager
 from app.App import logger
 from resources.Consts import consts
 from peewee import Model, TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
-from db.File import File
+from db.StorageUnit import StorageUnit
 from functools import reduce
 
 class ContentUnit(Model):

@@ -34,10 +34,10 @@ class DbConnection:
         from db.ContentUnit import ContentUnit
         from db.Relation import Relation
         from db.Stat import Stat
-        from db.File import File
+        from db.StorageUnit import StorageUnit
         from db.Service import Service
 
-        tables_list = [Collection, ContentUnit, Relation, File]
+        tables_list = [Collection, ContentUnit, Relation, StorageUnit]
         tables_list_app = [Stat, Service]
 
         # Appending content db

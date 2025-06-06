@@ -1,7 +1,7 @@
 from representations.Representation import Representation
 
 class File(Representation):
-    common_category = "fs"
+    category = "Data"
 
     def extractWheel(self, i = {}):
         if 'path' in i:

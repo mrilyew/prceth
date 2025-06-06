@@ -5,9 +5,7 @@ from pathlib import Path
 from peewee import Model, TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
 from shutil import ignore_patterns
 
-# File is not a file, its a directory with main file and secondary files.
-# So the dir and main file names as hash
-class File(Model):
+class StorageUnit(Model):
     self_name = 'file'
     temp_dir = ''
 

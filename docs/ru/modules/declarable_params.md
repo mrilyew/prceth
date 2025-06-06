@@ -49,6 +49,6 @@
 
 <br>
 
-#### Зарезервированные названия
+#### Имена, которые лучше не использовать
 
 `i`, `display_name`, `description`, `unlisted`, `make_preview`

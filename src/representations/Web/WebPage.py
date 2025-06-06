@@ -1,7 +1,7 @@
 from representations.Representation import Representation
 
 class WebPage(Representation):
-    common_category = "data"
+    category = "Web"
 
     def extractByHtml(self, i = {}):
         xml_text = i.get('html')

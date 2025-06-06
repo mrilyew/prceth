@@ -1,7 +1,7 @@
 from representations.Representation import Representation
 
 class Json(Representation):
-    common_category = "data"
+    category = "Data"
 
     def extractByText(self, i = {}):
         json_text = i.get('text')
