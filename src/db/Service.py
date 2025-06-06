@@ -27,7 +27,7 @@ class Service(Model):
 
         return parse_json(__data) 
 
-    def getApiStructure(self):
+    def api_structure(self):
         obj = {}
 
         obj["id"] = self.id

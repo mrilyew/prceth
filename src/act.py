@@ -12,7 +12,7 @@ async def ___runAct():
 
     act = act_class()
 
-    act_response = await act.safeExecute(args=app.argv)
+    act_response = await act.safeExecute(app.argv)
 
     print(dump_json(act_response, indent=4))
 

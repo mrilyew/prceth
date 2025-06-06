@@ -11,6 +11,9 @@ class Collection(Model):
     '''
     self_name = 'collection'
 
+    class Meta:
+        table_name = 'collections'
+
     id = AutoField() # Auto increment id.
     name = TextField(index=True,default='...') # Name of collection.
     description = TextField(index=True,null=True) # Alt.
@@ -52,7 +55,7 @@ class Collection(Model):
         except:
             return None
     
-    def getApiStructure(self):
+    def api_structure(self):
         obj = {
             "id": self.id,
             "name": self.name,
@@ -241,5 +244,5 @@ class Collection(Model):
     
     def saveInfoToJson(self, dir):
         stream = open(os.path.join(dir, f"collection_{self.id}.json"), "w")
-        stream.write(json.dumps(self.getApiStructure(), indent=2))
+        stream.write(json.dumps(self.api_structure(), indent=2))
         stream.close()

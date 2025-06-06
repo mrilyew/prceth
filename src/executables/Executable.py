@@ -3,40 +3,18 @@ from resources.Consts import consts
 from app.App import config, storage, logger
 from utils.MainUtils import get_ext, dump_json
 from db.ContentUnit import ContentUnit
-from declarable.ArgsValidator import ArgsValidator
 from executables.Runnable import Runnable
 
 class Executable(Runnable):
-    after_save_actions = {}
-    temp_dirs = []
-    entities_buffer = []
-    manual_params = False
-    already_declared = False
     events = {
         "success": [],
         "afterSave": [],
         "error": [],
     }
-    declaration_cfg = {}
 
     def __init__(self):
         def __onerror(exception):
             logger.logException(exception, section="Executables")
-
-        def __onsuccess():
-            try:
-                ___ln = len(self.entities_buffer)
-                __msg = f"Saving total {str(___ln)} entities;"
-                if ___ln > 100:
-                    __msg += " do not turn off your computer."
-
-                logger.log(__msg,section="ContentUnitSaveMechanism",name="success")
-            except Exception as _x:
-                print("PostRun:" + str(_x))
-                pass
-
-            for unsaved_ContentUnit in self.entities_buffer:
-                self._ContentUnitPostRun(unsaved_ContentUnit)
 
         self.events.get("error").append(__onerror)
         #self.events.get("success").append(__onsuccess)
@@ -47,17 +25,7 @@ class Executable(Runnable):
         pass
 
     async def safeExecute(self, args: dict)->dict:
-        res = None
-
-        try:
-            __validated_args = ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)
-
-            res = await self.execute(args=__validated_args)
-        except Exception as x:
-            logger.logException(x, section="Executables")
-            self.onError(x)
-
-            raise x
+        res = await self.execute(self.validate(args))
 
         return res
 
@@ -106,20 +74,6 @@ class Executable(Runnable):
 
     # Documentation
 
-    def getUsageString(self):
-        _p = ""
-        for id, param in enumerate(getattr(self, "params", {})):
-            __lang = config.get("ui.lang")
-            __param = getattr(self, "params", {}).get(param)
-            __docs = __param.get("docs")
-            if __docs != None:
-                __definition = __docs.get("definition")
-                __values = __docs.get("values")
-
-                _p += (f"{param}: {__definition.get(__lang, __definition.get("en"))}\n")
-
-        return _p
-
     def manual(self):
         manual = {}
         __docs = getattr(self, "docs")
@@ -150,4 +104,3 @@ class Executable(Runnable):
                 array_link.append(___item)
         except Exception as ___e:
             logger.logException(input_exception=___e,section="Extractor",silent=False)
-            pass

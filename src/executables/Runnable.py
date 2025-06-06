@@ -1,3 +1,5 @@
+from declarable.ArgsValidator import ArgsValidator
+
 class Runnable:
     name = 'base'
     category = 'base'
@@ -10,8 +12,12 @@ class Runnable:
             "en": "Abstract description"
         }
     }
+    declaration_cfg =  {}
 
     # Arguments
+
+    def defineConsts(self):
+        pass
 
     def declare():
         '''
@@ -60,3 +66,6 @@ class Runnable:
         Is this Executable can be runned or it's technical
         '''
         return cls.isAbstract() == False and cls.isHidden() == False
+
+    def validate(self, args: dict)->dict:
+        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)

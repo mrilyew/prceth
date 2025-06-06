@@ -1,35 +1,29 @@
 class WebServiceApiException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class NotFoundException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class InvalidPassedParam(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class NotPassedException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class NotInstalledException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class AccessDeniedException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class LibNotInstalledException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class DeclaredArgumentsException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
 
 class AbstractClassException(Exception):
-    def __init__(self, message):
-        super().__init__(message)
+    pass
+
+class SuitableExtractMethodNotFound(Exception):
+    pass

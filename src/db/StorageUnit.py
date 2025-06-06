@@ -1,22 +1,33 @@
-import os, shutil, json
+import os, json
 from resources.Consts import consts
 from app.App import logger
 from pathlib import Path
 from peewee import Model, TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
-from shutil import ignore_patterns
+from utils.MainUtils import valid_name, extract_metadata_to_dict
+import shutil
 
 class StorageUnit(Model):
     self_name = 'file'
     temp_dir = ''
 
-    id = AutoField() # ABSOLUTE ID
-    hash = TextField(null=True) # ContentUnit hash
+    class Meta:
+        table_name = 'storage_units'
+
+    # Identification
+    id = AutoField()
+    hash = TextField(null=True)
+    link = TextField(null=True,default=None)
+
+    # Meta
     upload_name = TextField(index=True,default='N/A') # Upload name (with extension)
     extension = TextField(null=True,default="json") # File extension
-    filesize = BigIntegerField(default=0) # Size of file
+
+    # Sizes
+    filesize = BigIntegerField(default=0) # Size of main file
+    dir_filesize = BigIntegerField(default=0) # Size of dir
+
+    # Metadata
     metadata = TextField(null=True,default=None)
-    link = TextField(null=True,default=None)
-    #dir_filesize = BigIntegerField(default=0) # Size of dir
 
     def moveTempDir(self, use_upload_name = False, preset_dir = None, move_type = -1, append_ContentUnit_id_to_start = True):
         from app.App import storage
@@ -54,7 +65,7 @@ class StorageUnit(Model):
                         if append_ContentUnit_id_to_start == True:
                             new_name_unsafe = str(self.id) + "_" + new_name_unsafe
                         
-                        new_name = utils.valid_name(new_name_unsafe)
+                        new_name = valid_name(new_name_unsafe)
                         file_path = os.path.join(TMP_DIR, __list[0])
 
                         if os.path.isfile(file_path):
@@ -88,11 +99,7 @@ class StorageUnit(Model):
         except Exception as __e__:
             logger.logException(__e__, "File")
 
-    # why two separate methods? idk
-    def getApiStructure(self):
-        return self.getFormattedInfo()
-
-    def getFormattedInfo(self):
+    def api_structure(self):
         _ = {
             "extension": self.extension,
             "id": self.id,
@@ -124,7 +131,7 @@ class StorageUnit(Model):
             except Exception as __egetexeption:
                 return []
 
-    def getPath(self):
+    def path(self):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
         if getattr(self, "link") != None:
@@ -139,12 +146,12 @@ class StorageUnit(Model):
 
         return ContentUnit_PATH
 
-    def getFsFileName(self):
+    def hash_filename(self):
         HASH = self.hash
 
         return f"{HASH}.{str(self.extension)}"
 
-    def getUpperHashDirPath(self):
+    def upper_hash_dir(self):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
 
@@ -153,7 +160,7 @@ class StorageUnit(Model):
 
         return COLLECTION_PATH
 
-    def getDirPath(self, need_check = False):
+    def dir_path(self, need_check = False):
         STORAGE_PATH = consts["storage"]
         HASH = self.hash
 
@@ -165,32 +172,6 @@ class StorageUnit(Model):
 
         return COLLECTION_PATH
 
-    @staticmethod
-    def fromJson(json_input, temp_dir = None):
-        __file = File()
-        __file.extension = json_input.get("extension")
-
-        if json_input.get("hash") == None:
-            __file.hash = utils.get_random_hash(32)
-        else:
-            __file.hash = json_input.get("hash")
-
-        __file.upload_name = json_input.get("upload_name")
-        __file.filesize = json_input.get("filesize")
-        if temp_dir != None or json_input.get("temp_dir") != None:
-            __file.temp_dir = temp_dir
-        
-        if json_input.get("link") != None:
-            __file.link = json_input.get("link")
-        
-        # TODO handle async
-        if json_input.get("take_metadata", False) == True:
-            __file.fillMeta()
-
-        __file.save()
-
-        return __file
-
     def fillMeta(self):
         from repositories.ActsRepository import ActsRepository
 
@@ -201,7 +182,7 @@ class StorageUnit(Model):
         metadata_arr = metadata_act.execute(i=self)
         ext_metadata_arr = ext_metadata_act.execute(i=self)
 
-        main_metadata = utils.extract_metadata_to_dict(metadata_arr)
+        main_metadata = extract_metadata_to_dict(metadata_arr)
         main_metadata.update(ext_metadata_arr)
 
         self.metadata = json.dumps(main_metadata)

@@ -99,24 +99,38 @@ def proc_strtr(text: str, length: int = 0, multipoint: bool = True):
     
     return newString + ("..." if text != newString else "")
 
-def parse_ContentUnit(input_string: str, allowed_entities = ["ContentUnit", "collection"]):
+def parse_db_entities(i, allowed_entities = ['cu', 'su', 'collection']):
     '''
     Recieves entities and collections by string.
     '''
     from db.ContentUnit import ContentUnit
+    from db.StorageUnit import StorageUnit
     from db.Collection import Collection
 
-    elements = input_string.split('ContentUnit')
-    if len(elements) > 1 and elements[0] == "":
-        if "ContentUnit" in allowed_entities:
-            ContentUnit_id = elements[1]
-            return ContentUnit.get(ContentUnit_id)
-    elif 'collection' in input_string:
-        if "collection" in allowed_entities:
-            collection_id = input_string.split('collection')[1]
-            return Collection.get(collection_id)
+    out = []
+    els = [] # сразу не понял
+    if type(i) == str:
+        els = i.split(',')
     else:
-        return None
+        els = i
+
+    for el in els:
+        interm_out = None
+        el_type, el_id = el.split('_')
+        if el_type not in allowed_entities:
+            continue
+
+        match(el_type):
+            case 'cu' | 'contentunit' | 'conuni':
+                interm_out = ContentUnit.get(el_id)
+            case 'su' | 'storageunit' | 'stouni':
+                interm_out = StorageUnit.get(el_id)
+            case 'collection':
+                interm_out = Collection.get(el_id)
+
+        out.append(interm_out)
+
+    return out
 
 def extract_metadata_to_dict(mtdd):
     metadata_dict = defaultdict(list)
@@ -129,7 +143,7 @@ def extract_metadata_to_dict(mtdd):
 
     return dict(metadata_dict)
 
-def json_values_to_string(data):
+def json_values_to_string(data, separator = ''):
     result = []
 
     if isinstance(data, dict):
@@ -142,11 +156,8 @@ def json_values_to_string(data):
 
     else:
         return str(data)
-    
-    if True:
-        return ''.join(filter(None, result))
-    
-    return ' '.join(filter(None, result))
+
+    return separator.join(filter(None, result))
 
 def get_mime_type(filename: str):
     mime_type, _ = mimetypes.guess_type(filename)
@@ -219,11 +230,11 @@ def valid_name(text):
 
     return safe_filename
 
-def replace_strings_in_dicts(input_data, link_to_linked_files, recurse_level = 0):
+def replace_link_gaps(input_data, link_to_linked_files, recurse_level = 0):
     if isinstance(input_data, dict):
-        return {key: replace_strings_in_dicts(value, link_to_linked_files) for key, value in input_data.items()}
+        return {key: replace_link_gaps(value, link_to_linked_files) for key, value in input_data.items()}
     elif isinstance(input_data, list):
-        return [replace_strings_in_dicts(item, link_to_linked_files) for item in input_data]
+        return [replace_link_gaps(item, link_to_linked_files) for item in input_data]
     elif isinstance(input_data, str):
         try:
             if "__$|ContentUnit_" in input_data:

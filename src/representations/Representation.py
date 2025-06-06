@@ -1,16 +1,30 @@
 from resources.Exceptions import AbstractClassException
 from executables.Runnable import Runnable
+from resources.Exceptions import SuitableExtractMethodNotFound
+from app.App import logger
 
 class Representation(Runnable):
     category = "base"
 
-    def extract(self, i = {}):
-        __wheel = self.extractWheel()
-        
-        return getattr(self, __wheel)()
+    async def extract(self, i = {}):
+        __wheel = self.extractWheel(i)
+        if __wheel == None:
+            __wheel = ""
+
+        __wheel_method = getattr(self, __wheel, None)
+        if __wheel_method == None:
+            raise SuitableExtractMethodNotFound('Not found suitable extractor for current args')
+
+        return await __wheel_method()
 
     def extractWheel(self):
         raise AbstractClassException("This is abstract representation")
+
+    async def safeExtract(self, i: dict = {})->dict:
+        res = None
+        __args = self.validate(i)
+
+        return await self.extract(i=__args)
 
     @classmethod
     def rawListMethods(cls):

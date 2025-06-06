@@ -17,6 +17,9 @@ class Extract(BaseAct):
             }
         }
     }
+    declaration_cfg = {
+        'free_args': True
+    }
 
     def declare():
         params = {}
@@ -33,8 +36,9 @@ class Extract(BaseAct):
 
         return params
 
-    async def execute(self, args={}):
-        __repr = RepresentationsRepository().getByName(args.get('representation'))
+    async def execute(self, i = {}):
+        __repr = RepresentationsRepository().getByName(i.get('representation'))
+        await __repr().safeExtract(i)
 
         return {
             "res": 1

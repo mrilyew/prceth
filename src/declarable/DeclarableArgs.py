@@ -58,6 +58,8 @@ class DeclarableArgs():
                         __value = proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
                     else:
                         __value = str(__value)
+                        if __value == 'True': #быдлокод
+                            __value = None
                 case "csv":
                     if type(__value) != list:
                         __strs = __value.split(",")
@@ -107,7 +109,13 @@ class DeclarableArgs():
                 param_object = self.recieveObjectByName(param_name)
 
                 try:
-                    __dict[param_name] = self.recieveValue(param_name, param_object)
+                    __rec_value = self.recieveValue(param_name, param_object)
+                    __unexist = param_object.get('save_none_values', False)
+
+                    if __rec_value == None and __unexist == False:
+                        continue
+
+                    __dict[param_name] = __rec_value
                 except Exception as _y:
                     if self.exc_type == "assert":
                         raise _y
