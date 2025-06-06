@@ -257,3 +257,9 @@ def replace_cwd(input_string: str):
 
 def replace_src(input_string: str):
     return input_string.replace("\\src", "")
+
+def list_conversation(i_list):
+    if type(i_list) == dict:
+        return [i_list]
+    
+    return i_list

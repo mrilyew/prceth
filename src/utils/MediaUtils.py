@@ -1,4 +1,5 @@
 import shutil, platform
+from datetime import datetime
 
 def is_ffmpeg_installed():
     ffmpeg_exists = shutil.which("ffmpeg") is not None
@@ -47,3 +48,16 @@ def get_chrome_platform():
             system_arch = f"{system}{arch}"
     
     return system_arch
+
+def rss_date_parse(date_string: str):
+    formats = [
+        "%Y-%m-%dT%H:%M:%SZ",
+        "%a, %d %b %Y %H:%M:%S %z",
+        "%a, %d %b %Y %H:%M:%S GMT",
+    ]
+
+    for fmt in formats:
+        try:
+            return datetime.strptime(date_string, fmt)
+        except ValueError:
+            continue

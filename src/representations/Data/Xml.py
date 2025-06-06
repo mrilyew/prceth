@@ -26,10 +26,6 @@ class Xml(Representation):
         xml_text = i.get('text')
 
         out = self.new_cu({
-            "source": {
-                'type': 'api',
-                'content': 'xml',
-            },
             'content': xmltodict.parse(xml_text),
         })
 

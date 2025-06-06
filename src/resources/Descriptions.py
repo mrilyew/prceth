@@ -47,3 +47,7 @@ descriptions['__xml_already_parsed'] = {
     "ru": "Преобразованная в json строка xml",
     "en": "Json view of xml"
 }
+descriptions['__url_to_rss_feed'] = {
+    "ru": "URL на RSS-фид",
+    "en": "URL to RSS-feed",
+}

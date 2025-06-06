@@ -24,7 +24,7 @@ class Executable(Runnable):
     async def execute(self, args):
         pass
 
-    async def safeExecute(self, args: dict)->dict:
+    async def safeExecute(self, args: dict):
         return await self.execute(self.validate(args))
 
     # Events
@@ -40,35 +40,6 @@ class Executable(Runnable):
     async def onSuccess(self):
         for __closure in self.events.get("success"):
             await __closure()
-
-    # Factory
-
-    def fork(self, extractor_name_or_class, args = None):
-        '''
-        Creates new executable by passed name or class.
-
-        Params:
-
-        extractor_name_or_class — full name or class of executable instance
-
-        args — dict that will be passed to "setArgs"
-        '''
-        from repositories.ExtractorsRepository import ExtractorsRepository
-
-        _ext = None
-        if type(extractor_name_or_class) == str:
-            _ext = (ExtractorsRepository()).getByName(extractor_name_or_class)
-        else:
-            _ext = extractor_name_or_class
-
-        if _ext == None:
-            return None
-
-        ext = _ext()
-        if args != None:
-            ext.setArgs(args)
-
-        return ext
 
     # Documentation
 
@@ -98,12 +69,3 @@ class Executable(Runnable):
         json_data['extractor'] = self.full_name
 
         return json_data
-
-    async def _execute_sub(self, extractor, extractor_params, array_link):
-        try:
-            extractor.setArgs(extractor_params)
-            executed = await extractor.execute({})
-            for ___item in executed.get("entities"):
-                array_link.append(___item)
-        except Exception as ___e:
-            logger.logException(input_exception=___e,section="Extractor",silent=False)

@@ -1,8 +1,9 @@
-from app.Logger import logger
-from submodules.Files.FileManager import file_manager
 from executables.Executable import Executable
 
 class BaseExtractor(Executable):
+    collections_add_after = []
+    linked_dict = None
+
     def declare():
         params = {}
         params["display_name"] = {
@@ -23,6 +24,5 @@ class BaseExtractor(Executable):
 
         return params
 
-    @classmethod
-    def isCreatesCollection(cls):
-        return getattr(cls, "_collection", None) != None
+    def link(self, linked_dict: dict):
+        self.linked_dict = linked_dict

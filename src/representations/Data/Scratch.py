@@ -5,10 +5,6 @@ class Scratch(Representation):
 
     async def extractByDefault(self, i = {}):
         out = self.new_cu({
-            "source": {
-                'type': 'api',
-                'content': 'null',
-            },
             'content': {},
         })
 

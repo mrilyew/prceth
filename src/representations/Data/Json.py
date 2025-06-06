@@ -1,6 +1,6 @@
 from representations.Representation import Representation
 from resources.Descriptions import descriptions
-from utils.MainUtils import parse_json
+from utils.MainUtils import parse_json, list_conversation
 
 class Json(Representation):
     category = "Data"
@@ -27,26 +27,21 @@ class Json(Representation):
         __obj = parse_json(json_text)
 
         out = self.new_cu({
-            "source": {
-                'type': 'api',
-                'content': 'json',
-            },
             'content': __obj,
         })
 
         return [out]
 
     async def extractByObject(self, i = {}):
-        json_object = i.get('object')
-        out = self.new_cu({
-            "source": {
-                'type': 'api',
-                'content': 'json',
-            },
-            'content': json_object,
-        })
+        json_object = list_conversation(i.get('object'))
+        out = []
+        
+        for i in json_object:
+            out.append(self.new_cu({
+                'content': i,
+            }))
 
-        return [out]
+        return out
 
     def extractWheel(self, i = {}):
         if 'object' in i:

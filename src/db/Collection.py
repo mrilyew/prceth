@@ -48,13 +48,6 @@ class Collection(BaseModel):
         
         return __db_query.count()
     
-    @staticmethod
-    def get(id):
-        try:
-            return Collection.select().where(Collection.id == id).get()
-        except:
-            return None
-    
     def api_structure(self):
         obj = {
             "id": self.id,

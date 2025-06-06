@@ -59,6 +59,16 @@ class ContentUnit(BaseModel):
     # Useless
     __cachedLinks = {}
     __cached_su = {}
+    __cached_content = None
+
+    @property
+    def json_content(self):
+        if self.__cached_content != None:
+            return self.__cached_content
+        if self.content == None:
+            return {}
+
+        return parse_json(self.content)
 
     @property
     def su(self):
@@ -78,8 +88,7 @@ class ContentUnit(BaseModel):
         super().delete()
 
     def formatted_data(self, recursive = False, recurse_level = 0):
-        content = getattr(self, "content", {})
-        loaded_content = json5.loads(content)
+        loaded_content = self.json_content
 
         if recursive == True and recurse_level < 3:
             loaded_content = replace_link_gaps(input_data=loaded_content,
@@ -97,7 +106,7 @@ class ContentUnit(BaseModel):
             return []
 
         _out = parse_db_entities(self.links)
-        
+
         self.__cachedLinks = _out
 
         return _out
@@ -119,7 +128,6 @@ class ContentUnit(BaseModel):
             "has_file": __su != None,
             "display_name": self.display_name,
             "description": self.description,
-            "source": parse_json(self.source),
             "meta": self.formatted_data(recursive=True),
             "frontend_data": frontend_data,
             "tags": tags,
@@ -128,6 +136,9 @@ class ContentUnit(BaseModel):
             "edited": None,
             "declared_created_at": None
         }
+
+        if self.source != None:
+            fnl.source = parse_json(self.source)
 
         try:
             fnl["created"] = int(self.created_at)
@@ -144,11 +155,12 @@ class ContentUnit(BaseModel):
     @staticmethod
     def fromJson(json_input):
         out = ContentUnit()
-
+        '''
         if json_input.get("hash") == None:
             __hash = get_random_hash(32)
         else:
             __hash = json_input.get("hash")
+        '''
 
         content = json_input.get("content")
         if content != None:
