@@ -20,11 +20,6 @@ class BaseExtractor(Executable):
             "type": "bool",
             "default": False,
         }
-        params["make_preview"] = {
-            "name": "make_preview",
-            "type": "bool",
-            "default": True,
-        }
 
         return params
 

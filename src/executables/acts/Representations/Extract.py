@@ -48,5 +48,5 @@ class Extract(BaseAct):
             __all_items.append(__item)
 
         return {
-            "entities": __all_items
+            "items": __all_items
         }

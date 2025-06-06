@@ -1,4 +1,5 @@
 from declarable.ArgsValidator import ArgsValidator
+from db.ContentUnit import ContentUnit
 
 class Runnable:
     name = 'base'
@@ -80,3 +81,6 @@ class Runnable:
     @property
     def full_name(self):
         return self.category + '.' + self.__class__.__name__
+
+    def new_cu(self, json_data):
+        return ContentUnit.fromJson(self.self_insert(json_data))

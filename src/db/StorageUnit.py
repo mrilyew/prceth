@@ -126,9 +126,9 @@ class StorageUnit(BaseModel):
         if self.temp_dir != None:
             __end_dir = self.temp_dir
 
-        ContentUnit_PATH = os.path.join(__end_dir, str(self.upload_name))
+        __path = os.path.join(__end_dir, str(self.hash_filename()))
 
-        return ContentUnit_PATH
+        return __path
 
     def hash_filename(self):
         return f"{self.hash}.{str(self.extension)}"

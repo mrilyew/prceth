@@ -1,7 +1,7 @@
 from app.App import logger
-from pathlib import Path
 from resources.Consts import consts
 from app.App import config
+from pathlib import Path
 import asyncio, aiohttp, os, time
 
 class DownloadManager():
@@ -21,17 +21,14 @@ class DownloadManager():
         print(d.get("percentage"))
 
     async def addDownload(self, end, dir):
-        try:
-            self.queue.append({
-                "url": end, 
-                "dir": dir,
-                "pause_flag": asyncio.Event(),
-                "task": None,
-            })
+        self.queue.append({
+            "url": end, 
+            "dir": dir,
+            "pause_flag": asyncio.Event(),
+            "task": None,
+        })
 
-            return await self.startDownload(self.queue[-1])
-        except:
-            return None
+        return await self.startDownload(self.queue[-1])
 
     async def startDownload(self, queue_element):
         if getattr(self, "__session", None) == None:
@@ -40,7 +37,7 @@ class DownloadManager():
 
         async with self.__session as session:
             queue_element["task"] = await asyncio.create_task(self.download(session, queue_element))
-            
+
             return queue_element["task"]
             #asyncio.run(self.download(session, queue_element))
 
@@ -48,7 +45,7 @@ class DownloadManager():
         DOWNLOAD_URL = queue_element.get("url")
         DOWNLOAD_DIR = queue_element.get("dir")
 
-        logger.log(section="AsyncDownloadManager", name="message", message=f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
+        logger.log(section="AsyncDownloadManager", kind="message", message=f"Downloading {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
         async with self.semaphore:
             async with session.get(DOWNLOAD_URL, allow_redirects=True, headers=self.__headers) as response:
                 HTTP_REQUEST_STATUS = response.status
@@ -58,9 +55,9 @@ class DownloadManager():
                 #    return None
                 if HTTP_REQUEST_STATUS == 404 or HTTP_REQUEST_STATUS == 403:
                     raise FileNotFoundError('File not found')
-                
+
                 if DOWNLOAD_DIR != None and Path(DOWNLOAD_DIR).is_file():
-                    logger.log(section="AsyncDownloadManager", name="message", message=f"{DOWNLOAD_URL} already downloaded, didn't.")
+                    logger.log(section="AsyncDownloadManager", kind="message", message=f"{DOWNLOAD_URL} already downloaded, didn't.")
                     return response
 
                 start_time = time.time()
@@ -105,7 +102,7 @@ class DownloadManager():
                         except:
                             pass
 
-                    logger.log(section="AsyncDownloadManager", name="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
+                    logger.log(section="AsyncDownloadManager", kind="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
                 
                 return response
     
@@ -137,4 +134,4 @@ class DownloadManager():
     def set_speed_limit_kbps(self, value):
         self.speed_limit_kbps = int(value)
 
-download_manager = DownloadManager(max_concurrent_downloads=2, speed_limit_kbps=200)
+download_manager = DownloadManager(max_concurrent_downloads = 2, speed_limit_kbps = 200)

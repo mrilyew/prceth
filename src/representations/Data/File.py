@@ -3,9 +3,11 @@ from resources.Descriptions import descriptions
 from db.StorageUnit import StorageUnit
 from submodules.Files.FileManager import file_manager
 from resources.Exceptions import InvalidPassedParam
+from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
-from db.ContentUnit import ContentUnit
-import os
+from utils.MainUtils import proc_strtr, name_from_url
+from utils.WebUtils import is_generated_ext
+import os, mimetypes
 
 class File(Representation):
     category = "Data"
@@ -30,13 +32,26 @@ class File(Representation):
             "default": "copy",
             "assertion": {
                 "only_when": [
-                    {"path": {"operator": "==", "value": "wall"}}
+                    {"path": {"operator": "!=", "value": None}}
                 ]
             }
         }
         params["text"] = {
             "type": "string",
             "default": None,
+        }
+        params["extension"] = {
+            "docs": {
+                "definition": descriptions.get('__file_extension')
+            },
+            "default": "txt",
+            "type": "string",
+            "maxlength": 6,
+            "assertion": {
+                "only_when": [
+                    {"text": {"operator": "!=", "value": None}}
+                ]
+            }
         }
         params["url"] = {
             "type": "string",
@@ -89,24 +104,96 @@ class File(Representation):
             "export_as": str(i.get("type")),
         }
 
-        out = ContentUnit.fromJson(self.self_insert({
+        out = self.new_cu({
             "source": {
                 'type': 'path',
                 'content': str(i_path),
             },
             'content': __out_metadata,
             'main_su': su
-        }))
+        })
 
         return [out]
 
     async def extractByContent(self, i = {}):
         text = i.get('text')
-        original_name = i.get('original_name')
+        original_name = "blank"
         extension = i.get('extension')
+        full_name = '.'.join([original_name, extension])
+
+        su = StorageUnit()
+    
+        file_manager.createFile(filename=full_name,
+            dir = su.temp_dir,
+            content = text
+        )
+
+        su.write_data({
+            "extension": i.get("extension"),
+            "upload_name": full_name,
+            "filesize": len(i.get("text").encode('utf-8')),
+        })
+
+        out = self.new_cu({
+            "source": {
+                'type': 'api',
+                'content': 'blank'
+            },
+            "content": {
+                "format": str(extension),
+                "text": proc_strtr(text, 100),
+            },
+            "suggested_name": "blank.txt",
+            "main_su": su
+        })
+
+        return [out]
 
     async def extractByUrl(self, i = {}):
         url = i.get('url')
+        name, ext = name_from_url(url)
+
+        su = StorageUnit()
+        tmp_dir = su.temp_dir
+
+        # Making HTTP request
+        save_path = Path(os.path.join(tmp_dir, "download.tmp"))
+
+        url_request = await download_manager.addDownload(end = url,dir = save_path)
+        content_type_header = url_request.headers.get('Content-Type', '').lower()
+        mime_ext = None
+
+        if ext == '' or is_generated_ext(ext):
+            mime_ext = mimetypes.guess_extension(content_type_header)
+            if mime_ext:
+                ext = mime_ext[1:]
+            else:
+                ext = 'html'
+        
+        result_name = '.'.join([name, ext])
+        result_path = Path(os.path.join(tmp_dir, result_name))
+
+        save_path.rename(os.path.join(tmp_dir, result_path))
+        file_size = result_path.stat().st_size
+        output_metadata = {
+            "mime": str(mime_ext),
+        }
+
+        su.write_data({
+            "extension": ext,
+            "upload_name": result_name,
+            "filesize": file_size,
+        })
+        out = self.new_cu({
+            "main_su": su,
+            "source": {
+                'type': 'url',
+                'content': url
+            },
+            "content": output_metadata,
+        })
+
+        return [out]
 
     async def metadata(self, i = {}):
         return []

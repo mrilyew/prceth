@@ -19,3 +19,7 @@ descriptions['__creates_virtual_link_to_folder'] = {
     "ru": "Создаёт виртуальную ссылку на локальный путь",
     "en": "Creates virtual link to local path"
 }
+descriptions['__file_extension'] = {
+    "ru": "Расширение файла",
+    "en": "File extension",
+}
