@@ -91,11 +91,7 @@ class ContentUnit(BaseModel):
         if self.__cachedLinks != None:
             return self.__cachedLinks
 
-        ids = []
-        for unit in self._linksSelection():
-            ids.append(unit.child)
-
-        _out = ContentUnitRelation.get(ids)
+        _out = ContentUnitRelation.get(self._linksSelectionIds())
         self.__cachedLinks = _out
 
         return _out
@@ -243,6 +239,15 @@ class ContentUnit(BaseModel):
         _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id)
 
         return _links
+
+    def _linksSelectionIds(self):
+        _selection = self._linksSelection()
+
+        ids = []
+        for unit in _selection:
+            ids.append(unit.child)
+
+        return ids
 
     def bifurcation(self, level=0, maximum=3):
         connections = {}

@@ -51,3 +51,19 @@ descriptions['__url_to_rss_feed'] = {
     "ru": "URL на RSS-фид",
     "en": "URL to RSS-feed",
 }
+descriptions['__limit_of_recieved_data'] = {
+    "ru": "Лимит полученных данных",
+    "en": "Limit of recieved items",
+}
+descriptions['__raw_model_explanation'] = {
+    "ru": "Возвращать модели в виде экземпляров класса (1) либо в виде api-представления (0)",
+    "en": "Return models as class instances (1) or json object (0)",
+}
+descriptions['__passed_text'] = {
+    "ru": "Переданный текст",
+    "en": "Passed text",
+}
+descriptions['__randomization_su_id'] = {
+    "ru": "ID content_unit'а, в чьих привязках проводить рандомизацию",
+    "en": "Content_unit's ID where do randomization",
+}

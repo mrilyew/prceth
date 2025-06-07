@@ -2,7 +2,7 @@ from peewee import SmallIntegerField, BigIntegerField, TextField, AutoField, Tim
 from utils.MainUtils import parse_json, dump_json
 import time
 
-class Service(Model):
+class ServiceInstance(Model):
     self_name = 'service'
 
     class Meta:
@@ -11,19 +11,21 @@ class Service(Model):
     id = AutoField()
     service_name = TextField()
     display_name = TextField(null=True)
-    data = TextField(default="{}")
     frontend_data = TextField(default="{}")
+    data = TextField(default="{}")
     interval = SmallIntegerField(default=60) # in seconds
     created_at = TimestampField(default=time.time())
     edited_at = TimestampField(null=True)
 
-    def getData(self):
+    def data_json(self):
         __data = self.data
 
         return parse_json(__data)
 
-    def getFrontendData(self):
+    def frontend_data_json(self):
         __data = self.frontend_data
+        if __data != None:
+            return {}
 
         return parse_json(__data) 
 
@@ -33,16 +35,16 @@ class Service(Model):
         obj["id"] = self.id
         obj["service_name"] = self.service_name
         obj["display_name"] = self.display_name
-        obj["data"] = self.getData()
-        obj["frontend_data"] = self.getFrontendData()
+        obj["data"] = self.data_json()
+        obj["frontend_data"] = self.frontend_data_json()
         obj["interval"] = self.interval
-        obj["created_at"] = self.created_at
+        obj["created_at"] = int(self.created_at)
 
         return obj
     
     @staticmethod
     def get(id):
-        return Service.select().where(Service.id == id).get()
+        return ServiceInstance.select().where(ServiceInstance.id == id).get()
     
     def updateData(self, json):
         self.data = dump_json(json)

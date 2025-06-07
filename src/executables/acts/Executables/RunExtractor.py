@@ -4,7 +4,6 @@ from app.App import logger
 from repositories.ExtractorsRepository import ExtractorsRepository
 
 class RunExtractor(BaseAct):
-    name = 'RunExtractor'
     category = 'Executables'
     docs = {
         "description": {
@@ -57,7 +56,6 @@ class RunExtractor(BaseAct):
         assert extractor_name != None, 'extractor not passed'
 
         append_ids = i.get('append_ids', None)
-
         colls_list = ContentUnit.ids(append_ids)
 
         extractor_class = (ExtractorsRepository()).getByName(extractor_name)

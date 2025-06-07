@@ -1,11 +1,11 @@
 from representations.Representation import Representation
 
 class Scratch(Representation):
-    category = "Data"
+    category = "Abstract"
 
     async def extractByDefault(self, i = {}):
         out = self.new_cu({
-            'content': {},
+            'content': i,
         })
 
         return [out]

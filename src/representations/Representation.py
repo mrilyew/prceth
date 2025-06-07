@@ -41,6 +41,6 @@ class Representation(Runnable):
         return __out
 
     def self_insert(self, json_data: dict):
-        json_data['representation'] = self.full_name
+        json_data['representation'] = self.full_name()
 
         return json_data

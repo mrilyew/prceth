@@ -24,8 +24,8 @@ class RSSFeed(BaseExtractor):
 
         return params
 
-    async def execute(self, args={}):
-        __call_url = args.get("url")
+    async def execute(self, i={}):
+        __call_url = i.get("url")
         __response = None
 
         async with aiohttp.ClientSession() as session:
@@ -62,7 +62,7 @@ class RSSFeed(BaseExtractor):
         })
 
         for i in out:
-            i.extractor = self.full_name
+            i.extractor = self.full_name()
 
             __name = i.json_content.get("title", "Untitled")
             __date = rss_date_parse(i.json_content.get("pubDate"))

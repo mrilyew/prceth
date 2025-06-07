@@ -66,6 +66,6 @@ class Executable(Runnable):
         return rt
 
     def self_insert(self, json_data: dict):
-        json_data['extractor'] = self.full_name
+        json_data['extractor'] = self.full_name()
 
         return json_data

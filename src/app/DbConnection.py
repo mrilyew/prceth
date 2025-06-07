@@ -34,10 +34,10 @@ class DbConnection:
         from db.ContentUnitRelation import ContentUnitRelation
         from db.Stat import Stat
         from db.StorageUnit import StorageUnit
-        from db.Service import Service
+        from db.ServiceInstance import ServiceInstance
 
         tables_list = [ContentUnitRelation, ContentUnit, StorageUnit]
-        tables_list_app = [Stat, Service]
+        tables_list_app = [Stat, ServiceInstance]
 
         # Appending content db
         self.db.bind(tables_list)
@@ -50,5 +50,5 @@ class DbConnection:
         self.instance_db.bind(tables_list_app)
 
         self.instance_db.connect()
-        self.instance_db.create_tables(tables_list, safe=True)
+        self.instance_db.create_tables(tables_list_app, safe=True)
         self.instance_db.close()

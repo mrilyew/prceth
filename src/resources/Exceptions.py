@@ -27,3 +27,6 @@ class AbstractClassException(Exception):
 
 class SuitableExtractMethodNotFound(Exception):
     pass
+
+class FatalError(Exception):
+    pass

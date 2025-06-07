@@ -31,20 +31,18 @@ class IterableBase():
 
         return params
 
-    async def run(self, args):
-        self.ContentUnit_list = []
+    async def run(self, i):
+        self.cu_list = []
 
-        for i in range(args.get("start"), args.get("end")):
+        for i in range(i.get("start"), i.get("end")):
             try:
                 await self._iterableAction(i)
             except Exception as ____e:
                 logger.logException(____e, "IterableBase", silent=False)
 
-            await asyncio.sleep(args.get("timeout"))
+            await asyncio.sleep(i.get("timeout"))
 
-        return {
-            "entities": self.ContentUnit_list,
-        }
+        return self.cu_list
 
     async def _iterableAction(self, i):
         pass

@@ -78,9 +78,9 @@ class Runnable:
 
         return json_data
 
-    @property
-    def full_name(self):
-        return self.category + '.' + self.__class__.__name__
+    @classmethod
+    def full_name(cls):
+        return cls.category + '.' + cls.__name__
 
     def new_cu(self, json_data):
         return ContentUnit.fromJson(self.self_insert(json_data))

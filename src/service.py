@@ -1,20 +1,27 @@
-async def runService():
-    assert "i" in args, "i not passed"
+from app.App import app, logger
+from db.ServiceInstance import ServiceInstance
+from repositories.ServicesRepository import ServicesRepository
+from utils.MainUtils import parse_json, dump_json
+from resources.Exceptions import FatalError
+import asyncio
 
-    __service_id = args.get("i")
-    __service_settings = Service.get(__service_id)
-    __input_interval = args.get("interval")
+async def runService():
+    assert "i" in app.argv, "service_instance id (--i) not passed"
+
+    __service_id = app.argv.get("i")
+    __service_settings = ServiceInstance.get(__service_id)
+    __input_interval = app.argv.get('interval')
 
     assert __service_settings != None, "service preset not found"
-    
-    __service_name = __service_settings.service_name
-    __service_res = ServicesRepository().getByName(service_name=__service_name)
-    __data = utils.parse_json(__service_settings.data)
 
-    OUT_SERV = __service_res()
-    OUT_SERV.setConfig(__data)
-    OUT_SERV.service_object = __service_settings
-    OUT_SERV.setArgs(args)
+    __service_name = __service_settings.service_name
+
+    __service_res = ServicesRepository().getByName(__service_name)
+    __data = parse_json(__service_settings.data)
+
+    service_out = __service_res()
+    service_out.config = __data
+    service_out.service_object = __service_settings
 
     interval = 0
 
@@ -25,12 +32,16 @@ async def runService():
 
     try:
         while True:
-            await OUT_SERV.run()
-    
-            logger.log(message=f"Sleeping for {interval}s",name="message",section="Services")
+            print(dump_json(await service_out.iteration(app.argv)))
+
+            logger.log(message=f"Sleeping for {interval}s", kind="message", section="Services")
 
             await asyncio.sleep(interval)
     except KeyboardInterrupt:
-        OUT_SERV.stop()
+        service_out.stop()
+    except FatalError as _e:
+        service_out.stop()
 
-loop.run_until_complete(runService())
+        raise _e
+
+app.loop.run_until_complete(runService())
