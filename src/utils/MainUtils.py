@@ -93,13 +93,12 @@ def proc_strtr(text: str, length: int = 0, multipoint: bool = True):
     
     return newString + ("..." if text != newString else "")
 
-def parse_db_entities(i, allowed_entities = ['cu', 'su', 'collection']):
+def parse_db_entities(i, allowed_entities = ['cu', 'su']):
     '''
-    Recieves entities and collections by string.
+    Recieves contentunits and storageunits by string.
     '''
     from db.ContentUnit import ContentUnit
     from db.StorageUnit import StorageUnit
-    from db.Collection import Collection
 
     out = []
     els = [] # сразу не понял
@@ -119,8 +118,6 @@ def parse_db_entities(i, allowed_entities = ['cu', 'su', 'collection']):
                 interm_out = ContentUnit.get(el_id)
             case 'su' | 'storageunit' | 'stouni':
                 interm_out = StorageUnit.get(el_id)
-            case 'collection':
-                interm_out = Collection.get(el_id)
 
         out.append(interm_out)
 

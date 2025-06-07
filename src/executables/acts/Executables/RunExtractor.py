@@ -1,4 +1,4 @@
-from db.Collection import Collection
+from db.ContentUnit import ContentUnit
 from executables.acts.Base.Base import BaseAct
 from app.App import logger
 from repositories.ExtractorsRepository import ExtractorsRepository
@@ -41,7 +41,7 @@ class RunExtractor(BaseAct):
                 'not_null': True
             }
         }
-        params["collection_ids"] = {
+        params["append_ids"] = {
             'type': 'csv',
             'default': [],
             'assertion': {
@@ -56,9 +56,9 @@ class RunExtractor(BaseAct):
 
         assert extractor_name != None, 'extractor not passed'
 
-        collection_ids = i.get('collection_ids', None)
+        append_ids = i.get('append_ids', None)
 
-        colls_list = Collection.ids(collection_ids)
+        colls_list = ContentUnit.ids(append_ids)
 
         extractor_class = (ExtractorsRepository()).getByName(extractor_name)
 
@@ -67,7 +67,10 @@ class RunExtractor(BaseAct):
 
         extractor = extractor_class()
         for _col in colls_list:
-            extractor.collections_add_after.append(_col)
+            if _col.is_collection == True:
+                pass
+
+            extractor.add_after.append(_col)
 
         results = []
         out = []
@@ -89,6 +92,10 @@ class RunExtractor(BaseAct):
 
         for __res in results:
             __res.save()
+
+            for ext in extractor.add_after:
+                if ext != None:
+                    ext.addLink(__res)
 
             if i.get("return_raw") == True:
                 out.append(__res)

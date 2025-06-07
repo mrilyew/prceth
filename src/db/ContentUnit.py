@@ -52,8 +52,9 @@ class ContentUnit(BaseModel):
     # Files
     su_id = IntegerField(null=True) # File id
 
-    # Visibility
+    # Booleans
     unlisted = BooleanField(index=True,default=0)
+    is_collection = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0)
 
     # Useless
@@ -193,27 +194,36 @@ class ContentUnit(BaseModel):
         if json_input.get("display_name") != None:
             out.display_name = json_input.get('display_name')
         else:
-            if json_input.get("suggested_name") == None:
+            if json_input.get("name") == None:
                 if json_input.get("file") == None:
                     out.display_name = "N/A"
                 else:
                     out.display_name = json_input.get('file').upload_name
             else:
-                out.display_name = json_input.get('suggested_name')
+                out.display_name = json_input.get('name')
 
         if json_input.get("description") != None:
             out.description = json_input.get('description')
         if json_input.get("source") != None:
-            out.source = dump_json(json_input.get('source'))
+            out.set_source(json_input.get('source'))
         if json_input.get("declared_created_at") != None:
-            out.declared_created_at = int(json_input.get("declared_created_at"))
+            if getattr(json_input.get("declared_created_at"), 'timestamp', None) != None:
+                out.declared_created_at = int(json_input.get("declared_created_at").timestamp())
+            else:
+                out.declared_created_at = int(json_input.get("declared_created_at"))
 
         # out.indexation_content_string = json.dumps(json_values_to_string(content), ensure_ascii=False).replace('None', '').replace('  ', ' ').replace('\n', ' ').replace(" ", "")
+
+        if json_input.get('is_collection', False) == True:
+            out.is_collection = True
 
         if json_input.get('save_model', False) == True:
             out.save()
 
         return out
+
+    def set_source(self, source_json: dict):
+        self.source = dump_json(source_json)
 
     # Links
 
@@ -239,6 +249,9 @@ class ContentUnit(BaseModel):
 
         __links = self.linked_units
         for link in __links:
+            if level > maximum:
+                continue
+
             connections[level] = link.bifurcation(level+1, maximum)
 
         return connections

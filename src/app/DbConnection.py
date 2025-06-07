@@ -30,14 +30,13 @@ class DbConnection:
         self.instance_db = instance_db
 
     def createTables(self):
-        from db.Collection import Collection
         from db.ContentUnit import ContentUnit
-        from db.Relation import Relation
+        from db.ContentUnitRelation import ContentUnitRelation
         from db.Stat import Stat
         from db.StorageUnit import StorageUnit
         from db.Service import Service
 
-        tables_list = [Collection, ContentUnit, Relation, StorageUnit]
+        tables_list = [ContentUnitRelation, ContentUnit, StorageUnit]
         tables_list_app = [Stat, Service]
 
         # Appending content db

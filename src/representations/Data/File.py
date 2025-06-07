@@ -143,7 +143,7 @@ class File(Representation):
                 "format": str(extension),
                 "text": proc_strtr(text, 100),
             },
-            "suggested_name": "blank.txt",
+            "name": "blank.txt",
             "main_su": su
         })
 

@@ -1,8 +1,7 @@
-from executables.extractors.Base.BaseCollectionable import BaseCollectionable
 from app.App import logger
 import asyncio
 
-class IterableBase(BaseCollectionable):
+class IterableBase():
     name = 'IterableBase'
     category = 'base'
 
@@ -31,11 +30,6 @@ class IterableBase(BaseCollectionable):
         }
 
         return params
-
-    def _collection(self):
-        return {
-            "suggested_name": f"Iterable {args.get("start")}-{args.get("end")}",
-        }
 
     async def run(self, args):
         self.ContentUnit_list = []

@@ -1,8 +1,8 @@
 from executables.extractors.Base.Base import BaseExtractor
 from app.App import logger
 from resources.Descriptions import descriptions
-from representations.Data.Json import Json as JsonRepresentation
 from utils.MediaUtils import rss_date_parse
+from representations.Data.Json import Json as JsonRepresentation
 import aiohttp, xmltodict
 
 class RSSFeed(BaseExtractor):
@@ -36,9 +36,26 @@ class RSSFeed(BaseExtractor):
 
         __rss = xmltodict.parse(__response)
 
-        __object_rss = __rss.get("rss")
-        channel = __object_rss.get("channel")
-        items = channel.get("item")
+        __object_rss = __rss.get('rss')
+        channel = __object_rss.get('channel')
+
+        items = channel.get('item')
+        if channel != None:
+            try:
+                del channel['item']
+            except:
+                pass
+
+            self.add_after.append(self.collectionable({
+                'name': channel.get('title'),
+                'description': channel.get('description'),
+                'content': channel,
+                'declared_created_at': rss_date_parse(channel.get("pubDate")),
+                'source': {
+                    'type': 'url',
+                    'content': channel.get('link')
+                }
+            }))
 
         out = await JsonRepresentation().extractByObject({
             'object': items
@@ -47,10 +64,10 @@ class RSSFeed(BaseExtractor):
         for i in out:
             i.extractor = self.full_name
 
-            __name = i.json_content.get("title")
+            __name = i.json_content.get("title", "Untitled")
             __date = rss_date_parse(i.json_content.get("pubDate"))
 
-            i.display_name = __name
+            i.display_name = str(__name)
             i.declared_created_at = __date.timestamp()
 
             self.linked_dict.append(i)

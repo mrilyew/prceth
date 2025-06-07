@@ -1,8 +1,8 @@
 ## Prethmeta
 
-Python app/framework for creating virtual collections with web content
+Python app/framework for creating collections with content
 
-Wt. [docs](docs/ru/README.md)
+Look at [docs](docs/ru/README.md)
 
 ![Prethmeta work scheme](readme/s_cli.png)
 
@@ -20,6 +20,4 @@ Wt. [docs](docs/ru/README.md)
 - [ ] Executable: хуки выполнения
 - [ ] Db: indexation_content_string в генерируемую колонку
 - [ ] Db: выбор типа подключения
-- [ ] Contentunit: Рефактор получения коллекции из экстрактора
 - [ ] Превью: переписать под state
-- [ ] Удаление понятия коллекция, замена на линкед файлы

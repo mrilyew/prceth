@@ -1,28 +1,17 @@
 from executables.Executable import Executable
+from representations.Data.Json import Json as JsonRepresentation
 
 class BaseExtractor(Executable):
-    collections_add_after = []
+    add_after = []
     linked_dict = None
-
-    def declare():
-        params = {}
-        params["display_name"] = {
-            "name": "display_name",
-            "type": "string",
-            "default": None,
-        }
-        params["description"] = {
-            "name": "description",
-            "type": "string",
-            "default": None,
-        }
-        params["unlisted"] = {
-            "name": "unlisted",
-            "type": "bool",
-            "default": False,
-        }
-
-        return params
 
     def link(self, linked_dict: dict):
         self.linked_dict = linked_dict
+
+    def collectionable(self, json_data: dict):
+        coll_obj = self.new_cu(json_data)
+        coll_obj.is_collection = True
+
+        coll_obj.save()
+
+        return coll_obj

@@ -59,5 +59,7 @@ def rss_date_parse(date_string: str):
     for fmt in formats:
         try:
             return datetime.strptime(date_string, fmt)
-        except ValueError:
+        except:
             continue
+
+    return None
