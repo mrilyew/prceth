@@ -4,10 +4,17 @@ Prethmeta — набор классов, абстракций, шаблонов 
 
 ### База данных
 
-Для сохранения контента используются ActiveRecord сущности из библиотеки [Peewee](https://docs.peewee-orm.com/en/latest/): 
+Для сохранения контента используются ActiveRecord сущности из [Peewee](https://docs.peewee-orm.com/en/latest/): 
 
-- [**ContentUnit**](db/content_unit.md) — единица контента с 
-- [**StorageUnit**](db/file.md) — привязанная к сущности папка в директории %storage%.
+- [**ContentUnit**](db/content_unit.md) — единица контента в формате json
+- [**StorageUnit**](db/storage_unit.md) — директория в %storage%, содержащая основной и дополнительные файлы. Может быть прикреплена
+- [**ServiceInstance**](executables/service.md) — данные о Service
+
+### Директории
+
+%cwd% — папка установки
+
+%storage% — %cwd%/storage/files. Может быть изменена в конфиге
 
 ### API
 

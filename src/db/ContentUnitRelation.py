@@ -5,5 +5,6 @@ class ContentUnitRelation(Model):
         table_name = 'content_relations'
 
     parent = BigIntegerField(null=True)
-    child = DeferredForeignKey('ContentUnit', null=True,backref='relations')
+    child_type = CharField(default='ContentUnit')
+    child = BigIntegerField(null=True)
     order = AutoField()

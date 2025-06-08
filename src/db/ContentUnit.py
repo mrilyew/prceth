@@ -41,7 +41,7 @@ class ContentUnit(BaseModel):
     description = TextField(index=True,null=True)
     source = TextField(null=True) # Source of content in JSON format
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
-    tags = TextField(index=True,null=True) # csv tags
+    tags = TextField(index=True,null=True) # tags
     author = TextField(null=True,default=consts.get('pc_fullname'))
 
     # Dates
@@ -223,15 +223,15 @@ class ContentUnit(BaseModel):
 
     # Links
 
-    def addLink(self, cu):
+    def addLink(self, u):
         _link = ContentUnitRelation()
         _link.parent = self.id
-        _link.child = cu.id
+        _link.child = u.id
 
         _link.save()
 
-    def removeLink(self, cu):
-        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == cu.id)
+    def removeLink(self, u):
+        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == u.id)
 
         _link.delete()
 

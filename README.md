@@ -4,8 +4,6 @@ Python app/framework for creating collections with content
 
 Look at [docs](docs/ru/README.md)
 
-![Prethmeta work scheme](readme/s_cli.png)
-
 ## Задачи:
 
 - [ ] Web crawler: полное переписывание, режим archive.is
@@ -25,3 +23,5 @@ Look at [docs](docs/ru/README.md)
 - [ ] Спроектировать получше
 - [ ] Services: close after x iteration
 - [ ] Services: хуки добавления в коллекцию
+- [ ] ContentUnitRelation: добавить линк StorageUnit
+- [ ] Класс DocumentationManager

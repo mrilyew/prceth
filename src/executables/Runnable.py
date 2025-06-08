@@ -2,7 +2,6 @@ from declarable.ArgsValidator import ArgsValidator
 from db.ContentUnit import ContentUnit
 
 class Runnable:
-    name = 'base'
     category = 'base'
 
     docs = {

@@ -40,32 +40,3 @@ class Executable(Runnable):
     async def onSuccess(self):
         for __closure in self.events.get("success"):
             await __closure()
-
-    # Documentation
-
-    def manual(self):
-        manual = {}
-        __docs = getattr(self, "docs")
-        __params = getattr(self, "params")
-        __meta = __docs.get("description")
-
-        manual["description"] = __meta
-        manual["files"] = getattr(self, "file_containment", {})
-        manual["params"] = __params
-
-        return manual
-
-    def describe(self):
-        rt = {
-            "id": self.name,
-            "category": self.category,
-            "hidden": getattr(self, "hidden", False),
-        }
-        rt["meta"] = self.manual()
-
-        return rt
-
-    def self_insert(self, json_data: dict):
-        json_data['extractor'] = self.full_name()
-
-        return json_data

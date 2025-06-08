@@ -6,15 +6,13 @@ class Extract(BaseAct):
     name = 'Extract'
     category = 'Representations'
     docs = {
-        "description": {
-            "name": {
-                "ru": ":)",
-                "en": ":)"
-            },
-            "definition": {
-                "ru": ":)",
-                "en": ":)"
-            }
+        "name": {
+            "ru": ":)",
+            "en": ":)"
+        },
+        "definition": {
+            "ru": ":)",
+            "en": ":)"
         }
     }
     declaration_cfg = {

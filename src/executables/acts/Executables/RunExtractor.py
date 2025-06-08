@@ -6,15 +6,13 @@ from repositories.ExtractorsRepository import ExtractorsRepository
 class RunExtractor(BaseAct):
     category = 'Executables'
     docs = {
-        "description": {
-            "name": {
-                "ru": "...",
-                "en": "..."
-            },
-            "definition": {
-                "ru": "...",
-                "en": "..."
-            }
+        "name": {
+            "ru": "...",
+            "en": "..."
+        },
+        "definition": {
+            "ru": "...",
+            "en": "..."
         },
         "returns": {
             "end": True,
