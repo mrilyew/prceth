@@ -67,3 +67,11 @@ descriptions['__randomization_su_id'] = {
     "rus": "ID content_unit'а, в чьих привязках проводить рандомизацию",
     "eng": "Content_unit's ID where do randomization",
 }
+descriptions['__is_create_collection_enabled'] = {
+    "rus": "Создавать ли коллекцию для полученных элементов",
+    "eng": "Do create the collection for got elements"
+}
+descriptions['__data_offset_service'] = {
+    "rus": "Отступ по unix-времени",
+    "eng": "Unix-timestamp offset"
+}

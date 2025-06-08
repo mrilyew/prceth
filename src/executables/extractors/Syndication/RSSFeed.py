@@ -21,6 +21,16 @@ class RSSFeed(BaseExtractor):
                 "not_null": True,
             },
         }
+        params["create_collection"] = {
+            "docs": {
+                "definition": descriptions.get('__is_create_collection_enabled')
+            },
+            "type": "bool",
+            "default": True,
+            "assertion": {
+                "not_null": True,
+            },
+        }
 
         return params
 
@@ -46,16 +56,17 @@ class RSSFeed(BaseExtractor):
             except:
                 pass
 
-            self.add_after.append(self.collectionable({
-                'name': channel.get('title', 'Untitled'),
-                'description': channel.get('description'),
-                'content': channel,
-                'declared_created_at': rss_date_parse(channel.get("pubDate")),
-                'source': {
-                    'type': 'url',
-                    'content': channel.get('link')
-                }
-            }))
+            if i.get('create_collection') == True:
+                self.add_after.append(self.collectionable({
+                    'name': channel.get('title', 'Untitled'),
+                    'description': channel.get('description'),
+                    'content': channel,
+                    'declared_created_at': rss_date_parse(channel.get("pubDate")),
+                    'source': {
+                        'type': 'url',
+                        'content': channel.get('link')
+                    }
+                }))
 
         out = await JsonRepresentation().extractByObject({
             'object': items

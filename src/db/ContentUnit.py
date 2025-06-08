@@ -226,22 +226,23 @@ class ContentUnit(BaseModel):
     def addLink(self, u):
         _link = ContentUnitRelation()
         _link.parent = self.id
+        _link.child_type = u.__class__.name
         _link.child = u.id
 
         _link.save()
 
     def removeLink(self, u):
-        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == u.id)
+        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == u.id).where(ContentUnitRelation.child_type == u.__class__.name)
 
         _link.delete()
 
-    def _linksSelection(self):
-        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id)
+    def _linksSelection(self, class_name = 'CollectionUnit'):
+        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child_type == class_name)
 
         return _links
 
-    def _linksSelectionIds(self):
-        _selection = self._linksSelection()
+    def _linksSelectionIds(self, class_name = 'CollectionUnit'):
+        _selection = self._linksSelection(class_name)
 
         ids = []
         for unit in _selection:

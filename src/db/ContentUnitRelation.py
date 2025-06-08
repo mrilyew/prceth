@@ -1,4 +1,4 @@
-from peewee import BigIntegerField, DeferredForeignKey, AutoField, Model
+from peewee import BigIntegerField, CharField, AutoField, Model
 
 class ContentUnitRelation(Model):
     class Meta:

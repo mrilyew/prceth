@@ -17,11 +17,9 @@ Look at [docs](docs/ru/README.md)
 - [ ] Инициализация: адаптация под bash
 - [ ] Executable: хуки выполнения
 - [ ] Db: indexation_content_string в генерируемую колонку
-- [ ] Db: выбор типа подключения
 - [ ] Превью: переписать под state
 - [ ] Services: документация того что вносится в колонку data
-- [ ] Спроектировать получше
-- [ ] Services: close after x iteration
 - [ ] Services: хуки добавления в коллекцию
 - [ ] ContentUnitRelation: добавить линк StorageUnit
 - [ ] Класс DocumentationManager
+- [ ] Акт заполнения data в ServiceInstance

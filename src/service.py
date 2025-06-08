@@ -2,7 +2,7 @@ from app.App import app, logger
 from db.ServiceInstance import ServiceInstance
 from repositories.ServicesRepository import ServicesRepository
 from utils.MainUtils import parse_json, dump_json
-from resources.Exceptions import FatalError
+from resources.Exceptions import FatalError, EndOfCycleException
 from datetime import datetime
 import asyncio
 
@@ -23,7 +23,7 @@ async def runService():
 
     service_out = __service_res()
     service_out.max_iterations = __max_iterations
-    service_out.config = __data
+    service_out.config = service_out.validate(__data)
     service_out.service_object = __service_settings
 
     interval = 0
