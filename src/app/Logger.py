@@ -82,13 +82,12 @@ class Logger():
         now = datetime.now()
 
         is_console = consts.get("context") == "cli"
-        is_silent = silent == False
+        is_silent = silent == True
 
         current_time = now.strftime("%Y-%m-%d %H:%M:%S")
 
         message = message.replace("\n", "\\n")
         write_message = f"{current_time} [{section}] {message}\n"
-
         if is_console == False:
             write_message = f"{current_time} [{kind}] [{section}] {message}\n"
 

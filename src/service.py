@@ -3,6 +3,7 @@ from db.ServiceInstance import ServiceInstance
 from repositories.ServicesRepository import ServicesRepository
 from utils.MainUtils import parse_json, dump_json
 from resources.Exceptions import FatalError
+from datetime import datetime
 import asyncio
 
 async def runService():
@@ -30,9 +31,11 @@ async def runService():
     else:
         interval = int(__input_interval)
 
+    logger.log(message=f"Started at {datetime.now()}", kind="message", section="Services")
+
     try:
         while True:
-            print(dump_json(await service_out.iteration(app.argv)))
+            await service_out.iteration(app.argv)
 
             logger.log(message=f"Sleeping for {interval}s", kind="message", section="Services")
 

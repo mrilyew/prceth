@@ -38,4 +38,4 @@ class RegularExecution(BaseService):
 
         __exec = self.c_cached_executable()
 
-        return await __exec.safeExecute(args=pass_args)
+        await __exec.safeExecute(args=pass_args)

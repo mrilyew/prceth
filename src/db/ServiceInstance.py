@@ -48,4 +48,4 @@ class ServiceInstance(Model):
     
     def updateData(self, json):
         self.data = dump_json(json)
-        self.save()
+        #self.save()

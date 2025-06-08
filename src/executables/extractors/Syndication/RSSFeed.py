@@ -32,7 +32,7 @@ class RSSFeed(BaseExtractor):
             async with session.get(__call_url) as response:
                 __response = await response.text()
 
-        logger.log(f"Called {__call_url}", section="RSS")
+        logger.log(f"Called passed URL", section="RSS")
 
         __rss = xmltodict.parse(__response)
 
@@ -47,7 +47,7 @@ class RSSFeed(BaseExtractor):
                 pass
 
             self.add_after.append(self.collectionable({
-                'name': channel.get('title'),
+                'name': channel.get('title', 'Untitled'),
                 'description': channel.get('description'),
                 'content': channel,
                 'declared_created_at': rss_date_parse(channel.get("pubDate")),

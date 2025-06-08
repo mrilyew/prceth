@@ -37,7 +37,7 @@ class ContentUnit(BaseModel):
     preview = TextField(null=True) # Preview in json format
 
     # Meta
-    display_name = TextField(index=True,default='N/A')
+    display_name = TextField(default='N/A')
     description = TextField(index=True,null=True)
     source = TextField(null=True) # Source of content in JSON format
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.

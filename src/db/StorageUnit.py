@@ -21,7 +21,7 @@ class StorageUnit(BaseModel):
     link = TextField(null=True,default=None)
 
     # Meta
-    upload_name = TextField(index=True,default='N/A') # Upload name (with extension)
+    upload_name = TextField(default='N/A') # Upload name (with extension)
     extension = TextField(null=True,default="json") # File extension
 
     # Sizes

@@ -35,13 +35,47 @@ DefaultSettings = {
         "type": "string",
         "default": "?cwd?/storage" # cwd -> /storage
     },
-    "db.sqlite_content_path": {
+    "db.content_db.type": {
+        "type": "array",
+        "values": ['sqlite', 'mysql', 'postgresql'],
+        "default": "sqlite",
+    },
+    "db.instance_db.type": {
+        "type": "array",
+        "values": ['sqlite', 'mysql', 'postgresql'],
+        "default": "sqlite",
+    },
+    "db.sqlite.content_db.name": {
         "type": "string",
         "default": "?cwd?/storage/dbs/content.db"
     },
-    "db.sqlite_instance_path": {
+    "db.sqlite.instance_db.name": {
         "type": "string",
         "default": "?cwd?/storage/dbs/instance.db"
+    },
+    "db.server_db.content_db.name": {
+        "type": "string",
+        "default": "th_content"
+    },
+    "db.server_db.instance_db.name": {
+        "type": "string",
+        "default": "th_instance"
+    },
+    "db.server_db.user": {
+        "type": "string",
+        "default": None,
+    },
+    "db.server_db.password": {
+        "type": "string",
+        "default": None,
+    },
+    "db.server_db.host": {
+        "type": "string",
+        "default": '127.0.0.1',
+    },
+    "db.server_db.port": {
+        "type": "int",
+        "default": 3306,
     },
     "net.timeout": {
         "type": "int",

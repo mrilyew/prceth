@@ -6,6 +6,8 @@ hachoir==3.3.0
 idna==3.10
 mutagen==1.47.0
 peewee==3.17.6
+pymysql
+psycopg2
 psutil==6.0.0
 pycryptodomex==3.20.0
 pywin32==310

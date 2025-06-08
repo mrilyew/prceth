@@ -1,24 +1,55 @@
 from resources.Consts import consts
 from utils.MainUtils import replace_cwd, replace_src
+from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase, OperationalError
 
 class DbConnection:
     def attachDb(self, config):
-        content_database_type = config.get("db.content_db_type", "sqlite")
-        instance_database_type = config.get("db.instance_db_type", "sqlite")
+        content_database_type = config.get("db.content_db.type", "sqlite")
+        instance_database_type = config.get("db.instance_db.type", "sqlite")
         db_set, instance_db_set = [None, None]
 
-        from peewee import SqliteDatabase
+
+        __server_db_user = config.get('db.server_db.user')
+        __server_db_pass = config.get('db.server_db.password')
+        __server_db_host = config.get('db.server_db.host')
+        __server_db_port = config.get('db.server_db.port')
 
         match(content_database_type):
             case "sqlite":
-                database_path = replace_src(replace_cwd(config.get("db.sqlite_content_path")))
+                database_path = replace_src(replace_cwd(config.get("db.sqlite.content_db.name")))
                 db_set = SqliteDatabase(database_path)
+            case "mysql" | "postgresql":
+                __class = MySQLDatabase
+                if content_database_type == 'postgresql':
+                    __class = PostgresqlDatabase
+
+                assert __server_db_user != None and __server_db_pass != None and __server_db_host != None and __server_db_port != None
+                
+                db_set = __class(config.get("db.server_db.content_db.name"),
+                    user=__server_db_user,
+                    password=__server_db_pass,
+                    host=__server_db_host,
+                    port=__server_db_port
+                )
 
         match(instance_database_type):
             case "sqlite":
-                instance_database_path = replace_src(replace_cwd(config.get("db.sqlite_instance_path")))
+                instance_database_path = replace_src(replace_cwd(config.get("db.sqlite.instance_db.name")))
 
                 instance_db_set = SqliteDatabase(instance_database_path)
+            case "mysql" | "postgresql":
+                __class = MySQLDatabase
+                if instance_database_type == 'postgresql':
+                    __class = PostgresqlDatabase
+
+                assert __server_db_user != None and __server_db_pass != None and __server_db_host != None and __server_db_port != None
+
+                instance_db_set = __class(config.get("db.server_db.instance_db.name"),
+                    user=__server_db_user,
+                    password=__server_db_pass,
+                    host=__server_db_host,
+                    port=__server_db_port
+                )
 
         self.__setDb(db_set)
         self.__setInstanceDb(instance_db_set)
