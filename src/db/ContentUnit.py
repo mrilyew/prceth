@@ -226,13 +226,13 @@ class ContentUnit(BaseModel):
     def addLink(self, u):
         _link = ContentUnitRelation()
         _link.parent = self.id
-        _link.child_type = u.__class__.name
+        _link.child_type = u.__class__.__name__
         _link.child = u.id
 
         _link.save()
 
     def removeLink(self, u):
-        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == u.id).where(ContentUnitRelation.child_type == u.__class__.name)
+        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == u.id).where(ContentUnitRelation.child_type == u.__class__.__name__)
 
         _link.delete()
 

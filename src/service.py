@@ -6,6 +6,7 @@ from resources.Exceptions import FatalError, EndOfCycleException
 from datetime import datetime
 import asyncio
 
+# TODO отрефакторить эту кашу из кода
 async def runService():
     assert "i" in app.argv, "service_instance id (--i) not passed"
 
@@ -13,6 +14,7 @@ async def runService():
     __service_settings = ServiceInstance.get(__service_id)
     __input_interval = app.argv.get('interval')
     __max_iterations = int(app.argv.get('max_iterations', 0))
+    join_argv = int(app.argv.get('__join_argv', 0)) == 1
 
     assert __service_settings != None, "service preset not found"
 
@@ -20,6 +22,9 @@ async def runService():
 
     __service_res = ServicesRepository().getByName(__service_name)
     __data = parse_json(__service_settings.data)
+
+    if join_argv == True:
+        __data.update(app.argv)
 
     service_out = __service_res()
     service_out.max_iterations = __max_iterations

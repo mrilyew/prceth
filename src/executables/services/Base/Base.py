@@ -1,6 +1,7 @@
-from utils.MainUtils import dump_json
+from utils.MainUtils import parse_json, dump_json
 from app.App import logger
 from resources.Exceptions import EndOfCycleException
+from declarable.ArgsValidator import ArgsValidator
 from executables.Executable import Executable
 import asyncio, time
 
@@ -37,3 +38,6 @@ class BaseService(Executable):
 
     def terminate(self):
         exit(-1)
+
+    def validate(self, args: dict)->dict:
+        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)

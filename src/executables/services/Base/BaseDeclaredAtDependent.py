@@ -6,16 +6,14 @@ from db.ContentUnit import ContentUnit
 class BaseDeclaredAtDependent(BaseService):
     category = 'Base'
     pass_params = {}
-    add_after = []
+    add_after = None
+    colls_list = []
 
     def declare():
         params = {}
         params["append_ids"] = {
             'type': 'csv',
             'default': [],
-            'assertion': {
-                'not_null': True
-            }
         }
         params["date_offset"] = {
             "docs": {
@@ -30,11 +28,14 @@ class BaseDeclaredAtDependent(BaseService):
         return params
 
     async def execute(self, i = {}):
-        append_ids = self.config.get('append_ids', None)
-        colls_list = ContentUnit.ids(append_ids)
+        append_ids = self.config.get('append_ids', [])
 
-        for col in colls_list:
-            self.add_after.append(col)
+        if self.add_after == None:
+            self.add_after = []
+            colls_list = ContentUnit.ids(append_ids)
+
+            for col in colls_list:
+                self.add_after.append(col)
 
         linked_dict = []
 
@@ -56,7 +57,7 @@ class BaseDeclaredAtDependent(BaseService):
             if item_created > date_offset:
                 item.save()
 
-                list_items.append(item.api_structure())
+                list_items.append(item)
 
                 check_dates.append(int(item_created))
 
@@ -71,6 +72,7 @@ class BaseDeclaredAtDependent(BaseService):
             self.service_object.updateData(self.config)
             self.service_object.save()
 
-        for ext in self.add_after:
-            if ext != None:
-                ext.addLink(__res)
+        for item in list_items:
+            for ext in self.add_after:
+                if ext != None:
+                    ext.addLink(item)
