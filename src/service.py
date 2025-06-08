@@ -12,6 +12,7 @@ async def runService():
     __service_id = app.argv.get("i")
     __service_settings = ServiceInstance.get(__service_id)
     __input_interval = app.argv.get('interval')
+    __max_iterations = int(app.argv.get('max_iterations', 0))
 
     assert __service_settings != None, "service preset not found"
 
@@ -21,6 +22,7 @@ async def runService():
     __data = parse_json(__service_settings.data)
 
     service_out = __service_res()
+    service_out.max_iterations = __max_iterations
     service_out.config = __data
     service_out.service_object = __service_settings
 
@@ -46,5 +48,7 @@ async def runService():
         service_out.stop()
 
         raise _e
+    except EndOfCycleException:
+        service_out.stop()
 
 app.loop.run_until_complete(runService())

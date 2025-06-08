@@ -30,3 +30,6 @@ class SuitableExtractMethodNotFound(Exception):
 
 class FatalError(Exception):
     pass
+
+class EndOfCycleException(Exception):
+    pass
