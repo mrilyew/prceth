@@ -108,7 +108,7 @@ class NewExecutable(BaseAct):
 
         boilerplate +=  "        return params\n"
         boilerplate += f"\n"
-        boilerplate +=  "    async def "+execute_name+"(self, i={}):\n"
+        boilerplate +=  "    async def "+execute_name+"(self, i = {}):\n"
         boilerplate +=  "        pass\n"
 
         stream.write(boilerplate)

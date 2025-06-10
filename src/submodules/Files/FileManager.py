@@ -5,20 +5,7 @@ class FileManager():
     def __init__(self):
         pass
 
-    def getFolderItems(self, path, offset = 0, limit = 50, extended = False):
-        return_array = []
-
-        with os.scandir(path) as entries:
-            entries = list(entries)
-            total_count = len(entries)
-            cutted_entries = entries[offset:limit + offset]
-
-            for entry in cutted_entries:
-                return_array.append(FileInfo(entry, extended))
-            
-            return return_array, total_count, len(return_array), offset + limit < total_count
-        
-    def getFolderSize(self, dir):
+    def folder_size(self, dir):
         return sum(file.stat().st_size for file in Path(dir).rglob('*'))
         
     def createFile(self, filename, dir, content=None):

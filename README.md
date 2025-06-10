@@ -18,4 +18,6 @@ Look at [docs](docs/ru/README.md)
 - [ ] Executable: хуки выполнения
 - [ ] Db: indexation_content_string в генерируемую колонку
 - [ ] Превью: переписать под state
-- [ ] Акт заполнения data в ServiceInstance
+- [ ] Executables.UpdateServiceData
+- [ ] Гидрация репрезентации, методы помимо extract
+- [ ] DeclarableArgs: расширение возможностей, разделение каждого параметра на класс

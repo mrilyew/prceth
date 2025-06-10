@@ -100,14 +100,26 @@ descriptions['__main_category_title'] = {
     "eng": "Script's main category"
 }
 descriptions['__name_of_the_script'] = {
-    "ru": "Название скрипта",
-    "en": "Name of the script"
+    "rus": "Название скрипта",
+    "eng": "Name of the script"
 }
 descriptions['__is_script_hidden'] = {
-    "ru": "Добавить параметр 'hidden' к скрипту",
-    "en": "Add 'hidden' param to script"
+    "rus": "Добавить параметр 'hidden' к скрипту",
+    "eng": "Add 'hidden' param to script"
 }
 descriptions['__list_of_arguments_divided_by_comma'] = {
-    "ru": "Список добавляемых аргументов, разделённых через запятую",
-    "en": "List of executable arguments, divided by comma"
+    "rus": "Список добавляемых аргументов, разделённых через запятую",
+    "eng": "List of executable arguments, divided by comma"
+}
+descriptions['__path_to_file_where_get_metadata'] = {
+    "rus": "Путь к файлу, из которого получать метаданные",
+    "eng": "Path to file from get metadata from"
+}
+descriptions['__su_id_where_get_metadata'] = {
+    "rus": "ID StorageUnit, из основного файла будут получены метаданные",
+    "eng": "StorageUnit ID from where metadata will be taken"
+}
+descriptions['__is_convert_hachoir_metadata_to_dict'] = {
+    "rus": "Конвертировать метаданные в читаемый словарь",
+    "eng": "Do convert metadata to readable dictionary"
 }

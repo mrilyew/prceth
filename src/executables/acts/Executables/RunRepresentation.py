@@ -2,8 +2,7 @@ from executables.acts.Base.Base import BaseAct
 from app.App import app, db_connection
 from repositories.RepresentationsRepository import RepresentationsRepository
 
-class Extract(BaseAct):
-    name = 'Extract'
+class RunRepresentation(BaseAct):
     category = 'Representations'
     docs = {
         "name": {
