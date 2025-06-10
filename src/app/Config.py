@@ -25,7 +25,7 @@ class Config():
 
         is_free_settings = self.compared_options == None
 
-        self.declared_settings = DeclarableArgs(self.compared_options, self.passed_options, "pass", is_free_settings)
+        self.declared_settings = DeclarableArgs(self.compared_options, self.passed_options, "pass", is_free_settings, is_free_settings)
         self.options = self.declared_settings.dict()
 
     def __load_path(self, path):

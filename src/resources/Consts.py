@@ -15,6 +15,7 @@ consts["pc_fullname"] = consts["pc_name"] + ", " + consts["pc_user"]
 # Runtime
 consts["cwd"] = Path(os.getcwd())
 consts["executables"] = Path(os.path.join(consts.get('cwd'), "executables"))
+consts["representations"] = Path(os.path.join(consts.get('cwd'), "representations"))
 
 # Config
 consts["config.hidden"] = 1

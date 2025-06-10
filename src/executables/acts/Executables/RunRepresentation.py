@@ -15,7 +15,7 @@ class Extract(BaseAct):
             "en": ":)"
         }
     }
-    declaration_cfg = {
+    executable_cfg = {
         'free_args': True
     }
 
@@ -36,6 +36,8 @@ class Extract(BaseAct):
 
     async def execute(self, i = {}):
         representationClass = RepresentationsRepository().getByName(i.get('representation'))
+        representationClass.canBeExecuted() == True, "representation cannot be executed"
+
         __ents = await representationClass().safeExtract(i)
         __all_items = []
 

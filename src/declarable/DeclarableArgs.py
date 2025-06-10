@@ -11,7 +11,7 @@ class DeclarableArgs():
     recieveValue()\n
     dict()\n
     '''
-    def __init__(self, comparing_options: dict, passed_options: dict, exc_type: str = "assert", is_free_settings: bool = False):
+    def __init__(self, comparing_options: dict, passed_options: dict, exc_type: str = "assert", is_free_settings: bool = False, rude_substitution: bool = False):
         '''
         compare_params: total declared params
 
@@ -29,6 +29,7 @@ class DeclarableArgs():
         self.args = passed_options
         self.exc_type = exc_type
         self.is_free_settings = is_free_settings
+        self.substitution = rude_substitution
 
     def recieveObjectByName(self, param_name: str):
         param_object = self.comparing.get(param_name)
@@ -101,7 +102,7 @@ class DeclarableArgs():
     def dict(self):
         __dict = {}
 
-        if self.is_free_settings == True:
+        if self.substitution == True:
             for index, param_name in enumerate(self.args):
                 __dict[param_name] = self.args.get(param_name)
         else:

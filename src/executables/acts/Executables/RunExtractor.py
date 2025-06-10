@@ -19,7 +19,7 @@ class RunExtractor(BaseAct):
             "type": "list",
         }
     }
-    declaration_cfg = {
+    executable_cfg = {
         'free_args': True
     }
 

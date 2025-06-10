@@ -12,7 +12,7 @@ class Runnable:
             "en": "Abstract description"
         }
     }
-    declaration_cfg =  {}
+    executable_cfg =  {}
 
     # Arguments
 
@@ -31,7 +31,7 @@ class Runnable:
         '''
         Brings all params from parent classes to one dict
         '''
-        ignore_list = self.declaration_cfg.get('ignore', [])
+        ignore_list = self.executable_cfg.get('ignore', [])
         output_params = {}
 
         for __sub_class in self.__class__.__mro__:
@@ -68,7 +68,7 @@ class Runnable:
         return cls.isAbstract() == False and cls.isHidden() == False
 
     def validate(self, args: dict)->dict:
-        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)
+        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.executable_cfg)
 
     def self_insert(self, json_data: dict)->dict:
         '''

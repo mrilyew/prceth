@@ -75,3 +75,39 @@ descriptions['__data_offset_service'] = {
     "rus": "Отступ по unix-времени",
     "eng": "Unix-timestamp offset"
 }
+descriptions['__type_of_creating_script'] = {
+    "rus": "Тип создаваемого скрипта",
+    "eng": "Type of new script"
+}
+descriptions['__act_title'] = {
+    "rus": "Акт",
+    "eng": "Act"
+}
+descriptions['__extractor_title'] = {
+    "rus": "Экстрактор",
+    "eng": "Extractor"
+}
+descriptions['__service_title'] = {
+    "rus": "Сервайс",
+    "eng": "Service"
+}
+descriptions['__representation_title'] = {
+    "rus": "Репрезентация",
+    "eng": "Representation"
+}
+descriptions['__main_category_title'] = {
+    "rus": "Основная категория скрипта",
+    "eng": "Script's main category"
+}
+descriptions['__name_of_the_script'] = {
+    "ru": "Название скрипта",
+    "en": "Name of the script"
+}
+descriptions['__is_script_hidden'] = {
+    "ru": "Добавить параметр 'hidden' к скрипту",
+    "en": "Add 'hidden' param to script"
+}
+descriptions['__list_of_arguments_divided_by_comma'] = {
+    "ru": "Список добавляемых аргументов, разделённых через запятую",
+    "en": "List of executable arguments, divided by comma"
+}

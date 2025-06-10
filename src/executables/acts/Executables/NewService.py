@@ -6,7 +6,7 @@ from db.ServiceInstance import ServiceInstance
 
 class NewService(BaseAct):
     category = 'Executables'
-    declaration_cfg = {
+    executable_cfg = {
         'free_args': True
     }
 

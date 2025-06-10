@@ -40,4 +40,4 @@ class BaseService(Executable):
         exit(-1)
 
     def validate(self, args: dict)->dict:
-        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.declaration_cfg)
+        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.executable_cfg)
