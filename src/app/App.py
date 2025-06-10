@@ -11,7 +11,7 @@ storage = Storage(config)
 logger = Logger(config, storage)
 
 db_connection = DbConnection()
-db_connection.attachDb(config)
+db_connection.attachDb(config, env)
 db_connection.createTables()
 
 class App():

@@ -1,6 +1,7 @@
 from executables.acts.Base.Base import BaseAct
 from app.App import app, db_connection
 from repositories.RepresentationsRepository import RepresentationsRepository
+from declarable.ArgumentsTypes import StringArgument
 
 class RunRepresentation(BaseAct):
     category = 'Representations'
@@ -20,8 +21,7 @@ class RunRepresentation(BaseAct):
 
     def declare():
         params = {}
-        params["representation"] = {
-            "type": "string",
+        params["representation"] = StringArgument({
             "default": None,
             "docs": {
                 "definition": {}
@@ -29,7 +29,7 @@ class RunRepresentation(BaseAct):
             "assertion": {
                 "not_null": True,
             }
-        }
+        })
 
         return params
 

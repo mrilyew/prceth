@@ -3,16 +3,15 @@ from utils.MainUtils import replace_cwd, replace_src
 from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase, OperationalError
 
 class DbConnection:
-    def attachDb(self, config):
+    def attachDb(self, config, env):
         content_database_type = config.get("db.content_db.type", "sqlite")
         instance_database_type = config.get("db.instance_db.type", "sqlite")
         db_set, instance_db_set = [None, None]
 
-
-        __server_db_user = config.get('db.server_db.user')
-        __server_db_pass = config.get('db.server_db.password')
-        __server_db_host = config.get('db.server_db.host')
-        __server_db_port = config.get('db.server_db.port')
+        __server_db_user = env.get('db.server_db.user')
+        __server_db_pass = env.get('db.server_db.password')
+        __server_db_host = env.get('db.server_db.host')
+        __server_db_port = env.get('db.server_db.port')
 
         match(content_database_type):
             case "sqlite":

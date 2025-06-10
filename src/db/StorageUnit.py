@@ -36,7 +36,8 @@ class StorageUnit(BaseModel):
 
         self.temp_dir = storage.sub('tmp_files').allocateTemp()
 
-    def __del__(self):
+    def remove_temp(self):
+        # get cursed
         if self.temp_dir != None:
             file_manager.rmdir(self.temp_dir)
 

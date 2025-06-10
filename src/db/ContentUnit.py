@@ -135,7 +135,7 @@ class ContentUnit(BaseModel):
         }
 
         if self.source != None:
-            fnl.source = parse_json(self.source)
+            fnl['source'] = parse_json(self.source)
 
         try:
             fnl["created"] = int(self.created_at)

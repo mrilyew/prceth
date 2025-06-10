@@ -4,8 +4,8 @@ from resources.Descriptions import descriptions
 from hachoir.core import config as HachoirConfig
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
-from db.StorageUnit import StorageUnit
 from utils.MainUtils import extract_metadata_to_dict
+from declarable.ArgumentsTypes import StringArgument, BooleanArgument, StorageUnitArgument
 
 class ExtractMetadata(BaseAct):
     category = 'Metadata'
@@ -17,27 +17,24 @@ class ExtractMetadata(BaseAct):
 
     def declare():
         params = {}
-        params["path"] = {
-            "type": "string",
+        params["path"] = StringArgument({
             "default": None,
             "docs": {
                 "definition": descriptions.get("__path_to_file_where_get_metadata")
             },
-        }
-        params["su_id"] = {
-            "type": "string",
+        })
+        params["su_id"] = StorageUnitArgument({
             "default": None,
             "docs": {
                 "definition": descriptions.get("__su_id_where_get_metadata")
             },
-        }
-        params["convert_to_dict"] = {
-            "type": "bool",
+        })
+        params["convert_to_dict"] = BooleanArgument({
             "default": True,
             "docs": {
                 "definition": descriptions.get("__is_convert_hachoir_metadata_to_dict")
             },
-        }
+        })
 
         return params
 
@@ -45,16 +42,15 @@ class ExtractMetadata(BaseAct):
         HachoirConfig.quiet = True
 
         input_path = i.get("path")
-        input_file_id = i.get("su_id")
+        input_file = i.get("su_id")
         final_path = None
 
         if input_path != None:
             final_path = input_path
         else:
-            file = StorageUnit.get(input_file_id)
-            assert file != None, "invalid storage_unit"
+            assert input_file != None, "invalid storage_unit"
 
-            final_path = file.path()
+            final_path = input_file.path()
 
         assert final_path != None, "input file not passed"
 

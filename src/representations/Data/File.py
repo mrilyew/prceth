@@ -7,6 +7,7 @@ from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
 from utils.MainUtils import proc_strtr, name_from_url
 from utils.WebUtils import is_generated_ext
+from declarable.ArgumentsTypes import StringArgument, LimitedArgument
 import os, mimetypes
 
 class File(Representation):
@@ -14,11 +15,10 @@ class File(Representation):
 
     def declare():
         params = {}
-        params["path"] = {
-            "type": "string",
+        params["path"] = StringArgument({
             "default": None,
-        }
-        params["type"] = {
+        })
+        params["type"] = LimitedArgument({
             "docs": {
                 "definition": descriptions.get('__movement_type'),
                 "values": {
@@ -27,7 +27,6 @@ class File(Representation):
                     "link": descriptions.get('__creates_virtual_link_to_folder'),
                 }
             },
-            "type": "array",
             "values": ["copy", "move", "link"],
             "default": "copy",
             "assertion": {
@@ -35,28 +34,25 @@ class File(Representation):
                     {"path": {"operator": "!=", "value": None}}
                 ]
             }
-        }
-        params["text"] = {
-            "type": "string",
+        })
+        params["text"] = StringArgument({
             "default": None,
-        }
-        params["extension"] = {
+        })
+        params["extension"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__file_extension')
             },
             "default": "txt",
-            "type": "string",
             "maxlength": 6,
             "assertion": {
                 "only_when": [
                     {"text": {"operator": "!=", "value": None}}
                 ]
             }
-        }
-        params["url"] = {
-            "type": "string",
+        })
+        params["url"] = StringArgument({
             "default": None,
-        }
+        })
 
         return params
 

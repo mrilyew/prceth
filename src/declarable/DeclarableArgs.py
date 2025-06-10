@@ -32,72 +32,7 @@ class DeclarableArgs():
         self.substitution = rude_substitution
 
     def recieveObjectByName(self, param_name: str):
-        param_object = self.comparing.get(param_name)
-
-        return param_object
-
-    def recieveValue(self, param_name: str, param_object: object):
-        __value = self.args.get(param_name, param_object.get("default"))
-
-        if param_object == None:
-            if self.is_free_settings == True:
-                return __value
-
-        if __value != None:
-            match(param_object.get("type")):
-                case "int":
-                    __value = int(__value)
-                case "float":
-                    __value = float(__value)
-                case "array":
-                    __allowed = param_object.get("values")
-                    assert __value in __allowed, f"not valid value, {param_name}={__value}"
-                    if __value == None:
-                        __value = param_object.get("default")
-                case "string":
-                    if param_object.get("maxlength") != None:
-                        __value = proc_strtr(str(__value), int(param_object.get("maxlength")), multipoint=False)
-                    else:
-                        __value = str(__value)
-                        if __value == 'True': #быдлокод
-                            __value = None
-                case "csv":
-                    if type(__value) != list:
-                        __strs = __value.split(",")
-
-                        __value = __strs
-                case "object":
-                    if type(__value) == list:
-                        pass
-                    elif type(__value) == str:
-                        __value = parse_json(__value)
-                    elif type(__value) == dict or type(__value) == object:
-                        if param_object.get("default") != None:
-                            __value = param_object.get("default")
-                        else:
-                            __value = None
-                case "bool":
-                    __value = int(__value) == 1
-                case _:
-                    pass
-
-            return __value
-        else:
-            if param_object.get("default") != None:
-                return param_object.get("default")
-
-        # Asserting for value is not null
-        if param_object.get("assertion") != None:
-            __assertion = param_object.get("assertion")
-
-            if __assertion.get("not_null") == True:
-                assert __value != None, f"{param_name} not passed"
-
-            if __assertion.get("assert_link") != None:
-                new_param_name = __assertion.get("assert_link")
-                new_param_object = self.comparing.get(new_param_name)
-
-                assert __value != None or self.args.get(new_param_name, new_param_object.get("default")) != None, f"{new_param_name} or {param_name} not passed"
+        return self.comparing.get(param_name)
 
     def dict(self):
         __dict = {}
@@ -105,22 +40,36 @@ class DeclarableArgs():
         if self.substitution == True:
             for index, param_name in enumerate(self.args):
                 __dict[param_name] = self.args.get(param_name)
-        else:
-            for index, param_name in enumerate(self.comparing):
-                param_object = self.recieveObjectByName(param_name)
 
-                try:
-                    __rec_value = self.recieveValue(param_name, param_object)
-                    __unexist = param_object.get('save_none_values', False)
+            return __dict
 
-                    if __rec_value == None and __unexist == False:
-                        continue
+        __enumeration = self.comparing
+        if self.is_free_settings == True:
+            __enumeration = self.args
 
-                    __dict[param_name] = __rec_value
-                except Exception as _y:
-                    if self.exc_type == "assert":
-                        raise _y
-                    else:
-                        __dict[param_name] = param_object.get("default")
+        for index, param_name in enumerate(__enumeration):
+            param_object = self.recieveObjectByName(param_name)
+            if param_object == None:
+                __dict[param_name] = __enumeration.get(param_name)
+                continue
+
+            param_object.passValue(self.args.get(param_name))
+            param_object.data['name'] = param_name
+
+            try:
+                __unexist = param_object.data.get('save_none_values', False)
+                __value = param_object.val()
+
+                if __value == None and __unexist == False:
+                    continue
+
+                param_object.assertions(__value)
+
+                __dict[param_name] = __value
+            except Exception as _y:
+                if self.exc_type == "assert":
+                    raise _y
+                else:
+                    __dict[param_name] = param_object.default()
 
         return __dict
