@@ -1,5 +1,6 @@
 from representations.Representation import Representation
 from resources.Descriptions import descriptions
+from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 import xmltodict
 
 class Xml(Representation):
@@ -7,18 +8,16 @@ class Xml(Representation):
 
     def declare():
         params = {}
-        params["text"] = {
+        params["text"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__xml_text_pass')
             },
-            "type": "text",
-        }
-        params["json"] = {
+        })
+        params["json"] = ObjectArgument({
             "docs": {
                 "definition": descriptions.get('__xml_already_parsed')
             },
-            "type": "object",
-        }
+        })
 
         return params
 

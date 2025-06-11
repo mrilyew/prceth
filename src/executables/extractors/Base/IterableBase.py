@@ -1,4 +1,5 @@
 from app.App import logger
+from declarable.ArgumentsTypes import IntArgument, FloatArgument
 import asyncio
 
 class IterableBase():
@@ -7,27 +8,24 @@ class IterableBase():
 
     def declare():
         params = {}
-        params["start"] = {
-            "type": "int",
+        params["start"] = IntArgument({
             "default": 1,
             "assertion": {
                 "not_null": True,
             }
-        }
-        params["end"] = {
-            "type": "int",
+        })
+        params["end"] = IntArgument({
             "default": 100,
             "assertion": {
                 "not_null": True,
             }
-        }
-        params["timeout"] = {
-            "type": "float",
+        })
+        params["timeout"] = FloatArgument({
             "default": 1,
             "assertion": {
                 "not_null": True,
             }
-        }
+        })
 
         return params
 

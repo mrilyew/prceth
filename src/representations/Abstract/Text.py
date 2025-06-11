@@ -1,18 +1,18 @@
 from representations.Representation import Representation
 from resources.Descriptions import descriptions
+from declarable.ArgumentsTypes import StringArgument
 
 class Text(Representation):
     category = "Abstract"
 
     def declare():
         params = {}
-        params["text"] = {
-            "type": "string",
+        params["text"] = StringArgument({
             "default": None,
             "docs": {
                 "definition": descriptions.get('__passed_text'),
             },
-        }
+        })
 
         return params
 

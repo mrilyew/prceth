@@ -6,4 +6,8 @@ class StorageUnitArgument(Argument):
         from db.StorageUnit import StorageUnit
 
         if self.input_value != None:
-            return StorageUnit.get(self.input_value)
+            item = StorageUnit.ids(self.input_value)
+            if item == None:
+                return None
+
+            return item

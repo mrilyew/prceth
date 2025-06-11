@@ -44,7 +44,7 @@ class ServiceInstance(Model):
     
     @staticmethod
     def get(id):
-        return ServiceInstance.select().where(ServiceInstance.id == id).get()
+        return ServiceInstance.select().where(ServiceInstance.id == id).first()
     
     def updateData(self, json):
         self.data = dump_json(json)

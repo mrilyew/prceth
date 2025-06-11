@@ -2,6 +2,7 @@ from db.ContentUnit import ContentUnit
 from executables.acts.Base.Base import BaseAct
 from app.App import logger
 from repositories.ExtractorsRepository import ExtractorsRepository
+from declarable.ArgumentsTypes import StringArgument, BooleanArgument, CsvArgument
 
 class RunExtractor(BaseAct):
     category = 'Executables'
@@ -25,26 +26,24 @@ class RunExtractor(BaseAct):
 
     def declare():
         params = {}
-        params["extractor"] = {
-            "type": "string",
+        params["extractor"] = StringArgument({
             "assertion": {
                 "not_null": True
             }
-        }
-        params["return_raw"] = {
+        })
+        params["return_raw"] = BooleanArgument({
             'type': 'bool',
             'default': False,
             'assertion': {
                 'not_null': True
             }
-        }
-        params["append_ids"] = {
-            'type': 'csv',
+        })
+        params["append_ids"] = CsvArgument({
             'default': [],
             'assertion': {
                 'not_null': True
             }
-        }
+        })
 
         return params
 

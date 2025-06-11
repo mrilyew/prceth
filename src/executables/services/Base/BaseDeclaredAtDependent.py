@@ -2,6 +2,7 @@ from executables.services.Base.Base import BaseService
 from resources.Descriptions import descriptions
 from app.App import logger
 from db.ContentUnit import ContentUnit
+from declarable.ArgumentsTypes import CsvArgument, StringArgument
 
 class BaseDeclaredAtDependent(BaseService):
     category = 'Base'
@@ -11,19 +12,17 @@ class BaseDeclaredAtDependent(BaseService):
 
     def declare():
         params = {}
-        params["append_ids"] = {
-            'type': 'csv',
+        params["append_ids"] = CsvArgument({
             'default': [],
-        }
-        params["date_offset"] = {
+        })
+        params["date_offset"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__data_offset_service')
             },
-            "type": "string",
             "assertion": {
                 "not_null": True,
             },
-        }
+        })
 
         return params
 

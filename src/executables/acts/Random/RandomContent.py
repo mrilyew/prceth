@@ -2,14 +2,14 @@ from executables.acts.Base.Base import BaseAct
 from resources.Descriptions import descriptions
 from db.ContentUnit import ContentUnit
 from peewee import fn
+from declarable.ArgumentsTypes import IntArgument, BooleanArgument
 
 class RandomContent(BaseAct):
     category = 'Random'
 
     def declare():
         params = {}
-        params["limit"] = {
-            "type": "int",
+        params["limit"] = IntArgument({
             "default": 10,
             "docs": {
                 "definition": descriptions.get('__limit_of_recieved_data')
@@ -17,9 +17,8 @@ class RandomContent(BaseAct):
             "assertion": {
                 "not_null": True,
             },
-        }
-        params["raw_models"] = {
-            "type": "bool",
+        })
+        params["raw_models"] = BooleanArgument({
             "docs": {
                 "definition": descriptions.get('__raw_model_explanation')
             },
@@ -27,14 +26,13 @@ class RandomContent(BaseAct):
             "assertion": {
                 "not_null": True,
             },
-        }
-        params["from_id"] = {
-            "type": "int",
+        })
+        params["from_id"] = IntArgument({
             "docs": {
                 "definition": descriptions.get('__randomization_su_id')
             },
             "default": None,
-        }
+        })
 
         return params
 

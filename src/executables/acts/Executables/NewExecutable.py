@@ -6,6 +6,7 @@ from db.ServiceInstance import ServiceInstance
 from resources.Descriptions import descriptions
 from resources.Consts import consts
 from pathlib import Path
+from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument
 import os
 
 class NewExecutable(BaseAct):
@@ -17,7 +18,7 @@ class NewExecutable(BaseAct):
 
     def declare():
         params = {}
-        params["type"] = {
+        params["type"] = LimitedArgument({
             "docs": {
                 "definition": descriptions.get('__type_of_creating_script'),
                 "values": {
@@ -27,37 +28,34 @@ class NewExecutable(BaseAct):
                     "representation": descriptions.get('__representation_title')
                 }
             },
-            "type": "array",
             "values": ["act", "extractor", "service", "representation"],
             "assertion": {
                 "not_null": True,
             },
-        }
-        params["category"] = {
+        })
+        params["category"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__main_category_title')
             },
-            "type": "string",
             "assertion": {
                 "not_null": True,
             },
-        }
-        params["title"] = {
+        })
+        params["title"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__name_of_the_script')
             },
-            "type": "string",
             "assertion": {
                 "not_null": True,
             },
-        }
-        params["declare"] = {
+        })
+        params["declare"] = CsvArgument({
             "docs": {
                 "definition": descriptions.get('__list_of_arguments_divided_by_comma')
             },
             "type": "csv",
             "default": [],
-        }
+        })
 
         return params
 

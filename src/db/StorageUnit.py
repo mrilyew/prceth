@@ -10,7 +10,7 @@ import shutil
 
 class StorageUnit(BaseModel):
     self_name = 'file'
-    temp_dir = ''
+    temp_dir = None
 
     class Meta:
         table_name = 'storage_units'
@@ -18,23 +18,24 @@ class StorageUnit(BaseModel):
     # Identification
     id = AutoField()
     hash = TextField(null=True)
-    link = TextField(null=True,default=None)
+    attached_path = TextField(null=True)
 
     # Meta
     upload_name = TextField(default='N/A') # Upload name (with extension)
-    extension = TextField(null=True,default="json") # File extension
+    extension = TextField(default="json") # File extension
 
     # Sizes
     filesize = BigIntegerField(default=0) # Size of main file
     dir_filesize = BigIntegerField(default=0) # Size of dir
 
     # Metadata
-    metadata = TextField(null=True,default=None)
+    metadata = TextField(default="")
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
-        self.temp_dir = storage.sub('tmp_files').allocateTemp()
+        if self._pk == None:
+            self.temp_dir = storage.sub('tmp_files').allocateTemp()
 
     def remove_temp(self):
         # get cursed
@@ -119,8 +120,8 @@ class StorageUnit(BaseModel):
         return _
 
     def path(self):
-        if getattr(self, "link") != None:
-            return self.link
+        if getattr(self, "attached_path", None) != None:
+            return self.attached_path
 
         __path = os.path.join(storage.sub('files').path(), self.hash[0:2])
         __end_dir = os.path.join(__path, self.hash)

@@ -1,6 +1,7 @@
 from executables.services.Base.BaseDeclaredAtDependent import BaseDeclaredAtDependent
 from repositories.ExtractorsRepository import ExtractorsRepository
 from resources.Descriptions import descriptions
+from declarable.ArgumentsTypes import StringArgument, IntArgument
 
 class RSS(BaseDeclaredAtDependent):
     category = 'Common'
@@ -9,15 +10,14 @@ class RSS(BaseDeclaredAtDependent):
 
     def declare():
         params = {}
-        params["url"] = {
+        params["url"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__url_to_rss_feed')
             },
-            "type": "string",
             "assertion": {
                 "not_null": True,
             },
-        }
+        })
 
         return params
 

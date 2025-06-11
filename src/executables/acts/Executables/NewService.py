@@ -1,8 +1,8 @@
 from db.ContentUnit import ContentUnit
 from executables.acts.Base.Base import BaseAct
-from app.App import logger
 from repositories.ServicesRepository import ServicesRepository
 from db.ServiceInstance import ServiceInstance
+from declarable.ArgumentsTypes import StringArgument, IntArgument
 
 class NewService(BaseAct):
     category = 'Executables'
@@ -12,22 +12,18 @@ class NewService(BaseAct):
 
     def declare():
         params = {}
-        params["class_name"] = {
-            "type": "string",
+        params["class_name"] = StringArgument({
             "assertion": {
                 "not_null": True,
             }
-        }
-        params["display_name"] = {
-            "type": "string",
-        }
-        params["interval"] = {
-            "type": "int",
+        })
+        params["display_name"] = StringArgument({})
+        params["interval"] = IntArgument({
             "default": 60,
             "assertion": {
                 "not_null": True,
             }
-        }
+        })
 
         return params
 

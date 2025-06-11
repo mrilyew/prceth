@@ -3,6 +3,7 @@ from app.App import logger
 from resources.Descriptions import descriptions
 from utils.MediaUtils import rss_date_parse
 from representations.Data.Json import Json as JsonRepresentation
+from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 import aiohttp, xmltodict
 
 class RSSFeed(BaseExtractor):
@@ -12,25 +13,23 @@ class RSSFeed(BaseExtractor):
 
     def declare():
         params = {}
-        params["url"] = {
+        params["url"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__url_to_rss_feed')
             },
-            "type": "string",
             "assertion": {
                 "not_null": True,
             },
-        }
-        params["create_collection"] = {
+        })
+        params["create_collection"] = BooleanArgument({
             "docs": {
                 "definition": descriptions.get('__is_create_collection_enabled')
             },
-            "type": "bool",
             "default": True,
             "assertion": {
                 "not_null": True,
             },
-        }
+        })
 
         return params
 

@@ -1,24 +1,24 @@
 from representations.Representation import Representation
 from resources.Descriptions import descriptions
 from utils.MainUtils import parse_json, list_conversation
+from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 
 class Json(Representation):
     category = "Data"
 
     def declare():
         params = {}
-        params["object"] = {
+        params["object"] = ObjectArgument({
             "docs": {
                 "definition": descriptions.get('__json_object_given_from_code')
             },
             "type": "object",
-        }
-        params["text"] = {
+        })
+        params["text"] = StringArgument({
             "docs": {
                 "definition": descriptions.get('__json_text_given_from_code')
             },
-            "type": "text",
-        }
+        })
 
         return params
 
