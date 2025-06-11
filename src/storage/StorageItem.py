@@ -26,5 +26,11 @@ class StorageItem:
 
         return Path(__hash_path)
 
+    def allocateHashOnce(self, hash):
+        __main_hash_path = os.path.join(self.dir, hash)
+        os.makedirs(__main_hash_path, exist_ok=True)
+
+        return Path(__main_hash_path)
+
     def path(self):
         return self.dir

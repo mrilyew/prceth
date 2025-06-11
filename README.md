@@ -11,11 +11,13 @@ Look at [docs](docs/ru/README.md)
 - [ ] Pre-execute если ничего не передано (?)
 - [ ] Хуки выполнения
 - [ ] Cli only use акты
+- [ ] Кэширование списка экзекьютеблов и тамбнейлов
 
 ### Экспорт
 
-- [ ] Acts.Metamorphosis.Export
+- [ ] Acts.Metamorphosis.Export (to .th zip)
 - [ ] Acts.Metamorphosis.Import
+- [ ] Acts.Metamorphosis.CopyToDirectory
 - [ ] Подмена даты создания файла при экспорте (если возможно?)
 
 ### Метаданные
@@ -25,7 +27,7 @@ Look at [docs](docs/ru/README.md)
 ### Contentunit
 
 - [ ] Генерируемая колонка indexation_content_string (колонка `content` без ключей и пробелов)
-- [ ] Переписать превью
+- [x] Переписать превью
 
 ### Репрезентации
 
@@ -40,3 +42,26 @@ Look at [docs](docs/ru/README.md)
 - [ ] Переписать
 - [ ] Режим archive.is без сохранения скриптов
 - [ ] Определённые декларируемые функции для определённого сайта
+
+### Acts.ContentUnits.
+
+- [ ] Search
+- [ ] Remove
+- [ ] GetById
+- [ ] Edit
+- [ ] ReorderGlobal
+- [ ] Link
+- [ ] Unlink
+- [ ] GetLinks
+
+### Acts.Executables.
+
+- [ ] List
+
+### Acts.Storage.
+
+- [ ] ClearTemp
+
+### ContentUnitRelation
+
+- [ ] .is_revision

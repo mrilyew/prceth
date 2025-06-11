@@ -34,7 +34,7 @@ class ContentUnit(BaseModel):
     content = TextField(null=True,default=None) # JSON data
     representation = TextField(null=True,default='File')
     extractor = TextField(null=True,default=None) # Extractor that was used for creation
-    preview = TextField(null=True) # Preview in json format
+    thumbnail = TextField(null=True) # Preview in json format
 
     # Meta
     display_name = TextField(default='N/A')
@@ -213,6 +213,15 @@ class ContentUnit(BaseModel):
         if json_input.get('is_collection', False) == True:
             out.is_collection = True
 
+        if json_input.get('make_thumbnail', True) == True:
+            thmb = out.make_thumbnail({}, json_input.get('representation_class', None))
+            if thmb != None:
+                fnl = []
+                for t in thmb:
+                    fnl.append(t.data)
+
+                out.thumbnail = dump_json(fnl)
+
         if json_input.get('save_model', False) == True:
             out.save()
 
@@ -220,6 +229,15 @@ class ContentUnit(BaseModel):
 
     def set_source(self, source_json: dict):
         self.source = dump_json(source_json)
+
+    def make_thumbnail(self, i = {}, representation = None):
+        if representation != None and getattr(representation, 'preview', None) != None:
+            return representation.preview({})
+
+        main_file = self.su
+
+        if main_file != None:
+            return main_file.make_thumbnail(i)
 
     # Links
 

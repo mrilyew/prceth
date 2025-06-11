@@ -7,6 +7,7 @@ from utils.MainUtils import valid_name, extract_metadata_to_dict, get_random_has
 from db.BaseModel import BaseModel
 from submodules.Files.FileManager import file_manager
 import shutil
+import mimetypes
 
 class StorageUnit(BaseModel):
     self_name = 'file'
@@ -23,6 +24,7 @@ class StorageUnit(BaseModel):
     # Meta
     upload_name = TextField(default='N/A') # Upload name (with extension)
     extension = TextField(default="json") # File extension
+    mime = TextField(null=True,default="n/a")
 
     # Sizes
     filesize = BigIntegerField(default=0) # Size of main file
@@ -52,18 +54,18 @@ class StorageUnit(BaseModel):
 
         self.upload_name = json_data.get("upload_name")
         self.filesize = json_data.get("filesize")
+        _mime = mimetypes.guess_type(self.path())
+        self.mime = _mime[0]
 
         if json_data.get("link") != None:
             self.link = json_data.get("link")
-        
+
         # TODO handle async
         if json_data.get("take_metadata", False) == True:
             self.fillMeta()
 
         if json_data.get('__flush__model__to__db__', True) == True:
             self.save()
-
-        self.move_temp_dir()
 
         if json_data.get('__move__from__temp__', True) == True:
             self.move_temp_dir()
@@ -104,6 +106,19 @@ class StorageUnit(BaseModel):
         except Exception as __e__:
             logger.logException(__e__, "File", silent=False)
 
+    def make_thumbnail(self, i = {}):
+        from thumbnails.Thumbnail import Thumbnail
+
+        __mime = self.mime
+        __class = Thumbnail.getByMime(__mime)
+        if __class == None:
+            return None
+        
+        _cl = __class()
+
+        i.update({'path': self.path()})
+        return _cl.safeExecute(i)
+
     def api_structure(self):
         _ = {
             "id": self.id,
@@ -133,6 +148,9 @@ class StorageUnit(BaseModel):
         return __path
 
     def hash_filename(self):
+        if self.temp_dir != None:
+            return f"{self.upload_name}"
+
         return f"{self.hash}.{str(self.extension)}"
 
     def upper_hash_dir(self):

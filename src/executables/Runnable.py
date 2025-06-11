@@ -16,6 +16,9 @@ class Runnable:
 
     # Arguments
 
+    def __init__(self):
+        self.defineConsts()
+
     def defineConsts(self):
         pass
 

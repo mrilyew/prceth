@@ -44,10 +44,14 @@ class DeclarableArgs():
             return __dict
 
         __enumeration = self.comparing
+        if self.is_free_settings:
+            for a, n in enumerate(self.args):
+                __enumeration[n] = self.comparing.get(n)
+
         for index, param_name in enumerate(__enumeration):
             param_object = self.recieveObjectByName(param_name)
             if param_object == None and self.is_free_settings == True:
-                __dict[param_name] = __enumeration.get(param_name)
+                __dict[param_name] = self.args.get(param_name)
                 continue
 
             param_object.passValue(self.args.get(param_name))
