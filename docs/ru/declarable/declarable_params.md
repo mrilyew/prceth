@@ -11,7 +11,7 @@
 Параметр должен быть классом, наследующим declarable.ArgumentsTypes.Argument. Для получения в коде можно прописать:
 
 ```
-from declarable.ArgumentsTypes import {...нужные параметры}
+from declarable.ArgumentsTypes import {...нужные аргументы}
 ```
 
 #### Создание своего аргумента
