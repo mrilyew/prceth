@@ -27,18 +27,22 @@ class VideoThumbnail(Thumbnail):
         with VideoFileClip(path) as video:
             duration = video.duration
             frag_len = (duration / i.get('frames'))
+            __hash = get_random_hash(8)
 
             for i in range(0, i.get('frames')):
                 _state = ThumbnailState()
-                _state.new(get_random_hash(8))
+                _state.new(__hash)
 
-                __new_prev = os.path.join(_state.get_dir(), f"{_state.hash}_{i}.jpg")
+                __new_prev = os.path.join(str(_state.get_dir()), f"{_state.hash}_{i}.jpg")
 
-                previews.append({
+                _state.write_data({
+                    "type": "photo",
                     "path": __new_prev,
                     "width": sizes[0],
                     "height": sizes[1]
                 })
+
+                previews.append(_state)
 
                 i_duration = i * frag_len
 

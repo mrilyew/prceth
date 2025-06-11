@@ -2,15 +2,15 @@ from utils.MainUtils import dump_json
 from app.App import storage
 
 class ThumbnailState:
-    tmp = None
+    directory = None
     hash = None
 
     def new(self, hash):
-        self.tmp = storage.sub('tmp').allocateTemp()
         self.hash = hash
+        self.directory = storage.sub('thumbnails').allocateHashOnce(self.hash)
 
     def get_dir(self):
-        _dir = storage.sub('thumbnails').allocateHashOnce(self.hash)
+        _dir = self.directory
 
         return _dir
 
