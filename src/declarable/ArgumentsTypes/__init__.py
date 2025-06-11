@@ -2,7 +2,9 @@ from declarable.ArgumentsTypes.BooleanArgument import BooleanArgument
 from declarable.ArgumentsTypes.CsvArgument import CsvArgument
 from declarable.ArgumentsTypes.FloatArgument import FloatArgument
 from declarable.ArgumentsTypes.IntArgument import IntArgument
+from declarable.ArgumentsTypes.JsonArgument import JsonArgument
 from declarable.ArgumentsTypes.LimitedArgument import LimitedArgument
 from declarable.ArgumentsTypes.ObjectArgument import ObjectArgument
+from declarable.ArgumentsTypes.ServiceInstanceArgument import ServiceInstanceArgument
 from declarable.ArgumentsTypes.StorageUnitArgument import StorageUnitArgument
 from declarable.ArgumentsTypes.StringArgument import StringArgument

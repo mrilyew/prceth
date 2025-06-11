@@ -32,13 +32,13 @@ class ServiceInstance(Model):
     def api_structure(self):
         obj = {}
 
-        obj["id"] = self.id
-        obj["service_name"] = self.service_name
-        obj["display_name"] = self.display_name
-        obj["data"] = self.data_json()
-        obj["frontend_data"] = self.frontend_data_json()
-        obj["interval"] = self.interval
-        obj["created_at"] = int(self.created_at)
+        obj['id'] = self.id
+        obj['service_name'] = self.service_name
+        obj['display_name'] = self.display_name
+        obj['data'] = self.data_json()
+        obj['frontend_data'] = self.frontend_data_json()
+        obj['interval'] = self.interval
+        obj['created_at'] = int(self.created_at)
 
         return obj
     
@@ -46,6 +46,12 @@ class ServiceInstance(Model):
     def get(id):
         return ServiceInstance.select().where(ServiceInstance.id == id).first()
     
-    def updateData(self, json):
+    def setData(self, json):
         self.data = dump_json(json)
         #self.save()
+
+    def updateData(self, json):
+        orig = self.data_json()
+        orig.update(json)
+
+        self.data = dump_json(orig)

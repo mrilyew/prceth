@@ -44,12 +44,9 @@ class DeclarableArgs():
             return __dict
 
         __enumeration = self.comparing
-        if self.is_free_settings == True:
-            __enumeration = self.args
-
         for index, param_name in enumerate(__enumeration):
             param_object = self.recieveObjectByName(param_name)
-            if param_object == None:
+            if param_object == None and self.is_free_settings == True:
                 __dict[param_name] = __enumeration.get(param_name)
                 continue
 
@@ -60,10 +57,10 @@ class DeclarableArgs():
                 __unexist = param_object.data.get('save_none_values', False)
                 __value = param_object.val()
 
+                param_object.assertions(__value)
+
                 if __value == None and __unexist == False:
                     continue
-
-                param_object.assertions(__value)
 
                 __dict[param_name] = __value
             except Exception as _y:

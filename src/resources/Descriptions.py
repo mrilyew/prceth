@@ -123,3 +123,19 @@ descriptions['__is_convert_hachoir_metadata_to_dict'] = {
     "rus": "Конвертировать метаданные в читаемый словарь",
     "eng": "Do convert metadata to readable dictionary"
 }
+descriptions['__service_id_where_updata_data'] = {
+    "rus": "ID сервайса, в котором нужно обновить данные",
+    "eng": "ServiceInstance ID where need to update data"
+}
+descriptions['__service_new_data'] = {
+    "rus": "Новые данные сервайса",
+    "eng": "New ServiceInstance data"
+}
+descriptions['__update_service_data'] = {
+    "rus": "Обновление данных сервайса",
+    "eng": "ServiceInstance data update"
+}
+descriptions['__updates_service_data_not_changes'] = {
+    "rus": "Обновляет сохранённые данные в сервайсе (не заменяет)",
+    "eng": "Updates saved data at ServiceInstance"
+}

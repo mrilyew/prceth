@@ -26,6 +26,7 @@ class RegularExecution(BaseService):
             },
         })
         params["pass_args"] = ObjectArgument({
+            "default": {},
             "assertion": {
                 "not_null": True,
             },
@@ -34,7 +35,7 @@ class RegularExecution(BaseService):
         return params
 
     def __get_executable(self, executable_name, executable_type):
-        self.pass_args = parse_json(self.config.get("pass_args", "{}"))
+        self.pass_args = self.config.get("pass_args", {})
 
         if self.c_cached_executable == None:
             match(executable_type):
@@ -59,4 +60,6 @@ class RegularExecution(BaseService):
 
         __exec = self.c_cached_executable()
 
-        await __exec.safeExecute(args=self.pass_args)
+        res = await __exec.safeExecute(args=self.pass_args)
+        if executable_type == "act":
+            print(res)

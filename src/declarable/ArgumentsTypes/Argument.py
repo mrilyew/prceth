@@ -22,12 +22,13 @@ class Argument:
                 __fnl['values'][name] = resolve_lang(__docs.get('values').get(name), __lang_code)
 
     def default(self):
-        return self.data.get('default')
+        return self.data.get('default', None)
 
     def value(self):
         return self.input_value
 
     def val(self):
+        #print(f"{self.data.get('name')}={self.input_value}={self.default()}")
         if self.input_value != None:
             return self.value()
         else:
