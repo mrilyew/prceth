@@ -2,7 +2,7 @@
 
 Модуль для логгирования каких либо сообщений.
 
-#### log(message=,section=,name=,silent=)
+#### log(message=,section=,kind=,silent=)
 
 Сохраняет строку в файл в формате [time] [$name] [$section] $message
 

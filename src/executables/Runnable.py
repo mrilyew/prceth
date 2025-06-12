@@ -4,6 +4,7 @@ from db.ContentUnit import ContentUnit
 class Runnable:
     category = 'base'
 
+    buffer = {}
     docs = {
         "name": {
             "en": "Abstract name"

@@ -96,16 +96,20 @@ class Logger():
             self.log_stream.write(write_message)
 
         if is_silent == False:
+            write_message = write_message.replace("\\n", "\n")
+            write_colored_message = ""
             if kind == "error":
-                print("\033[91m" + write_message.replace("\n", "") + "\033[0m")
+                write_colored_message = "\033[91m" + write_message + "\033[0m"
             elif kind == "success":
-                print("\033[92m" + write_message.replace("\n", "") + "\033[0m")
+                write_colored_message = "\033[92m" + write_message + "\033[0m"
             elif kind == "deprecated":
-                print("\033[93m" + write_message.replace("\n", "") + "\033[0m")
+                write_colored_message = "\033[93m" + write_message + "\033[0m"
             else:
-                print(write_message.replace("\n", ""))
+                write_colored_message = write_message
+            
+            print(write_colored_message, end='')
 
-    def logException(self, input_exception, section: str ="App", silent: bool =True):
+    def logException(self, input_exception, section: str ="App", silent: bool = False):
         __exp = traceback.format_exc()
 
         self.log(section=section, message=type(input_exception).__name__ + " " + __exp, kind="error", silent=silent)

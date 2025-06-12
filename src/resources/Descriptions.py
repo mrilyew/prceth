@@ -139,3 +139,34 @@ descriptions['__updates_service_data_not_changes'] = {
     "rus": "Обновляет сохранённые данные в сервайсе (не заменяет)",
     "eng": "Updates saved data at ServiceInstance"
 }
+
+# не канон
+
+descriptions['__vk_api_token_authorization'] = {
+    "rus": "Токен авторизации",
+    "eng": "Authorization token"
+}
+descriptions['__vk_api_endpoint'] = {
+    "rus": "Эндпоинт vk api",
+    "eng": "Vk api endpoint",
+}
+descriptions['__vk_site_path'] = {
+    "rus": "Ссылка на vk",
+    "eng": "VK Url",
+}
+descriptions['__vk_post'] = {
+    "rus": "Пост из ВК",
+    "eng": "Post from VK",
+}
+descriptions['__vk_post_and_its_attachments'] = {
+    "rus": "Информация о посте из ВК и его прикреплениях",
+    "eng": "Info about VK post and its attachments",
+}
+descriptions['__vk_photo'] = {
+    "rus": "Фото из ВК",
+    "eng": "Photo from VK",
+}
+descriptions['__vk_photo_from'] = {
+    "rus": "Информация о сущности фотографии",
+    "eng": "Info about vk photo entity",
+}

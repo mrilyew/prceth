@@ -238,7 +238,7 @@ def replace_link_gaps(input_data, link_to_linked_files, recurse_level = 0):
             elif "__$|file_" in input_data:
                 got_id = int(input_data.replace("__$|file_", ""))
                 for linked in link_to_linked_files:
-                    if linked.id == got_id and linked.self_name == "file":
+                    if linked.id == got_id and linked.self_name == "StorageUnit":
                         return linked.getFormattedInfo(recursive=True,recurse_level=recurse_level+1)
                     else:
                         return input_data
@@ -263,3 +263,9 @@ def list_conversation(i_list):
 
 def resolve_lang(translation_dict: dict, lang_code: str):
     return translation_dict.get(lang_code)
+
+def entity_sign(unit):
+    return f"__$|{unit.short_name}_{unit.id}"
+
+def entity_link(dict_link: dict, key_name: str, unit):
+    dict_link[key_name] = f"__$|{entity_sign(unit)}"

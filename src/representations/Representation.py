@@ -2,6 +2,7 @@ from resources.Exceptions import AbstractClassException
 from executables.Runnable import Runnable
 from resources.Exceptions import SuitableExtractMethodNotFound
 from app.App import logger
+import asyncio
 
 class Representation(Runnable):
     category = "base"
@@ -22,8 +23,12 @@ class Representation(Runnable):
     def extractWheel(self):
         raise AbstractClassException("This is abstract representation")
 
+    def preExtract(self, i = {}):
+        self.buffer['args'] = i
+
     async def safeExtract(self, i: dict = {})->dict:
         __args = self.validate(i)
+        self.preExtract(__args)
         __res = await self.extract(i=__args)
 
         return __res
@@ -45,3 +50,14 @@ class Representation(Runnable):
         json_data['representation_class'] = self
 
         return json_data
+
+    async def gatherTasks(self, items, method_name):
+        __list = []
+        __tasks = []
+        for item in items:
+            __task = asyncio.create_task(method_name(item, __list))
+            __tasks.append(__task)
+
+        await asyncio.gather(*__tasks, return_exceptions=False)
+
+        return __list

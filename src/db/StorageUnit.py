@@ -10,7 +10,8 @@ import shutil
 import mimetypes
 
 class StorageUnit(BaseModel):
-    self_name = 'file'
+    self_name = 'StorageUnit'
+    short_name = 'su'
     temp_dir = None
 
     class Meta:

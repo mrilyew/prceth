@@ -25,6 +25,7 @@ class ContentUnit(BaseModel):
         table_name = 'content_units'
 
     self_name = 'ContentUnit'
+    short_name = 'cu'
 
     # Identification
     id = AutoField() # Absolute id
@@ -58,6 +59,7 @@ class ContentUnit(BaseModel):
     deleted = BooleanField(index=True,default=0)
 
     # Useless
+    __tmpLinks = None
     __cachedLinks = {}
     __cached_su = {}
     __cached_content = None
@@ -172,18 +174,6 @@ class ContentUnit(BaseModel):
         if json_input.get("unlisted", None) == True:
             out.unlisted = 1
 
-        if json_input.get("links") != None:
-            __links = []
-            for item in json_input.get("links"):
-                if item == None:
-                    continue
-
-                __links.append(item)
-                out.addLink(item)
-
-            if len(__links) > 0:
-                out.__cachedLinks = __links
-
         out.extractor = json_input.get("extractor")
         out.representation = json_input.get("representation")
 
@@ -213,7 +203,7 @@ class ContentUnit(BaseModel):
         if json_input.get('is_collection', False) == True:
             out.is_collection = True
 
-        if json_input.get('make_thumbnail', True) == True:
+        if json_input.get('make_thumbnail', False) == True:
             thmb = out.make_thumbnail({}, json_input.get('representation_class', None))
             if thmb != None:
                 fnl = []
@@ -225,7 +215,30 @@ class ContentUnit(BaseModel):
         if json_input.get('save_model', False) == True:
             out.save()
 
+        if json_input.get("links") != None:
+            __links = []
+            for item in json_input.get("links"):
+                __links.append(item)
+
+            if len(__links) > 0:
+                out.__tmpLinks = __links
+
         return out
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        if self.__tmpLinks != None:
+            __links = []
+
+            for item in self.__tmpLinks:
+                if item == None:
+                    continue
+
+                self.addLink(item)
+                __links.append(item)
+
+            self.__cachedLinks = __links
 
     def set_source(self, source_json: dict):
         self.source = dump_json(source_json)

@@ -1,6 +1,7 @@
 from app.App import logger
 from pathlib import Path
 from resources.Consts import consts
+from resources.Cached import cached
 import importlib
 
 class ExecutableRepository:
@@ -31,10 +32,22 @@ class ExecutableRepository:
             raise _ex
 
     def getByName(self, plugin_name):
+        __cached = cached.get(f'{self.__category()}_list')
+        if __cached != None:
+            __ = plugin_name.split(".")
+            for c in __cached:
+                print(c.category, c.__name__)
+                if c.category == __[0] and c.__name__:
+                    return c
+
         return self.__import(plugin_name)
 
     def getList(self, show_hidden: bool = False, search_category: str = None):
         repo_type = self.class_type.__name__
+
+        if cached.get(f'{repo_type}s_list') != None:
+            return cached.get(f'{repo_type}s_list')
+
         __exit = []
 
         # TODO: Caching
@@ -52,5 +65,7 @@ class ExecutableRepository:
                 __module = self.__import(module_name.replace(".py", ""))
 
                 __exit.append(__module)
+        
+        cached[f'{self.self.__category()}_list'] = __exit
 
         return __exit
