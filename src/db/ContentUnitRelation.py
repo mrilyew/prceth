@@ -1,4 +1,4 @@
-from peewee import BigIntegerField, CharField, AutoField, Model
+from peewee import BigIntegerField, CharField, AutoField, Model, BooleanField
 
 class ContentUnitRelation(Model):
     class Meta:
@@ -8,3 +8,4 @@ class ContentUnitRelation(Model):
     child_type = CharField(default='ContentUnit')
     child = BigIntegerField(null=True)
     order = AutoField()
+    is_revision = BooleanField(default=0)
