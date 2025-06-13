@@ -1,10 +1,10 @@
 from app.App import logger
-from representations.Vk.BaseVk import BaseVk
+from representations.Vk.BaseVk import BaseVkByItemId
 from declarable.ArgumentsTypes import ObjectArgument, IntArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
 from utils.MainUtils import entity_link, entity_sign
 
-class Post(BaseVk):
+class VkPost(BaseVkByItemId):
     category = 'Vk'
     vk_type = 'post'
     docs = {
@@ -16,7 +16,7 @@ class Post(BaseVk):
 
     def declare():
         params = {}
-        params["objects"] = ObjectArgument({})
+        params["object"] = ObjectArgument({})
         params["item_id"] = StringArgument({})
         params["download_attachments_json_list"] = CsvArgument({
             'default': '*'
@@ -29,12 +29,6 @@ class Post(BaseVk):
         })
         return params
 
-    def extractWheel(self, i = {}):
-        if i.get('objects') != None:
-            return 'extractByObject'
-        elif 'item_id' in i:
-            return 'extractById'
-
     def preExtract(self, i):
         super().preExtract(i)
 
@@ -42,17 +36,17 @@ class Post(BaseVk):
         self.buffer['download_file_list'] = i.get("download_attachments_file_list").split(",")
 
     async def extractById(self, i = {}):
-        items_ids = i.get('item_id')
-        items_ids_list = items_ids.split(",")
+        items_ids_string = i.get('item_id')
+        items_ids = items_ids_string.split(",")
 
-        response = await self.vkapi.call("wall.getById", {"posts": (",".join(items_ids_list)), "extended": 1})
+        response = await self.vkapi.call("wall.getById", {"posts": (",".join(items_ids)), "extended": 1})
 
-        self.buffer['profiles'] = response.get("profiles")
-        self.buffer['groups'] = response.get("groups")
+        self.buffer['profiles'] = response.get('profiles')
+        self.buffer['groups'] = response.get('groups')
 
         items = response.get('items')
 
-        return await self.gatherTasks(items, self.item)
+        return await self.gatherTasksByTemplate(items, self.item)
 
     async def extractByObject(self, i = {}):
         objects = i.get("objects")
@@ -62,13 +56,23 @@ class Post(BaseVk):
         self.buffer['profiles'] = objects.get("profiles")
         self.buffer['groups'] = objects.get("groups")
 
-        return await self.gatherTasks(items, self.item)
+        return await self.gatherTasksByTemplate(items, self.item)
 
     async def item(self, item, list_to_add):
-        self._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+        '''
+        Converts VK Api Post object to readable format
+        '''
+
+        attachments_list = item.get('attachments', [])
+        reposts_list = item.get('copy_history')
+
+        do_download_attachments = True
+        do_download_reposts = self.buffer.get('args').get('download_reposts') == True
 
         item["relative_attachments"] = []
         item["relative_copy_history"] = []
+
+        self._insertVkLink(item, self.buffer.get('args').get('vk_path'))
 
         item_id = f"{item.get('owner_id')}_{item.get('id')}"
         if self.vk_type == "message":
@@ -85,12 +89,11 @@ class Post(BaseVk):
 
         logger.log(message=f"Recieved {self.vk_type} {item_id}",section="VK",kind="message")
 
-        __linked_files = []
+        links = []
 
-        # Replacing attachments to contentunit system
-        for key, attachment in enumerate(item.get("attachments", [])):
+        for key, attachment in enumerate(item.get(attachments_list)):
             try:
-                attachment_item = await self.format_attachment(key, attachment, __linked_files)
+                attachment_item = await self.format_attachment(key, attachment, links)
 
                 item['relative_attachments'].append({
                     "type": attachment.get('type'),
@@ -98,17 +101,17 @@ class Post(BaseVk):
                 })
             except ModuleNotFoundError:
                 pass
-            except Exception as ___e___:
-                logger.logException(___e___, "VkAttachments", silent=False)
+            except Exception as exc:
+                logger.logException(exc, "VkAttachments", silent=False)
 
-        if item.get('copy_history') != None and self.buffer.get('args').get('download_reposts') == True:
+        if reposts_list != None and do_download_reposts:
             for key, repost in enumerate(item.get("copy_history")):
                 try:
-                    await self.format_repost(key, repost, __linked_files)
+                    await self.format_repost(key, repost, links)
                 except ModuleNotFoundError:
                     pass
-                except Exception as ___e___:
-                    logger.logException(___e___, "VkAttachments", silent=False)
+                except Exception as exc:
+                    logger.logException(exc, "VkAttachments", silent=False)
 
         owner_keys = ['from_id', 'owner_id', 'copy_owner_id']
         for key in owner_keys:
@@ -119,7 +122,7 @@ class Post(BaseVk):
             "source": source,
             "name": f"VK {self.vk_type.title()} {str(item_id)}",
             "content": item,
-            "links": __linked_files,
+            "links": links,
             "unlisted": self.buffer.get('args').get("unlisted") == 1,
             "declared_created_at": item.get("date"),
         })
@@ -127,6 +130,10 @@ class Post(BaseVk):
         list_to_add.append(_item_cu)
 
     async def format_attachment(self, key, attachment, linked_dict):
+        '''
+        Converts attachment dict to ContentUnit
+        '''
+
         att_type = attachment.get("type")
         att_class_name = att_type
         att_object = attachment.get(att_type)
@@ -144,17 +151,19 @@ class Post(BaseVk):
             return None
 
         attachment_object = None
-        attachment_name = f"Vk.{att_class_name.title()}"
+        attachment_name = f"Vk.Vk{att_class_name.title()}"
         attachment_representation = RepresentationsRepository().getByName(attachment_name)
 
         if attachment_representation == None:
-            logger.log(message="Recieved unknown attachment: " + str(att_class_name),section="VkAttachments",kind="message")
+            from representations.Data.Json import Json as UnknownAttachmentRepresentation
 
-            __attachment_class_unknown = (RepresentationsRepository().getByName('Data.Json'))()
-            __attachment_class_unknown_entities = await __attachment_class_unknown.extract({
+            logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="VkAttachments", kind="message")
+
+            resl = await UnknownAttachmentRepresentation().extract({
                 "object": attachment['attachments'][key][att_class_name],
             })
-            attachment_object = __attachment_class_unknown_entities[0]
+
+            attachment_object = resl[0]
             attachment_object.save()
 
             linked_dict.append(attachment_object)
@@ -164,7 +173,7 @@ class Post(BaseVk):
 
             logger.log(message=f"Recieved attachment {str(att_class_name)} {attachment_id}",section="VkAttachments",kind="message")
 
-            ret = await att_class.extract({
+            resl = await att_class.extract({
                 "unlisted": True,
                 "object": att_object,
                 "api_token": self.buffer.get('args').get('api_token'),
@@ -173,7 +182,7 @@ class Post(BaseVk):
                 "download_file": should_download_file,
             })
 
-            attachment_object = ret[0]
+            attachment_object = resl[0]
             attachment_object.save()
 
             linked_dict.append(attachment_object)
@@ -187,7 +196,7 @@ class Post(BaseVk):
 
         logger.log(message=f"Found repost {key}",section="VKPost",kind="message")
 
-        repost_thing = Post()
+        repost_thing = VkPost()
         vals = await repost_thing.extract({
             "unlisted": True,
             "item_id": repost_id,

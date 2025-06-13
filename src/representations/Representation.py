@@ -51,7 +51,7 @@ class Representation(Runnable):
 
         return json_data
 
-    async def gatherTasks(self, items, method_name):
+    async def gatherTasksByTemplate(self, items, method_name):
         __list = []
         __tasks = []
         for item in items:

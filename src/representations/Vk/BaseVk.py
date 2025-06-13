@@ -75,3 +75,10 @@ class BaseVk(Representation):
 
     def _insertVkLink(self, item, vk_path):
         item['site'] = vk_path
+
+class BaseVkByItemId(BaseVk):
+    def extractWheel(self, i = {}):
+        if i.get('object') != None:
+            return 'extractByObject'
+        elif 'item_id' in i:
+            return 'extractById'

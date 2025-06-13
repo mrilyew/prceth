@@ -6,7 +6,7 @@ from pathlib import Path
 from submodules.Web.DownloadManager import download_manager
 import os
 
-class Photo(BaseVk):
+class VkPhoto(BaseVk):
     category = 'Vk'
     docs = {
         "description": {
@@ -41,7 +41,7 @@ class Photo(BaseVk):
         if type(final_object) != list:
             final_object = [final_object]
 
-        return await self.gatherTasks(final_object, self.item)
+        return await self.gatherTasksByTemplate(final_object, self.item)
 
     async def item(self, item, list_to_add):
         download_url = ""
