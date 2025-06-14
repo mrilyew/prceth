@@ -1,13 +1,9 @@
-from representations.Vk.BaseVk import BaseVkByItemId
+from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
 from declarable.ArgumentsTypes import ObjectArgument, IntArgument, StringArgument, BooleanArgument, CsvArgument
 from app.App import logger
 
-class VkAlbum(BaseVkByItemId):
+class VkAlbum(BaseVk):
     category = 'Vk'
-    docs = {
-        "name": '__vk_album',
-        "definition": '__vk_album'
-    }
 
     def declare():
         params = {}
@@ -16,51 +12,57 @@ class VkAlbum(BaseVkByItemId):
 
         return params
 
-    async def extractById(self, i = {}):
-        items_ids_string = i.get('item_id')
-        items_ids = items_ids_string.split(",")
-        owner_id = None
-        item_second_ids = []
+    class Extractor(VkExtractStrategy):
+        def extractWheel(self, i = {}):
+            if i.get('object') != None:
+                return 'extractByObject'
+            elif 'item_id' in i:
+                return 'extractById'
 
-        for item in items_ids:
-            owner_id = item[0]
+        async def extractByObject(self, i = {}):
+            objects = i.get("object")
 
-            item_second_ids.append(item[1])
+            items = objects
 
-        response = await self.vkapi.call("photos.getAlbums", {"owner_id": owner_id, "album_ids": ",".join(item_second_ids), "need_covers": 1, "photo_sizes": 1})
+            return await self.gatherList(items, self.item)
 
-        items = response.get('items')
+        async def extractById(self, i = {}):
+            items_ids_string = i.get('item_id')
+            items_ids = items_ids_string.split(",")
+            owner_id = None
+            item_second_ids = []
 
-        return await self.gatherTasksByTemplate(items, self.item)
+            for item in items_ids:
+                owner_id = item[0]
 
-    async def getList(self, i = {}):
-        owner_id = i.get('owner_id')
+                item_second_ids.append(item[1])
 
-        pass
+            response = await self.vkapi.call("photos.getAlbums", {"owner_id": owner_id, "album_ids": ",".join(item_second_ids), "need_covers": 1, "photo_sizes": 1})
 
-    async def getPhotos(self, i = {}):
-        pass
+            items = response.get('items')
 
-    async def item(self, item, list_to_add):
-        item_id = f"{item.get('owner_id')}_{item.get('id')}"
-        source = {
-            'type': 'vk',
-            'vk_type': "album",
-            'content': item_id
-        }
-        name = f"Album \"{item.get('title')}\""
+            return await self.gatherTasksByTemplate(items, self.item)
 
-        self._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+        async def item(self, item, list_to_add):
+            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            item_id = f"{item.get('owner_id')}_{item.get('id')}"
+            name = f"Album \"{item.get('title')}\""
 
-        logger.log(message=f"Recieved album {item_id}",section="VkCollection",name="message")
+            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
 
-        alb = self.contentUnit({
-            "source": source,
-            "content": item,
-            "unlisted": True,
-            "name": name,
-            "description": item.get("description"),
-            "declared_created_at": item.get("date"),
-        })
+            logger.log(message=f"Recieved album {item_id}",section="VkEntity",kind="message")
 
-        list_to_add.append(alb)
+            alb = self.contentUnit({
+                "source": {
+                    'type': 'vk',
+                    'vk_type': "album",
+                    'content': item_id
+                },
+                "content": item,
+                "unlisted": is_do_unlisted,
+                "name": name,
+                "description": item.get("description"),
+                "declared_created_at": item.get("date"),
+            })
+
+            list_to_add.append(alb)
