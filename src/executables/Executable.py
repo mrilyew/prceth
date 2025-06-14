@@ -1,11 +1,10 @@
-from submodules.Files.FileManager import file_manager
-from resources.Consts import consts
-from app.App import config, storage, logger
-from utils.MainUtils import get_ext, dump_json
-from db.ContentUnit import ContentUnit
+from app.App import logger
 from executables.Runnable import Runnable
+from executables.Documentable import Documentable
+from executables.Saveable import Saveable
+from executables.RecursiveDeclarable import RecursiveDeclarable
 
-class Executable(Runnable):
+class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
     events = {
         "success": [],
         "afterSave": [],
@@ -25,7 +24,7 @@ class Executable(Runnable):
         pass
 
     async def safeExecute(self, args: dict):
-        return await self.execute(self.validate(args))
+        return await self.execute(self.__class__.validate(args))
 
     # Events
 

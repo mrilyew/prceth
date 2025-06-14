@@ -1,58 +1,6 @@
-from declarable.ArgsValidator import ArgsValidator
-from db.ContentUnit import ContentUnit
-
 class Runnable:
     category = 'base'
-
     buffer = {}
-    docs = {
-        "name": {
-            "en": "Abstract name"
-        },
-        "definition": {
-            "en": "Abstract description"
-        }
-    }
-    executable_cfg =  {}
-
-    # Arguments
-
-    def __init__(self):
-        self.defineConsts()
-
-    def defineConsts(self):
-        pass
-
-    def declare():
-        '''
-        Method that defines dictionary of current executable args
-        '''
-        params = {}
-
-        return params
-
-    def recursiveDeclaration(self):
-        '''
-        Brings all params from parent classes to one dict
-        '''
-        ignore_list = self.executable_cfg.get('ignore', [])
-        output_params = {}
-
-        for __sub_class in self.__class__.__mro__:
-            if hasattr(__sub_class, "declare") == False:
-                continue
-
-            intermediate_dict = {}
-            current_level_declaration = __sub_class.declare()
-            for i, name in enumerate(current_level_declaration):
-                if name in ignore_list:
-                    continue
-
-                intermediate_dict[name] = current_level_declaration.get(name)
-
-            output_params.update(intermediate_dict)
-
-        return output_params
 
     # Comparisons
 
@@ -71,9 +19,6 @@ class Runnable:
         '''
         return cls.isAbstract() == False and cls.isHidden() == False
 
-    def validate(self, args: dict)->dict:
-        return ArgsValidator().validate(self.recursiveDeclaration(), args, self.executable_cfg)
-
     def self_insert(self, json_data: dict)->dict:
         '''
         You can append 'extractor' or 'representation' key there
@@ -84,6 +29,3 @@ class Runnable:
     @classmethod
     def full_name(cls):
         return cls.category + '.' + cls.__name__
-
-    def new_cu(self, json_data):
-        return ContentUnit.fromJson(self.self_insert(json_data))

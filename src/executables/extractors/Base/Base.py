@@ -9,7 +9,7 @@ class BaseExtractor(Executable):
         self.linked_dict = linked_dict
 
     def collectionable(self, json_data: dict):
-        coll_obj = self.new_cu(json_data)
+        coll_obj = self.contentUnit(json_data)
         coll_obj.is_collection = True
 
         coll_obj.save()

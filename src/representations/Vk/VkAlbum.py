@@ -54,7 +54,7 @@ class VkAlbum(BaseVkByItemId):
 
         logger.log(message=f"Recieved album {item_id}",section="VkCollection",name="message")
 
-        alb = self.new_cu({
+        alb = self.contentUnit({
             "source": source,
             "content": item,
             "unlisted": True,

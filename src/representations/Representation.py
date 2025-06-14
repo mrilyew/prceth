@@ -1,63 +1,36 @@
-from resources.Exceptions import AbstractClassException
-from executables.Runnable import Runnable
-from resources.Exceptions import SuitableExtractMethodNotFound
 from app.App import logger
+from resources.Exceptions import AbstractClassException
+from executables.RecursiveDeclarable import RecursiveDeclarable
+from executables.Runnable import Runnable
+from representations.ExtractStrategy import ExtractStrategy
 import asyncio
 
-class Representation(Runnable):
+class Representation(RecursiveDeclarable, Runnable):
     category = "base"
 
-    async def extract(self, i = {}):
-        __wheel = self.extractWheel(i)
-        if __wheel == None:
-            __wheel = ""
+    class Extractor(ExtractStrategy):
+        pass
 
-        __wheel_method = getattr(self, __wheel, None)
-        if __wheel_method == None:
-            raise SuitableExtractMethodNotFound('Not found suitable extractor for current args')
+    @classmethod
+    async def extract(cls, i: dict = {})->dict:
+        if cls.Extractor == None:
+            raise AbstractClassException('ExecutableStrategy is not implemented at this class')
 
-        __res = await __wheel_method(i)
+        strategy = cls.Extractor(cls)
+        args = cls.validate(i)
 
-        return __res
+        strategy.preExtract(args)
 
-    def extractWheel(self):
-        raise AbstractClassException("This is abstract representation")
-
-    def preExtract(self, i = {}):
-        self.buffer['args'] = i
-
-    async def safeExtract(self, i: dict = {})->dict:
-        __args = self.validate(i)
-        self.preExtract(__args)
-        __res = await self.extract(i=__args)
-
-        return __res
+        return await strategy.extract(i = args)
 
     @classmethod
     def rawListMethods(cls):
         fourbidden = ["canBeExecuted", "common_category", "extract", "isAbstract", "rawListMethods"]
         __methods = dir(cls)
         __out = []
-        
+
         for __method in __methods:
-            if __method.startswith("__") == False and __method.startswith("extract") == False and __method not in fourbidden:
+            if __method.startswith("__") == False and __method not in fourbidden:
                 __out.append(__method)
 
         return __out
-
-    def self_insert(self, json_data: dict):
-        json_data['representation'] = self.full_name()
-        json_data['representation_class'] = self
-
-        return json_data
-
-    async def gatherTasksByTemplate(self, items, method_name):
-        __list = []
-        __tasks = []
-        for item in items:
-            __task = asyncio.create_task(method_name(item, __list))
-            __tasks.append(__task)
-
-        await asyncio.gather(*__tasks, return_exceptions=False)
-
-        return __list

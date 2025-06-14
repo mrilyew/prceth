@@ -1,14 +1,19 @@
 from representations.Representation import Representation
+from representations.ExtractStrategy import ExtractStrategy
 
 class Scratch(Representation):
     category = "Abstract"
+    executable_cfg =  {
+        'free_args': True
+    }
 
-    async def extractByDefault(self, i = {}):
-        out = self.new_cu({
-            'content': i,
-        })
+    class Extractor(ExtractStrategy):
+        async def extractByDefault(self, i = {}):
+            out = self.contentUnit({
+                'content': i,
+            })
 
-        return [out]
+            return [out]
 
-    def extractWheel(self, i = {}):
-        return 'extractByDefault'
+        def extractWheel(self, i = {}):
+            return 'extractByDefault'

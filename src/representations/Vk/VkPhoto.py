@@ -92,7 +92,7 @@ class VkPhoto(BaseVk):
             except FileNotFoundError as _ea:
                 logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",kind="error")
 
-        __cu = self.new_cu({
+        __cu = self.contentUnit({
             "main_su": item_su,
             "name": f"VK Photo {str(item_id)}",
             "source": {

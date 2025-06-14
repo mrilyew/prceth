@@ -35,9 +35,9 @@ class RunRepresentation(BaseAct):
 
     async def execute(self, i = {}):
         representationClass = RepresentationsRepository().getByName(i.get('representation'))
-        representationClass.canBeExecuted() == True, "representation cannot be executed"
+        assert representationClass.canBeExecuted() == True, "representation cannot be executed"
 
-        __ents = await representationClass().safeExtract(i)
+        __ents = await representationClass.extract(i)
         __all_items = []
 
         for item in __ents:

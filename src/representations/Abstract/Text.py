@@ -1,6 +1,7 @@
 from representations.Representation import Representation
 from resources.Descriptions import descriptions
 from declarable.ArgumentsTypes import StringArgument
+from representations.ExtractStrategy import ExtractStrategy
 
 class Text(Representation):
     category = "Abstract"
@@ -16,15 +17,16 @@ class Text(Representation):
 
         return params
 
-    async def extractByDefault(self, i = {}):
-        out = self.new_cu({
-            'content': {
-                'text': i.get('text')
-            },
-        })
+    class Extractor(ExtractStrategy):
+        async def extractByDefault(self, i = {}):
+            out = self.contentUnit({
+                'content': {
+                    'text': i.get('text')
+                },
+            })
 
-        return [out]
+            return [out]
 
-    def extractWheel(self, i = {}):
-        if 'text' in i:
-            return 'extractByDefault'
+        def extractWheel(self, i = {}):
+            if 'text' in i:
+                return 'extractByDefault'

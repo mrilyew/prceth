@@ -118,7 +118,7 @@ class VkPost(BaseVkByItemId):
             if item.get(key) != None and self.buffer.get('profiles') != None:
                 item[key.replace('_id', '')] = self._find_owner(item.get(key), self.buffer.get('profiles'), self.buffer.get('groups'))
 
-        _item_cu = self.new_cu({
+        _item_cu = self.contentUnit({
             "source": source,
             "name": f"VK {self.vk_type.title()} {str(item_id)}",
             "content": item,

@@ -1,6 +1,6 @@
 ## Prethmeta
 
-Python app/framework for creating collections with content
+App for content saving with flexible settings
 
 Look at [docs](docs/ru/README.md)
 
@@ -12,6 +12,7 @@ Look at [docs](docs/ru/README.md)
 - [ ] Хуки выполнения
 - [ ] Cli only use акты
 - [ ] Кэширование списка экзекьютеблов и тамбнейлов
+- [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
 
 ### Экспорт
 
@@ -29,10 +30,11 @@ Look at [docs](docs/ru/README.md)
 - [ ] Генерируемая колонка indexation_content_string (колонка `content` без ключей и пробелов)
 - [x] Переписать превью
 - [ ] Замена ID на UUID или что то типо того
+- [ ] Подключение альтернативной базы данных
 
 ### Репрезентации
 
-- [ ] Методы экстракта сделать статичными, сделать гидрацию и внутренние методы
+- [x] Разделить representation и strategy
 
 ### Инциализация
 
