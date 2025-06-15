@@ -1,10 +1,10 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from app.App import logger
 
 class VkAlbum(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            item_id_str = i.get('item_id')
+            item_id_str = i.get('ids')
             items_ids = item_id_str.split(",")
 
             owner_id = None

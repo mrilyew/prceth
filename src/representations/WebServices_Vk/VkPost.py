@@ -1,4 +1,4 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
 from utils.MainUtils import entity_sign
@@ -10,11 +10,11 @@ class VkPost(BaseVkItemId):
     def declare():
         params = {}
         params["object"] = ObjectArgument({})
-        params["item_id"] = StringArgument({})
-        params["download_attachments_json_list"] = CsvArgument({
+        params["ids"] = StringArgument({})
+        params["attachments_info"] = CsvArgument({
             'default': '*'
         })
-        params["download_attachments_file_list"] = CsvArgument({
+        params["attachments_file"] = CsvArgument({
             'default': 'photo'
         })
         params["download_reposts"] = BooleanArgument({
@@ -26,11 +26,11 @@ class VkPost(BaseVkItemId):
         def preExtract(self, i):
             super().preExtract(i)
 
-            self.buffer['download_json_list'] = i.get("download_attachments_json_list").split(",")
-            self.buffer['download_file_list'] = i.get("download_attachments_file_list").split(",")
+            self.buffer['attachments_info'] = i.get("attachments_info")
+            self.buffer['attachments_file'] = i.get("attachments_file")
 
         async def __response(self, i = {}):
-            items_ids_str = i.get('item_id')
+            items_ids_str = i.get('ids')
             items_ids = items_ids_str.split(",")
 
             response = await self.vkapi.call("wall.getById", {"posts": (",".join(items_ids)), "extended": 1})
@@ -76,7 +76,7 @@ class VkPost(BaseVkItemId):
                 except ModuleNotFoundError:
                     pass
                 except Exception as exc:
-                    logger.logException(exc, "VkAttachments", silent=False)
+                    logger.logException(exc, "VkEntity", silent=False)
 
             if reposts_list != None and do_download_reposts:
                 for key, repost in enumerate(item.get("copy_history")):
@@ -87,7 +87,7 @@ class VkPost(BaseVkItemId):
                     except ModuleNotFoundError:
                         pass
                     except Exception as exc:
-                        logger.logException(exc, "VkAttachments", silent=False)
+                        logger.logException(exc, "VkEntity", silent=False)
 
             owner_keys = ['from_id', 'owner_id', 'copy_owner_id']
             for key in owner_keys:
@@ -124,14 +124,14 @@ class VkPost(BaseVkItemId):
             if att_type == "wall":
                 att_class_name = "post"
 
-            should_download_json = self.buffer.get('download_json_list')[0] == "*" or att_type in self.buffer['download_json_list']
-            should_download_file = self.buffer.get('download_file_list')[0] == "*" or att_type in self.buffer['download_file_list']
+            should_download_json = self.buffer.get('attachments_info')[0] == "*" or att_type in self.buffer['attachments_info']
+            should_download_file = self.buffer.get('attachments_file')[0] == "*" or att_type in self.buffer['attachments_file']
 
             if should_download_json == False:
                 return None
 
             attachment_object = None
-            attachment_name = f"Vk.Vk{att_class_name.title()}"
+            attachment_name = f"WebServices_Vk.Vk{att_class_name.title()}"
             attachment_representation = RepresentationsRepository().getByName(attachment_name)
             if attachment_representation == None:
                 from representations.Data.Json import Json as UnknownAttachmentRepresentation
@@ -139,7 +139,7 @@ class VkPost(BaseVkItemId):
                 logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="VkEntity", kind="message")
 
                 resl = await UnknownAttachmentRepresentation().extract({
-                    "object": attachment['attachments'][key][att_class_name],
+                    "object": attachment,
                 })
 
                 attachment_object = resl[0]

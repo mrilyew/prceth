@@ -1,4 +1,4 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from resources.Exceptions import LibNotInstalledException
 from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
@@ -17,9 +17,9 @@ class VkAudio(BaseVkItemId):
 
         return params
 
-    class Extractor(BaseVkItemId.VkExtractStrategy):
+    class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            item_id_str = i.get('item_id')
+            item_id_str = i.get('ids')
             items_ids = item_id_str.split(",")
 
             resp = await self.vkapi.call("audio.getById", {"audios": ",".join(items_ids), "extended": 1})

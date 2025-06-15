@@ -1,4 +1,4 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 from app.App import logger
 from pathlib import Path
@@ -25,7 +25,7 @@ class VkVideo(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('item_id')
+            items_ids_str = i.get('ids')
             items_ids = items_ids_str.split(",")
 
             response = await self.vkapi.call("video.get", {"videos": (",".join(items_ids)), "extended": 1})

@@ -1,5 +1,5 @@
 from submodules.Web.DownloadManager import download_manager
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from app.App import logger
 from pathlib import Path
@@ -7,7 +7,7 @@ import os
 
 class VkPhoto(BaseVkItemId):
     executable_cfg = {
-        "list": ["item_id", "object"],
+        "list": ["ids", "object"],
         "type": "or",
     }
 
@@ -21,7 +21,7 @@ class VkPhoto(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('item_id')
+            items_ids_str = i.get('ids')
             items_ids = items_ids_str.split(",")
 
             response = await self.vkapi.call("photos.getById", {"photos": (",".join(items_ids)), "photo_sizes": 1, "extended": 1})

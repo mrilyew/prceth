@@ -1,6 +1,6 @@
 from app.App import logger
-from declarable.ArgumentsTypes import BooleanArgument, ObjectArgument
-from representations.Vk.BaseVk import BaseVkItemId
+from declarable.ArgumentsTypes import BooleanArgument
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from utils.MediaUtils import find_highest_in_dict
 from submodules.Web.DownloadManager import download_manager
 from pathlib import Path

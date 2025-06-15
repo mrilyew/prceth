@@ -1,11 +1,11 @@
-from representations.Vk.VkPost import VkPost
+from representations.WebServices_Vk.VkPost import VkPost
 
 class VkComment(VkPost):
     vk_type = "comment"
 
     class Extractor(VkPost.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('item_id')
+            items_ids_str = i.get('ids')
             items_ids = items_ids_str.split(",")
             final_response = {
                 'items': [],

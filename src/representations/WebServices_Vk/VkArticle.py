@@ -1,11 +1,11 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 from app.App import logger
 
 class VkArticle(BaseVkItemId):
-    class Extractor(BaseVkItemId.VkExtractStrategy):
+    class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_string = i.get('item_id')
+            items_ids_string = i.get('ids')
             items_ids = items_ids_string.split(",")
 
             response = await self.vkapi.call("articles.getByLink", {"links": (",".join(items_ids)), "extended": 1})

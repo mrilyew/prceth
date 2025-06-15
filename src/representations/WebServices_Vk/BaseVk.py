@@ -8,7 +8,7 @@ from resources.Exceptions import AbstractClassException
 from resources.Consts import consts
 
 class BaseVk(Representation):
-    category = 'Vk'
+    category = 'WebServices_Vk'
     docs = {}
 
     def define():
@@ -84,7 +84,7 @@ class BaseVk(Representation):
 class BaseVkItemId(BaseVk):
     def declare():
         params = {}
-        params["item_id"] = StringArgument({})
+        params["ids"] = StringArgument({})
         params["object"] = ObjectArgument({
             "hidden": True,
         })
@@ -95,7 +95,7 @@ class BaseVkItemId(BaseVk):
         def extractWheel(self, i = {}):
             if i.get('object') != None:
                 return 'extractByObject'
-            elif 'item_id' in i:
+            elif 'ids' in i:
                 return 'extractById'
 
         async def __response(self, i = {}):

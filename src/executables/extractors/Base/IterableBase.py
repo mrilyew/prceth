@@ -1,8 +1,9 @@
 from app.App import logger
+from executables.extractors.Base.Base import BaseExtractor
 from declarable.ArgumentsTypes import IntArgument, FloatArgument
 import asyncio
 
-class IterableBase():
+class IterableBase(BaseExtractor):
     name = 'IterableBase'
     category = 'base'
 
@@ -29,18 +30,14 @@ class IterableBase():
 
         return params
 
-    async def run(self, i):
-        self.cu_list = []
-
-        for i in range(i.get("start"), i.get("end")):
+    async def execute(self, i):
+        for iterator in range(i.get("start"), i.get("end")):
             try:
-                await self._iterableAction(i)
+                await self._iterableAction(i, iterator)
             except Exception as ____e:
-                logger.logException(____e, "IterableBase", silent=False)
+                logger.logException(____e, "Iterable", silent=False)
 
             await asyncio.sleep(i.get("timeout"))
-
-        return self.cu_list
 
     async def _iterableAction(self, i):
         pass

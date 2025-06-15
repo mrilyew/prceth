@@ -1,11 +1,11 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from app.App import logger
 from utils.MainUtils import proc_strtr
 
 class VkNote(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            item_id = i.get('item_id')
+            item_id = i.get('ids')
             item_ids = item_id.split(',')
             final_response = {
                 'items': []

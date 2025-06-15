@@ -1,15 +1,15 @@
-from representations.Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from pathlib import Path
 from app.App import logger
-from utils.MainUtils import entity_link
+from utils.MainUtils import entity_sign
 from submodules.Web.DownloadManager import download_manager
 import os
 
 class VkPoll(BaseVkItemId):
     def declare():
         params = {}
-        params["download_bg"] = BooleanArgument({
+        params["download"] = BooleanArgument({
             "default": True
         })
 
@@ -17,7 +17,7 @@ class VkPoll(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('item_id')
+            items_ids_str = i.get('ids')
             item_ids = items_ids_str.split(',')
             final_response = {
                 'items': [],
@@ -54,9 +54,10 @@ class VkPoll(BaseVkItemId):
                         photo_sizes = sorted(item.get("photo").get("images"), key=lambda x: (x['width'] is None, x['width']), reverse=True)
                         optimal_size = photo_sizes[0]
                         save_path = Path(os.path.join(temp_dir, bg_name))
-                        file_size = save_path.stat().st_size
 
                         await download_manager.addDownload(end=optimal_size.get("url"),dir=save_path)
+
+                        file_size = save_path.stat().st_size
 
                         bg_su.write_data({
                             "extension": "jpg",
@@ -64,7 +65,7 @@ class VkPoll(BaseVkItemId):
                             "filesize": file_size,
                         })
 
-                        item["relative_photo"] = entity_link(bg_su)
+                        item["relative_photo"] = entity_sign(bg_su)
 
                         logger.log(message=f"Downloaded poll {item_id} background",section="VkEntity",kind="success")
                 except FileNotFoundError as _ea:
