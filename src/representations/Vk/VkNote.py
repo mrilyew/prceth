@@ -1,40 +1,25 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument
+from representations.Vk.BaseVk import BaseVkItemId
 from app.App import logger
-from utils.MainUtils import list_conversation, proc_strtr
+from utils.MainUtils import proc_strtr
 
-class VkNote(BaseVk):
-    category = 'Vk'
-
-    def declare():
-        params = {}
-        params["item_id"] = StringArgument({})
-        params["object"] = ObjectArgument({
-            "hidden": True,
-        })
-
-        return params
-
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
-        async def extractById(self, i = {}):
+class VkNote(BaseVkItemId):
+    class Extractor(BaseVkItemId.Extractor):
+        async def __response(self, i = {}):
             item_id = i.get('item_id')
-            items_id = item_id.split('_')
+            item_ids = item_id.split(',')
+            final_response = {
+                'items': []
+            }
 
-            response = await self.vkapi.call("notes.getById", {"owner_id": items_id[0], "note_id": items_id[1]})
-            items = list_conversation(response)
+            assert len(item_ids) < 3, 'bro too many'
 
-            return await self.gatherList(items, self.item)
+            for id in item_ids:
+                spl = id.split('_')
+                item = await self.vkapi.call("notes.getById", {"owner_id": spl[0], "note_id": spl[1]})
 
-        async def extractByObject(self, i = {}):
-            items = list_conversation(i.get('object'))
+                final_response['items'].append(item)
 
-            return await self.gatherList(items, self.item)
+            return final_response
 
         async def item(self, item, list_to_add):
             item_id  = f"{item.get('owner_id')}_{item.get('id')}"

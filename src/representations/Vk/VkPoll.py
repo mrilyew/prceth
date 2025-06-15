@@ -1,44 +1,39 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument
+from representations.Vk.BaseVk import BaseVkItemId
+from declarable.ArgumentsTypes import BooleanArgument
 from pathlib import Path
 from app.App import logger
-from utils.MainUtils import list_conversation, entity_link
+from utils.MainUtils import entity_link
 from submodules.Web.DownloadManager import download_manager
 import os
 
-class VkPoll(BaseVk):
-    category = 'Vk'
-
+class VkPoll(BaseVkItemId):
     def declare():
         params = {}
-        params["item_id"] = StringArgument({})
-        params["object"] = ObjectArgument({})
         params["download_bg"] = BooleanArgument({
             "default": True
         })
 
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
+    class Extractor(BaseVkItemId.Extractor):
+        async def __response(self, i = {}):
+            items_ids_str = i.get('item_id')
+            item_ids = items_ids_str.split(',')
+            final_response = {
+                'items': [],
+                'profiles': [],
+                'groups': []
+            }
 
-        async def extractByObject(self, i = {}):
-            items = list_conversation(i.get('object'))
+            assert len(item_ids) < 3, 'bro too many'
 
-            return await self.gatherList(items, self.item)
+            for id in item_ids:
+                spl = id.split('_')
+                response = await self.vkapi.call("polls.getById", {"owner_id": spl[0], "poll_id": spl[1], "extended": 1})
 
-        async def extractById(self, i = {}):
-            items_id = i.get('item_id')
-            items_ids = items_id.split('_')
+                final_response.update(response)
 
-            response = await self.vkapi.call("polls.getById", {"owner_id": items_ids[0], "poll_id": items_ids[1], "extended": 1})
-            responses = list_conversation(response)
-
-            return await self.gatherList(responses, self.item)
+            return response
 
         async def item(self, item, list_to_add):
             download_bg = self.buffer.get('args').get("download_bg")

@@ -1,10 +1,11 @@
-from app.App import logger, env
+from app.App import env
 from representations.Representation import Representation
-from resources.Consts import consts
-from resources.Descriptions import descriptions
-from declarable.ArgumentsTypes import StringArgument
+from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
+from utils.MainUtils import list_conversation
 from submodules.WebServices.VkApi import VkApi
 from representations.ExtractStrategy import ExtractStrategy
+from resources.Exceptions import AbstractClassException
+from resources.Consts import consts
 
 class BaseVk(Representation):
     category = 'Vk'
@@ -18,7 +19,7 @@ class BaseVk(Representation):
         params = {}
         params["api_token"] = StringArgument({
             "docs": {
-                "definition": descriptions.get('__vk_api_token_authorization')
+                "definition": '__vk_api_token_authorization'
             },
             "sensitive": True,
             "default": env.get("vk.access_token", None),
@@ -26,7 +27,7 @@ class BaseVk(Representation):
         })
         params["api_url"] = StringArgument({
             "docs": {
-                "definition": descriptions.get('__vk_api_endpoint')
+                "definition": '__vk_api_endpoint'
             },
             "env_property": "vk.api_url",
             "default": env.get("vk.api_url", "api.vk.com/method"),
@@ -36,10 +37,16 @@ class BaseVk(Representation):
         })
         params["vk_path"] = StringArgument({
             "docs": {
-                "definition": descriptions.get('__vk_site_path')
+                "definition": '__vk_site_path'
             },
             "env_property": "vk.api_url",
             "default": env.get("vk.vk_path", "vk.com"),
+            "assertion": {
+                "not_null": True,
+            },
+        })
+        params["execute_at_once"] = BooleanArgument({
+            "default": True,
             "assertion": {
                 "not_null": True,
             },
@@ -68,10 +75,52 @@ class BaseVk(Representation):
     def _insertOwner(cls, item, column_name, profiles, groups):
         item[column_name.replace('_id', '')] = cls._find_owner(item.get(column_name), profiles, groups)
 
-# ПЕРЕМЕСТИ ВНУТРЬ КЛАССА В СЛЕДУЮЩЕМ КОММИТЕ
-class VkExtractStrategy(ExtractStrategy):
-    def preExtract(self, i = {}):
-        super().preExtract(i)
+    class Extractor(ExtractStrategy):
+        def preExtract(self, i = {}):
+            super().preExtract(i)
 
-        self.vkapi = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
+            self.vkapi = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
 
+class BaseVkItemId(BaseVk):
+    def declare():
+        params = {}
+        params["item_id"] = StringArgument({})
+        params["object"] = ObjectArgument({
+            "hidden": True,
+        })
+
+        return params
+
+    class Extractor(BaseVk.Extractor):
+        def extractWheel(self, i = {}):
+            if i.get('object') != None:
+                return 'extractByObject'
+            elif 'item_id' in i:
+                return 'extractById'
+
+        async def __response(self, i = {}):
+            raise AbstractClassException('not implemented at this class')
+
+        async def extractById(self, i = {}):
+            resp = await self.__response(i)
+            i['object'] = resp
+
+            return await self.extractByObject(i)
+
+        async def extractByObject(self, i = {}):
+            objects = i.get("object")
+            items = []
+
+            if type(objects) == list:
+                items = objects
+            else:
+                if 'items' in objects:
+                    items = objects.get('items')
+
+                    if 'profiles' in objects:
+                        self.buffer['profiles'] = objects.get("profiles")
+                        self.buffer['groups'] = objects.get("groups")
+                else:
+                    items = list_conversation(objects)
+
+            return await self.gatherList(items, self.item, i.get('execute_at_once') == True)

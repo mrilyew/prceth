@@ -1,49 +1,29 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from utils.MainUtils import list_conversation, valid_name
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
-from app.App import logger
 from submodules.Web.DownloadManager import download_manager
+from declarable.ArgumentsTypes import BooleanArgument
+from representations.Vk.BaseVk import BaseVkItemId
+from utils.MainUtils import valid_name
+from app.App import logger
 from pathlib import Path
 import os
 
-class VkDoc(BaseVk):
-    category = 'Vk'
-
+class VkDoc(BaseVkItemId):
     def declare():
         params = {}
-        params["item_id"] = StringArgument({})
-        params["object"] = ObjectArgument({
-            "hidden": True,
-            "assertion": {
-                "assert_link": "item_id"
-            }
-        })
-        params["download_file"] = BooleanArgument({
+        params["download"] = BooleanArgument({
             "default": True
         })
 
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
+    class Extractor(BaseVkItemId.Extractor):
+        async def __response(self, i = {}):
+            items_ids_str = i.get('item_id')
+            items_ids = items_ids_str.split(",")
 
-        async def extractById(self, i = {}):
-            items_ids_string = i.get('item_id')
-            items_ids = items_ids_string.split(",")
-    
             response = await self.vkapi.call("docs.getById", {"docs": (",".join(items_ids)), "extended": 1})
 
-            return await self.gatherList(response, self.item)
+            return response
 
-        async def extractByObject(self, i = {}):
-            items = list_conversation(i.get('object'))
-
-            return await self.gatherList(items, self.item)
-    
         async def item(self, item, link_entities):
             self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
 
@@ -59,7 +39,7 @@ class VkDoc(BaseVk):
             item_url = item.get("url")
             item_filesize = item.get("size", 0)
 
-            if self.buffer.get('args').get("download_file") == True:
+            if self.buffer.get('args').get("download") == True:
                 main_su = self.storageUnit()
                 temp_dir = main_su.temp_dir
 

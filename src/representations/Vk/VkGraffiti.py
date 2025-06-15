@@ -1,38 +1,25 @@
 from app.App import logger
 from declarable.ArgumentsTypes import BooleanArgument, ObjectArgument
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from utils.MainUtils import list_conversation
+from representations.Vk.BaseVk import BaseVkItemId
 from utils.MediaUtils import find_highest_in_dict
 from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
 import os
 
-class VkGraffiti(BaseVk):
-    category = 'Vk'
+class VkGraffiti(BaseVkItemId):
     hidden = True
 
     def declare():
         params = {}
-        params["object"] = ObjectArgument({
-            "assertion": {
-                "not_null": True
-            }
-        })
         params["download"] = BooleanArgument({
             "default": True
         })
 
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-
-        async def extractByObject(self, i = {}):
-            items = list_conversation(i.get('object'))
-
-            return await self.gatherList(items, self.item)
+    class Extractor(BaseVkItemId.Extractor):
+        def __response(self, i = {}):
+            raise Exception('undefined')
 
         async def item(self, item, list_to_add):
             self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))

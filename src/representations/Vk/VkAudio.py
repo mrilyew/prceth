@@ -1,50 +1,30 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from resources.Exceptions import NotFoundException, LibNotInstalledException
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
+from representations.Vk.BaseVk import BaseVkItemId
+from resources.Exceptions import LibNotInstalledException
+from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
 from app.App import logger
 from utils.MainUtils import valid_name, list_conversation
 from utils.MediaUtils import is_ffmpeg_installed
-import os, asyncio
+import os
 
-class VkAudio(BaseVk):
-    category = 'Vk'
-
+class VkAudio(BaseVkItemId):
     def declare():
         params = {}
-        params["item_id"] = StringArgument({})
-        params["__json_info"] = ObjectArgument({
-            "hidden": True,
-            "assertion": {
-                "assert_link": "item_id"
-            }
-        })
         params["download"] = BooleanArgument({
             "default": True
         })
 
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
-        async def extractById(self, i = {}):
-            items_ids_string = i.get('item_id')
-            items_ids = items_ids_string.split(",")
+    class Extractor(BaseVkItemId.VkExtractStrategy):
+        async def __response(self, i = {}):
+            item_id_str = i.get('item_id')
+            items_ids = item_id_str.split(",")
 
             resp = await self.vkapi.call("audio.getById", {"audios": ",".join(items_ids), "extended": 1})
 
-            return await self.gatherList(resp.get('items'), self.item)
-
-        async def extractByObject(self, i = {}):
-            final_object = list_conversation(i.get("object"))
-
-            return await self.gatherList(final_object, self.item)
+            return resp
 
         async def item(self, item, list_to_add):
             self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))

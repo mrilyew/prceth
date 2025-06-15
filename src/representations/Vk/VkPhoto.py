@@ -1,18 +1,11 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
+from submodules.Web.DownloadManager import download_manager
+from representations.Vk.BaseVk import BaseVkItemId
+from declarable.ArgumentsTypes import BooleanArgument
 from app.App import logger
 from pathlib import Path
-from submodules.Web.DownloadManager import download_manager
 import os
 
-class VkPhoto(BaseVk):
-    category = 'Vk'
-    docs = {
-        "description": {
-            "name": '__vk_photo',
-            "definition": '__vk_photo_from',
-        }
-    }
+class VkPhoto(BaseVkItemId):
     executable_cfg = {
         "list": ["item_id", "object"],
         "type": "or",
@@ -20,37 +13,20 @@ class VkPhoto(BaseVk):
 
     def declare():
         params = {}
-        params["item_id"] = StringArgument({})
-        params["object"] = ObjectArgument({
-            "hidden": True,
-        })
         params["download"] = BooleanArgument({
             "default": True
         })
 
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
-        async def extractById(self, i = {}):
-            items_ids_string = i.get('item_id')
-            items_ids = items_ids_string.split(",")
+    class Extractor(BaseVkItemId.Extractor):
+        async def __response(self, i = {}):
+            items_ids_str = i.get('item_id')
+            items_ids = items_ids_str.split(",")
 
             response = await self.vkapi.call("photos.getById", {"photos": (",".join(items_ids)), "photo_sizes": 1, "extended": 1})
 
-            return await self.gatherList(response, self.item)
-
-        async def extractByObject(self, i = {}):
-            final_object = i.get("object")
-            if type(final_object) != list:
-                final_object = [final_object]
-
-            return await self.gatherList(final_object, self.item)
+            return response
 
         async def item(self, item, list_to_add):
             download_url = ""

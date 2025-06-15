@@ -1,18 +1,11 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
+from representations.Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
 from utils.MainUtils import entity_sign
 from app.App import logger
 
-class VkPost(BaseVk):
-    category = 'Vk'
+class VkPost(BaseVkItemId):
     vk_type = 'post'
-    docs = {
-        "description": {
-            "name": '__vk_post',
-            "definition": '__vk_post_and_its_attachments'
-        }
-    }
 
     def declare():
         params = {}
@@ -29,40 +22,20 @@ class VkPost(BaseVk):
         })
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
+    class Extractor(BaseVkItemId.Extractor):
         def preExtract(self, i):
             super().preExtract(i)
 
             self.buffer['download_json_list'] = i.get("download_attachments_json_list").split(",")
             self.buffer['download_file_list'] = i.get("download_attachments_file_list").split(",")
 
-        async def extractById(self, i = {}):
-            items_ids_string = i.get('item_id')
-            items_ids = items_ids_string.split(",")
+        async def __response(self, i = {}):
+            items_ids_str = i.get('item_id')
+            items_ids = items_ids_str.split(",")
 
             response = await self.vkapi.call("wall.getById", {"posts": (",".join(items_ids)), "extended": 1})
 
-            self.buffer['profiles'] = response.get('profiles')
-            self.buffer['groups'] = response.get('groups')
-
-            items = response.get('items')
-
-            return await self.gatherList(items, self.item)
-
-        async def extractByObject(self, i = {}):
-            objects = i.get("objects")
-
-            items = objects.get('items')
-            self.buffer['profiles'] = objects.get("profiles")
-            self.buffer['groups'] = objects.get("groups")
-
-            return await self.gatherList(items, self.item)
+            return response
 
         async def item(self, item, list_to_add):
             '''
@@ -121,14 +94,13 @@ class VkPost(BaseVk):
                 if item.get(key) != None and self.buffer.get('profiles') != None:
                     self.outer._insertOwner(item, key, self.buffer.get('profiles'), self.buffer.get('groups'))
 
-            # TODO: Set name as start of text
             _item_cu = self.contentUnit({
                 "source": {
                     'type': 'vk',
                     'vk_type': self.outer.vk_type,
                     'content': item_id
                 },
-                "name": f"VK {self.outer.vk_type.title()} {str(item_id)}",
+                "name": f"VK {self.outer.vk_type.title()} {str(item_id)}", # TODO: Set cu name as start of text
                 "content": item,
                 "links": links,
                 "unlisted": is_do_unlisted,
@@ -185,7 +157,7 @@ class VkPost(BaseVk):
                     "object": att_object,
                     "api_url": self.buffer.get('args').get("api_url"),
                     "vk_path": self.buffer.get('args').get("vk_path"),
-                    "download_file": should_download_file,
+                    "download": should_download_file,
                 })
 
                 attachment_object = resl[0]

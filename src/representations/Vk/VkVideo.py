@@ -1,7 +1,6 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
+from representations.Vk.BaseVk import BaseVkItemId
+from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 from app.App import logger
-from db.StorageUnit import StorageUnit
 from pathlib import Path
 from utils.MainUtils import valid_name
 from utils.MediaUtils import is_ffmpeg_installed, find_highest_in_dict
@@ -9,20 +8,11 @@ from submodules.Web.DownloadManager import download_manager
 from resources.Exceptions import LibNotInstalledException
 import os
 
-class VkVideo(BaseVk):
-    category = 'Vk'
-
+class VkVideo(BaseVkItemId):
     def declare():
         params = {}
-        params["item_id"] = StringArgument({})
-        params["objects"] = ObjectArgument({
-            "hidden": True,
-        })
         params["download"] = BooleanArgument({
             "default": True
-        })
-        params["download_at_once"] = BooleanArgument({
-            "default": False
         })
         params["quality"] = StringArgument({
             "default": "max",
@@ -33,31 +23,14 @@ class VkVideo(BaseVk):
 
         return params
 
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('objects') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
-        async def extractById(self, i = {}):
-            items_ids_string = i.get('item_id')
-            items_ids = items_ids_string.split(",")
+    class Extractor(BaseVkItemId.Extractor):
+        async def __response(self, i = {}):
+            items_ids_str = i.get('item_id')
+            items_ids = items_ids_str.split(",")
 
             response = await self.vkapi.call("video.get", {"videos": (",".join(items_ids)), "extended": 1})
-            self.buffer['profiles'] = response.get("profiles")
-            self.buffer['groups'] = response.get("groups")
 
-            return await self.gatherList(response.get('items'), self.item, i.get('download_at_once'))
-
-        async def extractByObject(self, i = {}):
-            objects = i.get("objects")
-
-            items = objects.get('items')
-            self.buffer['profiles'] = objects.get("profiles")
-            self.buffer['groups'] = objects.get("groups")
-
-            return await self.gatherList(items, self.item, i.get('download_at_once'))
+            return response
 
         async def item(self, item, list_to_add):
             self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
@@ -67,6 +40,7 @@ class VkVideo(BaseVk):
             quality = self.buffer.get('args').get("quality")
             page_domain = self.buffer.get('args').get('page_domain')
 
+            storage_unit = None
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
             item_name = item.get("title")
             file_name = f"{valid_name(item_name)}.mp4"

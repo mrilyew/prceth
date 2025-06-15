@@ -1,47 +1,24 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
-from declarable.ArgumentsTypes import ObjectArgument, IntArgument, StringArgument, BooleanArgument, CsvArgument
+from representations.Vk.BaseVk import BaseVkItemId
 from app.App import logger
 
-class VkAlbum(BaseVk):
-    category = 'Vk'
+class VkAlbum(BaseVkItemId):
+    class Extractor(BaseVkItemId.Extractor):
+        async def __response(self, i = {}):
+            item_id_str = i.get('item_id')
+            items_ids = item_id_str.split(",")
 
-    def declare():
-        params = {}
-        params["object"] = ObjectArgument({})
-        params["item_id"] = StringArgument({})
-
-        return params
-
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
-        async def extractByObject(self, i = {}):
-            objects = i.get("object")
-
-            items = objects
-
-            return await self.gatherList(items, self.item)
-
-        async def extractById(self, i = {}):
-            items_ids_string = i.get('item_id')
-            items_ids = items_ids_string.split(",")
             owner_id = None
-            item_second_ids = []
+            album_ids = []
 
             for item in items_ids:
-                owner_id = item[0]
+                spl = item.split('_')
+                owner_id = spl[0]
 
-                item_second_ids.append(item[1])
+                album_ids.append(spl[1])
 
-            response = await self.vkapi.call("photos.getAlbums", {"owner_id": owner_id, "album_ids": ",".join(item_second_ids), "need_covers": 1, "photo_sizes": 1})
+            response = await self.vkapi.call("photos.getAlbums", {"owner_id": owner_id, "album_ids": ",".join(album_ids), "need_covers": 1, "photo_sizes": 1})
 
-            items = response.get('items')
-
-            return await self.gatherTasksByTemplate(items, self.item)
+            return response
 
         async def item(self, item, list_to_add):
             is_do_unlisted = self.buffer.get('args').get("unlisted") == 1

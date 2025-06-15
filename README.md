@@ -13,6 +13,7 @@ Look at [docs](docs/ru/README.md)
 - [ ] Cli only use акты
 - [ ] Кэширование списка экзекьютеблов и тамбнейлов
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
+- [ ] Игнорируемые параметры
 
 ### Экспорт
 

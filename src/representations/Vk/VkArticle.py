@@ -1,38 +1,16 @@
-from representations.Vk.BaseVk import BaseVk, VkExtractStrategy
+from representations.Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 from app.App import logger
 
-class VkArticle(BaseVk):
-    category = 'Vk'
-
-    def declare():
-        params = {}
-        params["item_id"] = StringArgument({})
-        params["object"] = ObjectArgument({})
-
-        return params
-
-    class Extractor(VkExtractStrategy):
-        def extractWheel(self, i = {}):
-            if i.get('object') != None:
-                return 'extractByObject'
-            elif 'item_id' in i:
-                return 'extractById'
-
-        async def extractById(self, i = {}):
+class VkArticle(BaseVkItemId):
+    class Extractor(BaseVkItemId.VkExtractStrategy):
+        async def __response(self, i = {}):
             items_ids_string = i.get('item_id')
             items_ids = items_ids_string.split(",")
 
             response = await self.vkapi.call("articles.getByLink", {"links": (",".join(items_ids)), "extended": 1})
 
-            return await self.gatherList(response, self.item)
-
-        async def extractByObject(self, i = {}):
-            final_object = i.get("object")
-            if type(final_object) != list:
-                final_object = [final_object]
-
-            return await self.gatherList(final_object, self.item)
+            return response
 
         async def item(self, item, list_to_add):
             self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
