@@ -113,7 +113,7 @@ class VkIdentity(BaseVkItemId):
             else:
                 name = f"VK Club {item.get('name')}"
 
-            if self.buffer.get('args').get("download_avatar") == True:
+            if self.args.get("download_avatar") == True:
                 try:
                     ava = await self.__download_avatar(item)
                     item["relative_photo"] = entity_sign(ava)
@@ -122,7 +122,7 @@ class VkIdentity(BaseVkItemId):
                 except Exception as _e:
                     logger.log(message='Avatar not found, not downloading', section='VkEntity', kind='error')
 
-            if self.buffer.get('args').get("download_cover") == True:
+            if self.args.get("download_cover") == True:
                 try:
                     cov = await self.__download_cover(item)
                     item["relative_cover"] = entity_sign(cov)

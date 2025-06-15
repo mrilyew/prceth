@@ -4,12 +4,12 @@ from resources.Exceptions import AbstractClassException, SuitableExtractMethodNo
 
 class ExtractStrategy(Runnable, Saveable):
     buffer = {}
+    args = {}
 
     def __init__(self, outer):
         self.outer = outer
 
     def preExtract(self, i = {}):
-        print(i)
         self.buffer['args'] = i.copy()
 
     def extractWheel(self, i = {}):
@@ -20,10 +20,11 @@ class ExtractStrategy(Runnable, Saveable):
         if __wheel == None:
             __wheel = ""
 
-        print(i)
         __wheel_method = getattr(self, __wheel, None)
         if __wheel_method == None:
             raise SuitableExtractMethodNotFound('Not found suitable extractor for current args')
+
+        self.args = i
 
         __res = await __wheel_method(i)
 

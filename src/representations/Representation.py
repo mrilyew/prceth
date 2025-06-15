@@ -21,7 +21,6 @@ class Representation(RecursiveDeclarable, Runnable):
         args = cls.validate(i.copy())
 
         strategy.preExtract(args)
-        strategy.buffer['args'] = args
 
         return await strategy.extract(i = args)
 

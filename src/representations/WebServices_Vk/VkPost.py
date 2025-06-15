@@ -64,14 +64,14 @@ class VkPost(BaseVkItemId):
             attachments_list = item.get('attachments')
             reposts_list = item.get('copy_history')
 
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            is_do_unlisted = self.args.get("unlisted") == 1
             do_download_attachments = True
-            do_download_reposts = self.buffer.get('args').get('download_reposts') == True
+            do_download_reposts = self.args.get('download_reposts') == True
 
             item["relative_attachments"] = []
             item["relative_copy_history"] = []
 
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
             if self.outer.vk_type == "message":
@@ -143,8 +143,12 @@ class VkPost(BaseVkItemId):
             if att_type == "wall":
                 att_class_name = "post"
 
-            should_download_json = self.buffer.get('attachments_info')[0] == "*" or att_type in self.buffer.get('attachments_info')
-            should_download_file = self.buffer.get('attachments_file')[0] == "*" or att_type in self.buffer.get('attachments_file')
+            attachments_info = self.args.get('attachments_info')
+            attachments_file = self.args.get('attachments_file')
+
+            print(attachments_file)
+            should_download_json = attachments_info[0] == "*" or att_type in attachments_info
+            should_download_file = attachments_file[0] == "*" or att_type in attachments_file
 
             if should_download_json == False:
                 return None
@@ -174,8 +178,8 @@ class VkPost(BaseVkItemId):
                 resl = await att_class.extract({
                     "unlisted": True,
                     "object": att_object,
-                    "api_url": self.buffer.get('args').get("api_url"),
-                    "vk_path": self.buffer.get('args').get("vk_path"),
+                    "api_url": self.args.get("api_url"),
+                    "vk_path": self.args.get("vk_path"),
                     "download": should_download_file,
                 })
 
@@ -197,10 +201,10 @@ class VkPost(BaseVkItemId):
             vals = await repost_thing.extract({
                 "unlisted": True,
                 "object": repost,
-                "api_url": self.buffer.get('args').get("api_url"),
-                "vk_path": self.buffer.get('args').get("vk_path"),
-                "attachments_info": self.buffer.get('args').get("attachments_info"),
-                "attachments_file": self.buffer.get('args').get("attachments_file"),
+                "api_url": self.args.get("api_url"),
+                "vk_path": self.args.get("vk_path"),
+                "attachments_info": self.args.get("attachments_info"),
+                "attachments_file": self.args.get("attachments_file"),
                 "download_reposts": False,
             })
 

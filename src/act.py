@@ -4,6 +4,7 @@ from repositories.ActsRepository import ActsRepository
 
 async def ___runAct():
     assert "i" in app.argv, "pass the name of act as --i"
+    __is_print = 'silent' not in app.argv
 
     __act_name_input = app.argv.get("i")
     act_class = ActsRepository().getByName(plugin_name=__act_name_input)
@@ -14,6 +15,7 @@ async def ___runAct():
 
     act_response = await act.safeExecute(app.argv)
 
-    print(dump_json(act_response, indent=4))
+    if __is_print:
+        print(dump_json(act_response, indent=4))
 
 app.loop.run_until_complete(___runAct())

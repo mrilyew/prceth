@@ -34,13 +34,12 @@ class VkVideo(BaseVkItemId):
             return response
 
         async def item(self, item, list_to_add):
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            print(self.buffer.get('args'))
-            is_do_download = self.buffer.get('args').get("download") == True
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
-            quality = self.buffer.get('args').get("quality")
-            page_domain = self.buffer.get('args').get('page_domain', '')
+            is_do_download = self.args.get("download") == True
+            is_do_unlisted = self.args.get("unlisted") == 1
+            quality = self.args.get("quality")
+            page_domain = self.args.get('page_domain', '')
 
             storage_unit = None
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
@@ -50,7 +49,7 @@ class VkVideo(BaseVkItemId):
             item_url = page_domain + f"{item_id}"
             is_direct = item.get("platform") == None
 
-            logger.log(message=f"Recieved video {item_id}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved video {item_id}; download={is_do_download}",section="VkEntity",kind="message")
 
             if is_do_download:
                 if is_direct:

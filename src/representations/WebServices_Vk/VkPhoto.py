@@ -28,12 +28,12 @@ class VkPhoto(BaseVkItemId):
             download_url = ""
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
             item_su = None
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            is_do_unlisted = self.args.get("unlisted") == 1
 
             # So, downloading photo
 
-            logger.log(message=f"Recieved photo {item_id}",section="VK",kind="message")
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            logger.log(message=f"Recieved photo {item_id}",section="VkEntity!Photo",kind="message")
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             if item.get('orig_photo') != None:
                 download_url = item.get('orig_photo').get("url")
@@ -50,9 +50,9 @@ class VkPhoto(BaseVkItemId):
                         
                         download_url = __optimal_size.get('url')
                     except Exception as ___e:
-                        logger.logException(___e, section="Vk")
+                        logger.logException(___e, section="VkEntity!Photo")
 
-            if self.buffer.get('args').get('download') == True:
+            if self.args.get('download') == True:
                 original_name = f"photo_{item_id}_{item.get('date')}.jpg"
 
                 item_su = self.storageUnit()
@@ -71,9 +71,9 @@ class VkPhoto(BaseVkItemId):
                         "filesize": file_stats.st_size,
                     })
 
-                    logger.log(message=f"Downloaded photo {item_id}",section="Vk",kind="success")
+                    logger.log(message=f"Downloaded photo {item_id}",section="VkEntity!Photo",kind="success")
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VkEntity",kind="error")
 
             __cu = self.contentUnit({
                 "main_su": item_su,

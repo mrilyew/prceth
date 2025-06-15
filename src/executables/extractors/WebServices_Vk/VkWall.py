@@ -7,7 +7,6 @@ import math, asyncio
 
 class VkWall(BaseTimeoutable):
     category = 'WebServices_Vk'
-    docs = {}
 
     @classmethod
     def declare(cls):

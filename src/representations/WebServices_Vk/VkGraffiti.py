@@ -23,10 +23,10 @@ class VkGraffiti(BaseVkItemId):
             raise Exception('undefined')
 
         async def item(self, item, list_to_add):
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
-            is_do_download = self.buffer.get('args').get("download")
+            is_do_unlisted = self.args.get("unlisted") == 1
+            is_do_download = self.args.get("download")
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
             logger.log(message=f"Recieved graffiti {item_id}",section="VkEntity",kind="message")

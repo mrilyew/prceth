@@ -28,8 +28,8 @@ class VkAudio(BaseVkItemId):
             return resp
 
         async def item(self, item, list_to_add):
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
+            is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
             logger.log(message=f"Recieved audio {item_id}",section="VkEntity",kind="message")
@@ -41,7 +41,7 @@ class VkAudio(BaseVkItemId):
             audio_name = f"{item.get('artist')} — {item.get('title')}"
             audio_save_name = valid_name(audio_name) + f".{out_ext}"
 
-            if self.buffer.get('args').get("download") == True:
+            if self.args.get("download") == True:
                 main_su = self.storageUnit()
                 temp_dir = main_su.temp_dir
 

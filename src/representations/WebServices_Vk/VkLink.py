@@ -21,15 +21,15 @@ class VkLink(BaseVkItemId):
             raise Exception('undefined')
 
         async def item(self, item, list_to_add):
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             attached_photo = item.get("photo")
-            should_be_unlisted = self.buffer.get('args').get('unlisted') == 1
+            should_be_unlisted = self.args.get('unlisted') == 1
             su = None
 
             logger.log(message=f"Recieved attached link",section="VkEntity",kind="message")
 
-            if self.buffer.get('args').get("download") == True:
+            if self.args.get("download") == True:
                 if attached_photo != None:
                     photo_id = f"{attached_photo.get('owner_id')}_{attached_photo.get('id')}"
                     save_name = f"link_photo_{photo_id}.jpg"
@@ -55,9 +55,9 @@ class VkLink(BaseVkItemId):
 
                         item['relative_photo'] = entity_sign(su)
 
-                        logger.log(message=f"Downloaded link's photo {file_size}",section="VK",kind="success")
+                        logger.log(message=f"Downloaded link's photo {file_size}",section="VkEntity",kind="success")
                     except FileNotFoundError as _ea:
-                        logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VK",kind="error")
+                        logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VkEntity",kind="error")
 
             cu = self.contentUnit({
                 "content": item,

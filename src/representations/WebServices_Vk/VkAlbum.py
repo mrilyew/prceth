@@ -21,11 +21,11 @@ class VkAlbum(BaseVkItemId):
             return response
 
         async def item(self, item, list_to_add):
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
             name = f"Album \"{item.get('title')}\""
 
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             logger.log(message=f"Recieved album {item_id}",section="VkEntity",kind="message")
 

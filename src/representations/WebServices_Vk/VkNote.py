@@ -23,9 +23,9 @@ class VkNote(BaseVkItemId):
 
         async def item(self, item, list_to_add):
             item_id  = f"{item.get('owner_id')}_{item.get('id')}"
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            is_do_unlisted = self.args.get("unlisted") == 1
 
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             logger.log(message=f"Recieved note {item_id}",section="VkEntity",kind="message")
 

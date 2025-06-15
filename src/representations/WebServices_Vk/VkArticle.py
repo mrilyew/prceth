@@ -13,8 +13,8 @@ class VkArticle(BaseVkItemId):
             return response
 
         async def item(self, item, list_to_add):
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
+            is_do_unlisted = self.args.get("unlisted") == 1
 
             title = item.get("title")
             date = item.get("published_date")

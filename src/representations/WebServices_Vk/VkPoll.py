@@ -37,11 +37,11 @@ class VkPoll(BaseVkItemId):
             return response
 
         async def item(self, item, list_to_add):
-            download_bg = self.buffer.get('args').get("download_bg")
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            download_bg = self.args.get("download_bg")
+            is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             logger.log(message=f"Recieved poll {item_id}",section="VkEntity",kind="message")
 

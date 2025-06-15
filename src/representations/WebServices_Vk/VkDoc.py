@@ -26,11 +26,11 @@ class VkDoc(BaseVkItemId):
             return response
 
         async def item(self, item, link_entities):
-            self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
             private_url = item.get("private_url")
-            is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
+            is_do_unlisted = self.args.get("unlisted") == 1
 
             logger.log(message=f"Recieved document {item_id}",section="VkEntity",kind="message")
 
@@ -40,7 +40,7 @@ class VkDoc(BaseVkItemId):
             item_url = item.get("url")
             item_filesize = item.get("size", 0)
 
-            if self.buffer.get('args').get("download") == True:
+            if self.args.get("download") == True:
                 main_su = self.storageUnit()
                 temp_dir = main_su.temp_dir
 
