@@ -9,7 +9,8 @@ class ExtractStrategy(Runnable, Saveable):
         self.outer = outer
 
     def preExtract(self, i = {}):
-        self.buffer['args'] = i
+        print(i)
+        self.buffer['args'] = i.copy()
 
     def extractWheel(self, i = {}):
         raise AbstractClassException("This is abstract representation")
@@ -19,6 +20,7 @@ class ExtractStrategy(Runnable, Saveable):
         if __wheel == None:
             __wheel = ""
 
+        print(i)
         __wheel_method = getattr(self, __wheel, None)
         if __wheel_method == None:
             raise SuitableExtractMethodNotFound('Not found suitable extractor for current args')

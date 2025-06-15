@@ -15,7 +15,8 @@ class ExtractMetadata(BaseAct):
         "type": "or",
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["path"] = StringArgument({
             "default": None,

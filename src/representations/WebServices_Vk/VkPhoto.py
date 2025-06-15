@@ -6,12 +6,8 @@ from pathlib import Path
 import os
 
 class VkPhoto(BaseVkItemId):
-    executable_cfg = {
-        "list": ["ids", "object"],
-        "type": "or",
-    }
-
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True

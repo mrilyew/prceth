@@ -13,7 +13,8 @@ class RecursiveDeclarable:
     def validate(cls, args: dict)->dict:
         return ArgsValidator().validate(cls.declare_recursive(), args, cls.executable_cfg)
 
-    def declare():
+    @classmethod
+    def declare(cls):
         '''
         Method that defines dictionary of current executable args
         '''

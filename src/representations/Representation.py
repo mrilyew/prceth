@@ -7,6 +7,7 @@ import asyncio
 
 class Representation(RecursiveDeclarable, Runnable):
     category = "base"
+    hydrated = None
 
     class Extractor(ExtractStrategy):
         pass
@@ -17,9 +18,10 @@ class Representation(RecursiveDeclarable, Runnable):
             raise AbstractClassException('ExecutableStrategy is not implemented at this class')
 
         strategy = cls.Extractor(cls)
-        args = cls.validate(i)
+        args = cls.validate(i.copy())
 
         strategy.preExtract(args)
+        strategy.buffer['args'] = args
 
         return await strategy.extract(i = args)
 
@@ -34,3 +36,6 @@ class Representation(RecursiveDeclarable, Runnable):
                 __out.append(__method)
 
         return __out
+
+    def hydrate(self, item):
+        self.hydrated = item

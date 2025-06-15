@@ -24,7 +24,8 @@ class RunExtractor(BaseAct):
         'free_args': True
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["extractor"] = StringArgument({
             "assertion": {

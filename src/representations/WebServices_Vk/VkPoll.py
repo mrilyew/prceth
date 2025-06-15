@@ -7,7 +7,8 @@ from submodules.Web.DownloadManager import download_manager
 import os
 
 class VkPoll(BaseVkItemId):
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True

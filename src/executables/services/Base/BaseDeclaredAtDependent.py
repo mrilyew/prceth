@@ -10,7 +10,8 @@ class BaseDeclaredAtDependent(BaseService):
     add_after = None
     colls_list = []
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["append_ids"] = CsvArgument({
             'default': [],

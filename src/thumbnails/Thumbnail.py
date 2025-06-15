@@ -10,7 +10,8 @@ class Thumbnail(Runnable):
         'value': ['base']
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params['width'] = IntArgument({
             "default": config.get("thumbnail.width")

@@ -8,7 +8,8 @@ class RSS(BaseDeclaredAtDependent):
     rss_extr = None
     docs = {}
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["url"] = StringArgument({
             "docs": {

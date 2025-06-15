@@ -9,7 +9,8 @@ import os
 class VkGraffiti(BaseVkItemId):
     hidden = True
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True

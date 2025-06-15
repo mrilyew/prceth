@@ -12,7 +12,8 @@ class RegularExecution(BaseService):
     pass_args = {}
     docs = {}
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["executable_type"] = LimitedArgument({
             "values": ["act", "extractor"],

@@ -19,7 +19,8 @@ class RunRepresentation(BaseAct):
         'free_args': True
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["representation"] = StringArgument({
             "default": None,

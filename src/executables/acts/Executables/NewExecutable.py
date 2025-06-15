@@ -16,7 +16,8 @@ class NewExecutable(BaseAct):
     }
     available_on_web = False
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["type"] = LimitedArgument({
             "docs": {

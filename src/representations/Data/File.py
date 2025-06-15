@@ -9,7 +9,8 @@ import os, mimetypes
 class File(Representation):
     category = "Data"
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["path"] = StringArgument({
             "default": None,

@@ -11,7 +11,8 @@ class VideoThumbnail(Thumbnail):
         'value': ['video/*']
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params['frames'] = IntArgument({
             'default': 10

@@ -6,7 +6,8 @@ from representations.ExtractStrategy import ExtractStrategy
 class Json(Representation):
     category = "Data"
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["object"] = ObjectArgument({
             "docs": {

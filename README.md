@@ -40,6 +40,8 @@ Look at [docs](docs/ru/README.md)
 ### Репрезентации
 
 - [x] Разделить representation и strategy
+- [x] Гидрация репрезентации
+- [ ] Каждый метод репрезентации должен быть как то задокументирован и вынесен (?)
 - [ ] Post-execute действия (?)
 - [ ] file_containment (?)
 

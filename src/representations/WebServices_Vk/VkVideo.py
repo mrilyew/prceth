@@ -9,7 +9,8 @@ from resources.Exceptions import LibNotInstalledException
 import os
 
 class VkVideo(BaseVkItemId):
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True
@@ -35,10 +36,11 @@ class VkVideo(BaseVkItemId):
         async def item(self, item, list_to_add):
             self.outer._insertVkLink(item, self.buffer.get('args').get('vk_path'))
 
+            print(self.buffer.get('args'))
             is_do_download = self.buffer.get('args').get("download") == True
             is_do_unlisted = self.buffer.get('args').get("unlisted") == 1
             quality = self.buffer.get('args').get("quality")
-            page_domain = self.buffer.get('args').get('page_domain')
+            page_domain = self.buffer.get('args').get('page_domain', '')
 
             storage_unit = None
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
@@ -97,6 +99,8 @@ class VkVideo(BaseVkItemId):
                         })
                     except LibNotInstalledException as _libe:
                         raise _libe
+                    except AssertionError:
+                        logger.log(message='Video files not found', section='VkEntity', kind='error')
                     except Exception as __e:
                         logger.logException(__e, section="VkEntity",silent=False)
                 else:

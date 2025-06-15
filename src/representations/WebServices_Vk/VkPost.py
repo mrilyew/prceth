@@ -7,7 +7,8 @@ from app.App import logger
 class VkPost(BaseVkItemId):
     vk_type = 'post'
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["object"] = ObjectArgument({})
         params["ids"] = StringArgument({})
@@ -22,10 +23,28 @@ class VkPost(BaseVkItemId):
         })
         return params
 
+    async def wallCount(vkapi, owner_id, filter):
+        resp = await vkapi.call('wall.get', {
+            'owner_id': owner_id,
+            'filter': filter,
+            'count': 1,
+        })
+
+        return resp.get('count')
+
+    async def wall(vkapi, owner_id, filter, count=100, offset=0):
+        response = await vkapi.call('wall.get', {
+            'owner_id': owner_id,
+            'filter': filter,
+            'offset': offset,
+            'count': count,
+        })
+
+        return response
+
     class Extractor(BaseVkItemId.Extractor):
         def preExtract(self, i):
             super().preExtract(i)
-
             self.buffer['attachments_info'] = i.get("attachments_info")
             self.buffer['attachments_file'] = i.get("attachments_file")
 
@@ -124,8 +143,8 @@ class VkPost(BaseVkItemId):
             if att_type == "wall":
                 att_class_name = "post"
 
-            should_download_json = self.buffer.get('attachments_info')[0] == "*" or att_type in self.buffer['attachments_info']
-            should_download_file = self.buffer.get('attachments_file')[0] == "*" or att_type in self.buffer['attachments_file']
+            should_download_json = self.buffer.get('attachments_info')[0] == "*" or att_type in self.buffer.get('attachments_info')
+            should_download_file = self.buffer.get('attachments_file')[0] == "*" or att_type in self.buffer.get('attachments_file')
 
             if should_download_json == False:
                 return None
@@ -180,10 +199,12 @@ class VkPost(BaseVkItemId):
                 "object": repost,
                 "api_url": self.buffer.get('args').get("api_url"),
                 "vk_path": self.buffer.get('args').get("vk_path"),
-                "download_attachments_json_list": self.buffer.get('args').get("download_attachments_json_list"),
-                "download_attachments_file_list": self.buffer.get('args').get("download_attachments_file_list"),
+                "attachments_info": self.buffer.get('args').get("attachments_info"),
+                "attachments_file": self.buffer.get('args').get("attachments_file"),
                 "download_reposts": False,
             })
 
             vk_post = vals[0]
             linked_dict.append(vk_post)
+
+            return vk_post

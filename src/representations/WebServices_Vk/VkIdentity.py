@@ -9,7 +9,8 @@ from app.App import logger
 import os
 
 class VkIdentity(BaseVkItemId):
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download_avatar"] = BooleanArgument({
             "default": True,

@@ -1,13 +1,13 @@
 from app.App import logger
-from executables.extractors.Base.Base import BaseExtractor
-from declarable.ArgumentsTypes import IntArgument, FloatArgument
+from executables.extractors.Base.BaseTimeoutable import BaseTimeoutable
+from declarable.ArgumentsTypes import IntArgument
 import asyncio
 
-class IterableBase(BaseExtractor):
-    name = 'IterableBase'
+class BaseIterable(BaseTimeoutable):
     category = 'base'
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["start"] = IntArgument({
             "default": 1,
@@ -17,12 +17,6 @@ class IterableBase(BaseExtractor):
         })
         params["end"] = IntArgument({
             "default": 100,
-            "assertion": {
-                "not_null": True,
-            }
-        })
-        params["timeout"] = FloatArgument({
-            "default": 1,
             "assertion": {
                 "not_null": True,
             }

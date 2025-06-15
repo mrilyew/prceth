@@ -6,7 +6,8 @@ import xmltodict
 class Xml(Representation):
     category = "Data"
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["text"] = StringArgument({
             "docs": {

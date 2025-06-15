@@ -6,7 +6,8 @@ from representations.ExtractStrategy import ExtractStrategy
 class Text(Representation):
     category = "Abstract"
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["text"] = StringArgument({
             "default": None,

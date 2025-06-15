@@ -11,7 +11,8 @@ class UpdateServiceData(BaseAct):
         "definition": descriptions.get('__updates_service_data_not_changes')
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["service"] = ServiceInstanceArgument({
             "docs": {

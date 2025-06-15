@@ -7,7 +7,8 @@ from app.App import logger
 import os
 
 class VkLink(BaseVkItemId):
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True

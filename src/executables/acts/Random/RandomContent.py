@@ -7,7 +7,8 @@ from declarable.ArgumentsTypes import IntArgument, BooleanArgument
 class RandomContent(BaseAct):
     category = 'Random'
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["limit"] = IntArgument({
             "default": 10,

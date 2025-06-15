@@ -1,12 +1,13 @@
-from executables.extractors.Base.IterableBase import IterableBase
+from executables.extractors.Base.BaseIterable import BaseIterable
 from declarable.ArgumentsTypes import IntArgument, LimitedArgument
 from representations.Data.File import File
 from app.App import logger
 
-class VkStickers(IterableBase):
+class VkStickers(BaseIterable):
     category = 'WebServices_Vk'
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["size"] = IntArgument({
             "default": 512,

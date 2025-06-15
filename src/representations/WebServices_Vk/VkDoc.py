@@ -7,7 +7,8 @@ from pathlib import Path
 import os
 
 class VkDoc(BaseVkItemId):
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True

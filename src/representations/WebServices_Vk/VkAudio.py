@@ -9,7 +9,8 @@ from utils.MediaUtils import is_ffmpeg_installed
 import os
 
 class VkAudio(BaseVkItemId):
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["download"] = BooleanArgument({
             "default": True

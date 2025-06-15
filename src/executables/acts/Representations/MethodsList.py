@@ -17,7 +17,8 @@ class MethodsList(BaseAct):
         }
     }
 
-    def declare():
+    @classmethod
+    def declare(cls):
         params = {}
         params["representation"] = StringArgument({
             "default": None,
