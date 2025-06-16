@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from pathlib import Path
 from app.App import logger
@@ -43,7 +43,7 @@ class VkPoll(BaseVkItemId):
 
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            logger.log(message=f"Recieved poll {item_id}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved poll {item_id}",section="Vk!Poll",kind="message")
 
             if download_bg == True:
                 bg_su = self.storageUnit()
@@ -68,9 +68,9 @@ class VkPoll(BaseVkItemId):
 
                         item["relative_photo"] = entity_sign(bg_su)
 
-                        logger.log(message=f"Downloaded poll {item_id} background",section="VkEntity",kind="success")
+                        logger.log(message=f"Downloaded poll {item_id} background",section="Vk!Poll",kind="success")
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VkEntity",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Poll",kind="error")
 
             cu = self.contentUnit({
                 "source": {

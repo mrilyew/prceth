@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 from app.App import logger
 
@@ -19,7 +19,7 @@ class VkArticle(BaseVkItemId):
             title = item.get("title")
             date = item.get("published_date")
 
-            logger.log(message=f"Recieved article {item.get('url')}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved article {item.get('url')}",section="Vk!Article",kind="message")
 
             cu = self.contentUnit({
                 "source": {

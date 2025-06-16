@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 from app.App import logger
 from pathlib import Path
@@ -49,7 +49,7 @@ class VkVideo(BaseVkItemId):
             item_url = page_domain + f"{item_id}"
             is_direct = item.get("platform") == None
 
-            logger.log(message=f"Recieved video {item_id}; download={is_do_download}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved video {item_id}; download={is_do_download}",section="Vk!Video",kind="message")
 
             if is_do_download:
                 if is_direct:
@@ -73,7 +73,7 @@ class VkVideo(BaseVkItemId):
                         assert video_file_url != None, 'videofile not found'
 
                         if "srcIp=" not in video_file_url:
-                            logger.log(message=f"Video {item_id} contains direct mp4; downloading",section="VkEntity",name="message")
+                            logger.log(message=f"Video {item_id} contains direct mp4; downloading",section="Vk!Video",name="message")
 
                             await download_manager.addDownload(end=video_file_url,dir=save_path)
                         else:
@@ -82,7 +82,7 @@ class VkVideo(BaseVkItemId):
                             if is_ffmpeg_installed() == False:
                                 raise LibNotInstalledException("ffmpeg is not installed")
 
-                            logger.log(message=f"Making download via yt-dlp",section="VkEntity",name="message")
+                            logger.log(message=f"Making download via yt-dlp",section="Vk!Video",name="message")
 
                             ytd_params = {"outtmpl": str(save_path)}
                             if quality != "max":
@@ -99,11 +99,11 @@ class VkVideo(BaseVkItemId):
                     except LibNotInstalledException as _libe:
                         raise _libe
                     except AssertionError:
-                        logger.log(message='Video files not found', section='VkEntity', kind='error')
+                        logger.log(message='Video files not found', section='Vk!Video', kind='error')
                     except Exception as __e:
-                        logger.logException(__e, section="VkEntity",silent=False)
+                        logger.logException(__e, section="Vk",silent=False)
                 else:
-                    logger.log(message=f"Video {item_id} is from another platform ({item.get("platform")})",section="VkEntity",kind="message")
+                    logger.log(message=f"Video {item_id} is from another platform ({item.get("platform")})",section="Vk!Video",kind="message")
 
             cu = self.contentUnit({
                 "name": item_name,

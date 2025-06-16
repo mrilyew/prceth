@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from utils.MainUtils import valid_name
@@ -32,7 +32,7 @@ class VkDoc(BaseVkItemId):
             private_url = item.get("private_url")
             is_do_unlisted = self.args.get("unlisted") == 1
 
-            logger.log(message=f"Recieved document {item_id}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved document {item_id}",section="Vk!Doc",kind="message")
 
             item_ext = item.get("ext")
             item_title = item.get("title")
@@ -56,7 +56,7 @@ class VkDoc(BaseVkItemId):
                     "filesize": file_stats.st_size,
                 })
 
-                logger.log(message=f"Download file for doc {item_id}",section="VkEntity",kind="success")
+                logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind="success")
 
             cu = self.contentUnit({
                 "main_su": main_su,

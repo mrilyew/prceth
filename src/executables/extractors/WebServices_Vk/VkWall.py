@@ -2,7 +2,7 @@ from declarable.ArgumentsTypes import IntArgument, StringArgument, CsvArgument, 
 from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
 from executables.extractors.Base.Base import BaseExtractor
 from representations.WebServices_Vk.VkPost import VkPost
-from submodules.WebServices.VkApi import VkApi
+from representations.WebServices_Vk import VkApi
 from app.App import logger
 import math, asyncio
 

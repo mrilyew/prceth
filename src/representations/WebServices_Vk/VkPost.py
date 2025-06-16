@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
 from utils.MainUtils import entity_sign
@@ -80,7 +80,7 @@ class VkPost(BaseVkItemId):
             item.pop("track_code", None)
             item.pop("hash", None)
 
-            logger.log(message=f"Recieved {self.outer.vk_type} {item_id}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved {self.outer.vk_type} {item_id}",section="Vk!Post",kind="message")
 
             links = []
 
@@ -95,7 +95,7 @@ class VkPost(BaseVkItemId):
                 except ModuleNotFoundError:
                     pass
                 except Exception as exc:
-                    logger.logException(exc, "VkEntity", silent=False)
+                    logger.logException(exc, "Vk!Post", silent=False)
 
             if reposts_list != None and do_download_reposts:
                 for key, repost in enumerate(item.get("copy_history")):
@@ -106,7 +106,7 @@ class VkPost(BaseVkItemId):
                     except ModuleNotFoundError:
                         pass
                     except Exception as exc:
-                        logger.logException(exc, "VkEntity", silent=False)
+                        logger.logException(exc, "Vk!Post", silent=False)
 
             owner_keys = ['from_id', 'owner_id', 'copy_owner_id']
             for key in owner_keys:
@@ -158,7 +158,7 @@ class VkPost(BaseVkItemId):
             if attachment_representation == None:
                 from representations.Data.Json import Json as UnknownAttachmentRepresentation
 
-                logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="VkEntity", kind="message")
+                logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="Vk!Post", kind="message")
 
                 resl = await UnknownAttachmentRepresentation().extract({
                     "object": attachment,
@@ -172,7 +172,7 @@ class VkPost(BaseVkItemId):
                 attachment_id = f"{att_object.get('owner_id')}_{att_object.get('id')}"
                 att_class = attachment_representation()
 
-                logger.log(message=f"Recieved attachment {str(att_class_name)} {attachment_id}",section="VkEntity",kind="message")
+                logger.log(message=f"Recieved attachment {str(att_class_name)} {attachment_id}",section="Vk!Post",kind="message")
 
                 resl = await att_class.extract({
                     "unlisted": True,
@@ -194,7 +194,7 @@ class VkPost(BaseVkItemId):
             if repost == None:
                 return None
 
-            logger.log(message=f"Found repost {key}",section="VkEntity",kind="message")
+            logger.log(message=f"Found repost {key}",section="Vk!Post",kind="message")
 
             repost_thing = VkPost()
             vals = await repost_thing.extract({

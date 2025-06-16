@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from resources.Exceptions import NotFoundException
@@ -120,7 +120,7 @@ class VkIdentity(BaseVkItemId):
 
                     links.append(ava)
                 except Exception as _e:
-                    logger.log(message='Avatar not found, not downloading', section='VkEntity', kind='error')
+                    logger.log(message='Avatar not found, not downloading', section='Vk!Identity', kind='error')
 
             if self.args.get("download_cover") == True:
                 try:
@@ -129,11 +129,11 @@ class VkIdentity(BaseVkItemId):
 
                     links.append(cov)
                 except NotFoundException:
-                    logger.log(message='Cover not found, not downloading', section='VkEntity', kind='error')
+                    logger.log(message='Cover not found, not downloading', section='Vk!Identity', kind='error')
                 except Exception as _e:
-                    logger.logException(_e,section="VkEntity")
+                    logger.logException(_e,section="Vk!Identity")
 
-            logger.log(f"Got idents {item.get("vkapi_type")}{item.get('id')}",section="VkEntity",kind='success')
+            logger.log(f"Got idents {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind='success')
 
             cu = self.contentUnit({
                 "source": {

@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
 from utils.MainUtils import entity_sign
@@ -27,7 +27,7 @@ class VkLink(BaseVkItemId):
             should_be_unlisted = self.args.get('unlisted') == 1
             su = None
 
-            logger.log(message=f"Recieved attached link",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved attached link",section="Vk!Link",kind="message")
 
             if self.args.get("download") == True:
                 if attached_photo != None:
@@ -55,9 +55,9 @@ class VkLink(BaseVkItemId):
 
                         item['relative_photo'] = entity_sign(su)
 
-                        logger.log(message=f"Downloaded link's photo {file_size}",section="VkEntity",kind="success")
+                        logger.log(message=f"Downloaded link's photo {file_size}",section="Vk!Link",kind="success")
                     except FileNotFoundError as _ea:
-                        logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VkEntity",kind="error")
+                        logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Link",kind="error")
 
             cu = self.contentUnit({
                 "content": item,

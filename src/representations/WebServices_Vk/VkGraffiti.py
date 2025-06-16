@@ -1,6 +1,6 @@
+from representations.WebServices_Vk import BaseVkItemId
 from app.App import logger
 from declarable.ArgumentsTypes import BooleanArgument
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from utils.MediaUtils import find_highest_in_dict
 from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
@@ -29,7 +29,7 @@ class VkGraffiti(BaseVkItemId):
             is_do_download = self.args.get("download")
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
-            logger.log(message=f"Recieved graffiti {item_id}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved graffiti {item_id}",section="Vk!Graffiti",kind="message")
 
             if is_do_download:
                 try:
@@ -52,9 +52,9 @@ class VkGraffiti(BaseVkItemId):
                         "filesize": file_size,
                     })
 
-                    logger.log(message=f"Downloaded graffiti {item_id}",section="VkEntity",kind="success")
+                    logger.log(message=f"Downloaded graffiti {item_id}",section="Vk!Graffiti",kind="success")
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VkEntity",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Graffiti",kind="error")
 
             cu = self.contentUnit({
                 "source": {

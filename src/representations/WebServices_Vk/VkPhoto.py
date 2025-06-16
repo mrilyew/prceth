@@ -1,5 +1,5 @@
+from representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from app.App import logger
 from pathlib import Path
@@ -32,7 +32,7 @@ class VkPhoto(BaseVkItemId):
 
             # So, downloading photo
 
-            logger.log(message=f"Recieved photo {item_id}",section="VkEntity!Photo",kind="message")
+            logger.log(message=f"Recieved photo {item_id}",section="Vk!Photo",kind="message")
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             if item.get('orig_photo') != None:
@@ -50,7 +50,7 @@ class VkPhoto(BaseVkItemId):
                         
                         download_url = __optimal_size.get('url')
                     except Exception as ___e:
-                        logger.logException(___e, section="VkEntity!Photo")
+                        logger.logException(___e, section="Vk!Photo")
 
             if self.args.get('download') == True:
                 original_name = f"photo_{item_id}_{item.get('date')}.jpg"
@@ -71,9 +71,9 @@ class VkPhoto(BaseVkItemId):
                         "filesize": file_stats.st_size,
                     })
 
-                    logger.log(message=f"Downloaded photo {item_id}",section="VkEntity!Photo",kind="success")
+                    logger.log(message=f"Downloaded photo {item_id}",section="Vk!Photo",kind="success")
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="VkEntity",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Photo",kind="error")
 
             __cu = self.contentUnit({
                 "main_su": item_su,

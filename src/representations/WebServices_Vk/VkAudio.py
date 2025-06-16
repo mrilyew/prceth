@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.BaseVk import BaseVkItemId
+from representations.WebServices_Vk import BaseVkItemId
 from resources.Exceptions import LibNotInstalledException
 from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
@@ -32,7 +32,7 @@ class VkAudio(BaseVkItemId):
             is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
-            logger.log(message=f"Recieved audio {item_id}",section="VkEntity",kind="message")
+            logger.log(message=f"Recieved audio {item_id}",section="Vk!Audio",kind="message")
 
             main_su = None
             out_ext  = "mp3"
@@ -48,7 +48,7 @@ class VkAudio(BaseVkItemId):
                 save_path = Path(os.path.join(temp_dir, audio_save_name))
 
                 if item.get("url") == None:
-                    logger.log(message=f"Audio {item_id} does not contains url to file",section="VkEntity",kind="error")
+                    logger.log(message=f"Audio {item_id} does not contains url to file",section="Vk!Audio",kind="error")
                 else:
                     download_url = item.get("url")
 
@@ -58,7 +58,7 @@ class VkAudio(BaseVkItemId):
                         if is_ffmpeg_installed() == False:
                             raise LibNotInstalledException("ffmpeg is not installed")
 
-                        logger.log(message=f"Found .m3u8 of audio {item_id}",section="VkEntity",kind="message")
+                        logger.log(message=f"Found .m3u8 of audio {item_id}",section="Vk!Audio",kind="message")
 
                     
                         with YtDlpWrapper({"outtmpl": str(save_path)}).ydl as ydl:
@@ -66,7 +66,7 @@ class VkAudio(BaseVkItemId):
 
                         out_size = save_path.stat().st_size
                     else:
-                        logger.log(message=f"Downloading raw .mp3 of audio {item_id}",section="VkEntity",kind="message")
+                        logger.log(message=f"Downloading raw .mp3 of audio {item_id}",section="Vk!Audio",kind="message")
 
                         await download_manager.addDownload(end=download_url,dir=save_path)
                         out_size = save_path.stat().st_size
