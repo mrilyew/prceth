@@ -43,8 +43,8 @@ class VkPost(BaseVkItemId):
         return response
 
     class Extractor(BaseVkItemId.Extractor):
-        def preExtract(self, i):
-            super().preExtract(i)
+        def preExecute(self, i):
+            super().preExecute(i)
             self.buffer['attachments_info'] = i.get("attachments_info")
             self.buffer['attachments_file'] = i.get("attachments_file")
 
@@ -146,7 +146,6 @@ class VkPost(BaseVkItemId):
             attachments_info = self.args.get('attachments_info')
             attachments_file = self.args.get('attachments_file')
 
-            print(attachments_file)
             should_download_json = attachments_info[0] == "*" or att_type in attachments_info
             should_download_file = attachments_file[0] == "*" or att_type in attachments_file
 

@@ -20,7 +20,7 @@ class Representation(RecursiveDeclarable, Runnable):
         strategy = cls.Extractor(cls)
         args = cls.validate(i.copy())
 
-        strategy.preExtract(args)
+        strategy.preExecute(args)
 
         return await strategy.extract(i = args)
 

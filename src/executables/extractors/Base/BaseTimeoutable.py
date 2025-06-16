@@ -1,7 +1,6 @@
-from executables.extractors.Base.Base import BaseExtractor
 from declarable.ArgumentsTypes import FloatArgument
 
-class BaseTimeoutable(BaseExtractor):
+class BaseTimeoutable:
     @classmethod
     def declare(cls):
         params = {}

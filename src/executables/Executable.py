@@ -25,7 +25,7 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
 
     async def safeExecute(self, args: dict):
         _args = self.__class__.validate(args)
-        self.buffer['args'] = _args
+        self.preExecute(_args)
 
         return await self.execute(_args)
 

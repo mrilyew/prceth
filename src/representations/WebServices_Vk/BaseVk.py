@@ -88,7 +88,7 @@ class BaseVk(Representation):
         item[column_name.replace('_id', '')] = cls._find_owner(item.get(column_name), profiles, groups)
 
     class Extractor(ExtractStrategy):
-        def preExtract(self, i = {}):
+        def preExecute(self, i = {}):
             self.vkapi = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
 
 class BaseVkItemId(BaseVk):

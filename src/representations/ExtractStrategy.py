@@ -9,9 +9,6 @@ class ExtractStrategy(Runnable, Saveable):
     def __init__(self, outer):
         self.outer = outer
 
-    def preExtract(self, i = {}):
-        self.buffer['args'] = i.copy()
-
     def extractWheel(self, i = {}):
         raise AbstractClassException("This is abstract representation")
 

@@ -1,11 +1,12 @@
 from declarable.ArgumentsTypes import IntArgument, StringArgument, CsvArgument, BooleanArgument, FloatArgument
-from executables.extractors.Base.BaseTimeoutable import BaseTimeoutable
+from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
+from executables.extractors.Base.Base import BaseExtractor
 from representations.WebServices_Vk.VkPost import VkPost
 from submodules.WebServices.VkApi import VkApi
 from app.App import logger
 import math, asyncio
 
-class VkWall(BaseTimeoutable):
+class VkWall(BaseIterableExtended, BaseExtractor):
     category = 'WebServices_Vk'
 
     @classmethod
@@ -16,15 +17,6 @@ class VkWall(BaseTimeoutable):
             'assertion': {
                 'not_null': True,
             }
-        })
-        params["first_iteration"] = IntArgument({
-            "default": 0
-        })
-        params["limit"] = IntArgument({
-            "default": 0,
-        })
-        params["per_page"] = IntArgument({
-            "default": 100
         })
         params["filter"] = StringArgument({
             "default": 'all',
@@ -38,14 +30,11 @@ class VkWall(BaseTimeoutable):
         params["download_reposts"] = BooleanArgument({
             'default': True,
         })
-        params["api_timeout"] = FloatArgument({
-            "default": 1,
-            "assertion": {
-                "not_null": True,
-            }
-        })
 
         return params
+
+    def preExecute(self, i = {}):
+        self.buffer['vkapi'] = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
 
     async def execute(self, i = {}):
         downloaded_count = 0
@@ -54,9 +43,7 @@ class VkWall(BaseTimeoutable):
         limit_count = i.get('limit')
         first_iteration = i.get('first_iteration')
         per_page = i.get('per_page')
-        vkapi = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
-
-        total_count = await VkPost.wallCount(vkapi, owner_id, filter_name)
+        total_count = await VkPost.wallCount(self.buffer.get('vkapi'), owner_id, filter_name)
         call_times = math.ceil(total_count / i.get('per_page'))
 
         logger.log(message=f"Total {total_count} items; will be {call_times} calls",section="Iterable!Vk",kind="message")
@@ -68,7 +55,7 @@ class VkWall(BaseTimeoutable):
 
             logger.log(message=f"{time + 1}/{call_times} time of items recieving; {offset} offset",section="Iterable!Vk",kind="message")
 
-            response = await VkPost.wall(vkapi, owner_id=owner_id, filter=filter_name, count=per_page, offset=offset)
+            response = await VkPost.wall(self.buffer.get('vkapi'), owner_id=owner_id, filter=filter_name, count=per_page, offset=offset)
             items = await VkPost.extract({
                 'object': response,
                 'attachments_info': i.get('attachments_info'),
@@ -77,9 +64,8 @@ class VkWall(BaseTimeoutable):
             })
 
             downloaded_count += len(items)
-
-            if i.get("api_timeout") != 0:
-                await asyncio.sleep(i.get("api_timeout"))
-
             for item in items:
                 self.linked_dict.append(item)
+
+            if i.get("timeout") != 0:
+                await asyncio.sleep(i.get("timeout"))

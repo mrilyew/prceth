@@ -29,3 +29,6 @@ class Runnable:
     @classmethod
     def full_name(cls):
         return cls.category + '.' + cls.__name__
+
+    def preExecute(self, i = {}):
+        pass
