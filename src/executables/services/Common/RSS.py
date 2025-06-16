@@ -5,7 +5,6 @@ from declarable.ArgumentsTypes import StringArgument, IntArgument
 
 class RSS(BaseDeclaredAtDependent):
     category = 'Common'
-    rss_extr = None
     docs = {}
 
     @classmethod

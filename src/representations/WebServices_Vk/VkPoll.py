@@ -52,7 +52,7 @@ class VkPoll(BaseVkItemId):
 
                 try:
                     if item.get("photo") != None:
-                        photo_sizes = sorted(item.get("photo").get("images"), key=lambda x: (x['width'] is None, x['width']), reverse=True)
+                        photo_sizes = sorted(item.get("photo").get("images"), key=lambda x: (x['width'] is not None, x['width']), reverse=True)
                         optimal_size = photo_sizes[0]
                         save_path = Path(os.path.join(temp_dir, bg_name))
 

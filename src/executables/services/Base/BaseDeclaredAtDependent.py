@@ -17,10 +17,11 @@ class BaseDeclaredAtDependent(BaseService):
             'default': [],
         })
         params["date_offset"] = StringArgument({
-            "docs": {
+            'docs': {
                 "definition": descriptions.get('__data_offset_service')
             },
-            "assertion": {
+            'default': 0,
+            'assertion': {
                 "not_null": True,
             },
         })

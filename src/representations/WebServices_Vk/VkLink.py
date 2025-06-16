@@ -38,7 +38,7 @@ class VkLink(BaseVkItemId):
                         su = self.storageUnit()
                         temp_dir = su.temp_dir
 
-                        __photo_sizes = sorted(attached_photo.get("sizes"), key=lambda x: (x['width'] is None, x['width']), reverse=True)
+                        __photo_sizes = sorted(attached_photo.get("sizes"), key=lambda x: (x['width'] is not None, x['width']), reverse=True)
                         __optimal_size = __photo_sizes[0]
 
                         save_path = Path(os.path.join(temp_dir, save_name))

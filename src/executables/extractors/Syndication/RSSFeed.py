@@ -7,7 +7,6 @@ from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 import aiohttp, xmltodict
 
 class RSSFeed(BaseExtractor):
-    name = 'RSSFeed'
     category = 'Syndication'
     docs = {}
 

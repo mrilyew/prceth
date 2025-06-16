@@ -51,7 +51,7 @@ class VkIdentity(BaseVkItemId):
                 raise NotFoundException("cover not found")
 
             images = cover.get("images")
-            images_ = sorted(images, key=lambda x: (x['width'] is None, x['width']), reverse=True)
+            images_ = sorted(images, key=lambda x: (x['width'] is not None, x['width']), reverse=True)
             image = images_[0]
 
             await download_manager.addDownload(dir=save_path,end=image.get("url"))

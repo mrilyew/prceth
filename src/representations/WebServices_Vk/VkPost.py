@@ -88,10 +88,11 @@ class VkPost(BaseVkItemId):
                 try:
                     attachment_item = await self.format_attachment(key, attachment, links)
 
-                    item['relative_attachments'].append({
-                        "type": attachment.get('type'),
-                        f"{attachment.get('type')}": entity_sign(attachment_item)
-                    })
+                    if attachment_item != None:
+                        item['relative_attachments'].append({
+                            "type": attachment.get('type'),
+                            f"{attachment.get('type')}": entity_sign(attachment_item)
+                        })
                 except ModuleNotFoundError:
                     pass
                 except Exception as exc:
@@ -102,7 +103,8 @@ class VkPost(BaseVkItemId):
                     try:
                         repost_item = await self.format_repost(key, repost, links)
 
-                        item['relative_copy_history'].append(entity_sign(repost_item))
+                        if repost_item != None:
+                            item['relative_copy_history'].append(entity_sign(repost_item))
                     except ModuleNotFoundError:
                         pass
                     except Exception as exc:

@@ -13,7 +13,7 @@ class NewService(BaseAct):
     @classmethod
     def declare(cls):
         params = {}
-        params["class_name"] = StringArgument({
+        params["class"] = StringArgument({
             "assertion": {
                 "not_null": True,
             }
@@ -29,7 +29,7 @@ class NewService(BaseAct):
         return params
 
     async def execute(self, i = {}):
-        service_class_name = i.get('class_name')
+        service_class_name = i.get('class')
         service_class = (ServicesRepository()).getByName(service_class_name)
 
         assert service_class != None, "invalid service"

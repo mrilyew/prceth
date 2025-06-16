@@ -42,7 +42,7 @@ class VkPhoto(BaseVkItemId):
                     download_url = item.get('url')
                 else:
                     try:
-                        __photo_sizes = sorted(item.get('sizes'), key=lambda x: (x['width'] is None, x['width']), reverse=True)
+                        __photo_sizes = sorted(item.get('sizes'), key=lambda x: (x['width'] is not None, x['width']), reverse=True)
                         __optimal_size = __photo_sizes[0]
                         # For old photos without sizes.
                         if __optimal_size.get('height') == 0:
