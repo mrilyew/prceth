@@ -48,7 +48,7 @@ class BaseDeclaredAtDependent(BaseService):
 
         await extractor_instance.safeExecute(self.pass_params)
 
-        logger.log(message=f"Got total {len(linked_dict)} items",kind='message',section='RegularDeclaredAtChecker')
+        logger.log(message=f"Got total {len(linked_dict)} items",kind='message',section='Services!RegularDeclaredAtChecker')
 
         list_items = []
         check_dates = []
@@ -65,12 +65,12 @@ class BaseDeclaredAtDependent(BaseService):
 
                 check_dates.append(int(item_created))
 
-        logger.log(message=f"Totally {len(list_items)} new items",kind='success',section='RegularDeclaredAtChecker')
+        logger.log(message=f"Totally {len(list_items)} new items",kind='success',section='Services!RegularDeclaredAtChecker')
 
         if len(list_items) > 0:
             new_offset = max(check_dates)
 
-            logger.log(message=f"Changed date offset {date_offset}->{new_offset}",kind='message',section='RegularDeclaredAtChecker')
+            logger.log(message=f"Changed date offset {date_offset}->{new_offset}",kind='message',section='Services!RegularDeclaredAtChecker')
 
             self.config['date_offset'] = new_offset
             self.service_object.updateData(self.config)

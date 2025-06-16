@@ -19,6 +19,7 @@ class Logger():
         self.per_startup_mode = keep
         self.logs_storage = storage.sub('logs')
         self.config_link = config
+        self.skip_categories = self.config_link.get("logger.skip_categories")
         self.is_out_to_file = self.config_link.get("logger.skip_file") == 0
 
         __path = self.logs_storage.dir
@@ -74,8 +75,12 @@ class Logger():
         silent: If True, no message will be displayed in the console
         '''
 
-        if section in self.config_link.get("logger.skip_categories"):
-            return
+        for compare_section in self.skip_categories:
+            if compare_section == section:
+                return
+
+            if compare_section.endswith('*') and section.find(compare_section.replace('*', '')) != -1:
+                return
 
         self.__log_file_check()
 
