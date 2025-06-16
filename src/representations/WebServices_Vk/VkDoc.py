@@ -34,6 +34,7 @@ class VkDoc(BaseVkItemId):
 
             logger.log(message=f"Recieved document {item_id}",section="Vk!Doc",kind="message")
 
+            main_su = None
             item_ext = item.get("ext")
             item_title = item.get("title")
             file_name = valid_name(item_title + "." + item_ext)
