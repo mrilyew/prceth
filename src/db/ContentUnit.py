@@ -151,6 +151,9 @@ class ContentUnit(BaseModel):
 
         return fnl
 
+    def cli_show(self):
+        return f"{self.display_name}, {int(self.created_at)}, {int(self.declared_created_at)}"
+
     # Factory
 
     @staticmethod

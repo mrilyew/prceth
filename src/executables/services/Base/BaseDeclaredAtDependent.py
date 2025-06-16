@@ -2,7 +2,7 @@ from executables.services.Base.Base import BaseService
 from resources.Descriptions import descriptions
 from app.App import logger
 from db.ContentUnit import ContentUnit
-from declarable.ArgumentsTypes import CsvArgument, StringArgument
+from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgument
 
 class BaseDeclaredAtDependent(BaseService):
     category = 'Base'
@@ -24,6 +24,9 @@ class BaseDeclaredAtDependent(BaseService):
             'assertion': {
                 "not_null": True,
             },
+        })
+        params["display_cli"] = BooleanArgument({
+            'default': True
         })
 
         return params
@@ -74,6 +77,9 @@ class BaseDeclaredAtDependent(BaseService):
             self.service_object.save()
 
         for item in list_items:
+            if self.config.get('display_cli') == True:
+                print(item.cli_show())
+
             for ext in self.add_after:
                 if ext != None:
                     ext.addLink(item)
