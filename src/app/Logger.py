@@ -8,6 +8,12 @@ class Logger():
     '''
     Module for logging of messages and printing them to terminal
     '''
+
+    KIND_SUCCESS = 'success'
+    KIND_ERROR = 'error'
+    KIND_DEPRECATED = 'deprecated'
+    KIND_MESSAGE = 'message'
+
     def __init__(self, config, storage, keep: bool = False):
         '''
         Params:
@@ -103,18 +109,18 @@ class Logger():
         if is_silent == False:
             write_message = write_message.replace("\\n", "\n")
             write_colored_message = ""
-            if kind == "error":
+            if kind == self.KIND_ERROR:
                 write_colored_message = "\033[91m" + write_message + "\033[0m"
-            elif kind == "success":
+            elif kind == self.KIND_SUCCESS:
                 write_colored_message = "\033[92m" + write_message + "\033[0m"
-            elif kind == "deprecated":
+            elif kind == self.KIND_DEPRECATED:
                 write_colored_message = "\033[93m" + write_message + "\033[0m"
             else:
                 write_colored_message = write_message
-            
+
             print(write_colored_message, end='')
 
     def logException(self, input_exception, section: str ="App", silent: bool = False):
         __exp = traceback.format_exc()
 
-        self.log(section=section, message=type(input_exception).__name__ + " " + __exp, kind="error", silent=silent)
+        self.log(section=section, message=type(input_exception).__name__ + " " + __exp, kind=self.KIND_ERROR, silent=silent)

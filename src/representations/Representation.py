@@ -38,3 +38,5 @@ class Representation(RecursiveDeclarable, Runnable):
 
     def hydrate(self, item):
         self.hydrated = item
+
+        return self

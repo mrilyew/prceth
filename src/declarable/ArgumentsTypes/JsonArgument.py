@@ -1,6 +1,9 @@
 from declarable.ArgumentsTypes.Argument import Argument
-from utils.MainUtils import parse_json
+import json5
 
 class JsonArgument(Argument):
     def value(self):
-        return parse_json(self.input_value)
+        if type(self.input_value) == str:
+            return json5.loads(self.input_value)
+        else:
+            return self.input_value

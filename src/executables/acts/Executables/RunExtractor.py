@@ -90,6 +90,9 @@ class RunExtractor(BaseAct):
             __res.save()
 
             for ext in extractor.add_after:
+                if ext.is_saved() == False:
+                    ext.save()
+
                 if ext != None:
                     ext.addLink(__res)
 

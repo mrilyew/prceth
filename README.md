@@ -1,43 +1,37 @@
-## Prethmeta
+Todo:
 
-App for content saving with flexible settings
-
-Look at [docs](docs/ru/README.md)
-
-## Задачи:
-
-### Экзекьютеблы
+#### Экзекьютеблы
 
 - [ ] Pre-execute если ничего не передано (?)
 - [ ] Хуки выполнения
 - [ ] Cli only use акты
-- [ ] Кэширование списка экзекьютеблов и тамбнейлов
+- [ ] Кэширование списка
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
 - [ ] Игнорируемые параметры
 
-### Экспорт
+#### Экспорт
 
 - [ ] Acts.Metamorphosis.Export (to .th zip)
 - [ ] Acts.Metamorphosis.Import
 - [ ] Acts.Metamorphosis.CopyToDirectory
 - [ ] Подмена даты создания файла при экспорте (если возможно?)
 
-### Метаданные
+#### Метаданные
 
 - [ ] Акты для каждого mime типа
 
-### Contentunit
+#### Contentunit
 
 - [ ] Генерируемая колонка indexation_content_string (колонка `content` без ключей и пробелов)
 - [x] Переписать превью
 - [ ] Замена ID на UUID или что то типо того
 - [ ] Подключение альтернативной базы данных
 
-### StorageUnit
+#### StorageUnit
 
 - [ ] Автоматическое определение размера файла
 
-### Репрезентации
+#### Репрезентации
 
 - [x] Разделить репрезентацию и стратегию экспорта
 - [x] Гидрация репрезентации
@@ -45,17 +39,21 @@ Look at [docs](docs/ru/README.md)
 - [ ] Post-execute действия (?)
 - [ ] file_containment (?)
 
-### Инциализация
+#### Инциализация
 
 - [ ] Адаптация под bash
 
-### Веб кравлер
+#### Web crawler
 
 - [ ] Переписать
 - [ ] Режим archive.is без сохранения скриптов
 - [ ] Определённые декларируемые функции для определённого сайта
 
-### Acts.ContentUnits.
+#### Acts.Executables.
+
+- [ ] CreateCollection
+
+#### Acts.ContentUnits.
 
 - [ ] Search
 - [ ] Remove
@@ -66,14 +64,14 @@ Look at [docs](docs/ru/README.md)
 - [ ] Unlink
 - [ ] GetLinks
 
-### Acts.Executables.
+#### Acts.Executables.
 
 - [ ] List
 
-### Acts.Storage.
+#### Acts.Storage.
 
 - [ ] ClearTemp
 
-### ContentUnitRelation
+#### ContentUnitRelation
 
 - [ ] .is_revision

@@ -6,7 +6,7 @@ from resources.Exceptions import FatalError, EndOfCycleException
 from datetime import datetime
 import asyncio
 
-# TODO отрефакторить эту кашу из кода
+# TODO почистить здесь код
 async def runService():
     assert "i" in app.argv, "service_instance id (--i) not passed"
 

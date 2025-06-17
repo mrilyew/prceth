@@ -15,6 +15,28 @@ class VkPhoto(BaseVkItemId):
 
         return params
 
+    @classmethod
+    async def countByUser(cls, vkapi, owner_id):
+        resp = await vkapi.call('photos.getAll', {"owner_id": owner_id, "count": 1})
+
+        return resp.get('count')
+
+    @classmethod
+    async def byUser(cls, vkapi, owner_id, offset, count, rev = False, download = False):
+        photos = await vkapi.call('photos.getAll', {
+            "owner_id": owner_id,
+            "offset": offset,
+            "count": count,
+            "rev": int(rev), 
+            "extended": 1,
+            "photo_sizes": 1,
+        })
+
+        return await VkPhoto.extract({
+            'object': photos,
+            'download': download
+        })
+
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
             items_ids_str = i.get('ids')

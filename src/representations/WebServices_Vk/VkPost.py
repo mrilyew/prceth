@@ -61,8 +61,8 @@ class VkPost(BaseVkItemId):
             Converts VK Api Post object to readable format
             '''
 
-            attachments_list = item.get('attachments')
-            reposts_list = item.get('copy_history')
+            attachments_list = item.get('attachments', [])
+            reposts_list = item.get('copy_history', [])
 
             is_do_unlisted = self.args.get("unlisted") == 1
             do_download_attachments = True
@@ -99,7 +99,7 @@ class VkPost(BaseVkItemId):
                     logger.logException(exc, "Vk!Post", silent=False)
 
             if reposts_list != None and do_download_reposts:
-                for key, repost in enumerate(item.get("copy_history")):
+                for key, repost in enumerate(reposts_list):
                     try:
                         repost_item = await self.format_repost(key, repost, links)
 

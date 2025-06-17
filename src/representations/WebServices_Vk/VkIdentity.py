@@ -23,13 +23,13 @@ class VkIdentity(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __download_avatar(self, json):
+            url = json.get("photo_id")
+            if url == None:
+                raise NotFoundException("ava not found")
+
             su = self.storageUnit()
             save_name = "avatar.jpg"
             save_path = Path(os.path.join(su.temp_dir, save_name))
-
-            url = json.get("photo_max")
-            if url == None:
-                raise NotFoundException("ava not found")
 
             await download_manager.addDownload(dir=save_path,end=url)
 
@@ -42,13 +42,13 @@ class VkIdentity(BaseVkItemId):
             return su
 
         async def __download_cover(self, json):
-            su = self.storageUnit()
-            save_name = "cover.jpg"
-            save_path = Path(os.path.join(su.temp_dir, save_name))
-
             cover = json.get("cover")
             if cover == None or cover.get('images') == None or len(cover.get("images")) < 1:
                 raise NotFoundException("cover not found")
+
+            su = self.storageUnit()
+            save_name = "cover.jpg"
+            save_path = Path(os.path.join(su.temp_dir, save_name))
 
             images = cover.get("images")
             images_ = sorted(images, key=lambda x: (x['width'] is not None, x['width']), reverse=True)
@@ -78,7 +78,7 @@ class VkIdentity(BaseVkItemId):
                 else:
                     group_ids.append(abs(__id))
 
-            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}", section='VkEntities', kind='success')
+            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}", section='Vk!Identity', kind='success')
 
             if len(user_ids) > 0:
                 __users_response = await self.vkapi.call("users.get", {"user_ids": ",".join(str(x) for x in user_ids), "fields": ",".join(consts["vk.user_fields"])})
@@ -107,6 +107,11 @@ class VkIdentity(BaseVkItemId):
             declared_date = None
             links = []
 
+            if 'first_name' in item:
+                item['vkapi_type'] = 'user'
+            else:
+                item['vkapi_type'] = 'group'
+
             if item.get("vkapi_type") == "user":
                 name = f"VK User {item.get('first_name')} {item.get('last_name')}"
                 declared_date = item.get("reg_date", None)
@@ -115,25 +120,27 @@ class VkIdentity(BaseVkItemId):
 
             if self.args.get("download_avatar") == True:
                 try:
-                    ava = await self.__download_avatar(item)
-                    item["relative_photo"] = entity_sign(ava)
+                    if item.get('photo_id') != None:
+                        ava = await self.__download_avatar(item)
+                        item["relative_photo"] = entity_sign(ava)
 
-                    links.append(ava)
+                        links.append(ava)
                 except Exception as _e:
                     logger.log(message='Avatar not found, not downloading', section='Vk!Identity', kind='error')
 
             if self.args.get("download_cover") == True:
                 try:
-                    cov = await self.__download_cover(item)
-                    item["relative_cover"] = entity_sign(cov)
+                    if item.get('cover') != None and item.get('cover').get('images') != None:
+                        cov = await self.__download_cover(item)
+                        item["relative_cover"] = entity_sign(cov)
 
-                    links.append(cov)
+                        links.append(cov)
                 except NotFoundException:
                     logger.log(message='Cover not found, not downloading', section='Vk!Identity', kind='error')
                 except Exception as _e:
                     logger.logException(_e,section="Vk!Identity")
 
-            logger.log(f"Got idents {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind='success')
+            logger.log(f"Got id {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind='success')
 
             cu = self.contentUnit({
                 "source": {

@@ -73,7 +73,11 @@ class ContentUnit(BaseModel):
         if self.content == None:
             return {}
 
-        return parse_json(self.content)
+        parsed = parse_json(self.content)
+        if parsed != None:
+            self.__cached_content = parsed
+
+        return parsed
 
     @property
     def su(self):
@@ -301,3 +305,6 @@ class ContentUnit(BaseModel):
     def delete(self):
         # TODO additional options
         super().delete()
+
+    def is_saved(self):
+        return self._pk != None
