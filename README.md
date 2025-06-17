@@ -13,7 +13,7 @@ Todo:
 
 - [ ] Acts.Metamorphosis.Export (to .th zip)
 - [ ] Acts.Metamorphosis.Import
-- [ ] Acts.Metamorphosis.CopyToDirectory
+- [x] Acts.Metamorphosis.CopyToDirectory
 - [ ] Подмена даты создания файла при экспорте (если возможно?)
 
 #### Метаданные
@@ -24,7 +24,7 @@ Todo:
 
 - [ ] Генерируемая колонка indexation_content_string (колонка `content` без ключей и пробелов)
 - [x] Переписать превью
-- [ ] Замена ID на UUID или что то типо того
+- [ ] UUIDField вместо AutoField
 - [ ] Подключение альтернативной базы данных
 
 #### StorageUnit

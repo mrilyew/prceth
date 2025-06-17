@@ -14,7 +14,7 @@ class ExecutableRepository:
 
         repo_type = self.class_type.__name__ 
 
-        return f".{repo_type.replace("Base", "").lower()}s"
+        return f".{repo_type.replace('Base', '').lower()}s"
 
     def __import(self, plugin_name):
         try:

@@ -5,16 +5,6 @@ from declarable.ArgumentsTypes import StringArgument
 
 class RunRepresentation(BaseAct):
     category = 'Representations'
-    docs = {
-        "name": {
-            "ru": ":)",
-            "en": ":)"
-        },
-        "definition": {
-            "ru": ":)",
-            "en": ":)"
-        }
-    }
     executable_cfg = {
         'free_args': True
     }
@@ -24,9 +14,6 @@ class RunRepresentation(BaseAct):
         params = {}
         params["representation"] = StringArgument({
             "default": None,
-            "docs": {
-                "definition": {}
-            },
             "assertion": {
                 "not_null": True,
             }

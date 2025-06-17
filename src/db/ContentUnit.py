@@ -61,7 +61,7 @@ class ContentUnit(BaseModel):
     # Useless
     __tmpLinks = None
     __cachedLinks = {}
-    __cached_su = {}
+    __cached_su = None
     __cached_content = None
 
     # Properties
@@ -87,7 +87,7 @@ class ContentUnit(BaseModel):
         if self.__cached_su != None:
             return self.__cached_su
 
-        _fl = StorageUnit.get(self.su_id)
+        _fl = StorageUnit.select().where(StorageUnit.id == self.su_id).first()
         self.__cached_su = _fl
         
         return _fl
@@ -308,3 +308,28 @@ class ContentUnit(BaseModel):
 
     def is_saved(self):
         return self._pk != None
+
+    def save_info_to_json(self, dir_path):
+        with open(os.path.join(dir_path, f"data_{self.id}.json"), "w", encoding='utf8') as json_file:
+            json_file.write(json.dumps(self.api_structure(sensitive=True), indent=2, ensure_ascii=False))
+
+    async def export(self, **kwargs):
+        dir_path = kwargs.get('dir_path')
+        file_prefix = kwargs.get('file_prefix', '')
+        recursion_level = kwargs.get('recursion_level', 0)
+        recursion_level_limit = kwargs.get('recursion_level_limit', 5)
+        save_json = kwargs.get('save_json', False)
+        if recursion_level > recursion_level_limit:
+            return None
+
+        main_su = self.su
+        if main_su != None:
+            await main_su.export(dir_path, kwargs.get('file_prefix', ''))
+
+        if kwargs.get('export_linked', True) == True:
+            links = self.linked_units
+            for link in links:
+                link.export(dir_path=dir_path,save_json=save_json,recursion_level=recursion_level+1,recursion_level_limit=recursion_level_limit)
+
+        if save_json == True:
+            self.save_info_to_json(dir_path)

@@ -1,9 +1,8 @@
 import os, json
-from resources.Consts import consts
 from app.App import logger, storage
 from pathlib import Path
-from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField
-from utils.MainUtils import valid_name, extract_metadata_to_dict, get_random_hash
+from peewee import TextField, BigIntegerField, AutoField
+from utils.MainUtils import extract_metadata_to_dict, get_random_hash
 from db.BaseModel import BaseModel
 from submodules.Files.FileManager import file_manager
 import shutil
@@ -94,18 +93,21 @@ class StorageUnit(BaseModel):
         current_dir_path = self.dir_path()
         to_move_path = save_dir
 
-        file_name = (prefix + str(self.upload_name)).replace("thumb", "th_umb") #быдлокод
+        file_name = (str(prefix) + str(self.upload_name))
 
         __list = os.listdir(current_dir_path)
         __count = len(__list)
         try:
             if __count > 0:
-                shutil.copytree(str(current_dir_path), str(to_move_path), ignore=shutil.ignore_patterns('*_thumb.*'), dirs_exist_ok = True)
-                
+                shutil.copytree(str(current_dir_path), str(to_move_path), dirs_exist_ok = True)
+
                 # renaming hashed filename to original
                 Path(os.path.join(to_move_path, self.hash_filename())).rename(os.path.join(to_move_path, file_name))
         except Exception as __e__:
             logger.logException(__e__, "File", silent=False)
+
+    async def export(self, dir, prefix = ""):
+        self.save_to_dir(save_dir=dir, prefix=prefix)
 
     def make_thumbnail(self, i = {}):
         from thumbnails.Thumbnail import Thumbnail
