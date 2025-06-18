@@ -106,8 +106,8 @@ class StorageUnit(BaseModel):
         except Exception as __e__:
             logger.logException(__e__, "File", silent=False)
 
-    async def export(self, dir, prefix = ""):
-        self.save_to_dir(save_dir=dir, prefix=prefix)
+    async def export(self, dir_path, file_prefix = ""):
+        self.save_to_dir(save_dir=dir_path, prefix=file_prefix)
 
     def make_thumbnail(self, i = {}):
         from thumbnails.Thumbnail import Thumbnail

@@ -13,7 +13,8 @@ Todo:
 
 - [ ] Acts.Metamorphosis.Export (to .th zip)
 - [ ] Acts.Metamorphosis.Import
-- [x] Acts.Metamorphosis.CopyToDirectory
+- [x] Acts.Metamorphosis.CopyToDirectory (всё равно не очень)
+- [ ] Слишком труднопроизносимое название (?)
 - [ ] Подмена даты создания файла при экспорте (если возможно?)
 
 #### Метаданные
@@ -74,4 +75,10 @@ Todo:
 
 #### ContentUnitRelation
 
+- [ ] Подрефакторить (?)
 - [ ] .is_revision
+
+#### Фронтенд???
+
+- [ ] Telegram-бот ???
+- [ ] Веб представление ???

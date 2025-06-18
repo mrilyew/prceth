@@ -2,6 +2,7 @@ from executables.acts.Base.Base import BaseAct
 from declarable.ArgumentsTypes import StringArgument, CsvArgument, BooleanArgument, LimitedArgument
 from db.ContentUnit import ContentUnit
 from pathlib import Path
+from app.App import logger
 import os
 
 class CopyToDirectory(BaseAct):
@@ -32,7 +33,7 @@ class CopyToDirectory(BaseAct):
         })
         params["prefix"] = LimitedArgument({
             'default': 'id_timestamp',
-            'values': ['id', 'order']
+            'values': ['id', 'id_timestamp', 'order']
         })
 
         return params
@@ -88,4 +89,12 @@ class CopyToDirectory(BaseAct):
                     prefix = _iterator
                     _iterator += 1
 
-            await item.export(dir_path=dir_to_export, file_prefix=str(prefix) + '_', save_json=save_json,export_linked=is_do_export_linked)
+            try:
+                await item.export(dir_path=dir_to_export, file_prefix=str(prefix) + '_', save_json=save_json,export_linked=is_do_export_linked)
+            except Exception as e:
+                logger.logException(e, section='Export!Copy')
+
+        return {
+            'count': _iterator,
+            'destination': str(dir_path)
+        }
