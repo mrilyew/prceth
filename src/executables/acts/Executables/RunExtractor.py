@@ -87,11 +87,11 @@ class RunExtractor(BaseAct):
         assert len(results) > 0, "nothing exported"
 
         for __res in results:
-            __res.save()
+            __res.save(force_insert=True)
 
             for ext in extractor.add_after:
                 if ext.is_saved() == False:
-                    ext.save()
+                    ext.save(force_insert=True)
 
                 if ext != None:
                     ext.addLink(__res)

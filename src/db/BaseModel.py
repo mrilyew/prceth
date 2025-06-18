@@ -25,3 +25,6 @@ class BaseModel(Model):
                 logger.logException(exc, section = 'Models', silent = False)
 
                 return []
+
+    def is_saved(self):
+        return self.id != None

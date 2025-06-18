@@ -7,7 +7,7 @@ Todo:
 - [ ] Cli only use акты
 - [ ] Кэширование списка
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
-- [ ] Игнорируемые параметры
+- [x] Игнорируемые параметры
 
 #### Экспорт
 
@@ -25,7 +25,7 @@ Todo:
 
 - [ ] Генерируемая колонка indexation_content_string (колонка `content` без ключей и пробелов)
 - [x] Переписать превью
-- [ ] UUIDField вместо AutoField
+- [x] UUIDField вместо AutoField
 - [ ] Подключение альтернативной базы данных
 
 #### StorageUnit

@@ -1,12 +1,11 @@
 import os, json
 from app.App import logger, storage
 from pathlib import Path
-from peewee import TextField, BigIntegerField, AutoField
+from peewee import TextField, BigIntegerField, UUIDField, CharField
 from utils.MainUtils import extract_metadata_to_dict, get_random_hash
 from db.BaseModel import BaseModel
 from submodules.Files.FileManager import file_manager
-import shutil
-import mimetypes
+import shutil, uuid, mimetypes
 
 class StorageUnit(BaseModel):
     self_name = 'StorageUnit'
@@ -17,7 +16,7 @@ class StorageUnit(BaseModel):
         table_name = 'storage_units'
 
     # Identification
-    id = AutoField()
+    id = CharField(max_length=50, unique=True)
     hash = TextField(null=True)
     attached_path = TextField(null=True)
 
@@ -33,10 +32,15 @@ class StorageUnit(BaseModel):
     # Metadata
     metadata = TextField(default="")
 
+    def save(self, **kwargs):
+        self.id = str(uuid.uuid4())
+
+        super().save(**kwargs)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        if self._pk == None:
+        if self.is_saved() == False:
             self.temp_dir = storage.sub('tmp_files').allocateTemp()
 
     def remove_temp(self):
@@ -65,7 +69,7 @@ class StorageUnit(BaseModel):
             self.fillMeta()
 
         if json_data.get('__flush__model__to__db__', True) == True:
-            self.save()
+            self.save(force_insert=True)
 
         if json_data.get('__move__from__temp__', True) == True:
             self.move_temp_dir()

@@ -167,7 +167,7 @@ class VkPost(BaseVkItemId):
                 })
 
                 attachment_object = resl[0]
-                attachment_object.save()
+                attachment_object.save(force_insert=True)
 
                 linked_dict.append(attachment_object)
             else:
@@ -185,7 +185,7 @@ class VkPost(BaseVkItemId):
                 })
 
                 attachment_object = resl[0]
-                attachment_object.save()
+                attachment_object.save(force_insert=True)
 
                 linked_dict.append(attachment_object)
 

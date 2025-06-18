@@ -1,9 +1,9 @@
-import os, time, operator, json5, json
+import os, time, operator, json5, json, uuid
 from pathlib import Path
 from submodules.Files.FileManager import file_manager
 from resources.Consts import consts
 from utils.MainUtils import dump_json, parse_json, replace_link_gaps, get_random_hash, clear_json, json_values_to_string, parse_db_entities
-from peewee import TextField, IntegerField, BigIntegerField, AutoField, BooleanField, TimestampField, JOIN
+from peewee import TextField, IntegerField, CharField, BooleanField, TimestampField, JOIN
 from db.StorageUnit import StorageUnit
 from db.ContentUnitRelation import ContentUnitRelation
 from db.BaseModel import BaseModel
@@ -28,7 +28,7 @@ class ContentUnit(BaseModel):
     short_name = 'cu'
 
     # Identification
-    id = AutoField() # Absolute id
+    id = CharField(max_length=50, unique=True) # UUID
     #hash = TextField(null=True)
 
     # Data
@@ -220,7 +220,7 @@ class ContentUnit(BaseModel):
                 out.thumbnail = dump_json(fnl)
 
         if json_input.get('save_model', False) == True:
-            out.save()
+            out.save(force_insert=True)
 
         if json_input.get("links") != None:
             __links = []
@@ -233,6 +233,8 @@ class ContentUnit(BaseModel):
         return out
 
     def save(self, **kwargs):
+        self.id = str(uuid.uuid4())
+
         super().save(**kwargs)
 
         if self.__tmpLinks != None:
@@ -305,9 +307,6 @@ class ContentUnit(BaseModel):
     def delete(self):
         # TODO additional options
         super().delete()
-
-    def is_saved(self):
-        return self._pk != None
 
     def save_info_to_json(self, dir_path):
         with open(os.path.join(dir_path, f"data_{self.id}.json"), "w", encoding='utf8') as json_file:

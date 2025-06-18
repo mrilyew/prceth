@@ -12,6 +12,6 @@ class BaseExtractor(Executable):
         coll_obj = self.contentUnit(json_data)
         coll_obj.is_collection = True
 
-        coll_obj.save()
+        coll_obj.save(force_insert=True)
 
         return coll_obj

@@ -59,7 +59,7 @@ class BaseDeclaredAtDependent(BaseService):
             item_created = int(item.declared_created_at)
 
             if item_created > date_offset:
-                item.save()
+                item.save(force_insert=True)
 
                 list_items.append(item)
 

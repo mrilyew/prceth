@@ -29,7 +29,7 @@ class RunRepresentation(BaseAct):
         __all_items = []
 
         for item in __ents:
-            item.save()
+            item.save(force_insert=True)
 
             __item = item.api_structure()
             __all_items.append(__item)
