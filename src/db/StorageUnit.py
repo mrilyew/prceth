@@ -16,7 +16,7 @@ class StorageUnit(BaseModel):
         table_name = 'storage_units'
 
     # Identification
-    id = CharField(max_length=50, unique=True)
+    uuid = CharField(max_length=50, unique=True, primary_key=True)
     hash = TextField(null=True)
     attached_path = TextField(null=True)
 
@@ -33,7 +33,7 @@ class StorageUnit(BaseModel):
     metadata = TextField(default="")
 
     def save(self, **kwargs):
-        self.id = str(uuid.uuid4())
+        self.uuid = str(uuid.uuid4())
 
         super().save(**kwargs)
 
@@ -128,7 +128,7 @@ class StorageUnit(BaseModel):
 
     def api_structure(self):
         _ = {
-            "id": self.id,
+            "id": self.uuid,
             "upload_name": self.upload_name,
             "extension": self.extension,
             "filesize": self.filesize,

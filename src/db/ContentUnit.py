@@ -3,7 +3,7 @@ from pathlib import Path
 from submodules.Files.FileManager import file_manager
 from resources.Consts import consts
 from utils.MainUtils import dump_json, parse_json, replace_link_gaps, get_random_hash, clear_json, json_values_to_string, parse_db_entities
-from peewee import TextField, IntegerField, CharField, BooleanField, TimestampField, JOIN
+from peewee import TextField, IntegerField, CharField, BooleanField, TimestampField
 from db.StorageUnit import StorageUnit
 from db.ContentUnitRelation import ContentUnitRelation
 from db.BaseModel import BaseModel
@@ -28,7 +28,7 @@ class ContentUnit(BaseModel):
     short_name = 'cu'
 
     # Identification
-    id = CharField(max_length=50, unique=True) # UUID
+    uuid = CharField(max_length=50, unique=True, primary_key=True) # UUID
     #hash = TextField(null=True)
 
     # Data
@@ -125,10 +125,9 @@ class ContentUnit(BaseModel):
             frontend_data = json5.loads(getattr(self, "frontend_data", "{}"))
         except Exception as wx:
             frontend_data = {}
-        
+
         fnl = {
-            "id": self.id,
-            "has_file": __su != None,
+            "id": self.uuid,
             "display_name": self.display_name,
             "description": self.description,
             "meta": self.formatted_data(recursive=True),
@@ -233,7 +232,7 @@ class ContentUnit(BaseModel):
         return out
 
     def save(self, **kwargs):
-        self.id = str(uuid.uuid4())
+        self.uuid = str(uuid.uuid4())
 
         super().save(**kwargs)
 
@@ -264,20 +263,32 @@ class ContentUnit(BaseModel):
     # Links
 
     def addLink(self, u):
+        if u == None:
+            logger.log(message=f"Not found item to link", section='DB', kind = logger.KIND_ERROR)
+            return
+
         _link = ContentUnitRelation()
-        _link.parent = self.id
+        _link.parent = self.uuid
         _link.child_type = u.__class__.__name__
-        _link.child = u.id
+        _link.child = u.uuid
+
+        logger.log(message=f"Linked {self.short_name}_{self.uuid}<->{u.short_name}_{u.uuid}", section='DB', kind = logger.KIND_SUCCESS)
 
         _link.save()
 
     def removeLink(self, u):
-        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child == u.id).where(ContentUnitRelation.child_type == u.__class__.__name__)
+        if u == None:
+            logger.log(message=f"Not found item to link", section='DB', kind = logger.KIND_ERROR)
+            return
+
+        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.uuid).where(ContentUnitRelation.child == u.uuid).where(ContentUnitRelation.child_type == u.__class__.__name__)
+
+        logger.log(message=f"Unlinked {self.short_name}_{self.uuid}<->{u.short_name}_{u.uuid}", section='DB', kind = logger.KIND_SUCCESS)
 
         _link.delete()
 
     def _linksSelection(self, class_name = 'CollectionUnit'):
-        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.id).where(ContentUnitRelation.child_type == class_name)
+        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.uuid).where(ContentUnitRelation.child_type == class_name)
 
         return _links
 

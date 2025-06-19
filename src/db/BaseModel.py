@@ -4,8 +4,8 @@ from app.App import logger
 class BaseModel(Model):
     @classmethod
     def ids(cls, id):
-        if type(id) == int or type(id) == str:
-            _query = cls.select().where(cls.id == int(id))
+        if type(id) == str:
+            _query = cls.select().where(cls.uuid == id)
             if getattr(cls, "deleted", None) != None:
                 _query = _query.where(cls.deleted == 0)
 
@@ -13,7 +13,7 @@ class BaseModel(Model):
         else:
             try:
                 __arr = []
-                _query = cls.select().where(cls.id << id)
+                _query = cls.select().where(cls.uuid << id)
                 if getattr(cls, "deleted", None) != None:
                     _query = _query.where(cls.deleted == 0)
 
@@ -22,9 +22,13 @@ class BaseModel(Model):
 
                 return __arr
             except Exception as exc:
-                logger.logException(exc, section = 'Models', silent = False)
+                logger.logException(exc, section = 'DB', silent = False)
 
                 return []
+
+    @property
+    def id(self):
+        return self.uuid
 
     def is_saved(self):
         return self.id != None

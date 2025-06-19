@@ -1,7 +1,7 @@
 from executables.acts.Base.Base import BaseAct
-from app.App import app, db_connection
 from repositories.RepresentationsRepository import RepresentationsRepository
-from declarable.ArgumentsTypes import StringArgument
+from declarable.ArgumentsTypes import StringArgument, CsvArgument
+from utils.MainUtils import parse_db_entities
 
 class RunRepresentation(BaseAct):
     category = 'Representations'
@@ -18,6 +18,9 @@ class RunRepresentation(BaseAct):
                 "not_null": True,
             }
         })
+        params["link"] = CsvArgument({
+            "default": []
+        })
 
         return params
 
@@ -27,9 +30,13 @@ class RunRepresentation(BaseAct):
 
         __ents = await representationClass.extract(i)
         __all_items = []
+        __ids = i.get('link')
+        __link_to = parse_db_entities(__ids)
 
         for item in __ents:
             item.save(force_insert=True)
+            for _item in __link_to:
+                item.addLink(_item)
 
             __item = item.api_structure()
             __all_items.append(__item)

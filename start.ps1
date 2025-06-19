@@ -5,7 +5,7 @@ $src_path = $current_location + "\src"
 $requirements = $current_location + "\requirements.txt"
 
 if (Test-Path -Path $path) {
-    echo venv was found
+    echo "venv was found"
     Invoke-Expression $activate_script
     Set-Location $src_path
 } else {

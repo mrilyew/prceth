@@ -115,9 +115,9 @@ def parse_db_entities(i, allowed_entities = ['cu', 'su']):
 
         match(el_type):
             case 'cu' | 'contentunit' | 'conuni':
-                interm_out = ContentUnit.get(el_id)
+                interm_out = ContentUnit.select().where(ContentUnit.uuid == el_id).first()
             case 'su' | 'storageunit' | 'stouni':
-                interm_out = StorageUnit.get(el_id)
+                interm_out = StorageUnit.select().where(StorageUnit.uuid == el_id).first()
 
         out.append(interm_out)
 
