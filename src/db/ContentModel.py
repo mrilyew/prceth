@@ -1,5 +1,6 @@
 from peewee import Model
 from app.App import logger
+import uuid
 
 class BaseModel(Model):
     @classmethod
@@ -32,3 +33,8 @@ class BaseModel(Model):
 
     def is_saved(self):
         return self.id != None
+
+    def save(self, **kwargs):
+        self.uuid = str(uuid.uuid4())
+
+        super().save(**kwargs)

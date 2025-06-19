@@ -1,24 +1,15 @@
 import os, time, operator, json5, json, uuid
-from pathlib import Path
-from submodules.Files.FileManager import file_manager
-from resources.Consts import consts
 from utils.MainUtils import dump_json, parse_json, replace_link_gaps, get_random_hash, clear_json, json_values_to_string, parse_db_entities
 from peewee import TextField, IntegerField, CharField, BooleanField, TimestampField
 from db.StorageUnit import StorageUnit
 from db.ContentUnitRelation import ContentUnitRelation
-from db.BaseModel import BaseModel
-from functools import reduce
+from db.ContentModel import BaseModel
+from functools import cached_property
 from app.App import logger
 
 class ContentUnit(BaseModel):
     '''
-    Model that represents unit of information.
-
-    Fields:
-    id: id of ContentUnit
-    content: json content of ContentUnit
-    display_name: visual name of ContentUnit
-
+    Model that represents unit of information
     '''
 
     class Meta:
@@ -29,21 +20,20 @@ class ContentUnit(BaseModel):
 
     # Identification
     uuid = CharField(max_length=50, unique=True, primary_key=True) # UUID
-    #hash = TextField(null=True)
 
     # Data
-    content = TextField(null=True,default=None) # JSON data
-    representation = TextField(null=True,default='File')
-    extractor = TextField(null=True,default=None) # Extractor that was used for creation
-    thumbnail = TextField(null=True) # Preview in json format
+    content = TextField(null=True, default=None) # JSON data
+    representation = TextField(null=True)
+    extractor = TextField(null=True, default=None) # Extractor that was used for creation
 
-    # Meta
+    # Display
     display_name = TextField(default='N/A')
-    description = TextField(index=True,null=True)
-    source = TextField(null=True) # Source of content in JSON format
+    description = TextField(index=True, null=True)
+    source = TextField(null=True)
     frontend_data = TextField(null=True) # Info that will be used in frontend. Set by frontend.
-    tags = TextField(index=True,null=True) # tags
-    author = TextField(null=True,default=consts.get('pc_fullname'))
+    tags = TextField(index=True,null=True)
+    thumbnail = TextField(null=True) # Preview in json format
+    # author = TextField(null=True,default=consts.get('pc_fullname')) значимость под вопросом
 
     # Dates
     declared_created_at = TimestampField(default=time.time())
@@ -54,53 +44,36 @@ class ContentUnit(BaseModel):
     su_id = IntegerField(null=True) # File id
 
     # Booleans
-    unlisted = BooleanField(index=True,default=0)
     is_collection = BooleanField(index=True,default=0)
+    unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0)
 
-    # Useless
+    # Cached
     __tmpLinks = None
-    __cachedLinks = {}
+    __cached_links = {}
     __cached_su = None
     __cached_content = None
 
     # Properties
 
-    @property
+    @cached_property
     def json_content(self):
-        if self.__cached_content != None:
-            return self.__cached_content
-        if self.content == None:
-            return {}
+        return parse_json(self.content)
 
-        parsed = parse_json(self.content)
-        if parsed != None:
-            self.__cached_content = parsed
-
-        return parsed
-
-    @property
+    @cached_property
     def su(self):
         if self.su_id == None:
             return None
 
-        if self.__cached_su != None:
-            return self.__cached_su
+        _su = StorageUnit.select().where(StorageUnit.uuid == self.su_id).first()
 
-        _fl = StorageUnit.select().where(StorageUnit.id == self.su_id).first()
-        self.__cached_su = _fl
-        
-        return _fl
+        return _su
 
-    @property
+    @cached_property
     def linked_units(self):
-        if self.__cachedLinks != None:
-            return self.__cachedLinks
+        __out = ContentUnitRelation.select().where(ContentUnitRelation.child << self._linksSelectionIds())
 
-        _out = ContentUnitRelation.get(self._linksSelectionIds())
-        self.__cachedLinks = _out
-
-        return _out
+        return __out
 
     # Recievation
 
@@ -133,7 +106,6 @@ class ContentUnit(BaseModel):
             "meta": self.formatted_data(recursive=True),
             "frontend_data": frontend_data,
             "tags": tags,
-            "author": self.author,
             "created": None,
             "edited": None,
             "declared_created_at": None
@@ -156,8 +128,6 @@ class ContentUnit(BaseModel):
 
     def cli_show(self):
         return f"{self.display_name}, {int(self.declared_created_at)}"
-
-    # Factory
 
     @staticmethod
     def fromJson(json_input):
@@ -232,8 +202,6 @@ class ContentUnit(BaseModel):
         return out
 
     def save(self, **kwargs):
-        self.uuid = str(uuid.uuid4())
-
         super().save(**kwargs)
 
         if self.__tmpLinks != None:
@@ -246,7 +214,7 @@ class ContentUnit(BaseModel):
                 self.addLink(item)
                 __links.append(item)
 
-            self.__cachedLinks = __links
+            self.__cached_links = __links
 
     def set_source(self, source_json: dict):
         self.source = dump_json(source_json)

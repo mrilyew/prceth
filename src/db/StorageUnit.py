@@ -3,7 +3,7 @@ from app.App import logger, storage
 from pathlib import Path
 from peewee import TextField, BigIntegerField, UUIDField, CharField
 from utils.MainUtils import extract_metadata_to_dict, get_random_hash
-from db.BaseModel import BaseModel
+from db.ContentModel import BaseModel
 from submodules.Files.FileManager import file_manager
 import shutil, uuid, mimetypes
 
@@ -31,11 +31,6 @@ class StorageUnit(BaseModel):
 
     # Metadata
     metadata = TextField(default="")
-
-    def save(self, **kwargs):
-        self.uuid = str(uuid.uuid4())
-
-        super().save(**kwargs)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
