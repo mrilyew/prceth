@@ -97,8 +97,8 @@ def parse_db_entities(i, allowed_entities = ['cu', 'su']):
     '''
     Recieves contentunits and storageunits by string.
     '''
-    from db.ContentUnit import ContentUnit
-    from db.StorageUnit import StorageUnit
+    from db.Content.ContentUnit import ContentUnit
+    from db.Content.StorageUnit import StorageUnit
 
     out = []
     els = [] # сразу не понял

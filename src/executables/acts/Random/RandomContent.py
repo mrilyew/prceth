@@ -1,6 +1,6 @@
 from executables.acts.Base.Base import BaseAct
 from resources.Descriptions import descriptions
-from db.ContentUnit import ContentUnit
+from db.Content.ContentUnit import ContentUnit
 from peewee import fn
 from declarable.ArgumentsTypes import IntArgument, BooleanArgument
 

@@ -60,11 +60,11 @@ class DbConnection:
         self.instance_db = instance_db
 
     def createTables(self):
-        from db.ContentUnit import ContentUnit
-        from db.ContentUnitRelation import ContentUnitRelation
-        from db.Stat import Stat
-        from db.StorageUnit import StorageUnit
-        from db.ServiceInstance import ServiceInstance
+        from db.Content.ContentUnit import ContentUnit
+        from db.Relations.ContentUnitRelation import ContentUnitRelation
+        from db.Relations.Stat import Stat
+        from db.Content.StorageUnit import StorageUnit
+        from db.Instances.ServiceInstance import ServiceInstance
 
         tables_list = [ContentUnitRelation, ContentUnit, StorageUnit]
         tables_list_app = [Stat, ServiceInstance]

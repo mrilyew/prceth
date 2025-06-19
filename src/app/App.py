@@ -1,4 +1,4 @@
-from app.DbConnection import DbConnection
+from db.DbConnection import DbConnection
 from storage.Storage import Storage
 from app.Config import Config
 from app.Logger import Logger

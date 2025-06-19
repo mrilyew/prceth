@@ -3,7 +3,7 @@ from utils.MainUtils import parse_json
 
 class StorageUnitArgument(Argument):
     def value(self):
-        from db.StorageUnit import StorageUnit
+        from db.Content.StorageUnit import StorageUnit
 
         if self.input_value != None:
             item = StorageUnit.ids(self.input_value)

@@ -1,5 +1,5 @@
-from db.ContentUnit import ContentUnit
-from db.ContentUnit import StorageUnit
+from db.Content.ContentUnit import ContentUnit
+from db.Content.ContentUnit import StorageUnit
 from app.App import logger
 import asyncio
 
