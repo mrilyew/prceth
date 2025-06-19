@@ -41,11 +41,11 @@ class ServiceInstance(Model):
         obj['created_at'] = int(self.created_at)
 
         return obj
-    
+
     @staticmethod
     def get(id):
         return ServiceInstance.select().where(ServiceInstance.id == id).first()
-    
+
     def setData(self, json):
         self.data = dump_json(json)
         #self.save()

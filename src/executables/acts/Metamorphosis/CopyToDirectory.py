@@ -1,6 +1,6 @@
 from executables.acts.Base.Base import BaseAct
 from declarable.ArgumentsTypes import StringArgument, CsvArgument, BooleanArgument, LimitedArgument
-from db.Content.ContentUnit import ContentUnit
+from db.Models.Content.ContentUnit import ContentUnit
 from pathlib import Path
 from app.App import logger
 import os

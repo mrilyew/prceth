@@ -8,6 +8,7 @@ Todo:
 - [ ] Кэширование списка
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
 - [x] Игнорируемые параметры
+- [ ] Журнал запусков в базе данных (?)
 
 #### Экспорт
 

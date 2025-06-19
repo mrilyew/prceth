@@ -1,7 +1,7 @@
-from db.Content.ContentUnit import ContentUnit
+from db.Models.Content.ContentUnit import ContentUnit
 from executables.acts.Base.Base import BaseAct
 from repositories.ServicesRepository import ServicesRepository
-from db.Instances.ServiceInstance import ServiceInstance
+from db.Models.Instances.ServiceInstance import ServiceInstance
 from declarable.ArgumentsTypes import StringArgument, IntArgument
 
 class NewService(BaseAct):

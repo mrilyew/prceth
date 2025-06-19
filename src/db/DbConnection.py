@@ -1,57 +1,60 @@
-from resources.Consts import consts
 from utils.MainUtils import replace_cwd, replace_src
-from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase, OperationalError
+from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase
 
 class DbConnection:
+    conf = {}
+
     def attachDb(self, config, env):
-        content_database_type = config.get("db.content_db.type", "sqlite")
-        instance_database_type = config.get("db.instance_db.type", "sqlite")
-        db_set, instance_db_set = [None, None]
+        __t_content_db = config.get("db.content_db.type", "sqlite")
+        __t_instance_db = config.get("db.instance_db.type", "sqlite")
+        db_content, db_instance = [None, None]
 
-        __server_db_user = env.get('db.server_db.user')
-        __server_db_pass = env.get('db.server_db.password')
-        __server_db_host = env.get('db.server_db.host')
-        __server_db_port = env.get('db.server_db.port')
+        conf = {
+            'user': env.get('db.server_db.user'),
+            'password': env.get('db.server_db.password'),
+            'host': env.get('db.server_db.host'),
+            'port': env.get('db.server_db.port')
+        }
 
-        match(content_database_type):
+        match(__t_content_db):
             case "sqlite":
                 database_path = replace_src(replace_cwd(config.get("db.sqlite.content_db.name")))
-                db_set = SqliteDatabase(database_path)
+                db_content = SqliteDatabase(database_path)
             case "mysql" | "postgresql":
                 __class = MySQLDatabase
-                if content_database_type == 'postgresql':
+                if __t_content_db == 'postgresql':
                     __class = PostgresqlDatabase
 
-                assert __server_db_user != None and __server_db_pass != None and __server_db_host != None and __server_db_port != None
-                
-                db_set = __class(config.get("db.server_db.content_db.name"),
-                    user=__server_db_user,
-                    password=__server_db_pass,
-                    host=__server_db_host,
-                    port=__server_db_port
+                assert conf.get('user') != None and conf.get('password') != None and conf.get('host') != None and conf.get('host') != None
+
+                db_content = __class(config.get("db.server_db.content_db.name"),
+                    user=conf.get('user'),
+                    password=conf.get('password'),
+                    host=conf.get('host'),
+                    port=conf.get('port')
                 )
 
-        match(instance_database_type):
+        match(__t_instance_db):
             case "sqlite":
                 instance_database_path = replace_src(replace_cwd(config.get("db.sqlite.instance_db.name")))
 
-                instance_db_set = SqliteDatabase(instance_database_path)
+                db_instance = SqliteDatabase(instance_database_path)
             case "mysql" | "postgresql":
                 __class = MySQLDatabase
-                if instance_database_type == 'postgresql':
+                if __t_instance_db == 'postgresql':
                     __class = PostgresqlDatabase
 
-                assert __server_db_user != None and __server_db_pass != None and __server_db_host != None and __server_db_port != None
+                assert conf.get('user') != None and conf.get('password') != None and conf.get('host') != None and conf.get('host') != None
 
-                instance_db_set = __class(config.get("db.server_db.instance_db.name"),
-                    user=__server_db_user,
-                    password=__server_db_pass,
-                    host=__server_db_host,
-                    port=__server_db_port
+                db_instance = __class(config.get("db.server_db.instance_db.name"),
+                    user=conf.get('user'),
+                    password=conf.get('password'),
+                    host=conf.get('host'),
+                    port=conf.get('port')
                 )
 
-        self.__setDb(db_set)
-        self.__setInstanceDb(instance_db_set)
+        self.__setDb(db_content)
+        self.__setInstanceDb(db_instance)
 
     def __setDb(self, db):
         self.db = db

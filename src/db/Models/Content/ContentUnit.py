@@ -1,9 +1,9 @@
 import os, time, json5, json
 from utils.MainUtils import dump_json, parse_json, replace_link_gaps, get_random_hash, clear_json, json_values_to_string, parse_db_entities
 from peewee import TextField, IntegerField, CharField, BooleanField, TimestampField
-from db.Content.StorageUnit import StorageUnit
-from db.Relations.ContentUnitRelation import ContentUnitRelation
-from db.Content.ContentModel import BaseModel
+from db.Models.Content.StorageUnit import StorageUnit
+from db.Models.Relations.ContentUnitRelation import ContentUnitRelation
+from db.Models.Content.ContentModel import BaseModel
 from functools import cached_property
 from app.App import logger
 

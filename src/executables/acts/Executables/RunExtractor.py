@@ -1,4 +1,4 @@
-from db.Content.ContentUnit import ContentUnit
+from db.Models.Content.ContentUnit import ContentUnit
 from executables.acts.Base.Base import BaseAct
 from app.App import logger
 from repositories.ExtractorsRepository import ExtractorsRepository

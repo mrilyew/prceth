@@ -2,7 +2,7 @@ from app.App import app, logger
 from resources.Consts import consts
 from repositories.ActsRepository import ActsRepository
 from utils.MainUtils import dump_json, parse_json
-from db.Instances.ServiceInstance import ServiceInstance
+from db.Models.Instances.ServiceInstance import ServiceInstance
 from repositories.ServicesRepository import ServicesRepository
 from resources.Exceptions import FatalError, EndOfCycleException
 from datetime import datetime
