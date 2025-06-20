@@ -10,7 +10,6 @@ class RegularExecution(BaseService):
     category = 'Common'
     c_cached_executable = None
     pass_args = {}
-    docs = {}
 
     @classmethod
     def declare(cls):

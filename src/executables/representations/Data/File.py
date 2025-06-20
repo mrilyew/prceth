@@ -1,10 +1,10 @@
-from representations.Representation import Representation
+from executables.representations.Representation import Representation
 from submodules.Files.FileManager import file_manager
 from pathlib import Path
 from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr, name_from_url
 from declarable.ArgumentsTypes import StringArgument, LimitedArgument
-from representations.ExtractStrategy import ExtractStrategy
+from executables.representations.ExtractStrategy import ExtractStrategy
 import os, mimetypes
 
 class File(Representation):

@@ -1,6 +1,7 @@
 class Runnable:
     category = 'base'
     buffer = {}
+    available = ['web', 'cli']
 
     # Comparisons
 

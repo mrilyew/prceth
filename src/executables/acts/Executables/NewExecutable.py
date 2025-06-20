@@ -10,7 +10,6 @@ class NewExecutable(BaseAct):
     executable_cfg = {
         'free_args': True
     }
-    available_on_web = False
 
     @classmethod
     def declare(cls):

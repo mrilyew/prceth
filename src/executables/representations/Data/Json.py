@@ -1,7 +1,7 @@
-from representations.Representation import Representation
+from executables.representations.Representation import Representation
 from utils.MainUtils import parse_json, list_conversation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
-from representations.ExtractStrategy import ExtractStrategy
+from executables.representations.ExtractStrategy import ExtractStrategy
 from db.DbInsert import db_insert
 
 class Json(Representation):

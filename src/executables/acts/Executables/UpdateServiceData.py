@@ -6,10 +6,6 @@ from resources.Descriptions import descriptions
 
 class UpdateServiceData(BaseAct):
     category = 'Representations'
-    docs = {
-        "name": descriptions.get('__update_service_data'),
-        "definition": descriptions.get('__updates_service_data_not_changes')
-    }
 
     @classmethod
     def declare(cls):

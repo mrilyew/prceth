@@ -1,9 +1,9 @@
 from app.App import env
-from representations.Representation import Representation
+from executables.representations.Representation import Representation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
 from utils.MainUtils import list_conversation
 from submodules.Uncanon.WebServices.VkApi import VkApi
-from representations.ExtractStrategy import ExtractStrategy
+from executables.representations.ExtractStrategy import ExtractStrategy
 from resources.Exceptions import AbstractClassException
 from resources.Consts import consts
 

@@ -6,20 +6,6 @@ from declarable.ArgumentsTypes import StringArgument, BooleanArgument, CsvArgume
 
 class RunExtractor(BaseAct):
     category = 'Executables'
-    docs = {
-        "name": {
-            "ru": "...",
-            "en": "..."
-        },
-        "definition": {
-            "ru": "...",
-            "en": "..."
-        },
-        "returns": {
-            "end": True,
-            "type": "list",
-        }
-    }
     executable_cfg = {
         'free_args': True
     }

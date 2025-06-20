@@ -9,7 +9,6 @@ from declarable.ArgumentsTypes import StringArgument, BooleanArgument, StorageUn
 
 class ExtractMetadata(BaseAct):
     category = 'Metadata'
-    docs = {}
     executable_cfg = {
         "list": ["path", "su_id"],
         "type": "or",

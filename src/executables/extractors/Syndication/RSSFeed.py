@@ -8,7 +8,6 @@ import aiohttp, xmltodict
 
 class RSSFeed(BaseExtractor):
     category = 'Syndication'
-    docs = {}
 
     def declare():
         params = {}
