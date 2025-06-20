@@ -2,6 +2,7 @@ from representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from utils.MainUtils import valid_name
+from db.DbInsert import db_insert
 from app.App import logger
 from pathlib import Path
 import os
@@ -60,7 +61,7 @@ class VkDoc(BaseVkItemId):
                 logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind="success")
 
             cu = db_insert.contentFromJson({
-                "main_su": main_su,
+                "links": [main_su],
                 "name": item_title,
                 "source": {
                     'type': 'vk',

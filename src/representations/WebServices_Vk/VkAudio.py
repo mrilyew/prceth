@@ -6,6 +6,7 @@ from pathlib import Path
 from app.App import logger
 from utils.MainUtils import valid_name, list_conversation
 from utils.MediaUtils import is_ffmpeg_installed
+from db.DbInsert import db_insert
 import os
 
 class VkAudio(BaseVkItemId):
@@ -85,7 +86,7 @@ class VkAudio(BaseVkItemId):
                 },
                 "content": item,
                 "name": audio_name,
-                "main_su": main_su,
+                "links": [main_su],
                 "unlisted": is_do_unlisted,
                 "declared_created_at": item.get("date"),
             })

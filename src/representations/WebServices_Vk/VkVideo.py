@@ -6,6 +6,7 @@ from utils.MainUtils import valid_name
 from utils.MediaUtils import is_ffmpeg_installed, find_highest_in_dict
 from submodules.Web.DownloadManager import download_manager
 from resources.Exceptions import LibNotInstalledException
+from db.DbInsert import db_insert
 import os
 
 class VkVideo(BaseVkItemId):
@@ -113,7 +114,7 @@ class VkVideo(BaseVkItemId):
                     'content': item_id
                 },
                 "content": item,
-                "main_su": storage_unit,
+                "links": [storage_unit],
                 "unlisted": is_do_unlisted,
                 "declared_created_at": item.get("date"),
             })

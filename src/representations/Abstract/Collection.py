@@ -1,7 +1,7 @@
 from representations.Representation import Representation
 from representations.ExtractStrategy import ExtractStrategy
-from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument
-from db.Models.Content.ContentUnit import ContentUnit
+from declarable.ArgumentsTypes import StringArgument
+from db.DbInsert import db_insert
 
 class Collection(Representation):
     category = "Abstract"

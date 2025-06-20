@@ -1,5 +1,6 @@
 from representations.Representation import Representation
 from representations.ExtractStrategy import ExtractStrategy
+from db.DbInsert import db_insert
 
 class Scratch(Representation):
     category = "Abstract"

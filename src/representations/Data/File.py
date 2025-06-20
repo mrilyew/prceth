@@ -69,7 +69,7 @@ class File(Representation):
             assert path.exists(), 'path does not exists'
             assert path.is_dir() == False, 'path is dir'
 
-            su = db_insert.storageUnit()()
+            su = db_insert.storageUnit()
 
             link = None
             file_stat = path.stat()
@@ -103,7 +103,7 @@ class File(Representation):
                 'content': {
                     "export_as": str(i.get("type")),
                 },
-                'main_su': su
+                'links': [su]
             })
 
             return [out]
@@ -137,7 +137,7 @@ class File(Representation):
                     "text": proc_strtr(text, 100),
                 },
                 "name": "blank.txt",
-                "main_su": su
+                "links": [su]
             })
 
             return [out]
@@ -181,7 +181,7 @@ class File(Representation):
                 "filesize": file_size,
             })
             out = db_insert.contentFromJson({
-                "main_su": su,
+                "links": [su],
                 "source": {
                     'type': 'url',
                     'content': url

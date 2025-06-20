@@ -1,6 +1,7 @@
 from representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
+from db.DbInsert import db_insert
 from app.App import logger
 from pathlib import Path
 import os
@@ -98,7 +99,7 @@ class VkPhoto(BaseVkItemId):
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Photo",kind="error")
 
             __cu = db_insert.contentFromJson({
-                "main_su": item_su,
+                "links": [item_su],
                 "name": f"VK Photo {str(item_id)}",
                 "source": {
                     "type": 'vk',

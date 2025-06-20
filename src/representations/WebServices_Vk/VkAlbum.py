@@ -1,6 +1,7 @@
 from representations.WebServices_Vk import BaseVkItemId
 from representations.WebServices_Vk.VkPhoto import VkPhoto
 from app.App import logger
+from db.DbInsert import db_insert
 
 class VkAlbum(BaseVkItemId):
     async def getPhotos(self, vkapi, offset, count, rev = False, download = False):

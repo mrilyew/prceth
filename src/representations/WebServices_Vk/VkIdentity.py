@@ -3,6 +3,7 @@ from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from resources.Exceptions import NotFoundException
 from resources.Consts import consts
+from db.DbInsert import db_insert
 from pathlib import Path
 from app.App import logger
 import os

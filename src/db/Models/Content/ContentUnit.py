@@ -42,6 +42,8 @@ class ContentUnit(BaseModel):
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0)
 
+    link_queue = []
+
     # Properties
 
     @cached_property
@@ -114,3 +116,15 @@ class ContentUnit(BaseModel):
     def save_info_to_json(self, dir_path):
         with open(os.path.join(dir_path, f"data_{self.uuid}.json"), "w", encoding='utf8') as json_file:
             json_file.write(json.dumps(self.api_structure(sensitive=True), indent=2, ensure_ascii=False))
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+
+        if self.link_queue != None:
+            from db.LinkManager import link_manager
+
+            for item in self.link_queue:
+                if item == None:
+                    continue
+
+                link_manager.link(self, item)

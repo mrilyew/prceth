@@ -55,9 +55,8 @@ class DbInsert():
             out.save(force_insert=True)
 
         if json_input.get("links") != None:
-            __links = []
             for item in json_input.get("links"):
-                __links.append(item)
+                out.link_queue.append(item)
 
         return out
 

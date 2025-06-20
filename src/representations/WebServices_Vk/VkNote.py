@@ -1,4 +1,5 @@
 from representations.WebServices_Vk import BaseVkItemId
+from db.DbInsert import db_insert
 from app.App import logger
 from utils.MainUtils import proc_strtr
 

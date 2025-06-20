@@ -1,6 +1,7 @@
 from representations.Representation import Representation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 from representations.ExtractStrategy import ExtractStrategy
+from db.DbInsert import db_insert
 import xmltodict
 
 class Xml(Representation):

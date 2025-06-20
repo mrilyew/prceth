@@ -3,6 +3,7 @@ from app.App import logger
 from declarable.ArgumentsTypes import BooleanArgument
 from utils.MediaUtils import find_highest_in_dict
 from submodules.Web.DownloadManager import download_manager
+from db.DbInsert import db_insert
 from pathlib import Path
 import os
 
@@ -65,7 +66,7 @@ class VkGraffiti(BaseVkItemId):
                 "content": item,
                 "unlisted": is_do_unlisted,
                 "name": f"Graffiti {item_id.get('id')}",
-                "main_su": main_su,
+                "links": [main_su],
             })
 
             list_to_add.append(cu)

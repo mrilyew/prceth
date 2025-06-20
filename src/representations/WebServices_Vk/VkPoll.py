@@ -1,5 +1,6 @@
 from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
+from db.DbInsert import db_insert
 from pathlib import Path
 from app.App import logger
 from submodules.Web.DownloadManager import download_manager
