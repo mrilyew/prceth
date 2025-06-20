@@ -28,7 +28,7 @@ class Json(Representation):
             json_text = i.get('text')
             __obj = parse_json(json_text)
 
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 'content': __obj,
             })
 
@@ -39,7 +39,7 @@ class Json(Representation):
             out = []
             
             for i in json_object:
-                out.append(self.contentUnit({
+                out.append(db_insert.contentFromJson({
                     'content': i,
                 }))
 

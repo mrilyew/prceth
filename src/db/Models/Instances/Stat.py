@@ -6,4 +6,4 @@ class Stat(Model):
     name = TextField(default='Untitled')
     type = TextField(default='default')
     linked_id = BigIntegerField(default=0)
-    timestamp = TimestampField(default=time.time())
+    timestamp = TimestampField(default=time.time)

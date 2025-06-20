@@ -42,7 +42,7 @@ class VkDoc(BaseVkItemId):
             item_filesize = item.get("size", 0)
 
             if self.args.get("download") == True:
-                main_su = self.storageUnit()
+                main_su = db_insert.storageUnit()
                 temp_dir = main_su.temp_dir
 
                 save_path = Path(os.path.join(temp_dir, file_name))
@@ -59,7 +59,7 @@ class VkDoc(BaseVkItemId):
 
                 logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind="success")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "main_su": main_su,
                 "name": item_title,
                 "source": {

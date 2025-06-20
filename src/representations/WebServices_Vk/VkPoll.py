@@ -2,7 +2,6 @@ from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from pathlib import Path
 from app.App import logger
-from utils.MainUtils import entity_sign
 from submodules.Web.DownloadManager import download_manager
 import os
 
@@ -46,7 +45,7 @@ class VkPoll(BaseVkItemId):
             logger.log(message=f"Recieved poll {item_id}",section="Vk!Poll",kind="message")
 
             if download_bg == True:
-                bg_su = self.storageUnit()
+                bg_su = db_insert.storageUnit()
                 bg_name = f"poll{item_id}.jpg"
                 temp_dir = bg_su.temp_dir
 
@@ -66,13 +65,13 @@ class VkPoll(BaseVkItemId):
                             "filesize": file_size,
                         })
 
-                        item["relative_photo"] = entity_sign(bg_su)
+                        item["relative_photo"] = bg_su.sign()
 
                         logger.log(message=f"Downloaded poll {item_id} background",section="Vk!Poll",kind="success")
                 except FileNotFoundError as _ea:
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Poll",kind="error")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': 'poll',

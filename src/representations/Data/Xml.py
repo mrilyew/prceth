@@ -26,7 +26,7 @@ class Xml(Representation):
         async def extractByText(self, i = {}):
             xml_text = i.get('text')
 
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 'content': xmltodict.parse(xml_text),
             })
 

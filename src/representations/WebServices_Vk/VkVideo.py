@@ -54,7 +54,7 @@ class VkVideo(BaseVkItemId):
             if is_do_download:
                 if is_direct:
                     try:
-                        storage_unit = self.storageUnit()
+                        storage_unit = db_insert.storageUnit()
                         temp_dir = storage_unit.temp_dir
 
                         save_path = Path(os.path.join(temp_dir, file_name))
@@ -105,7 +105,7 @@ class VkVideo(BaseVkItemId):
                 else:
                     logger.log(message=f"Video {item_id} is from another platform ({item.get("platform")})",section="Vk!Video",kind="message")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "name": item_name,
                 "source": {
                     'type': 'vk',

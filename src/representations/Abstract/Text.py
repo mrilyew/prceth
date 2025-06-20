@@ -20,7 +20,7 @@ class Text(Representation):
 
     class Extractor(ExtractStrategy):
         async def extractByDefault(self, i = {}):
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 'content': {
                     'text': i.get('text')
                 },

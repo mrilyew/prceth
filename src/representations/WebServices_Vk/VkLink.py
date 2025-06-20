@@ -1,7 +1,6 @@
 from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
-from utils.MainUtils import entity_sign
 from pathlib import Path
 from app.App import logger
 import os
@@ -35,7 +34,7 @@ class VkLink(BaseVkItemId):
                     save_name = f"link_photo_{photo_id}.jpg"
 
                     try:
-                        su = self.storageUnit()
+                        su = db_insert.storageUnit()
                         temp_dir = su.temp_dir
 
                         __photo_sizes = sorted(attached_photo.get("sizes"), key=lambda x: (x['width'] is not None, x['width']), reverse=True)
@@ -53,13 +52,13 @@ class VkLink(BaseVkItemId):
                             "filesize": file_size,
                         })
 
-                        item['relative_photo'] = entity_sign(su)
+                        item['relative_photo'] = su.sign()
 
                         logger.log(message=f"Downloaded link's photo {file_size}",section="Vk!Link",kind="success")
                     except FileNotFoundError as _ea:
                         logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Link",kind="error")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "content": item,
                 "source": {
                     "type": 'url',

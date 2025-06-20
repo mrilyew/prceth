@@ -23,7 +23,7 @@ class Collection(Representation):
 
     class Extractor(ExtractStrategy):
         async def extractByDefault(self, i = {}):
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 'content': {},
                 'display_name': i.get('name'),
                 'description': i.get('description'),

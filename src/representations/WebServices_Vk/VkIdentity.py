@@ -3,7 +3,6 @@ from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from resources.Exceptions import NotFoundException
 from resources.Consts import consts
-from utils.MainUtils import entity_sign
 from pathlib import Path
 from app.App import logger
 import os
@@ -27,7 +26,7 @@ class VkIdentity(BaseVkItemId):
             if url == None:
                 raise NotFoundException("ava not found")
 
-            su = self.storageUnit()
+            su = db_insert.storageUnit()
             save_name = "avatar.jpg"
             save_path = Path(os.path.join(su.temp_dir, save_name))
 
@@ -46,7 +45,7 @@ class VkIdentity(BaseVkItemId):
             if cover == None or cover.get('images') == None or len(cover.get("images")) < 1:
                 raise NotFoundException("cover not found")
 
-            su = self.storageUnit()
+            su = db_insert.storageUnit()
             save_name = "cover.jpg"
             save_path = Path(os.path.join(su.temp_dir, save_name))
 
@@ -122,7 +121,7 @@ class VkIdentity(BaseVkItemId):
                 try:
                     if item.get('photo_id') != None:
                         ava = await self.__download_avatar(item)
-                        item["relative_photo"] = entity_sign(ava)
+                        item["relative_photo"] = ava.sign()
 
                         links.append(ava)
                 except Exception as _e:
@@ -132,7 +131,7 @@ class VkIdentity(BaseVkItemId):
                 try:
                     if item.get('cover') != None and item.get('cover').get('images') != None:
                         cov = await self.__download_cover(item)
-                        item["relative_cover"] = entity_sign(cov)
+                        item["relative_cover"] = cov.sign()
 
                         links.append(cov)
                 except NotFoundException:
@@ -142,7 +141,7 @@ class VkIdentity(BaseVkItemId):
 
             logger.log(f"Got id {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind='success')
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': item.get("vkapi_type"),

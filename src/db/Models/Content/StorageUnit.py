@@ -5,7 +5,7 @@ from peewee import TextField, BigIntegerField, UUIDField, CharField
 from utils.MainUtils import extract_metadata_to_dict, get_random_hash
 from db.Models.Content.ContentModel import BaseModel
 from submodules.Files.FileManager import file_manager
-import shutil, uuid, mimetypes
+import shutil, mimetypes
 
 class StorageUnit(BaseModel):
     self_name = 'StorageUnit'
@@ -53,6 +53,7 @@ class StorageUnit(BaseModel):
 
         self.upload_name = json_data.get("upload_name")
         self.filesize = json_data.get("filesize")
+
         _mime = mimetypes.guess_type(self.path())
         self.mime = _mime[0]
 

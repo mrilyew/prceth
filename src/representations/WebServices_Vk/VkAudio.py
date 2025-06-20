@@ -42,7 +42,7 @@ class VkAudio(BaseVkItemId):
             audio_save_name = valid_name(audio_name) + f".{out_ext}"
 
             if self.args.get("download") == True:
-                main_su = self.storageUnit()
+                main_su = db_insert.storageUnit()
                 temp_dir = main_su.temp_dir
 
                 save_path = Path(os.path.join(temp_dir, audio_save_name))
@@ -77,7 +77,7 @@ class VkAudio(BaseVkItemId):
                     "filesize": out_size,
                 })
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': 'photo',

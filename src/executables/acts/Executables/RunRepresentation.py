@@ -1,7 +1,7 @@
 from executables.acts.Base.Base import BaseAct
 from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument
-from utils.MainUtils import parse_db_entities
+from db.DbFind import db_find
 
 class RunRepresentation(BaseAct):
     category = 'Representations'
@@ -31,7 +31,7 @@ class RunRepresentation(BaseAct):
         __ents = await representationClass.extract(i)
         __all_items = []
         __ids = i.get('link')
-        __link_to = parse_db_entities(__ids)
+        __link_to = db_find.fromStringDifferentTypes(__ids)
 
         for item in __ents:
             item.save(force_insert=True)

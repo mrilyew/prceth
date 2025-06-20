@@ -1,8 +1,8 @@
 from representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
-from utils.MainUtils import entity_sign
 from app.App import logger
+from db.DbInsert import db_insert
 
 class VkPost(BaseVkItemId):
     vk_type = 'post'
@@ -91,7 +91,7 @@ class VkPost(BaseVkItemId):
                     if attachment_item != None:
                         item['relative_attachments'].append({
                             "type": attachment.get('type'),
-                            f"{attachment.get('type')}": entity_sign(attachment_item)
+                            f"{attachment.get('type')}": attachment_item.sign()
                         })
                 except ModuleNotFoundError:
                     pass
@@ -104,7 +104,7 @@ class VkPost(BaseVkItemId):
                         repost_item = await self.format_repost(key, repost, links)
 
                         if repost_item != None:
-                            item['relative_copy_history'].append(entity_sign(repost_item))
+                            item['relative_copy_history'].append(repost_item.sign())
                     except ModuleNotFoundError:
                         pass
                     except Exception as exc:
@@ -115,7 +115,7 @@ class VkPost(BaseVkItemId):
                 if item.get(key) != None and self.buffer.get('profiles') != None:
                     self.outer._insertOwner(item, key, self.buffer.get('profiles'), self.buffer.get('groups'))
 
-            _item_cu = self.contentUnit({
+            _item_cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': self.outer.vk_type,

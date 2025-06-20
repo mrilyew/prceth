@@ -31,10 +31,13 @@ class BaseModel(Model):
     def id(self):
         return self.uuid
 
-    def is_saved(self):
+    def is_saved(self)->bool:
         return self.id != None
 
     def save(self, **kwargs):
         self.uuid = str(uuid.uuid4())
 
         super().save(**kwargs)
+
+    def sign(self)->str:
+        return f"__$|{self.short_name}_{self.uuid}"

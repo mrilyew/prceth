@@ -21,7 +21,7 @@ class VkArticle(BaseVkItemId):
 
             logger.log(message=f"Recieved article {item.get('url')}",section="Vk!Article",kind="message")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "source": {
                     "type": 'url',
                     'content': item.get('url')

@@ -77,7 +77,7 @@ class VkPhoto(BaseVkItemId):
             if self.args.get('download') == True:
                 original_name = f"photo_{item_id}_{item.get('date')}.jpg"
 
-                item_su = self.storageUnit()
+                item_su = db_insert.storageUnit()
                 temp_dir = item_su.temp_dir
 
                 try:
@@ -97,7 +97,7 @@ class VkPhoto(BaseVkItemId):
                 except FileNotFoundError as _ea:
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Photo",kind="error")
 
-            __cu = self.contentUnit({
+            __cu = db_insert.contentFromJson({
                 "main_su": item_su,
                 "name": f"VK Photo {str(item_id)}",
                 "source": {

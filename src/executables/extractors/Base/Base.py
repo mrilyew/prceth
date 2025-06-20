@@ -1,5 +1,5 @@
 from executables.Executable import Executable
-from representations.Data.Json import Json as JsonRepresentation
+from db.DbInsert import db_insert
 
 class BaseExtractor(Executable):
     add_after = []
@@ -9,7 +9,7 @@ class BaseExtractor(Executable):
         self.linked_dict = linked_dict
 
     def collectionable(self, json_data: dict):
-        coll_obj = self.contentUnit(json_data)
+        coll_obj = db_insert.contentFromJson(json_data)
         coll_obj.is_collection = True
 
         coll_obj.save(force_insert=True)

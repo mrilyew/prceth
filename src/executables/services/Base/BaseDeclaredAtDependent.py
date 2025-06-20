@@ -77,9 +77,6 @@ class BaseDeclaredAtDependent(BaseService):
             self.service_object.save()
 
         for item in list_items:
-            if self.config.get('display_cli') == True:
-                print(item.cli_show())
-
             for ext in self.add_after:
                 if ext != None:
                     ext.addLink(item)

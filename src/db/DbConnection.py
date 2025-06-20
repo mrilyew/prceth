@@ -65,7 +65,7 @@ class DbConnection:
     def createTables(self):
         from db.Models.Content.ContentUnit import ContentUnit
         from db.Models.Relations.ContentUnitRelation import ContentUnitRelation
-        from db.Models.Relations.Stat import Stat
+        from db.Models.Instances.Stat import Stat
         from db.Models.Content.StorageUnit import StorageUnit
         from db.Models.Instances.ServiceInstance import ServiceInstance
 
@@ -85,3 +85,5 @@ class DbConnection:
         self.instance_db.connect()
         self.instance_db.create_tables(tables_list_app, safe=True)
         self.instance_db.close()
+
+db_connection = DbConnection()

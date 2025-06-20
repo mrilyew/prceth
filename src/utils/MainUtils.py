@@ -81,7 +81,7 @@ def remove_protocol(link):
 
     return final_link
 
-# УГАДАЙ ОТКУДА :)
+# откуда-то взято
 def proc_strtr(text: str, length: int = 0, multipoint: bool = True):
     '''
     Cuts string to "length".
@@ -90,38 +90,8 @@ def proc_strtr(text: str, length: int = 0, multipoint: bool = True):
 
     if multipoint == False:
         return newString
-    
+
     return newString + ("..." if text != newString else "")
-
-def parse_db_entities(i, allowed_entities = ['cu', 'su']):
-    '''
-    Recieves contentunits and storageunits by string.
-    '''
-    from db.Models.Content.ContentUnit import ContentUnit
-    from db.Models.Content.StorageUnit import StorageUnit
-
-    out = []
-    els = [] # сразу не понял
-    if type(i) == str:
-        els = i.split(',')
-    else:
-        els = i
-
-    for el in els:
-        interm_out = None
-        el_type, el_id = el.split('_')
-        if el_type not in allowed_entities:
-            continue
-
-        match(el_type):
-            case 'cu' | 'contentunit' | 'conuni':
-                interm_out = ContentUnit.select().where(ContentUnit.uuid == el_id).first()
-            case 'su' | 'storageunit' | 'stouni':
-                interm_out = StorageUnit.select().where(StorageUnit.uuid == el_id).first()
-
-        out.append(interm_out)
-
-    return out
 
 def extract_metadata_to_dict(mtdd):
     metadata_dict = defaultdict(list)
@@ -197,7 +167,7 @@ def name_from_url(input_url):
 @contextmanager
 def override_db(__classes = [], __db = None):
     '''
-    Overrides entity db
+    Overrides db for a time
     '''
     old_db = None
     for __class in __classes:
@@ -258,14 +228,8 @@ def replace_src(input_string: str):
 def list_conversation(i_list):
     if type(i_list) == dict:
         return [i_list]
-    
+
     return i_list
 
 def resolve_lang(translation_dict: dict, lang_code: str):
     return translation_dict.get(lang_code)
-
-def entity_sign(unit):
-    return f"__$|{unit.short_name}_{unit.id}"
-
-def entity_link(dict_link: dict, key_name: str, unit):
-    dict_link[key_name] = f"__$|{entity_sign(unit)}"

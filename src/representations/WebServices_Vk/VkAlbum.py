@@ -56,7 +56,7 @@ class VkAlbum(BaseVkItemId):
 
             logger.log(message=f"Recieved album {item_id}",section="Vk!Album",kind="message")
 
-            alb = self.contentUnit({
+            alb = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': "album",

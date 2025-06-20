@@ -29,7 +29,7 @@ class VkNote(BaseVkItemId):
 
             logger.log(message=f"Recieved note {item_id}",section="Vk!Note",kind="message")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': 'note',

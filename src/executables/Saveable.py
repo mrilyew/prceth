@@ -1,15 +1,7 @@
-from db.Models.Content.ContentUnit import ContentUnit
-from db.Models.Content.ContentUnit import StorageUnit
 from app.App import logger
 import asyncio
 
 class Saveable:
-    def contentUnit(self, json_data):
-        return ContentUnit.fromJson(self.self_insert(json_data))
-
-    def storageUnit(self, json_data = {}):
-        return StorageUnit()
-
     async def gatherList(self, items, method_name, is_gather = True):
         __list = []
         __tasks = []

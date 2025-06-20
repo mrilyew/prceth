@@ -1,6 +1,7 @@
 from representations.Representation import Representation
 from submodules.Files.FileManager import file_manager
 from pathlib import Path
+from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr, name_from_url
 from declarable.ArgumentsTypes import StringArgument, LimitedArgument
 from representations.ExtractStrategy import ExtractStrategy
@@ -68,7 +69,7 @@ class File(Representation):
             assert path.exists(), 'path does not exists'
             assert path.is_dir() == False, 'path is dir'
 
-            su = self.storageUnit()
+            su = db_insert.storageUnit()()
 
             link = None
             file_stat = path.stat()
@@ -94,7 +95,7 @@ class File(Representation):
                 "link": link,
             })
 
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 "source": {
                     'type': 'path',
                     'content': str(path),
@@ -113,7 +114,7 @@ class File(Representation):
             extension = i.get('extension')
             full_name = '.'.join([original_name, extension])
 
-            su = self.storageUnit()
+            su = db_insert.storageUnit()
 
             file_manager.createFile(filename=full_name,
                 dir = su.temp_dir,
@@ -126,7 +127,7 @@ class File(Representation):
                 "filesize": len(i.get("text").encode('utf-8')),
             })
 
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 "source": {
                     'type': 'api',
                     'content': 'blank'
@@ -148,7 +149,7 @@ class File(Representation):
             url = i.get('url')
             name, ext = name_from_url(url)
 
-            su = self.storageUnit()
+            su = db_insert.storageUnit()
             tmp_dir = su.temp_dir
             tmp_save_path = Path(os.path.join(tmp_dir, "download.tmp"))
             mime_ext = None
@@ -179,7 +180,7 @@ class File(Representation):
                 "upload_name": result_name,
                 "filesize": file_size,
             })
-            out = self.contentUnit({
+            out = db_insert.contentFromJson({
                 "main_su": su,
                 "source": {
                     'type': 'url',

@@ -35,7 +35,7 @@ class VkGraffiti(BaseVkItemId):
                 try:
                     max_size = find_highest_in_dict(item, "photo_")
 
-                    main_su = self.storageUnit()
+                    main_su = db_insert.storageUnit()
                     temp_dir = main_su.temp_dir
 
                     download_url = item.get(f"photo_{max_size}")
@@ -56,7 +56,7 @@ class VkGraffiti(BaseVkItemId):
                 except FileNotFoundError as _ea:
                     logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Graffiti",kind="error")
 
-            cu = self.contentUnit({
+            cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
                     'vk_type': 'graffiti',
