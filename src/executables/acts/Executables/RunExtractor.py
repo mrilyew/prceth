@@ -19,13 +19,6 @@ class RunExtractor(BaseAct):
                 "not_null": True
             }
         })
-        params["return_raw"] = BooleanArgument({
-            'type': 'bool',
-            'default': False,
-            'assertion': {
-                'not_null': True
-            }
-        })
         params["append_ids"] = CsvArgument({
             'default': [],
             'assertion': {
@@ -37,28 +30,27 @@ class RunExtractor(BaseAct):
 
     async def execute(self, i = {}):
         extractor_name = i.get('extractor') # Extractor that will be using for export
-
-        assert extractor_name != None, 'extractor not passed'
-
-        append_ids = i.get('append_ids', None)
-        colls_list = ContentUnit.ids(append_ids)
-
+        append_ids = i.get('append_ids')
         extractor_class = (ExtractorsRepository()).getByName(extractor_name)
+        results = []
+        out = []
 
         assert extractor_class != None, 'Extractor not found'
         assert extractor_class.canBeExecuted(), 'Extractor is abstract'
 
+        relations = ContentUnit.ids(append_ids)
         extractor = extractor_class()
-        for _col in colls_list:
-            if _col.is_collection == True:
-                pass
 
-            extractor.add_after.append(_col)
-
-        results = []
-        out = []
+        for _rel in relations:
+            if _rel.is_collection == True:
+                extractor.add_after.append(_rel)
 
         extractor.link(results)
+
+        def __onerror(exc):
+            logger.logException(exc, section=logger.SECTION_EXTRACTORS)
+
+        extractor.events['error'].append(__onerror)
 
         try:
             await extractor.safeExecute(i)
@@ -67,7 +59,7 @@ class RunExtractor(BaseAct):
         except KeyboardInterrupt:
             pass
         except Exception as __ee:
-            logger.logException(__ee, section=logger.SECTION_EXTRACTORS)
+            await extractor.onError(__ee)
 
             raise __ee
 
@@ -86,9 +78,6 @@ class RunExtractor(BaseAct):
                     except AssertionError as _e:
                         logger.logException(_e, section=logger.SECTION_LINKAGE)
 
-            if i.get("return_raw") == True:
-                out.append(__res)
-            else:
-                out.append(__res.api_structure())
+            out.append(__res.api_structure())
 
         return out

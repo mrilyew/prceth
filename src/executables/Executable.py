@@ -6,6 +6,7 @@ from executables.RecursiveDeclarable import RecursiveDeclarable
 
 class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
     events = {
+        "beforeRun": [],
         "success": [],
         "afterSave": [],
         "error": [],
@@ -33,12 +34,21 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
 
     async def onError(self, exception: Exception):
         for __closure in self.events.get("error"):
+            if __closure != None:
+                continue
+
             await __closure(exception)
 
-    async def onAfterSave(self, entities):
+    async def onAfterSave(self, results):
         for __closure in self.events.get("afterSave"):
-            await __closure(entities)
+            if __closure != None:
+                continue
+
+            await __closure(results)
 
     async def onSuccess(self):
         for __closure in self.events.get("success"):
+            if __closure != None:
+                continue
+
             await __closure()

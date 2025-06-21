@@ -38,27 +38,28 @@ class NewExecutable(BaseAct):
 
     async def execute(self, i = {}):
         exec_folder = consts.get("executables")
-        exec_folder_by_type = os.path.join(exec_folder, i.get("type") + "s")
-
-        if i.get('type') == 'representation':
-            exec_folder = consts.get("representations")
-            exec_folder_by_type = exec_folder
-
-        executables_folder_category = os.path.join(exec_folder_by_type, i.get("category"))
-        executables_folder_file = os.path.join(executables_folder_category, i.get("title"))
-
-        Path(executables_folder_category).mkdir(exist_ok=True)
-        assert Path(executables_folder_file).exists() == False, "script already exists"
+        exec_type = i.get('type')
+        exec_folder_by_type = os.path.join(exec_folder, exec_type + "s")
+        execute_name = "execute"
+        base_class = f"Base{exec_type.title()}"
+        base_class_path = f"executables.{exec_type}s.Base.Base"
 
         title = i.get("title")
         category = i.get("category")
-        execute_name = "execute"
+        is_hidden = i.get("is_hidden")
+        declare_list = i.get('declare')
 
-        base_class = f"Base{i.get("type").title()}"
-        base_class_path = f"executables.{i.get("type")}s.Base.Base"
-        if i.get('type') == 'representation':
+        if exec_type == 'representation':
+            exec_folder = consts.get("representations")
+            exec_folder_by_type = exec_folder
             base_class = f"Representation"
-            base_class_path = f"{i.get("type")}s.Representation"
+            base_class_path = f"{exec_type}s.Representation"
+
+        executables_folder_category = os.path.join(exec_folder_by_type, category)
+        executables_folder_file = os.path.join(executables_folder_category, title)
+
+        Path(executables_folder_category).mkdir(exist_ok=True)
+        assert Path(executables_folder_file).exists() == False, "script already exists"
 
         stream = open(str(executables_folder_file) + ".py", "w")
 
@@ -70,15 +71,15 @@ class NewExecutable(BaseAct):
         template += f"    category = '{category}'\n"
         template +=  "    docs = {}\n"
 
-        if i.get("is_hidden") == True:
+        if is_hidden == True:
             template += "    hidden = True\n"
 
         template += "\n"
         template += f"    def declare():\n"
         template +=  "        params = {}\n"
 
-        if i.get('declare') != None:
-            for arg in i.get('declare'):
+        if declare_list != None:
+            for arg in declare_list:
                 template += f"        params[\"{arg}\"] = {{}}\n"
 
         template +=  "        return params\n"
@@ -89,4 +90,4 @@ class NewExecutable(BaseAct):
         stream.write(template)
         stream.close()
 
-        return {"path": str(executables_folder_file) + ".py"}
+        return str(executables_folder_file) + ".py"

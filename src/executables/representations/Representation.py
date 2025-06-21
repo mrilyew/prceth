@@ -2,7 +2,6 @@ from resources.Exceptions import AbstractClassException
 from executables.RecursiveDeclarable import RecursiveDeclarable
 from executables.Runnable import Runnable
 from executables.representations.ExtractStrategy import ExtractStrategy
-import asyncio
 
 class Representation(RecursiveDeclarable, Runnable):
     category = "base"

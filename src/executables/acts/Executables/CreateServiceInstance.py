@@ -3,7 +3,7 @@ from repositories.ServicesRepository import ServicesRepository
 from db.Models.Instances.ServiceInstance import ServiceInstance
 from declarable.ArgumentsTypes import StringArgument, IntArgument
 
-class NewService(BaseAct):
+class CreateServiceInstance(BaseAct):
     category = 'Executables'
     executable_cfg = {
         'free_args': True
@@ -28,18 +28,21 @@ class NewService(BaseAct):
         return params
 
     async def execute(self, i = {}):
+        display_name = i.get('display_name')
+        interval = i.get('interval')
         service_class_name = i.get('class')
+
         service_class = (ServicesRepository()).getByName(service_class_name)
 
         assert service_class != None, "invalid service"
 
         new_service = ServiceInstance()
         new_service.service_name = service_class.full_name()
-        new_service.display_name = i.get('display_name')
+        new_service.display_name = display_name
         new_service.data = "{}"
 
-        if i.get('interval') != None:
-            new_service.interval = i.get('interval')
+        if interval != None:
+            new_service.interval = interval
 
         new_service.save()
 

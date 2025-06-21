@@ -1,7 +1,7 @@
 from executables.extractors.Base.Base import BaseExtractor
 from app.App import logger
 from utils.MediaUtils import rss_date_parse
-from representations.Data.Json import Json as JsonRepresentation
+from executables.representations.Data.Json import Json as JsonRepresentation
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 import aiohttp, xmltodict
 
@@ -58,7 +58,7 @@ class RSSFeed(BaseExtractor):
                     }
                 }))
 
-        out = await JsonRepresentation().extractByObject({
+        out = await JsonRepresentation.extract({
             'object': items
         })
 

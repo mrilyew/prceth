@@ -27,9 +27,9 @@ class VkStickers(BaseIterable):
 
     async def _iterableAction(self, i, iterator):
         if i.get("type") == "stickers":
-            PATH_URL = (f"https://vk.com/sticker/1-{str(iterator)}-{str(i.get("size"))}.png")
+            PATH_URL = f"https://vk.com/sticker/1-{str(iterator)}-{str(i.get("size"))}.png"
         else:
-            PATH_URL = (f"https://vk.com/images/gift/{str(iterator)}/256.jpg")
+            PATH_URL = f"https://vk.com/images/gift/{str(iterator)}/256.jpg"
 
         __extrs = await File.extract({
             "url": PATH_URL,

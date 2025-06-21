@@ -29,6 +29,4 @@ class UpdateServiceData(BaseAct):
         service.updateData(data)
         service.save()
 
-        return {
-            'success': 1
-        }
+        return True
