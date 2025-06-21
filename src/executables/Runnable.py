@@ -20,13 +20,6 @@ class Runnable:
         '''
         return cls.isAbstract() == False and cls.isHidden() == False
 
-    def self_insert(self, json_data: dict)->dict:
-        '''
-        You can append 'extractor' or 'representation' key there
-        '''
-
-        return json_data
-
     @classmethod
     def full_name(cls):
         return cls.category + '.' + cls.__name__

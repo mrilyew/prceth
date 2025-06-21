@@ -13,7 +13,7 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
 
     def __init__(self):
         def __onerror(exception):
-            logger.logException(exception, section="Executables")
+            logger.logException(exception, section=logger.SECTION_EXECUTABLES)
 
         self.events.get("error").append(__onerror)
         #self.events.get("success").append(__onsuccess)

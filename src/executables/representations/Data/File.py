@@ -17,14 +17,6 @@ class File(Representation):
             "default": None,
         })
         params["type"] = LimitedArgument({
-            "docs": {
-                "definition": '__movement_type',
-                "values": {
-                    "copy": '__copies_to_storage_folder',
-                    "move": '__moves_to_storage_folder',
-                    "link": '__creates_virtual_link_to_folder',
-                }
-            },
             "values": ["copy", "move", "link"],
             "default": "copy",
             "assertion": {
@@ -37,9 +29,6 @@ class File(Representation):
             "default": None,
         })
         params["extension"] = StringArgument({
-            "docs": {
-                "definition": '__file_extension'
-            },
             "default": "txt",
             "maxlength": 6,
             "assertion": {

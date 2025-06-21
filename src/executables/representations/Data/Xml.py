@@ -10,16 +10,8 @@ class Xml(Representation):
     @classmethod
     def declare(cls):
         params = {}
-        params["text"] = StringArgument({
-            "docs": {
-                "definition": '__xml_text_pass'
-            },
-        })
-        params["json"] = ObjectArgument({
-            "docs": {
-                "definition": '__xml_already_parsed'
-            },
-        })
+        params["text"] = StringArgument({})
+        params["json"] = ObjectArgument({})
 
         return params
 

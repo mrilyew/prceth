@@ -12,26 +12,17 @@ class RandomContent(BaseAct):
         params = {}
         params["limit"] = IntArgument({
             "default": 10,
-            "docs": {
-                "definition": descriptions.get('__limit_of_recieved_data')
-            },
             "assertion": {
                 "not_null": True,
             },
         })
         params["raw_models"] = BooleanArgument({
-            "docs": {
-                "definition": descriptions.get('__raw_model_explanation')
-            },
             "default": False,
             "assertion": {
                 "not_null": True,
             },
         })
         params["from_id"] = IntArgument({
-            "docs": {
-                "definition": descriptions.get('__randomization_su_id')
-            },
             "default": None,
         })
 

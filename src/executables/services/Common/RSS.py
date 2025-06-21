@@ -5,15 +5,11 @@ from declarable.ArgumentsTypes import StringArgument, IntArgument
 
 class RSS(BaseDeclaredAtDependent):
     category = 'Common'
-    docs = {}
 
     @classmethod
     def declare(cls):
         params = {}
         params["url"] = StringArgument({
-            "docs": {
-                "definition": descriptions.get('__url_to_rss_feed')
-            },
             "assertion": {
                 "not_null": True,
             },

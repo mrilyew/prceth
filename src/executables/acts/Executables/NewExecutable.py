@@ -15,40 +15,22 @@ class NewExecutable(BaseAct):
     def declare(cls):
         params = {}
         params["type"] = LimitedArgument({
-            "docs": {
-                "definition": descriptions.get('__type_of_creating_script'),
-                "values": {
-                    "act": descriptions.get('__act_title'),
-                    "extractor": descriptions.get('__extractor_title'),
-                    "service": descriptions.get('__service_title'),
-                    "representation": descriptions.get('__representation_title')
-                }
-            },
             "values": ["act", "extractor", "service", "representation"],
             "assertion": {
                 "not_null": True,
             },
         })
         params["category"] = StringArgument({
-            "docs": {
-                "definition": descriptions.get('__main_category_title')
-            },
             "assertion": {
                 "not_null": True,
             },
         })
         params["title"] = StringArgument({
-            "docs": {
-                "definition": descriptions.get('__name_of_the_script')
-            },
             "assertion": {
                 "not_null": True,
             },
         })
         params["declare"] = CsvArgument({
-            "docs": {
-                "definition": descriptions.get('__list_of_arguments_divided_by_comma')
-            },
             "type": "csv",
             "default": [],
         })
@@ -81,31 +63,31 @@ class NewExecutable(BaseAct):
 
         stream = open(str(executables_folder_file) + ".py", "w")
 
-        boilerplate = ""
-        boilerplate += f"from app.App import logger\n"
-        boilerplate += f"from {base_class_path} import {base_class}\n"
-        boilerplate += f"\n"
-        boilerplate += f"class {title}({base_class}):\n"
-        boilerplate += f"    category = '{category}'\n"
-        boilerplate +=  "    docs = {}\n"
+        template = ""
+        template += f"from app.App import logger\n"
+        template += f"from {base_class_path} import {base_class}\n"
+        template += f"\n"
+        template += f"class {title}({base_class}):\n"
+        template += f"    category = '{category}'\n"
+        template +=  "    docs = {}\n"
 
         if i.get("is_hidden") == True:
-            boilerplate += "    hidden = True\n"
+            template += "    hidden = True\n"
 
-        boilerplate += "\n"
-        boilerplate += f"    def declare():\n"
-        boilerplate +=  "        params = {}\n"
+        template += "\n"
+        template += f"    def declare():\n"
+        template +=  "        params = {}\n"
 
         if i.get('declare') != None:
             for arg in i.get('declare'):
-                boilerplate += f"        params[\"{arg}\"] = {{}}\n"
+                template += f"        params[\"{arg}\"] = {{}}\n"
 
-        boilerplate +=  "        return params\n"
-        boilerplate += f"\n"
-        boilerplate +=  "    async def "+execute_name+"(self, i = {}):\n"
-        boilerplate +=  "        pass\n"
+        template +=  "        return params\n"
+        template += f"\n"
+        template +=  "    async def "+execute_name+"(self, i = {}):\n"
+        template +=  "        pass\n"
 
-        stream.write(boilerplate)
+        stream.write(template)
         stream.close()
 
         return {"path": str(executables_folder_file) + ".py"}

@@ -11,6 +11,7 @@ class DeclarableArgs():
     recieveValue()\n
     dict()\n
     '''
+
     def __init__(self, comparing_options: dict, passed_options: dict, exc_type: str = "assert", is_free_settings: bool = False, rude_substitution: bool = False):
         '''
         compare_params: total declared params

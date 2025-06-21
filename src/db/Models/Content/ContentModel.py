@@ -28,7 +28,7 @@ class BaseModel(Model):
                 return []
 
     @property
-    def id(self):
+    def id(self)->str:
         return self.uuid
 
     def is_saved(self)->bool:

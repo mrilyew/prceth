@@ -11,16 +11,9 @@ class Json(Representation):
     def declare(cls):
         params = {}
         params["object"] = ObjectArgument({
-            "docs": {
-                "definition": '__json_object_given_from_code'
-            },
             "type": "object",
         })
-        params["text"] = StringArgument({
-            "docs": {
-                "definition": '__json_text_given_from_code'
-            },
-        })
+        params["text"] = StringArgument({})
 
         return params
 

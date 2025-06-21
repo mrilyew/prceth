@@ -1,6 +1,6 @@
 from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
 from representations.WebServices_Vk import BaseVk
-from declarable.ArgumentsTypes import JsonArgument, BooleanArgument, IntArgument, CsvArgument, LimitedArgument
+from declarable.ArgumentsTypes import JsonArgument, IntArgument, LimitedArgument
 from submodules.Uncanon.WebServices.VkApi import VkApi
 from resources.Consts import consts
 

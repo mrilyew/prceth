@@ -9,7 +9,6 @@ from resources.Consts import consts
 
 class BaseVk(Representation):
     category = 'WebServices_Vk'
-    docs = {}
     executable_cfg = {
         "list": ["ids", "object"],
         "type": "or",
@@ -25,17 +24,11 @@ class BaseVk(Representation):
     def declareVk(cls):
         params = {}
         params["api_token"] = StringArgument({
-            "docs": {
-                "definition": '__vk_api_token_authorization'
-            },
             "sensitive": True,
             "default": env.get("vk.access_token", None),
             "env_property": "vk.access_token",
         })
         params["api_url"] = StringArgument({
-            "docs": {
-                "definition": '__vk_api_endpoint'
-            },
             "env_property": "vk.api_url",
             "default": env.get("vk.api_url", "api.vk.com/method"),
             "assertion": {
@@ -43,9 +36,6 @@ class BaseVk(Representation):
             },
         })
         params["vk_path"] = StringArgument({
-            "docs": {
-                "definition": '__vk_site_path'
-            },
             "env_property": "vk.api_url",
             "default": env.get("vk.vk_path", "vk.com"),
             "assertion": {

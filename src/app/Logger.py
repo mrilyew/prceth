@@ -1,4 +1,4 @@
-from colorama import Fore, init as ColoramaInit
+from colorama import init as ColoramaInit
 from resources.Consts import consts
 from pathlib import Path
 from datetime import datetime
@@ -13,6 +13,14 @@ class Logger():
     KIND_ERROR = 'error'
     KIND_DEPRECATED = 'deprecated'
     KIND_MESSAGE = 'message'
+
+    SECTION_SERVICES = 'Services'
+    SECTION_DB = 'DB'
+    SECTION_LINKAGE = 'Linkage'
+    SECTION_EXECUTABLES = 'Executables'
+    SECTION_SAVEABLE = 'Saveable'
+    SECTION_EXTRACTORS = 'Extractors'
+    SECTION_ACTS = 'Acts'
 
     def __init__(self, config, storage, keep: bool = False):
         '''

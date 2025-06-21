@@ -26,7 +26,7 @@ class BaseService(Executable):
 
             __end = self.max_iterations
 
-        logger.log(message=f"Making run {self.current_iterator}/{__end}", kind="message", section="Services")
+        logger.log(message=f"Making run {self.current_iterator}/{__end}", kind="message", section=logger.SECTION_SERVICES)
 
         return await self.execute(i)
 

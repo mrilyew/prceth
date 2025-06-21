@@ -58,13 +58,13 @@ class CLI:
         else:
             interval = int(__input_interval)
 
-        logger.log(message=f"Started at {datetime.now()}", kind=logger.KIND_MESSAGE, section="Services")
+        logger.log(message=f"Started at {datetime.now()}", kind=logger.KIND_MESSAGE, section=logger.SECTION_SERVICES)
 
         try:
             while True:
                 await service_out.iteration(app.argv)
 
-                logger.log(message=f"Sleeping for {interval}s", kind=logger.KIND_MESSAGE, section="Services")
+                logger.log(message=f"Sleeping for {interval}s", kind=logger.KIND_MESSAGE, section=logger.SECTION_SERVICES)
 
                 await asyncio.sleep(interval)
         except KeyboardInterrupt:

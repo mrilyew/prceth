@@ -1,7 +1,7 @@
 from resources.Consts import consts
 from resources.DefaultSettings import DefaultSettings
 from pathlib import Path
-import json, os
+import json
 
 class Config():
     '''

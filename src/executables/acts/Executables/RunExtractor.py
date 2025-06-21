@@ -1,8 +1,9 @@
 from db.Models.Content.ContentUnit import ContentUnit
 from executables.acts.Base.Base import BaseAct
-from app.App import logger
 from repositories.ExtractorsRepository import ExtractorsRepository
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument, CsvArgument
+from db.LinkManager import link_manager
+from app.App import logger
 
 class RunExtractor(BaseAct):
     category = 'Executables'
@@ -66,7 +67,7 @@ class RunExtractor(BaseAct):
         except KeyboardInterrupt:
             pass
         except Exception as __ee:
-            logger.logException(__ee, section='Extractors')
+            logger.logException(__ee, section=logger.SECTION_EXTRACTORS)
 
             raise __ee
 
@@ -80,7 +81,7 @@ class RunExtractor(BaseAct):
                     ext.save(force_insert=True)
 
                 if ext != None:
-                    ext.addLink(__res)
+                    link_manager.link(ext, __res)
 
             if i.get("return_raw") == True:
                 out.append(__res)

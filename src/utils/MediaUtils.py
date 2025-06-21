@@ -46,7 +46,7 @@ def get_chrome_platform():
             system_arch = f"win{arch}"
         case _:
             system_arch = f"{system}{arch}"
-    
+
     return system_arch
 
 def rss_date_parse(date_string: str):

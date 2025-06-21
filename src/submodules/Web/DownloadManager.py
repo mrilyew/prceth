@@ -15,7 +15,7 @@ class DownloadManager():
         }
         self.__timeout = config.get("net.timeout")
         self.__hooks = []
-    
+
     def __selfDownloadHook(self, d):
         print(d.get("status"))
         print(d.get("percentage"))
@@ -103,28 +103,28 @@ class DownloadManager():
                             pass
 
                     logger.log(section="AsyncDownloadManager", kind="success", message=f"Successfully downloaded file {DOWNLOAD_URL} to {DOWNLOAD_DIR}")
-                
+
                 return response
-    
+
     def __findDownloadByURL(self, url):
         for item in self.queue:
             if item.get("url") == url:
                 return item
-            
+
         return None
 
     def pause(self, url):
         item = self.__findDownloadByURL(url)
         if item == None:
             return None
-        
+
         item["pause_flag"].clear()
 
     def resume(self, url):
         item = self.__findDownloadByURL(url)
         if item == None:
             return None
-        
+
         item["pause_flag"].set()
 
     def set_max_concurrent_downloads(self, value):

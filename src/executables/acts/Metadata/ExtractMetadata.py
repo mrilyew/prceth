@@ -19,21 +19,12 @@ class ExtractMetadata(BaseAct):
         params = {}
         params["path"] = StringArgument({
             "default": None,
-            "docs": {
-                "definition": descriptions.get("__path_to_file_where_get_metadata")
-            },
         })
         params["su_id"] = StorageUnitArgument({
             "default": None,
-            "docs": {
-                "definition": descriptions.get("__su_id_where_get_metadata")
-            },
         })
         params["convert_to_dict"] = BooleanArgument({
             "default": True,
-            "docs": {
-                "definition": descriptions.get("__is_convert_hachoir_metadata_to_dict")
-            },
         })
 
         return params
@@ -70,6 +61,6 @@ class ExtractMetadata(BaseAct):
                 else:
                     return _metadata.exportPlaintext()
             except Exception as err:
-                logger.logException(err,section="Acts?Metadata")
+                logger.logException(err,section="Acts!Metadata")
 
                 return []

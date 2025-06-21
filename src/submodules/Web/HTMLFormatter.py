@@ -24,19 +24,19 @@ class HTMLFormatter():
     @staticmethod
     def findAllIMG(soup):
         return soup.find_all('img', src=True)
-    
+
     @staticmethod
     def findAllScripts(soup):
         return soup.find_all('script', src=True)
-    
+
     @staticmethod
     def findAllHrefs(soup):
         return soup.find_all(True,href=True)    
-    
+
     @staticmethod
     def findAllLinks(soup):
         return soup.find_all('link', href=True)
-    
+
     @staticmethod
     def srcToBase(url, base):
         if not url.startswith('http'):
@@ -50,8 +50,7 @@ class HTMLFormatter():
             meta_name = meta.get('name')
             meta_content = meta.get('content')
             if meta_name == None:
-                meta_name = meta.get('property') # HTML moment
-                # XML better
+                meta_name = meta.get('property')
 
             final_meta[meta_name] = meta_content
 

@@ -62,7 +62,7 @@ def parse_json(text):
     Parses JSON from text
     '''
     return json.loads(text)
-    
+
 def dump_json(obj, indent=None):
     '''
     Serializes JSON object to text
@@ -147,21 +147,21 @@ def clear_json(__json):
         return __json
     else:
         return None
-    
+
 def name_from_url(input_url):
     parsed_url = urlparse(input_url)
     path = parsed_url.path
 
     if path.endswith('/') or path == "":
         return "index", "html"
-    
+
     filename = os.path.basename(path)
     OUTPUT_NAME, OUTPUT_NAME_EXT = os.path.splitext(filename)
     if not OUTPUT_NAME_EXT:
         OUTPUT_NAME_EXT = ""
     else:
         OUTPUT_NAME_EXT = OUTPUT_NAME_EXT[1:]
-    
+
     return OUTPUT_NAME, OUTPUT_NAME_EXT
 
 @contextmanager
@@ -190,34 +190,6 @@ def valid_name(text):
         return "unnamed"
 
     return safe_filename
-
-def replace_link_gaps(input_data, link_to_linked_files, recurse_level = 0):
-    if isinstance(input_data, dict):
-        return {key: replace_link_gaps(value, link_to_linked_files) for key, value in input_data.items()}
-    elif isinstance(input_data, list):
-        return [replace_link_gaps(item, link_to_linked_files) for item in input_data]
-    elif isinstance(input_data, str):
-        try:
-            if "__$|cu_" in input_data:
-                got_id = int(input_data.replace("__$|cu_", ""))
-                for linked in link_to_linked_files:
-                    if linked.id == got_id and linked.self_name == "ContentUnit":
-                        return linked.getFormattedInfo(recursive=True,recurse_level=recurse_level+1)
-                    else:
-                        return input_data
-            elif "__$|su_" in input_data:
-                got_id = int(input_data.replace("__$|su_", ""))
-                for linked in link_to_linked_files:
-                    if linked.id == got_id and linked.self_name == "StorageUnit":
-                        return linked.getFormattedInfo(recursive=True,recurse_level=recurse_level+1)
-                    else:
-                        return input_data
-            else:
-                return input_data
-        except Exception as __e:
-            return input_data
-    else:
-        return input_data
 
 def replace_cwd(input_string: str):
     return input_string.replace("?cwd?", str(consts.get("cwd")))

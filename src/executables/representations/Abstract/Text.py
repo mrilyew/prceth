@@ -12,9 +12,6 @@ class Text(Representation):
         params = {}
         params["text"] = StringArgument({
             "default": None,
-            "docs": {
-                "definition": descriptions.get('__passed_text'),
-            },
         })
 
         return params

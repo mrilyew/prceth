@@ -16,6 +16,13 @@ class Saveable:
             try:
                 await method_name(item, __list)
             except Exception as _exc:
-                logger.logException(_exc, section='Saveable')
+                logger.logException(_exc, section=logger.SECTION_EXECUTABLES)
 
         return __list
+
+    def self_insert(self, json_data: dict)->dict:
+        '''
+        You can append 'extractor' or 'representation' key there
+        '''
+
+        return json_data

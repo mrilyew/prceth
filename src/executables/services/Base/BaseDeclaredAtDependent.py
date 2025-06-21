@@ -1,8 +1,8 @@
 from executables.services.Base.Base import BaseService
-from resources.Descriptions import descriptions
 from app.App import logger
 from db.Models.Content.ContentUnit import ContentUnit
 from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgument
+from db.LinkManager import link_manager
 
 class BaseDeclaredAtDependent(BaseService):
     category = 'Base'
@@ -17,9 +17,6 @@ class BaseDeclaredAtDependent(BaseService):
             'default': [],
         })
         params["date_offset"] = StringArgument({
-            'docs': {
-                "definition": descriptions.get('__data_offset_service')
-            },
             'default': 0,
             'assertion': {
                 "not_null": True,
@@ -79,4 +76,4 @@ class BaseDeclaredAtDependent(BaseService):
         for item in list_items:
             for ext in self.add_after:
                 if ext != None:
-                    ext.addLink(item)
+                    link_manager.link(ext, item)

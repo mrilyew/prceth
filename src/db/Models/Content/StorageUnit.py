@@ -11,6 +11,7 @@ class StorageUnit(BaseModel):
     self_name = 'StorageUnit'
     short_name = 'su'
     temp_dir = None
+    path_link = None
 
     class Meta:
         table_name = 'storage_units'
@@ -43,6 +44,9 @@ class StorageUnit(BaseModel):
         if self.temp_dir != None:
             file_manager.rmdir(self.temp_dir)
 
+    def set_main_file(self, path):
+        self.path_link = path
+
     def write_data(self, json_data):
         self.extension = json_data.get("extension")
 
@@ -60,9 +64,9 @@ class StorageUnit(BaseModel):
         if json_data.get("link") != None:
             self.link = json_data.get("link")
 
-        # TODO handle async
+        ''' TODO handle async
         if json_data.get("take_metadata", False) == True:
-            self.fillMeta()
+            self.fillMeta()'''
 
         if json_data.get('__flush__model__to__db__', True) == True:
             self.save(force_insert=True)
@@ -116,7 +120,7 @@ class StorageUnit(BaseModel):
         __class = Thumbnail.getByMime(__mime)
         if __class == None:
             return None
-        
+
         _cl = __class()
 
         i.update({'path': self.path()})
@@ -166,18 +170,3 @@ class StorageUnit(BaseModel):
             __dir_path.mkdir(parents=True)
 
         return __dir_path
-
-    def fillMeta(self):
-        from repositories.ActsRepository import ActsRepository
-
-        metadata_act = (ActsRepository().getByName("Metadata.ExtractMetadata"))()
-        ext_metadata_act = (ActsRepository().getByName("Metadata.AdditionalMetadata"))()
-        metadata_act.setArgs()
-
-        metadata_arr = metadata_act.execute(i=self)
-        ext_metadata_arr = ext_metadata_act.execute(i=self)
-
-        main_metadata = extract_metadata_to_dict(metadata_arr)
-        main_metadata.update(ext_metadata_arr)
-
-        self.metadata = json.dumps(main_metadata)

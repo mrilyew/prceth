@@ -1,5 +1,5 @@
-import os, time, json5, json
-from utils.MainUtils import dump_json, parse_json, replace_link_gaps
+import os, time, json
+from utils.MainUtils import dump_json, parse_json
 from peewee import TextField, CharField, BooleanField, TimestampField
 from db.Models.Content.ContentModel import BaseModel
 from functools import cached_property
@@ -21,6 +21,7 @@ class ContentUnit(BaseModel):
     # Data
     content = TextField(null=True, default=None) # JSON data
     representation = TextField(null=True)
+    # main_link = CharField(max_length=100)
     extractor = TextField(null=True, default=None) # Extractor that was used for creation
 
     # Display
@@ -33,8 +34,8 @@ class ContentUnit(BaseModel):
     # author = TextField(null=True,default=consts.get('pc_fullname')) под вопросом
 
     # Dates
-    declared_created_at = TimestampField(default=time.time())
-    created_at = TimestampField(default=time.time())
+    declared_created_at = TimestampField(default=time.time)
+    created_at = TimestampField(default=time.time)
     edited_at = TimestampField(null=True)
 
     # Booleans
@@ -58,28 +59,9 @@ class ContentUnit(BaseModel):
         loaded_content = self.json_content
 
         if recursive == True and recurse_level < 3:
-            loaded_content = replace_link_gaps(input_data=loaded_content,
-                                               link_to_linked_files=link_manager.linksList(self),
-                                               recurse_level=recurse_level)
+            loaded_content = link_manager.injectLinksToJsonFromInstance(self, recurse_level)
 
         return loaded_content
-
-    # unused at this moment
-    def fr_data(self):
-        frontend_data = None
-        try:
-            frontend_data = json5.loads(getattr(self, "frontend_data", "{}"))
-        except Exception as wx:
-            frontend_data = {}
-
-        return frontend_data
-
-    def get_tags(self):
-        tags = ",".split(self.tags)
-        if tags[0] == ",":
-            tags = []
-
-        return tags
 
     def api_structure(self, sensitive=False):
         ret = {}

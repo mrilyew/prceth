@@ -1,6 +1,7 @@
 from executables.acts.Base.Base import BaseAct
 from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument
+from db.LinkManager import link_manager
 from db.DbFind import db_find
 
 class RunRepresentation(BaseAct):
@@ -36,7 +37,7 @@ class RunRepresentation(BaseAct):
         for item in __ents:
             item.save(force_insert=True)
             for _item in __link_to:
-                item.addLink(_item)
+                link_manager.link(item, _item)
 
             __item = item.api_structure()
             __all_items.append(__item)
