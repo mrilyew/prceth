@@ -6,7 +6,7 @@ from app.App import logger
 import os
 
 class CopyToDirectory(BaseAct):
-    category = 'Metamorphosis'
+    category = 'Export'
 
     @classmethod
     def declare(cls):

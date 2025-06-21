@@ -128,7 +128,7 @@ class Logger():
 
             print(write_colored_message, end='')
 
-    def logException(self, input_exception, section: str ="App", silent: bool = False):
+    def logException(self, input_exception, section: str = "App", silent: bool = False):
         __exp = traceback.format_exc()
 
         self.log(section=section, message=type(input_exception).__name__ + " " + __exp, kind=self.KIND_ERROR, silent=silent)

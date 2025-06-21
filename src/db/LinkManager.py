@@ -90,14 +90,14 @@ class LinkManager:
             return [cls.injectLinksToJson(item, linked_list) for item in json_input]
         elif isinstance(json_input, str):
             try:
-                if "__$|cu_" in json_input:
+                if json_input.startswith("__$|cu_"):
                     got_id = json_input.replace("__$|cu_", "")
                     for linked in linked_list:
                         if linked.uuid == got_id and linked.self_name == "ContentUnit":
                             return linked.formatted_data(recursive=True,recurse_level=recurse_level+1)
                         else:
                             return json_input
-                elif "__$|su_" in json_input:
+                elif json_input.startswith("__$|su_"):
                     got_id = json_input.replace("__$|su_", "")
                     for linked in linked_list:
                         if linked.uuid == got_id and linked.self_name == "StorageUnit":

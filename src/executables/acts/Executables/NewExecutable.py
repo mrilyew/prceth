@@ -1,5 +1,4 @@
 from executables.acts.Base.Base import BaseAct
-from resources.Descriptions import descriptions
 from resources.Consts import consts
 from pathlib import Path
 from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument

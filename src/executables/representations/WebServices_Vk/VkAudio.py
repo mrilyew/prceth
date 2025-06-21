@@ -4,7 +4,7 @@ from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
 from app.App import logger
-from utils.MainUtils import valid_name, list_conversation
+from utils.MainUtils import valid_name
 from utils.MediaUtils import is_ffmpeg_installed
 from db.DbInsert import db_insert
 import os

@@ -1,4 +1,4 @@
-import sys, os
+import os, sys
 
 correct_path = os.path.join(os.path.dirname(os.getcwd()), 'src')
 os.chdir(correct_path)

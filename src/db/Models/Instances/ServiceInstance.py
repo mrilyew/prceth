@@ -1,4 +1,4 @@
-from peewee import SmallIntegerField, BigIntegerField, TextField, AutoField, TimestampField, Model
+from peewee import SmallIntegerField, TextField, AutoField, TimestampField, Model
 from utils.MainUtils import parse_json, dump_json
 import time
 

@@ -21,7 +21,7 @@ class ContentUnit(BaseModel):
     # Data
     content = TextField(null=True, default=None) # JSON data
     representation = TextField(null=True)
-    # main_link = CharField(max_length=100)
+    storage_unit = CharField(null=True,max_length=100)
     extractor = TextField(null=True, default=None) # Extractor that was used for creation
 
     # Display

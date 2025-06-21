@@ -1,5 +1,4 @@
 from executables.services.Base.Base import BaseService
-from utils.MainUtils import parse_json
 from app.App import logger
 from repositories.ActsRepository import ActsRepository
 from repositories.ExtractorsRepository import ExtractorsRepository

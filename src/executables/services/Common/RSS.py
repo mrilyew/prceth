@@ -1,7 +1,6 @@
 from executables.services.Base.BaseDeclaredAtDependent import BaseDeclaredAtDependent
 from repositories.ExtractorsRepository import ExtractorsRepository
-from resources.Descriptions import descriptions
-from declarable.ArgumentsTypes import StringArgument, IntArgument
+from declarable.ArgumentsTypes import StringArgument
 
 class RSS(BaseDeclaredAtDependent):
     category = 'Common'

@@ -8,14 +8,13 @@ Todo:
 - [ ] Кэширование списка
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
 - [x] Игнорируемые параметры
-- [ ] Журнал запусков в базе данных (?)
+- [ ] Журнал запусков в базе данных
 
 #### Экспорт
 
-- [ ] Acts.Metamorphosis.Export (to .th zip)
-- [ ] Acts.Metamorphosis.Import
-- [x] Acts.Metamorphosis.CopyToDirectory (всё равно не очень)
-- [ ] Слишком труднопроизносимое название (?)
+- [ ] Acts.Export.Export (to .th zip)
+- [ ] Acts.Export.Import
+- [x] Acts.Export.CopyToDirectory
 - [ ] Подмена даты создания файла при экспорте (если возможно?)
 
 #### Contentunit
@@ -31,13 +30,14 @@ Todo:
 #### StorageUnit
 
 - [ ] Автоматическое определение размера файла
+- [ ] Поиск дубликатов по хешу (?)
+- [ ] Не переименовывать файл в хеш (?)
 
 #### Репрезентации
 
 - [x] Разделить репрезентацию и стратегию экспорта
 - [x] Гидрация репрезентации
 - [ ] Каждый метод репрезентации должен быть как то задокументирован и вынесен (?)
-- [ ] Post-execute действия (?)
 - [ ] file_containment (?)
 
 #### Инциализация
@@ -79,7 +79,6 @@ Todo:
 
 #### ContentUnitRelation
 
-- [ ] Подрефакторить (?)
 - [ ] .is_revision
 
 #### Фронтенд???

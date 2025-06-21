@@ -3,6 +3,7 @@ from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument
 from db.LinkManager import link_manager
 from db.DbFind import db_find
+from app.App import logger
 
 class RunRepresentation(BaseAct):
     category = 'Representations'
@@ -37,7 +38,10 @@ class RunRepresentation(BaseAct):
         for item in __ents:
             item.save(force_insert=True)
             for _item in __link_to:
-                link_manager.link(item, _item)
+                try:
+                    link_manager.link(item, _item)
+                except AssertionError as _e:
+                    logger.logException(_e, section=logger.SECTION_LINKAGE)
 
             __item = item.api_structure()
             __all_items.append(__item)

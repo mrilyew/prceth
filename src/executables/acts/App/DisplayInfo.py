@@ -1,10 +1,9 @@
 from executables.acts.Base.Base import BaseAct
-from resources.Descriptions import descriptions
-from app.App import app, db_connection
+from app.App import app
 
 class DisplayInfo(BaseAct):
     name = 'DisplayInfo'
-    category = 'Meta'
+    category = 'App'
 
     async def execute(self, args = {}):
         return {

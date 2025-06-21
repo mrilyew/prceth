@@ -59,30 +59,25 @@ class File(Representation):
             assert path.is_dir() == False, 'path is dir'
 
             su = db_insert.storageUnit()
-
-            link = None
-            file_stat = path.stat()
-            file_size = file_stat.st_size
             file_name = path.name
-            file_ext = str(path.suffix[1:]) # remove dot
+            move_type = i.get("type")
             move_to = Path(os.path.join(su.temp_dir, file_name))
+            link = None
 
-            assert i.get('type') in ['copy', 'move', link], 'invalid type'
+            assert move_type in ['copy', 'move', 'link'], 'invalid type'
 
-            if i.get("type") == 'copy':
+            if move_type == 'copy':
                 file_manager.copyFile(path, move_to)
-            elif i.get("type") == 'move':
+            elif move_type == 'move':
                 file_manager.moveFile(path, move_to)
-            elif i.get("type") == 'link':
-                link = str(path)
+            elif move_type == 'link':
+                link = path
                 #file_manager.symlinkFile(INPUT_PATH, MOVE_TO)
 
-            su.write_data({
-                "extension": file_ext,
-                "upload_name": file_name,
-                "filesize": file_size,
-                "link": link,
-            })
+            if link == None:
+                su.set_main_file(move_to)
+            else:
+                su.set_link(link)
 
             out = db_insert.contentFromJson({
                 "source": {
@@ -90,9 +85,10 @@ class File(Representation):
                     'content': str(path),
                 },
                 'content': {
-                    "export_as": str(i.get("type")),
+                    "export_as": str(move_type),
                 },
-                'links': [su]
+                'links': [su],
+                'link_main': 0
             })
 
             return [out]
@@ -102,19 +98,12 @@ class File(Representation):
             original_name = "blank"
             extension = i.get('extension')
             full_name = '.'.join([original_name, extension])
-
             su = db_insert.storageUnit()
+            path = os.path.join(su.temp_dir, full_name)
 
-            file_manager.createFile(filename=full_name,
-                dir = su.temp_dir,
-                content = text
-            )
+            file_manager.createFile(path, text)
 
-            su.write_data({
-                "extension": i.get("extension"),
-                "upload_name": full_name,
-                "filesize": len(i.get("text").encode('utf-8')),
-            })
+            su.set_main_file(path)
 
             out = db_insert.contentFromJson({
                 "source": {
@@ -126,7 +115,8 @@ class File(Representation):
                     "text": proc_strtr(text, 100),
                 },
                 "name": "blank.txt",
-                "links": [su]
+                "links": [su],
+                "link_main": 0
             })
 
             return [out]

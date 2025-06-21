@@ -44,8 +44,35 @@ class StorageUnit(BaseModel):
         if self.temp_dir != None:
             file_manager.rmdir(self.temp_dir)
 
-    def set_main_file(self, path):
-        self.path_link = path
+    def generate_hash(self):
+        self.hash = get_random_hash(32)
+
+    def flush(self):
+        self.save(force_insert=True)
+        self.move_temp_dir()
+
+    def set_mime(self):
+        _mime = mimetypes.guess_type(self.path())
+        self.mime = _mime[0]
+
+    def set_about(self):
+        path = self.path_link
+
+        file_stat = path.stat()
+        self.filesize = file_stat.st_size
+        self.extension = str(path.suffix[1:])
+        self.upload_name = str(path.name)
+
+    def set_main_file(self, path: Path):
+        self.path_link = Path(path)
+        self.generate_hash()
+        self.set_about()
+        self.set_mime()
+        self.flush()
+
+    def set_link(self, link):
+        self.path_link = Path(link)
+        self.link = str(link)
 
     def write_data(self, json_data):
         self.extension = json_data.get("extension")
@@ -57,9 +84,7 @@ class StorageUnit(BaseModel):
 
         self.upload_name = json_data.get("upload_name")
         self.filesize = json_data.get("filesize")
-
-        _mime = mimetypes.guess_type(self.path())
-        self.mime = _mime[0]
+        self.set_mime()
 
         if json_data.get("link") != None:
             self.link = json_data.get("link")

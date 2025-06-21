@@ -1,5 +1,4 @@
 from executables.representations.Representation import Representation
-from resources.Descriptions import descriptions
 from declarable.ArgumentsTypes import StringArgument
 from executables.representations.ExtractStrategy import ExtractStrategy
 from db.DbInsert import db_insert

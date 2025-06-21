@@ -1,4 +1,3 @@
-from app.App import logger
 from resources.Exceptions import AbstractClassException
 from executables.RecursiveDeclarable import RecursiveDeclarable
 from executables.Runnable import Runnable

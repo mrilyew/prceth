@@ -7,13 +7,12 @@ class FileManager():
 
     def folder_size(self, dir):
         return sum(file.stat().st_size for file in Path(dir).rglob('*'))
-        
-    def createFile(self, filename, dir, content=None):
-        path = os.path.join(str(dir), filename)
+
+    def createFile(self, path, content=None):
         stream = open(path, 'w', encoding='utf-8')
         if content != None:
             stream.write(content)
-        
+
         stream.close()
 
     def newFile(self, path, content=None, write_mode = "wb"):
@@ -51,5 +50,5 @@ class FileManager():
                 shutil.copytree(s, d, symlinks, ignore)
             else:
                 shutil.copy2(s, d)
-    
+
 file_manager = FileManager()

@@ -1,6 +1,5 @@
 from app.App import logger
 from executables.acts.Base.Base import BaseAct
-from resources.Descriptions import descriptions
 from hachoir.core import config as HachoirConfig
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
