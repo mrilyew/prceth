@@ -1,4 +1,3 @@
-from resources.Consts import consts
 from utils.MainUtils import replace_cwd, replace_src
 from storage.StorageItem import StorageItem
 from storage.TempStorage import TempStorage

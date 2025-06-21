@@ -1,4 +1,4 @@
-import secrets, os, platform, sys, random, json, mimetypes, wget, zipfile
+import secrets, os, platform, sys, random, json, mimetypes, zipfile
 from contextlib import contextmanager
 from resources.Consts import consts
 from collections import defaultdict

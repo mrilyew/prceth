@@ -1,5 +1,5 @@
 from pathlib import Path
-import win32file, win32api, os, shutil
+import os, shutil
 
 class FileManager():
     def __init__(self):

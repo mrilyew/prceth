@@ -2,7 +2,6 @@ from thumbnails.Thumbnail import Thumbnail
 from thumbnails.ThumbnailState import ThumbnailState
 from utils.MainUtils import get_random_hash
 from PIL import Image
-from moviepy import VideoFileClip
 from declarable.ArgumentsTypes import IntArgument
 import os
 
@@ -24,6 +23,8 @@ class VideoThumbnail(Thumbnail):
 
         previews = []
         path = i.get('path')
+
+        return []
 
         with VideoFileClip(path) as video:
             duration = video.duration
