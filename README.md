@@ -52,7 +52,7 @@ Todo:
 
 #### Acts.ContentUnits.
 
-- [ ] Search
+- [x] Search
 - [ ] Remove
 - [ ] GetById
 - [ ] Edit

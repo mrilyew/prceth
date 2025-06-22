@@ -2,4 +2,7 @@ from declarable.ArgumentsTypes.Argument import Argument
 
 class IntArgument(Argument):
     def value(self)->int:
-        return int(self.input_value)
+        try:
+            return int(self.input_value)
+        except ValueError:
+            return None

@@ -6,7 +6,12 @@ class StringArgument(Argument):
         return self.data.get('maxlength', None)
 
     def value(self)->str:
+        inp = str(self.input_value)
+        if len(inp) == 0:
+            if self.data.get('return_none_on_empty', True) == True:
+                return None
+
         if self.get_maxlength() != None:
-            return proc_strtr(str(self.input_value), int(self.data.get("maxlength")), multipoint=False)
+            return proc_strtr(inp, int(self.data.get("maxlength")), multipoint=False)
         else:
-            return str(self.input_value)
+            return inp

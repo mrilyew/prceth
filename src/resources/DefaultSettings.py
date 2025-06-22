@@ -14,12 +14,13 @@ DefaultSettings = {
         "default": "127.0.0.1",
     }),
     "web.port": IntArgument({
-        "type": "int",
         "default": 7782,
     }),
     "web.max_speed": IntArgument({
-        "type": "int",
         "default": 2000, # kbs
+    }),
+    "web.debug": BooleanArgument({
+        "default": True,
     }),
     "storage.root_path": StringArgument({
         "default": "?cwd?/storage" # cwd -> /storage

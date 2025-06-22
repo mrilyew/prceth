@@ -68,6 +68,7 @@ class ContentUnit(BaseModel):
         ret['id'] = self.uuid
         ret['display_name'] = self.display_name
         ret['description'] = self.description
+        ret['representation'] = self.representation
         ret['content'] = self.formatted_data(recursive=True)
         # ret['tags'] = self.get_tags()
 
@@ -75,11 +76,11 @@ class ContentUnit(BaseModel):
             ret['source'] = parse_json(self.source)
 
         try:
-            ret["created"] = int(self.created_at)
-            ret["edited"] = int(self.edited_at)
-            ret["declared_created_at"] = str(self.declared_created_at)
-        except Exception:
-            pass
+            ret["created"] = int(self.created_at.timestamp())
+            ret["edited"] = int(self.edited_at.timestamp())
+            ret["declared_created_at"] = str(self.declared_created_at.timestamp())
+        except Exception as _e:
+            print(_e)
 
         return ret
 
