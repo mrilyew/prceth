@@ -3,7 +3,7 @@ from declarable.ArgumentsTypes import IntArgument, StringArgument, LimitedArgume
 from db.Models.Content.ContentUnit import ContentUnit
 
 class Search(BaseAct):
-    category = 'Executables'
+    category = 'ContentUnits'
 
     @classmethod
     def declare(cls):
@@ -27,6 +27,7 @@ class Search(BaseAct):
         count = i.get('count')
         timestamp_after = i.get('timestamp_after')
         by_representation = i.get('representation')
+        order = i.get('order')
 
         cnt = ContentUnit.select().where(ContentUnit.deleted == 0)
         items_count = cnt.count()
@@ -40,7 +41,7 @@ class Search(BaseAct):
         if by_representation != None:
             cnt = cnt.where(ContentUnit.representation == by_representation)
 
-        match(i.get('order')):
+        match(order):
             case 'created_desc':
                 cnt = cnt.order_by(ContentUnit.created_at.desc())
             case 'created_asc':

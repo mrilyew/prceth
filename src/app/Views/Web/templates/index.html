@@ -101,6 +101,7 @@
             background: #f9f9f9;
             border-left: 1px solid #d0cdcd;
             padding: 7px 7px;
+            width: 380px;
         }
 
         input[type='text'] {
@@ -185,6 +186,16 @@
             `)
         }
 
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/`/g, '&#x60;');
+        }
+
         function selectTab(tab) {
             u('.tab').removeClass('selected')
             u(`.tab[data-name='${tab}']`).addClass('selected')
@@ -241,7 +252,7 @@
 
             data = await fetch(_url)
 
-            u('.execution_side').html(`<pre>${JSON.stringify(await data.json(), null, 4)}</pre>`)
+            u('.execution_side').html(`<pre>${escapeHtml(JSON.stringify(await data.json(), null, 4))}</pre>`)
         })
 
         u(document).on('click', '#search', async (e) => {

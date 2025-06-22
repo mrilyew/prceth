@@ -54,7 +54,7 @@ Todo:
 
 - [x] Search
 - [ ] Remove
-- [ ] GetById
+- [x] GetById
 - [ ] Edit
 - [ ] ReorderGlobal
 

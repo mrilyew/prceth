@@ -3,6 +3,11 @@ from declarable.ArgumentsTypes.Argument import Argument
 class LimitedArgument(Argument):
     def value(self):
         __allowed = self.data.get("values")
-        assert self.input_value in __allowed, f"not valid value, {self.data.get('name')}={self.input_value}"
+        inp = str(self.input_value)
+        if len(inp) == 0:
+            if self.data.get('return_none_on_empty', True) == True:
+                return None
 
-        return self.input_value
+        assert inp in __allowed, f"not valid value, {self.data.get('name')}={self.input_value}"
+
+        return inp
