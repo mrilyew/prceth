@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 from app.App import logger
 from pathlib import Path
@@ -55,35 +55,25 @@ class VkVideo(BaseVkItemId):
             if is_do_download:
                 if is_direct:
                     try:
+                        from submodules.Media.YtDlpWrapper import YtDlpWrapper
+
                         storage_unit = db_insert.storageUnit()
                         temp_dir = storage_unit.temp_dir
 
                         save_path = Path(os.path.join(temp_dir, file_name))
 
-                        assert files_list != None and type(files_list) == list and len(files_list) > 0, 'no "files" found'
+                        assert files_list != None, 'no "files" found'
 
                         max_quality = find_highest_in_dict(files_list, "mp4_")
                         video_file_url = None
-                        hls_url = files_list.get("hls")
 
                         if quality == "max":
                             video_file_url = files_list.get(f"mp4_{max_quality}")
                         else:
                             video_file_url = files_list.get(f"mp4_{quality}")
 
-                        assert video_file_url != None, 'videofile not found'
-
-                        if "srcIp=" not in video_file_url:
-                            logger.log(message=f"Video {item_id} contains direct mp4; downloading",section="Vk!Video",name="message")
-
-                            await download_manager.addDownload(end=video_file_url,dir=save_path)
-                        else:
-                            from submodules.Media.YtDlpWrapper import YtDlpWrapper
-
-                            if is_ffmpeg_installed() == False:
-                                raise LibNotInstalledException("ffmpeg is not installed")
-
-                            logger.log(message=f"Making download via yt-dlp",section="Vk!Video",name="message")
+                        async def _byPage():
+                            logger.log(message=f"Making raw page download via yt-dlp",section="Vk!Video",kind=logger.KIND_MESSAGE)
 
                             ytd_params = {"outtmpl": str(save_path)}
                             if quality != "max":
@@ -92,11 +82,26 @@ class VkVideo(BaseVkItemId):
                             with YtDlpWrapper(ytd_params).ydl as ydl:
                                 info = ydl.extract_info(item_url, download=True)
 
-                        storage_unit.write_data({
-                            "extension": "mp4",
-                            "upload_name": file_name,
-                            "filesize": save_path.stat().st_size,
-                        })
+                        async def _byMp4():
+                            logger.log(message=f"Video {item_id} contains direct mp4; downloading",section="Vk!Video",kind="message")
+
+                            await download_manager.addDownload(end=video_file_url,dir=save_path)
+
+                        async def _byHls():
+                            logger.log(message=f"Making download via yt-dlp",section="Vk!Video",kind="message")
+
+                            with YtDlpWrapper({"outtmpl": str(save_path)}).ydl as ydl:
+                                info = ydl.extract_info(video_file_url, download=True)
+
+                        if video_file_url == None:
+                            await _byPage()
+
+                        if "srcIp=" not in video_file_url:
+                            await _byMp4()
+                        else:
+                            await _byPage()
+
+                        storage_unit.set_main_file(save_path)
                     except LibNotInstalledException as _libe:
                         raise _libe
                     except AssertionError:
@@ -115,6 +120,7 @@ class VkVideo(BaseVkItemId):
                 },
                 "content": item,
                 "links": [storage_unit],
+                "link_main": 0,
                 "unlisted": is_do_unlisted,
                 "declared_created_at": item.get("date"),
             })

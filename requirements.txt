@@ -1,6 +1,7 @@
 asyncio==3.4.3
 aiohttp==3.11.12
 xmltodict
+pycryptodomex
 peewee==3.17.6
 requests==2.32.3
 selenium==4.28.1

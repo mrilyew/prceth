@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from utils.MainUtils import valid_name
@@ -45,23 +45,17 @@ class VkDoc(BaseVkItemId):
             if self.args.get("download") == True:
                 main_su = db_insert.storageUnit()
                 temp_dir = main_su.temp_dir
-
                 save_path = Path(os.path.join(temp_dir, file_name))
 
                 await download_manager.addDownload(end=item_url,dir=save_path)
 
-                file_stats = save_path.stat()
-
-                main_su.write_data({
-                    "extension": item_ext,
-                    "upload_name": file_name,
-                    "filesize": file_stats.st_size,
-                })
+                main_su.set_main_file(save_path)
 
                 logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind="success")
 
             cu = db_insert.contentFromJson({
                 "links": [main_su],
+                "link_main": 0,
                 "name": item_title,
                 "source": {
                     'type': 'vk',

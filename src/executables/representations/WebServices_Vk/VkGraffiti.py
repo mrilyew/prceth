@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from app.App import logger
 from declarable.ArgumentsTypes import BooleanArgument
 from utils.MediaUtils import find_highest_in_dict
@@ -46,12 +46,7 @@ class VkGraffiti(BaseVkItemId):
 
                     await download_manager.addDownload(end=download_url,dir=save_path)
 
-                    file_size = save_path.stat().st_size
-                    main_su.write_data({
-                        "extension": "png",
-                        "upload_name": original_name,
-                        "filesize": file_size,
-                    })
+                    main_su.set_main_file(save_path)
 
                     logger.log(message=f"Downloaded graffiti {item_id}",section="Vk!Graffiti",kind="success")
                 except FileNotFoundError as _ea:
@@ -67,6 +62,7 @@ class VkGraffiti(BaseVkItemId):
                 "unlisted": is_do_unlisted,
                 "name": f"Graffiti {item_id.get('id')}",
                 "links": [main_su],
+                "link_main": 0
             })
 
             list_to_add.append(cu)

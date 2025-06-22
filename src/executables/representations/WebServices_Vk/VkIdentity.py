@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from resources.Exceptions import NotFoundException
@@ -33,11 +33,7 @@ class VkIdentity(BaseVkItemId):
 
             await download_manager.addDownload(dir=save_path,end=url)
 
-            su.write_data({
-                "extension": "jpg",
-                "upload_name": save_name,
-                "filesize": save_path.stat().st_size,
-            })
+            su.set_main_file(save_path)
 
             return su
 
@@ -56,11 +52,7 @@ class VkIdentity(BaseVkItemId):
 
             await download_manager.addDownload(dir=save_path,end=image.get("url"))
 
-            su.write_data({
-                "extension": "jpg",
-                "upload_name": save_name,
-                "filesize": save_path.stat().st_size,
-            })
+            su.set_main_file(save_path)
 
             return su
 

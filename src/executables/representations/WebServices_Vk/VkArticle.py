@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from app.App import logger
 from db.DbInsert import db_insert
 

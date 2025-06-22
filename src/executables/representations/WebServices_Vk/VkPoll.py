@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from db.DbInsert import db_insert
 from pathlib import Path
@@ -58,13 +58,7 @@ class VkPoll(BaseVkItemId):
 
                         await download_manager.addDownload(end=optimal_size.get("url"),dir=save_path)
 
-                        file_size = save_path.stat().st_size
-
-                        bg_su.write_data({
-                            "extension": "jpg",
-                            "upload_name": bg_name,
-                            "filesize": file_size,
-                        })
+                        bg_su.set_main_path(save_path)
 
                         item["relative_photo"] = bg_su.sign()
 
@@ -83,6 +77,7 @@ class VkPoll(BaseVkItemId):
                 "declared_created_at": item.get("date"),
                 "name": item.get("question"),
                 "links": [bg_su],
+                "link_main": 0,
             })
 
             list_to_add.append(cu)

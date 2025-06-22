@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
 from app.App import logger

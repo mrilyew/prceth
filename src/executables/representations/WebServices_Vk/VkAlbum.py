@@ -1,5 +1,5 @@
-from representations.WebServices_Vk import BaseVkItemId
-from representations.WebServices_Vk.VkPhoto import VkPhoto
+from executables.representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk.VkPhoto import VkPhoto
 from app.App import logger
 from db.DbInsert import db_insert
 
@@ -55,7 +55,7 @@ class VkAlbum(BaseVkItemId):
 
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            logger.log(message=f"Recieved album {item_id}",section="Vk!Album",kind="message")
+            logger.log(message=f"Recieved album {item_id}",section="Vk!Album",kind=logger.KIND_MESSAGE)
 
             alb = db_insert.contentFromJson({
                 "source": {

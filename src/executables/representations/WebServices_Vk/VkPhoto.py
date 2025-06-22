@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from db.DbInsert import db_insert
@@ -86,13 +86,7 @@ class VkPhoto(BaseVkItemId):
 
                     await download_manager.addDownload(end = download_url, dir = save_path)
 
-                    file_stats = save_path.stat()
-
-                    item_su.write_data({
-                        "extension": "jpg",
-                        "upload_name": original_name,
-                        "filesize": file_stats.st_size,
-                    })
+                    item_su.set_main_file(save_path)
 
                     logger.log(message=f"Downloaded photo {item_id}",section="Vk!Photo",kind="success")
                 except FileNotFoundError as _ea:
@@ -100,6 +94,7 @@ class VkPhoto(BaseVkItemId):
 
             __cu = db_insert.contentFromJson({
                 "links": [item_su],
+                "link_main": 0,
                 "name": f"VK Photo {str(item_id)}",
                 "source": {
                     "type": 'vk',

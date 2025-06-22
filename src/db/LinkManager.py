@@ -7,6 +7,7 @@ class LinkManager:
     @staticmethod
     def link(parent: ContentUnit, child, revision: bool = False)->bool:
         assert parent != None and child != None, 'Not found item to link'
+        assert parent.uuid != None and child.uuid != None, "Can't link: Items probaly not saved"
 
         _link = ContentUnitRelation()
         _link.parent = parent.uuid

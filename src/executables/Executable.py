@@ -1,8 +1,8 @@
-from app.App import logger
 from executables.Runnable import Runnable
 from executables.Documentable import Documentable
 from executables.Saveable import Saveable
 from executables.RecursiveDeclarable import RecursiveDeclarable
+from app.App import logger
 
 class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
     events = {
@@ -27,6 +27,8 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
     async def safeExecute(self, args: dict):
         _args = self.__class__.validate(args)
         self.preExecute(_args)
+
+        logger.log(message=f"Executed {self.full_name()}",section=logger.SECTION_EXECUTABLES,kind=logger.KIND_MESSAGE)
 
         return await self.execute(_args)
 

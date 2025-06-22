@@ -1,4 +1,4 @@
-from representations.WebServices_Vk.VkPost import VkPost
+from executables.representations.WebServices_Vk.VkPost import VkPost
 
 class VkComment(VkPost):
     vk_type = "comment"

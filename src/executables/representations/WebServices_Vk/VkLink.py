@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
 from db.DbInsert import db_insert
@@ -45,17 +45,11 @@ class VkLink(BaseVkItemId):
 
                         await download_manager.addDownload(end=__optimal_size.get("url"),dir=save_path)
 
-                        file_size = save_path.stat().st_size
-
-                        su.write_data({
-                            "extension": "jpg",
-                            "upload_name": save_name,
-                            "filesize": file_size,
-                        })
+                        su.set_main_file(save_path)
 
                         item['relative_photo'] = su.sign()
 
-                        logger.log(message=f"Downloaded link's photo {file_size}",section="Vk!Link",kind="success")
+                        logger.log(message=f"Downloaded link's photo {photo_id}",section="Vk!Link",kind="success")
                     except FileNotFoundError as _ea:
                         logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Link",kind="error")
 
@@ -67,7 +61,8 @@ class VkLink(BaseVkItemId):
                 },
                 "unlisted": should_be_unlisted,
                 "name": f"Vk Attached link",
-                "links": [su]
+                "links": [su],
+                "link_main": 0
             })
 
             list_to_add.append(cu)

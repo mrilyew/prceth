@@ -1,4 +1,4 @@
-from representations.WebServices_Vk import BaseVkItemId
+from executables.representations.WebServices_Vk import BaseVkItemId
 from resources.Exceptions import LibNotInstalledException
 from declarable.ArgumentsTypes import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
@@ -36,11 +36,10 @@ class VkAudio(BaseVkItemId):
             logger.log(message=f"Recieved audio {item_id}",section="Vk!Audio",kind="message")
 
             main_su = None
-            out_ext  = "mp3"
-            out_size = 0
 
             audio_name = f"{item.get('artist')} — {item.get('title')}"
-            audio_save_name = valid_name(audio_name) + f".{out_ext}"
+            audio_save_name = valid_name(audio_name) + f".mp3"
+            save_path = None
 
             if self.args.get("download") == True:
                 main_su = db_insert.storageUnit()
@@ -61,32 +60,25 @@ class VkAudio(BaseVkItemId):
 
                         logger.log(message=f"Found .m3u8 of audio {item_id}",section="Vk!Audio",kind="message")
 
-                    
                         with YtDlpWrapper({"outtmpl": str(save_path)}).ydl as ydl:
                             info = ydl.extract_info(download_url, download=True)
-
-                        out_size = save_path.stat().st_size
                     else:
                         logger.log(message=f"Downloading raw .mp3 of audio {item_id}",section="Vk!Audio",kind="message")
 
                         await download_manager.addDownload(end=download_url,dir=save_path)
-                        out_size = save_path.stat().st_size
 
-                main_su.write_data({
-                    "extension": out_ext,
-                    "upload_name": audio_save_name,
-                    "filesize": out_size,
-                })
+                main_su.set_main_file(save_path)
 
             cu = db_insert.contentFromJson({
                 "source": {
                     'type': 'vk',
-                    'vk_type': 'photo',
+                    'vk_type': 'audio',
                     'content': item_id,
                 },
                 "content": item,
                 "name": audio_name,
                 "links": [main_su],
+                "link_main": 0,
                 "unlisted": is_do_unlisted,
                 "declared_created_at": item.get("date"),
             })
