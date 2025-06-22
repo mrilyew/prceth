@@ -1,6 +1,5 @@
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
-from executables.representations.ExtractStrategy import ExtractStrategy
 from db.DbInsert import db_insert
 import xmltodict
 
@@ -15,7 +14,7 @@ class Xml(Representation):
 
         return params
 
-    class Extractor(ExtractStrategy):
+    class Extractor(Representation.ExtractStrategy):
         async def extractByText(self, i = {}):
             xml_text = i.get('text')
 

@@ -1,4 +1,4 @@
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 
 class WebPage(Representation):
     category = "Web"

@@ -27,7 +27,7 @@ class Link(BaseVkItemId):
             should_be_unlisted = self.args.get('unlisted') == 1
             su = None
 
-            logger.log(message=f"Recieved attached link",section="Vk!Link",kind="message")
+            logger.log(message=f"Recieved attached link",section="Vk!Link",kind=logger.KIND_MESSAGE)
 
             if self.args.get("download") == True:
                 if attached_photo != None:
@@ -49,9 +49,9 @@ class Link(BaseVkItemId):
 
                         item['relative_photo'] = su.sign()
 
-                        logger.log(message=f"Downloaded link's photo {photo_id}",section="Vk!Link",kind="success")
+                        logger.log(message=f"Downloaded link's photo {photo_id}",section="Vk!Link",kind=logger.KIND_SUCCESS)
                     except FileNotFoundError as _ea:
-                        logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Link",kind="error")
+                        logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Link",kind=logger.KIND_ERROR)
 
             cu = db_insert.contentFromJson({
                 "content": item,

@@ -30,7 +30,7 @@ class Graffiti(BaseVkItemId):
             is_do_download = self.args.get("download")
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
-            logger.log(message=f"Recieved graffiti {item_id}",section="Vk!Graffiti",kind="message")
+            logger.log(message=f"Recieved graffiti {item_id}",section="Vk!Graffiti",kind=logger.KIND_MESSAGE)
 
             if is_do_download:
                 try:
@@ -48,9 +48,9 @@ class Graffiti(BaseVkItemId):
 
                     main_su.set_main_file(save_path)
 
-                    logger.log(message=f"Downloaded graffiti {item_id}",section="Vk!Graffiti",kind="success")
+                    logger.log(message=f"Downloaded graffiti {item_id}",section="Vk!Graffiti",kind=logger.KIND_SUCCESS)
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Graffiti",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Graffiti",kind=logger.KIND_ERROR)
 
             cu = db_insert.contentFromJson({
                 "source": {

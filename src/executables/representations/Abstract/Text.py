@@ -1,5 +1,4 @@
-from executables.representations.ExtractStrategy import ExtractStrategy
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 from declarable.ArgumentsTypes import StringArgument
 from db.DbInsert import db_insert
 
@@ -15,7 +14,7 @@ class Text(Representation):
 
         return params
 
-    class Extractor(ExtractStrategy):
+    class Extractor(Representation.ExtractStrategy):
         async def extractByDefault(self, i = {}):
             out = db_insert.contentFromJson({
                 'content': {

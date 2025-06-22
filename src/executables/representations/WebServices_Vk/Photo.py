@@ -55,7 +55,7 @@ class Photo(BaseVkItemId):
 
             # So, downloading photo
 
-            logger.log(message=f"Recieved photo {item_id}",section="Vk!Photo",kind="message")
+            logger.log(message=f"Recieved photo {item_id}",section="Vk!Photo",kind=logger.KIND_MESSAGE)
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
             if item.get('orig_photo') != None:
@@ -88,9 +88,9 @@ class Photo(BaseVkItemId):
 
                     item_su.set_main_file(save_path)
 
-                    logger.log(message=f"Downloaded photo {item_id}",section="Vk!Photo",kind="success")
+                    logger.log(message=f"Downloaded photo {item_id}",section="Vk!Photo",kind=logger.KIND_SUCCESS)
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Photo",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Photo",kind=logger.KIND_ERROR)
 
             __cu = db_insert.contentFromJson({
                 "links": [item_su],

@@ -1,9 +1,8 @@
 from app.App import env
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
 from utils.MainUtils import list_conversation
 from submodules.Uncanon.WebServices.VkApi import VkApi
-from executables.representations.ExtractStrategy import ExtractStrategy
 from resources.Exceptions import AbstractClassException
 from resources.Consts import consts
 
@@ -82,7 +81,7 @@ class BaseVk(Representation):
     def _insertOwner(cls, item, column_name, profiles, groups):
         item[column_name.replace('_id', '')] = cls._find_owner(item.get(column_name), profiles, groups)
 
-    class Extractor(ExtractStrategy):
+    class Extractor(Representation.ExtractStrategy):
         def preExecute(self, i = {}):
             self.vkapi = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
 

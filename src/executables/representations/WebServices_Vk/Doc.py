@@ -33,7 +33,7 @@ class Doc(BaseVkItemId):
             private_url = item.get("private_url")
             is_do_unlisted = self.args.get("unlisted") == 1
 
-            logger.log(message=f"Recieved document {item_id}",section="Vk!Doc",kind="message")
+            logger.log(message=f"Recieved document {item_id}",section="Vk!Doc",kind=logger.KIND_MESSAGE)
 
             main_su = None
             item_ext = item.get("ext")
@@ -51,7 +51,7 @@ class Doc(BaseVkItemId):
 
                 main_su.set_main_file(save_path)
 
-                logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind="success")
+                logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind=logger.KIND_SUCCESS)
 
             cu = db_insert.contentFromJson({
                 "links": [main_su],

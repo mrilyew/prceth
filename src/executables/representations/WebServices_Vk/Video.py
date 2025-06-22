@@ -50,7 +50,7 @@ class Video(BaseVkItemId):
             item_url = page_domain + f"{item_id}"
             is_direct = item.get("platform") == None
 
-            logger.log(message=f"Recieved video {item_id}; download={is_do_download}",section="Vk!Video",kind="message")
+            logger.log(message=f"Recieved video {item_id}; download={is_do_download}",section="Vk!Video",kind=logger.KIND_MESSAGE)
 
             if is_do_download:
                 if is_direct:
@@ -83,12 +83,12 @@ class Video(BaseVkItemId):
                                 info = ydl.extract_info(item_url, download=True)
 
                         async def _byMp4():
-                            logger.log(message=f"Video {item_id} contains direct mp4; downloading",section="Vk!Video",kind="message")
+                            logger.log(message=f"Video {item_id} contains direct mp4; downloading",section="Vk!Video",kind=logger.KIND_MESSAGE)
 
                             await download_manager.addDownload(end=video_file_url,dir=save_path)
 
                         async def _byHls():
-                            logger.log(message=f"Making download via yt-dlp",section="Vk!Video",kind="message")
+                            logger.log(message=f"Making download via yt-dlp",section="Vk!Video",kind=logger.KIND_MESSAGE)
 
                             with YtDlpWrapper({"outtmpl": str(save_path)}).ydl as ydl:
                                 info = ydl.extract_info(video_file_url, download=True)
@@ -105,11 +105,11 @@ class Video(BaseVkItemId):
                     except LibNotInstalledException as _libe:
                         raise _libe
                     except AssertionError:
-                        logger.log(message='Video files not found', section='Vk!Video', kind='error')
+                        logger.log(message='Video files not found', section='Vk!Video', kind=logger.KIND_ERROR)
                     except Exception as __e:
                         logger.logException(__e, section="Vk",silent=False)
                 else:
-                    logger.log(message=f"Video {item_id} is from another platform ({item.get("platform")})",section="Vk!Video",kind="message")
+                    logger.log(message=f"Video {item_id} is from another platform ({item.get("platform")})",section="Vk!Video",kind=logger.KIND_MESSAGE)
 
             item.pop('files', None)
             item.pop('trailer', None)

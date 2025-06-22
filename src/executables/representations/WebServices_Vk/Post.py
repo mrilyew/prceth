@@ -165,7 +165,7 @@ class Post(BaseVkItemId):
             if attachment_representation == None:
                 from representations.Data.Json import Json as UnknownAttachmentRepresentation
 
-                logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="Vk!Post", kind="message")
+                logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="Vk!Post", kind=logger.KIND_MESSAGE)
 
                 resl = await UnknownAttachmentRepresentation().extract({
                     "object": attachment,
@@ -179,7 +179,7 @@ class Post(BaseVkItemId):
                 attachment_id = f"{att_object.get('owner_id')}_{att_object.get('id')}"
                 att_class = attachment_representation()
 
-                logger.log(message=f"Recieved attachment {str(att_class_name)} {attachment_id}",section="Vk!Post",kind="message")
+                logger.log(message=f"Recieved attachment {str(att_class_name)} {attachment_id}",section="Vk!Post",kind=logger.KIND_MESSAGE)
 
                 resl = await att_class.extract({
                     "unlisted": True,
@@ -201,9 +201,9 @@ class Post(BaseVkItemId):
             if repost == None:
                 return None
 
-            logger.log(message=f"Found repost {key}",section="Vk!Post",kind="message")
+            logger.log(message=f"Found repost {key}",section="Vk!Post",kind=logger.KIND_MESSAGE)
 
-            repost_thing = VkPost()
+            repost_thing = Post()
             vals = await repost_thing.extract({
                 "unlisted": True,
                 "object": repost,

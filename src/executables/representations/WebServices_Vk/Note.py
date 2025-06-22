@@ -28,7 +28,7 @@ class Note(BaseVkItemId):
 
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            logger.log(message=f"Recieved note {item_id}",section="Vk!Note",kind="message")
+            logger.log(message=f"Recieved note {item_id}",section="Vk!Note",kind=logger.KIND_MESSAGE)
 
             cu = db_insert.contentFromJson({
                 "source": {

@@ -1,5 +1,4 @@
-from executables.representations.ExtractStrategy import ExtractStrategy
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 from db.DbInsert import db_insert
 
 class Scratch(Representation):
@@ -8,7 +7,7 @@ class Scratch(Representation):
         'free_args': True
     }
 
-    class Extractor(ExtractStrategy):
+    class Extractor(Representation.ExtractStrategy):
         async def extractByDefault(self, i = {}):
             out = db_insert.contentFromJson({
                 'content': i,

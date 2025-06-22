@@ -33,7 +33,7 @@ class Audio(BaseVkItemId):
             is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
-            logger.log(message=f"Recieved audio {item_id}",section="Vk!Audio",kind="message")
+            logger.log(message=f"Recieved audio {item_id}",section="Vk!Audio",kind=logger.KIND_MESSAGE)
 
             main_su = None
 
@@ -48,7 +48,7 @@ class Audio(BaseVkItemId):
                 save_path = Path(os.path.join(temp_dir, audio_save_name))
 
                 if item.get("url") == None:
-                    logger.log(message=f"Audio {item_id} does not contains url to file",section="Vk!Audio",kind="error")
+                    logger.log(message=f"Audio {item_id} does not contains url to file",section="Vk!Audio",kind=logger.KIND_ERROR)
                 else:
                     download_url = item.get("url")
 
@@ -58,16 +58,18 @@ class Audio(BaseVkItemId):
                         if is_ffmpeg_installed() == False:
                             raise LibNotInstalledException("ffmpeg is not installed")
 
-                        logger.log(message=f"Found .m3u8 of audio {item_id}",section="Vk!Audio",kind="message")
+                        logger.log(message=f"Found .m3u8 of audio {item_id}",section="Vk!Audio",kind=logger.KIND_MESSAGE)
 
                         with YtDlpWrapper({"outtmpl": str(save_path)}).ydl as ydl:
                             info = ydl.extract_info(download_url, download=True)
                     else:
-                        logger.log(message=f"Downloading raw .mp3 of audio {item_id}",section="Vk!Audio",kind="message")
+                        logger.log(message=f"Downloading raw .mp3 of audio {item_id}",section="Vk!Audio",kind=logger.KIND_MESSAGE)
 
                         await download_manager.addDownload(end=download_url,dir=save_path)
 
                 main_su.set_main_file(save_path)
+
+                logger.log(message=f"Downloaded .mp3 of audio {item_id} ({main_su.uuid})",section="Vk!Audio",kind=logger.KIND_MESSAGE)
 
             cu = db_insert.contentFromJson({
                 "source": {

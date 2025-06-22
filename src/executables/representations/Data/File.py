@@ -1,10 +1,9 @@
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 from submodules.Files.FileManager import file_manager
 from pathlib import Path
 from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr, name_from_url
 from declarable.ArgumentsTypes import StringArgument, LimitedArgument
-from executables.representations.ExtractStrategy import ExtractStrategy
 import os, mimetypes
 
 class File(Representation):
@@ -43,7 +42,7 @@ class File(Representation):
 
         return params
 
-    class Extractor(ExtractStrategy):
+    class Extractor(Representation.ExtractStrategy):
         def extractWheel(self, i = {}):
             if 'path' in i:
                 return 'extractByPath'

@@ -43,7 +43,7 @@ class Poll(BaseVkItemId):
 
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            logger.log(message=f"Recieved poll {item_id}",section="Vk!Poll",kind="message")
+            logger.log(message=f"Recieved poll {item_id}",section="Vk!Poll",kind=logger.KIND_MESSAGE)
 
             if download_bg == True:
                 bg_su = db_insert.storageUnit()
@@ -62,9 +62,9 @@ class Poll(BaseVkItemId):
 
                         item["relative_photo"] = bg_su.sign()
 
-                        logger.log(message=f"Downloaded poll {item_id} background",section="Vk!Poll",kind="success")
+                        logger.log(message=f"Downloaded poll {item_id} background",section="Vk!Poll",kind=logger.KIND_SUCCESS)
                 except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Poll",kind="error")
+                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Poll",kind=logger.KIND_ERROR)
 
             cu = db_insert.contentFromJson({
                 "source": {

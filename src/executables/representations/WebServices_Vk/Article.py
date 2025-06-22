@@ -19,7 +19,7 @@ class Article(BaseVkItemId):
             title = item.get("title")
             date = item.get("published_date")
 
-            logger.log(message=f"Recieved article {item.get('url')}",section="Vk!Article",kind="message")
+            logger.log(message=f"Recieved article {item.get('url')}",section="Vk!Article",kind=logger.KIND_MESSAGE)
 
             cu = db_insert.contentFromJson({
                 "source": {

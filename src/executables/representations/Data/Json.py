@@ -1,7 +1,6 @@
-from executables.representations.Representation import Representation
+from executables.representations import Representation
 from utils.MainUtils import parse_json, list_conversation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
-from executables.representations.ExtractStrategy import ExtractStrategy
 from db.DbInsert import db_insert
 
 class Json(Representation):
@@ -17,7 +16,7 @@ class Json(Representation):
 
         return params
 
-    class Extractor(ExtractStrategy):
+    class Extractor(Representation.ExtractStrategy):
         async def extractByText(self, i = {}):
             json_text = i.get('text')
             __obj = parse_json(json_text)

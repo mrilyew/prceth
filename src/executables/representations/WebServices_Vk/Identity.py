@@ -71,7 +71,7 @@ class Identity(BaseVkItemId):
                 else:
                     group_ids.append(abs(__id))
 
-            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}", section='Vk!Identity', kind='success')
+            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}", section='Vk!Identity', kind=logger.KIND_SUCCESS)
 
             if len(user_ids) > 0:
                 __users_response = await self.vkapi.call("users.get", {"user_ids": ",".join(str(x) for x in user_ids), "fields": ",".join(consts["vk.user_fields"])})
@@ -119,7 +119,7 @@ class Identity(BaseVkItemId):
 
                         links.append(ava)
                 except Exception as _e:
-                    logger.log(message='Avatar not found, not downloading', section='Vk!Identity', kind='error')
+                    logger.log(message='Avatar not found, not downloading', section='Vk!Identity', kind=logger.KIND_ERROR)
 
             if self.args.get("download_cover") == True:
                 try:
@@ -129,11 +129,11 @@ class Identity(BaseVkItemId):
 
                         links.append(cov)
                 except NotFoundException:
-                    logger.log(message='Cover not found, not downloading', section='Vk!Identity', kind='error')
+                    logger.log(message='Cover not found, not downloading', section='Vk!Identity', kind=logger.KIND_ERROR)
                 except Exception as _e:
                     logger.logException(_e,section="Vk!Identity")
 
-            logger.log(f"Got id {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind='success')
+            logger.log(f"Got id {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind=logger.KIND_SUCCESS)
 
             cu = db_insert.contentFromJson({
                 "source": {
