@@ -1,6 +1,7 @@
 from executables.representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from repositories.RepresentationsRepository import RepresentationsRepository
+from utils.MainUtils import proc_strtr
 from app.App import logger
 from db.DbInsert import db_insert
 
@@ -110,6 +111,10 @@ class VkPost(BaseVkItemId):
                     except Exception as exc:
                         logger.logException(exc, "Vk!Post", silent=False)
 
+            _name = f"{self.outer.vk_type.title()} {str(item_id)}"
+            if item.get('text') != None and type(item.get('text')) == str and len(item.get('text')) > 0:
+                _name = proc_strtr(item.get('text'), 100)
+
             owner_keys = ['from_id', 'owner_id', 'copy_owner_id']
             for key in owner_keys:
                 if item.get(key) != None and self.buffer.get('profiles') != None:
@@ -121,7 +126,7 @@ class VkPost(BaseVkItemId):
                     'vk_type': self.outer.vk_type,
                     'content': item_id
                 },
-                "name": f"VK {self.outer.vk_type.title()} {str(item_id)}", # TODO: Set cu name as start of text
+                "name": _name, # TODO:
                 "content": item,
                 "links": links,
                 "unlisted": is_do_unlisted,

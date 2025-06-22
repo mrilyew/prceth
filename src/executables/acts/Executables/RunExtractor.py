@@ -1,5 +1,5 @@
 from db.Models.Content.ContentUnit import ContentUnit
-from executables.acts.Base.Base import BaseAct
+from executables.acts import BaseAct
 from repositories.ExtractorsRepository import ExtractorsRepository
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument, CsvArgument
 from db.LinkManager import link_manager

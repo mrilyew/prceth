@@ -1,4 +1,4 @@
-from executables.acts.Base.Base import BaseAct
+from executables.acts import BaseAct
 from db.Models.Content.ContentUnit import ContentUnit
 from peewee import fn
 from declarable.ArgumentsTypes import IntArgument, BooleanArgument

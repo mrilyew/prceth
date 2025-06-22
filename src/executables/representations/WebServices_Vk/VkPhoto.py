@@ -95,7 +95,7 @@ class VkPhoto(BaseVkItemId):
             __cu = db_insert.contentFromJson({
                 "links": [item_su],
                 "link_main": 0,
-                "name": f"VK Photo {str(item_id)}",
+                "name": f"Photo {str(item_id)}",
                 "source": {
                     "type": 'vk',
                     'vk_type': 'photo',

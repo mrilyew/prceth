@@ -1,4 +1,4 @@
-from executables.acts.Base.Base import BaseAct
+from executables.acts import BaseAct
 from declarable.ArgumentsTypes import ServiceInstanceArgument, JsonArgument
 
 class UpdateServiceData(BaseAct):

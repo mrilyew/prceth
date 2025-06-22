@@ -1,4 +1,4 @@
-from executables.acts.Base.Base import BaseAct
+from executables.acts import BaseAct
 from declarable.ArgumentsTypes import StringArgument, CsvArgument, LimitedArgument
 from db.Models.Content.StorageUnit import StorageUnit
 from pathlib import Path

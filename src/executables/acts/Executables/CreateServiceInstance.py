@@ -1,4 +1,4 @@
-from executables.acts.Base.Base import BaseAct
+from executables.acts import BaseAct
 from repositories.ServicesRepository import ServicesRepository
 from db.Models.Instances.ServiceInstance import ServiceInstance
 from declarable.ArgumentsTypes import StringArgument, IntArgument

@@ -1,4 +1,4 @@
-from executables.acts.Base.Base import BaseAct
+from executables.acts import BaseAct
 from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument
 from db.LinkManager import link_manager

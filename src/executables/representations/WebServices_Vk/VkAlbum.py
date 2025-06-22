@@ -51,7 +51,7 @@ class VkAlbum(BaseVkItemId):
         async def item(self, item, list_to_add):
             is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
-            name = f"Vk Album \"{item.get('title')}\""
+            name = item.get('title')
 
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 

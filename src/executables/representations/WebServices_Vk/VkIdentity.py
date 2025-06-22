@@ -2,6 +2,7 @@ from executables.representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from resources.Exceptions import NotFoundException
+from utils.MainUtils import proc_strtr
 from resources.Consts import consts
 from db.DbInsert import db_insert
 from pathlib import Path
@@ -105,10 +106,10 @@ class VkIdentity(BaseVkItemId):
                 item['vkapi_type'] = 'group'
 
             if item.get("vkapi_type") == "user":
-                name = f"VK User {item.get('first_name')} {item.get('last_name')}"
+                name = f"{item.get('first_name')} {item.get('last_name')}"
                 declared_date = item.get("reg_date", None)
             else:
-                name = f"VK Club {item.get('name')}"
+                name = f"{item.get('name')}"
 
             if self.args.get("download_avatar") == True:
                 try:
@@ -140,7 +141,7 @@ class VkIdentity(BaseVkItemId):
                     'vk_type': item.get("vkapi_type"),
                     'content': item.get('id')
                 },
-                "name": name,
+                "name": proc_strtr(name, 200),
                 "content": item,
                 "declared_created_at": declared_date,
                 "links": links,

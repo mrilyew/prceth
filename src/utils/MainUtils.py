@@ -82,7 +82,7 @@ def remove_protocol(link):
     return final_link
 
 # откуда-то взято
-def proc_strtr(text: str, length: int = 0, multipoint: bool = True):
+def proc_strtr(text: str, length: int = 100, multipoint: bool = True):
     '''
     Cuts string to "length".
     '''

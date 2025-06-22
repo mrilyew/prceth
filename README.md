@@ -50,10 +50,6 @@ Todo:
 - [ ] Режим archive.is без сохранения скриптов
 - [ ] Определённые декларируемые функции для определённого сайта
 
-#### Acts.Executables.
-
-- [ ] CreateCollection
-
 #### Acts.ContentUnits.
 
 - [ ] Search
@@ -61,9 +57,14 @@ Todo:
 - [ ] GetById
 - [ ] Edit
 - [ ] ReorderGlobal
+
+#### Acts.Links
+
 - [ ] Link
 - [ ] Unlink
-- [ ] GetLinks
+- [ ] GetList
+- [ ] GetListByItem
+- [ ] ReoderLink
 
 #### Acts.Executables.
 
@@ -79,7 +80,7 @@ Todo:
 
 #### ContentUnitRelation
 
-- [ ] .is_revision
+- [x] .is_revision
 
 #### Фронтенд???
 

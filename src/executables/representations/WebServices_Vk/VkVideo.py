@@ -111,6 +111,11 @@ class VkVideo(BaseVkItemId):
                 else:
                     logger.log(message=f"Video {item_id} is from another platform ({item.get("platform")})",section="Vk!Video",kind="message")
 
+            item.pop('files', None)
+            item.pop('trailer', None)
+            item.pop('stats_pixels', None)
+            item.pop('ads', None)
+
             cu = db_insert.contentFromJson({
                 "name": item_name,
                 "source": {
