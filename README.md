@@ -56,7 +56,7 @@ Todo:
 - [ ] Remove
 - [x] GetById
 - [ ] Edit
-- [ ] ReorderGlobal
+~~ - [ ] ReorderGlobal~~
 
 #### Acts.Links
 
@@ -69,6 +69,7 @@ Todo:
 #### Acts.Executables.
 
 - [ ] List
+- [x] Describe
 
 #### Acts.Storage.
 

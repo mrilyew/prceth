@@ -5,6 +5,12 @@ class Argument:
     def __init__(self, data):
         self.data = data
 
+    def out(self):
+        ps = self.data.copy()
+        ps.update({'name': self.__class__.__name__})
+
+        return ps
+
     def passValue(self, val):
         self.input_value = val
 

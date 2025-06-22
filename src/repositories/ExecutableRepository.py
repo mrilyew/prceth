@@ -14,12 +14,17 @@ class ExecutableRepository:
 
         repo_type = self.class_type.__name__ 
 
-        return f".{repo_type.replace('Base', '').lower()}s"
+        return f"{repo_type.replace('Base', '').lower()}s"
 
-    def __import(self, plugin_name):
+    def doImportRaw(self, folder_name, category, plugin_name):
+        __module_name = f'{folder_name}.{category}.{plugin_name}'
+        __module = importlib.import_module(__module_name)
+
+        return __module
+
+    def doImport(self, plugin_name):
         try:
-            __module_name = f'{self.folder_name}{self.__category()}.{plugin_name}'
-            __module = importlib.import_module(__module_name)
+            __module = self.doImportRaw(self.folder_name, self.__category(), plugin_name)
             __class = getattr(__module, plugin_name.split(".")[-1])
 
             if __class.canBeExecuted() == False:
@@ -40,7 +45,7 @@ class ExecutableRepository:
                 if c.category == __[0] and c.__name__:
                     return c
 
-        return self.__import(plugin_name)
+        return self.doImport(plugin_name)
 
     def getList(self, show_hidden: bool = False, search_category: str = None):
         repo_type = self.class_type.__name__
@@ -62,7 +67,7 @@ class ExecutableRepository:
             module_name = str(relative_path.with_suffix("")).replace("\\", ".").replace("/", ".")
 
             if module_name.endswith('.py'):
-                __module = self.__import(module_name.replace(".py", ""))
+                __module = self.doImport(module_name.replace(".py", ""))
 
                 __exit.append(__module)
         
