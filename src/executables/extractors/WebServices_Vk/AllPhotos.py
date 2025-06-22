@@ -1,15 +1,15 @@
 from declarable.ArgumentsTypes import IntArgument, BooleanArgument
-from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
-from representations.WebServices_Vk.VkPhoto import VkPhoto
+from executables.extractors.BaseIterableExtended import BaseIterableExtended
+from executables.representations.WebServices_Vk.Photo import Photo
 from submodules.Uncanon.WebServices.VkApi import VkApi
 
-class VkAllPhotos(BaseIterableExtended):
+class AllPhotos(BaseIterableExtended):
     category = 'WebServices_Vk'
 
     @classmethod
     def declare(cls):
         params = {}
-        params.update(VkPhoto.declareVk())
+        params.update(Photo.declareVk())
         params["owner_id"] = IntArgument({
             'assertion': {
                 'not_null': True,
@@ -29,11 +29,11 @@ class VkAllPhotos(BaseIterableExtended):
             self.params['owner_id'] = i.get('owner_id')
 
         async def _get_count(self):
-            return await VkPhoto.countByUser(self.params.get('vkapi'), self.params.get('owner_id'))
+            return await Photo.countByUser(self.params.get('vkapi'), self.params.get('owner_id'))
 
         async def iterate(self, time):
             offset = self.params.get('per_page') * time
 
-            _items = await VkPhoto.byUser(self.params.get('vkapi'), owner_id=self.params.get('owner_id'), count=self.params.get('per_page'), offset=offset, download=self.params.get('download'))
+            _items = await Photo.byUser(self.params.get('vkapi'), owner_id=self.params.get('owner_id'), count=self.params.get('per_page'), offset=offset, download=self.params.get('download'))
 
             return _items

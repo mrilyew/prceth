@@ -1,4 +1,4 @@
-from executables.extractors.Base.Base import BaseExtractor
+from executables.extractors import BaseExtractor
 from app.App import logger
 from utils.MediaUtils import rss_date_parse
 from executables.representations.Data.Json import Json as JsonRepresentation
@@ -17,9 +17,6 @@ class RSSFeed(BaseExtractor):
         })
         params["create_collection"] = BooleanArgument({
             "default": True,
-            "assertion": {
-                "not_null": True,
-            },
         })
 
         return params

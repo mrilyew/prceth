@@ -1,9 +1,9 @@
 from executables.representations.WebServices_Vk import BaseVkItemId
-from executables.representations.WebServices_Vk.VkPhoto import VkPhoto
+from executables.representations.WebServices_Vk.Photo import Photo
 from app.App import logger
 from db.DbInsert import db_insert
 
-class VkAlbum(BaseVkItemId):
+class Album(BaseVkItemId):
     async def getPhotos(self, vkapi, offset, count, rev = False, download = False):
         hd = self.hydrated.json_content
 
@@ -17,7 +17,7 @@ class VkAlbum(BaseVkItemId):
             "photo_sizes": 1,
         })
 
-        return await VkPhoto.extract({
+        return await Photo.extract({
             'object': photos,
             'download': download
         })

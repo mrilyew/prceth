@@ -6,7 +6,7 @@ from app.App import logger
 from submodules.Web.DownloadManager import download_manager
 import os
 
-class VkPoll(BaseVkItemId):
+class Poll(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}

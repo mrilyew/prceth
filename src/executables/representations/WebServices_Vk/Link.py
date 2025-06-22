@@ -6,7 +6,7 @@ from pathlib import Path
 from app.App import logger
 import os
 
-class VkLink(BaseVkItemId):
+class Link(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}

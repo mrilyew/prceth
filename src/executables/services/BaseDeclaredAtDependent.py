@@ -1,4 +1,4 @@
-from executables.services.Base.Base import BaseService
+from executables.services import BaseService
 from app.App import logger
 from db.Models.Content.ContentUnit import ContentUnit
 from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgument

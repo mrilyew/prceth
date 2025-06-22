@@ -9,7 +9,7 @@ from pathlib import Path
 from app.App import logger
 import os
 
-class VkIdentity(BaseVkItemId):
+class Identity(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}

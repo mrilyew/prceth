@@ -1,5 +1,5 @@
-from executables.extractors.Base.BaseTimeoutable import BaseTimeoutable
-from executables.extractors.Base.Base import BaseExtractor
+from executables.extractors import BaseExtractor
+from executables.extractors.BaseTimeoutable import BaseTimeoutable
 from declarable.ArgumentsTypes import IntArgument
 from resources.Exceptions import AbstractClassException
 from app.App import logger

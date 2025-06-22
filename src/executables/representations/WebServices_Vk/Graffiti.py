@@ -7,7 +7,7 @@ from db.DbInsert import db_insert
 from pathlib import Path
 import os
 
-class VkGraffiti(BaseVkItemId):
+class Graffiti(BaseVkItemId):
     hidden = True
 
     @classmethod

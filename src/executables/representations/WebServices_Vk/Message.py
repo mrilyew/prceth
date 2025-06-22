@@ -1,9 +1,9 @@
-from executables.representations.WebServices_Vk.VkPost import VkPost
+from executables.representations.WebServices_Vk.Post import Post
 
-class VkMessage(VkPost):
+class Message(Post):
     vk_type = "message"
 
-    class Extractor(VkPost.Extractor):
+    class Extractor(Post.Extractor):
         async def __response(self, i = {}):
             items_ids_str = i.get('ids')
             items_ids = items_ids_str.split(",")

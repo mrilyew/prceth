@@ -1,9 +1,9 @@
-from executables.extractors.Base.BaseIterable import BaseIterable
+from executables.extractors.BaseIterable import BaseIterable
 from declarable.ArgumentsTypes import IntArgument, LimitedArgument
-from representations.Data.File import File
+from executables.representations.Data.File import File
 from app.App import logger
 
-class VkStickers(BaseIterable):
+class Stickers(BaseIterable):
     category = 'WebServices_Vk'
 
     @classmethod

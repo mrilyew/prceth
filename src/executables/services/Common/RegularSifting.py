@@ -1,4 +1,4 @@
-from executables.services.Base.BaseDeclaredAtDependent import BaseDeclaredAtDependent
+from executables.services.BaseDeclaredAtDependent import BaseDeclaredAtDependent
 from repositories.ExtractorsRepository import ExtractorsRepository
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 

@@ -2,7 +2,7 @@ from executables.representations.WebServices_Vk import BaseVkItemId
 from app.App import logger
 from db.DbInsert import db_insert
 
-class VkArticle(BaseVkItemId):
+class Article(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
             items_ids_string = i.get('ids')

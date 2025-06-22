@@ -1,15 +1,15 @@
 from declarable.ArgumentsTypes import IntArgument, StringArgument, CsvArgument, BooleanArgument
-from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
-from representations.WebServices_Vk.VkPost import VkPost
+from executables.extractors.BaseIterableExtended import BaseIterableExtended
+from executables.representations.WebServices_Vk.Post import Post
 from submodules.Uncanon.WebServices.VkApi import VkApi
 
-class VkWall(BaseIterableExtended):
+class Wall(BaseIterableExtended):
     category = 'WebServices_Vk'
 
     @classmethod
     def declare(cls):
         params = {}
-        params.update(VkPost.declareVk())
+        params.update(Post.declareVk())
         params["owner_id"] = IntArgument({
             'assertion': {
                 'not_null': True,
@@ -42,13 +42,13 @@ class VkWall(BaseIterableExtended):
             self.params['download_reposts'] = i.get('download_reposts')
 
         async def _get_count(self):
-            return await VkPost.wallCount(self.params.get('vkapi'), self.params.get('owner_id'), self.params.get('filter'))
+            return await Post.wallCount(self.params.get('vkapi'), self.params.get('owner_id'), self.params.get('filter'))
 
         async def iterate(self, time):
             offset = self.params.get('per_page') * time
 
-            response = await VkPost.wall(self.params.get('vkapi'), owner_id=self.params.get('owner_id'), filter=self.params.get('filter'), count=self.params.get('per_page'), offset=offset)
-            _items = await VkPost.extract({
+            response = await Post.wall(self.params.get('vkapi'), owner_id=self.params.get('owner_id'), filter=self.params.get('filter'), count=self.params.get('per_page'), offset=offset)
+            _items = await Post.extract({
                 'object': response,
                 'attachments_info': self.params.get('attachments_info'),
                 'attachments_file': self.params.get('attachments_file'),

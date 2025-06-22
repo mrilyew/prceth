@@ -1,10 +1,10 @@
-from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
-from representations.WebServices_Vk import BaseVk
+from executables.extractors.BaseIterableExtended import BaseIterableExtended
+from executables.representations.WebServices_Vk import BaseVk
 from declarable.ArgumentsTypes import JsonArgument, IntArgument, LimitedArgument
 from submodules.Uncanon.WebServices.VkApi import VkApi
 from resources.Consts import consts
 
-class VkFave(BaseIterableExtended):
+class Fave(BaseIterableExtended):
     category = 'WebServices_Vk'
 
     @classmethod
@@ -32,11 +32,11 @@ class VkFave(BaseIterableExtended):
             self.params['_method'] = ''
             self.params['_execute'] = {}
 
-            from representations.WebServices_Vk.VkIdentity import VkIdentity
-            from representations.WebServices_Vk.VkPost import VkPost
-            from representations.WebServices_Vk.VkVideo import VkVideo
-            from representations.WebServices_Vk.VkArticle import VkArticle
-            from representations.WebServices_Vk.VkLink import VkLink
+            from executables.representations.WebServices_Vk.Identity import Identity
+            from executables.representations.WebServices_Vk.Post import Post
+            from executables.representations.WebServices_Vk.Video import Video
+            from executables.representations.WebServices_Vk.Article import Article
+            from executables.representations.WebServices_Vk.Link import Link
 
             match(i.get('section')):
                 case 'users' | 'groups' | 'hints':
@@ -44,7 +44,7 @@ class VkFave(BaseIterableExtended):
                     self.params['_execute'] = {
                         'type': i.get('section')
                     }
-                    self.params['_class'] = VkIdentity
+                    self.params['_class'] = Identity
                 case 'post' | 'video' | 'article' | 'link':
                     self.params['_method'] = 'fave.get'
                     self.params['_execute'] = {
@@ -54,13 +54,13 @@ class VkFave(BaseIterableExtended):
 
                     match(i.get('section')):
                         case 'post':
-                            self.params['_class'] = VkPost
+                            self.params['_class'] = Post
                         case 'video':
-                            self.params['_class'] = VkVideo
+                            self.params['_class'] = Video
                         case 'article':
-                            self.params['_class'] = VkArticle
+                            self.params['_class'] = Article
                         case 'link':
-                            self.params['_class'] = VkLink
+                            self.params['_class'] = Link
 
             BaseVk.define()
             self.params.get('_execute')['fields'] = ",".join(consts.get("vk.min_group_fields") + consts.get("vk.min_user_fields"))

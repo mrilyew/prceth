@@ -5,7 +5,7 @@ from utils.MainUtils import proc_strtr
 from app.App import logger
 from db.DbInsert import db_insert
 
-class VkPost(BaseVkItemId):
+class Post(BaseVkItemId):
     vk_type = 'post'
 
     @classmethod
@@ -160,7 +160,7 @@ class VkPost(BaseVkItemId):
                 return None
 
             attachment_object = None
-            attachment_name = f"WebServices_Vk.Vk{att_class_name.title()}"
+            attachment_name = f"WebServices_Vk.{att_class_name.title()}"
             attachment_representation = RepresentationsRepository().getByName(attachment_name)
             if attachment_representation == None:
                 from representations.Data.Json import Json as UnknownAttachmentRepresentation

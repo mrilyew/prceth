@@ -6,7 +6,7 @@ from app.App import logger
 from pathlib import Path
 import os
 
-class VkPhoto(BaseVkItemId):
+class Photo(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}

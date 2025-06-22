@@ -3,7 +3,7 @@ from db.DbInsert import db_insert
 from app.App import logger
 from utils.MainUtils import proc_strtr
 
-class VkNote(BaseVkItemId):
+class Note(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
             item_id = i.get('ids')

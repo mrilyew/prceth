@@ -1,15 +1,15 @@
 from declarable.ArgumentsTypes import IntArgument, CsvArgument, LimitedArgument
-from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
-from representations.WebServices_Vk.VkComment import VkComment
+from executables.extractors.BaseIterableExtended import BaseIterableExtended
+from executables.representations.WebServices_Vk.Comment import Comment
 from submodules.Uncanon.WebServices.VkApi import VkApi
 
-class VkComments(BaseIterableExtended):
+class Comments(BaseIterableExtended):
     category = 'WebServices_Vk'
 
     @classmethod
     def declare(cls):
         params = {}
-        params.update(VkComment.declareVk())
+        params.update(Comment.declareVk())
         params["owner_id"] = IntArgument({
             'assertion': {
                 'not_null': True,
@@ -103,6 +103,6 @@ class VkComments(BaseIterableExtended):
             })
 
             _items = await self.params.get('vkapi').call(self.params.get('_method'), _dct)
-            return await VkComment.extract({
+            return await Comment.extract({
                 'object': _items
             })

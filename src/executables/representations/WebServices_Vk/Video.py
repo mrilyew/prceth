@@ -3,13 +3,13 @@ from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 from app.App import logger
 from pathlib import Path
 from utils.MainUtils import valid_name
-from utils.MediaUtils import is_ffmpeg_installed, find_highest_in_dict
+from utils.MediaUtils import find_highest_in_dict
 from submodules.Web.DownloadManager import download_manager
 from resources.Exceptions import LibNotInstalledException
 from db.DbInsert import db_insert
 import os
 
-class VkVideo(BaseVkItemId):
+class Video(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}

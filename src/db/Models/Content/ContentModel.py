@@ -32,7 +32,7 @@ class BaseModel(Model):
         return self.uuid
 
     def is_saved(self)->bool:
-        return self.id != None
+        return self.uuid != None
 
     def save(self, **kwargs):
         self.uuid = str(uuid.uuid4())

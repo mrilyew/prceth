@@ -1,5 +1,5 @@
 from app.App import logger
-from executables.extractors.Base.BaseTimeoutable import BaseTimeoutable
+from executables.extractors.BaseTimeoutable import BaseTimeoutable
 from declarable.ArgumentsTypes import IntArgument
 import asyncio
 

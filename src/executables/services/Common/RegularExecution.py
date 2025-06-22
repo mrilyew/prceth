@@ -1,4 +1,4 @@
-from executables.services.Base.Base import BaseService
+from executables.services import BaseService
 from app.App import logger
 from repositories.ActsRepository import ActsRepository
 from repositories.ExtractorsRepository import ExtractorsRepository

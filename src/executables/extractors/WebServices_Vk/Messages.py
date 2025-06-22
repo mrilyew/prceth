@@ -1,15 +1,15 @@
-from executables.extractors.Base.BaseIterableExtended import BaseIterableExtended
+from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from declarable.ArgumentsTypes import IntArgument, CsvArgument
-from representations.WebServices_Vk.VkMessage import VkMessage
+from executables.representations.WebServices_Vk.Message import Message
 from submodules.Uncanon.WebServices.VkApi import VkApi
 
-class VkMessages(BaseIterableExtended):
+class Messages(BaseIterableExtended):
     category = 'WebServices_Vk'
 
     @classmethod
     def declare(cls):
         params = {}
-        params.update(VkMessage.declareVk())
+        params.update(Message.declareVk())
         params["peer_id"] = IntArgument({
             'assertion': {
                 'not_null': True,
@@ -56,6 +56,6 @@ class VkMessages(BaseIterableExtended):
 
             _items = await self.params.get('vkapi').call(self.params.get('_method'), _dct)
 
-            return await VkMessage.extract({
+            return await Message.extract({
                 'object': _items
             })

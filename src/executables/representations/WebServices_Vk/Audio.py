@@ -9,7 +9,7 @@ from utils.MediaUtils import is_ffmpeg_installed
 from db.DbInsert import db_insert
 import os
 
-class VkAudio(BaseVkItemId):
+class Audio(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}
