@@ -68,7 +68,7 @@ Todo:
 
 #### Acts.Executables.
 
-- [ ] List
+- [x] List
 - [x] Describe
 
 #### Acts.Storage.

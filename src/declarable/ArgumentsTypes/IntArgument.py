@@ -5,4 +5,4 @@ class IntArgument(Argument):
         try:
             return int(self.input_value)
         except ValueError:
-            return None
+            return self.default()

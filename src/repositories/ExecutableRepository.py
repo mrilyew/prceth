@@ -5,16 +5,8 @@ from resources.Cached import cached
 import importlib
 
 class ExecutableRepository:
-    class_type = None
+    part_name = None
     folder_name = "executables"
-
-    def __category(self):
-        if self.class_type == None:
-            return ''
-
-        repo_type = self.class_type.__name__ 
-
-        return f"{repo_type.replace('Base', '').lower()}s"
 
     def doImportRaw(self, folder_name, category, plugin_name):
         __module_name = f'{folder_name}.{category}.{plugin_name}'
@@ -24,7 +16,7 @@ class ExecutableRepository:
 
     def doImport(self, plugin_name):
         try:
-            __module = self.doImportRaw(self.folder_name, self.__category(), plugin_name)
+            __module = self.doImportRaw(self.folder_name, self.part_name + 's', plugin_name)
             __class = getattr(__module, plugin_name.split(".")[-1])
 
             if __class.canBeExecuted() == False:
@@ -37,7 +29,7 @@ class ExecutableRepository:
             raise _ex
 
     def getByName(self, plugin_name):
-        __cached = cached.get(f'{self.__category()}_list')
+        __cached = cached.get(f'{self.part_name}_list')
         if __cached != None:
             __ = plugin_name.split(".")
             for c in __cached:
@@ -47,30 +39,35 @@ class ExecutableRepository:
 
         return self.doImport(plugin_name)
 
-    def getList(self, show_hidden: bool = False, search_category: str = None):
-        repo_type = self.class_type.__name__
+    def getList(self, repo_type = None, show_hidden: bool = False, search_category: str = None):
+        if repo_type == None:
+            repo_type = self.part_name
 
         if cached.get(f'{repo_type}s_list') != None:
             return cached.get(f'{repo_type}s_list')
 
+        exec_dir = consts.get('executables')
         __exit = []
 
         # TODO: Caching
         # TODO: Hiddenness
-        __base_path = Path(f"{consts.get('executable')}\\{repo_type}s")
+        __base_path = Path(f"{exec_dir}\\{repo_type}s")
         __plugins = Path(__base_path).rglob('*.py')
         for plugin_file in __plugins:
-            if plugin_file.name == '__init__.py' or plugin_file.name == '__pycache__' or plugin_file.name == "Base.py":
+            plugin_name = plugin_file.name
+
+            if plugin_name in ['__init__.py', '__pycache__', 'Base.py']:
                 continue
 
             relative_path = plugin_file.relative_to(__base_path)
             module_name = str(relative_path.with_suffix("")).replace("\\", ".").replace("/", ".")
 
-            if module_name.endswith('.py'):
-                __module = self.doImport(module_name.replace(".py", ""))
+            if plugin_name.endswith('.py'):
+                __module = self.doImport(module_name)
 
-                __exit.append(__module)
-        
-        cached[f'{self.self.__category()}_list'] = __exit
+                if __module != None:
+                    __exit.append(__module)
+
+        cached[f'{repo_type}_list'] = __exit
 
         return __exit

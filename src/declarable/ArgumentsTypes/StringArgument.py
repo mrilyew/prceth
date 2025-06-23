@@ -9,7 +9,7 @@ class StringArgument(Argument):
         inp = str(self.input_value)
         if len(inp) == 0:
             if self.data.get('return_none_on_empty', True) == True:
-                return None
+                return self.default()
 
         if self.get_maxlength() != None:
             return proc_strtr(inp, int(self.data.get("maxlength")), multipoint=False)

@@ -7,7 +7,13 @@ class Argument:
 
     def out(self):
         ps = self.data.copy()
-        ps.update({'name': self.__class__.__name__})
+        ps.update({
+            'name': self.__class__.__name__,
+            'docs': self.manual()
+        })
+
+        if ps.get('sensitive') == True:
+            ps['default'] = 'x'
 
         return ps
 
@@ -15,9 +21,12 @@ class Argument:
         self.input_value = val
 
     def manual(self):
-        __lang_code = consts.get('lang', 'eng')
+        __lang_code = consts.get('ui.lang', 'eng')
         __fnl  = {}
         __docs = self.data.get('docs')
+
+        if __docs == None:
+            return {}
 
         if __docs.get('definition') != None:
             __fnl['definition'] = resolve_lang(__docs.get('definition'), __lang_code)
@@ -26,6 +35,8 @@ class Argument:
             __fnl['values'] = {}
             for index, name in enumerate(__docs.get('values')):
                 __fnl['values'][name] = resolve_lang(__docs.get('values').get(name), __lang_code)
+
+        return __fnl
 
     def default(self):
         return self.data.get('default', None)

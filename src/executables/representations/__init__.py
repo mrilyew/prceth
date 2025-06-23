@@ -1,9 +1,10 @@
 from resources.Exceptions import AbstractClassException, SuitableExtractMethodNotFound
 from executables.RecursiveDeclarable import RecursiveDeclarable
+from executables.Documentable import Documentable
 from executables.Runnable import Runnable
 from executables.Saveable import Saveable
 
-class Representation(RecursiveDeclarable, Runnable):
+class Representation(RecursiveDeclarable, Runnable, Documentable):
     category = "base"
     hydrated = None
 
