@@ -69,6 +69,7 @@ Todo:
 #### Acts.Executables.
 
 - [x] List
+- [ ] List занимает слишком много времени
 - [x] Describe
 
 #### Acts.Storage.

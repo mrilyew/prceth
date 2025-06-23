@@ -36,7 +36,7 @@ class ContentUnit(BaseModel):
     # Dates
     declared_created_at = TimestampField(default=time.time)
     created_at = TimestampField(default=time.time)
-    edited_at = TimestampField(null=True)
+    edited_at = TimestampField(default=None,null=True)
 
     # Booleans
     is_collection = BooleanField(index=True,default=0)
@@ -76,9 +76,22 @@ class ContentUnit(BaseModel):
             ret['source'] = parse_json(self.source)
 
         try:
-            ret["created"] = int(self.created_at.timestamp())
-            ret["edited"] = int(self.edited_at.timestamp())
-            ret["declared_created_at"] = str(self.declared_created_at.timestamp())
+            # cuz after saving it doesnt converts to datetime we need to use this workaround
+            if getattr(self.created_at, 'timestamp', None) != None:
+                ret["created"] = int(self.created_at.timestamp())
+            else:
+                ret["created"] = int(self.created_at)
+
+            if self.edited_at != None:
+                if getattr(self.edited_at, 'timestamp', None) != None:
+                    ret["edited"] = int(self.edited_at.timestamp())
+                else:
+                    ret["edited"] = int(self.edited_at)
+
+            if getattr(self.declared_created_at, 'timestamp', None) != None:
+                ret["declared_created"] = int(self.declared_created_at.timestamp())
+            else:
+                ret["declared_created"] = int(self.declared_created_at)
         except Exception as _e:
             print(_e)
 

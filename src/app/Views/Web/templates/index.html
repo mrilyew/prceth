@@ -252,7 +252,7 @@
 
             data = await fetch(_url)
 
-            u('.execution_side').html(`<pre>${escapeHtml(JSON.stringify(await data.json(), null, 4))}</pre>`)
+            u('.execution_side').html(`<pre>${escapeHtml(JSON.stringify(await data.json(), null, 2))}</pre>`)
         })
 
         u(document).on('click', '#search', async (e) => {

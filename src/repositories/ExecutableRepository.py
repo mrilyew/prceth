@@ -19,7 +19,7 @@ class ExecutableRepository:
             __module = self.doImportRaw(self.folder_name, self.part_name + 's', plugin_name)
             __class = getattr(__module, plugin_name.split(".")[-1])
 
-            if __class.canBeExecuted() == False:
+            if getattr(__class, 'canBeExecuted', None) == None or __class.canBeExecuted() == False:
                 return None
 
             return __class
@@ -33,8 +33,7 @@ class ExecutableRepository:
         if __cached != None:
             __ = plugin_name.split(".")
             for c in __cached:
-                print(c.category, c.__name__)
-                if c.category == __[0] and c.__name__:
+                if c.category == __[0] and c.__name__ == __[1]:
                     return c
 
         return self.doImport(plugin_name)
