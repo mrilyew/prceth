@@ -21,11 +21,13 @@ class Documentable():
             'sub': section,
             'category': category,
             'name': name,
-            'args': {},
+            'args': [],
         }
 
         _args = cls.declare_recursive()
         for _id, _name in enumerate(_args):
-            ts['args'][_name] = _args.get(_name).out()
+            _p = _args.get(_name).out()
+            _p['name'] = _name
+            ts['args'].append(_p)
 
         return ts

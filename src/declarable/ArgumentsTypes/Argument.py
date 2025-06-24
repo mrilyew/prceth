@@ -8,12 +8,12 @@ class Argument:
     def out(self):
         ps = self.data.copy()
         ps.update({
-            'name': self.__class__.__name__,
+            'type': self.__class__.__name__,
             'docs': self.manual()
         })
 
         if ps.get('sensitive') == True:
-            ps['default'] = 'x'
+            ps['default'] = None
 
         return ps
 

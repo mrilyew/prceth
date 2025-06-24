@@ -1,11 +1,11 @@
 from app.App import app, config
 from resources.Consts import consts
-from flask import Flask, request, jsonify, render_template, json
+from flask import Flask, request, jsonify, render_template
 from repositories.ActsRepository import ActsRepository
 
 consts['context'] = 'flask'
 
-fl_app = Flask(__name__, template_folder='templates')
+fl_app = Flask(__name__, template_folder='templates', static_folder='static')
 fl_app.json.ensure_ascii = False
 
 if config.get('web.debug') == False:
@@ -28,9 +28,9 @@ if config.get('web.debug') == False:
 def main_page():
     return render_template("index.html")
 
-@fl_app.route("/api/act", methods=["GET"])
+@fl_app.route("/api/act", methods=["POST"])
 async def run_act():
-    args = request.args
+    args = request.form
 
     assert "i" in args, "pass the name of act as --i"
 

@@ -123,4 +123,7 @@ class ContentUnit(BaseModel):
                 if item == None:
                     continue
 
-                link_manager.link(self, item)
+                try:
+                    link_manager.link(self, item)
+                except AssertionError:
+                    pass

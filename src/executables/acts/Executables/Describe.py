@@ -8,13 +8,13 @@ class Describe(BaseAct):
     @classmethod
     def declare(cls):
         params = {}
-        params["class"] = StringArgument({
+        params["class_type"] = LimitedArgument({
+            "values": ['representation', 'extractor', 'act', 'service'],
             "assertion": {
                 "not_null": True,
             }
         })
-        params["class_type"] = LimitedArgument({
-            "values": ['representation', 'extractor', 'act', 'service'],
+        params["class"] = StringArgument({
             "assertion": {
                 "not_null": True,
             }
@@ -23,9 +23,12 @@ class Describe(BaseAct):
         return params
 
     async def execute(self, i = {}):
-        class_type = i.get('class_type') + 's'
+        class_type = i.get('class_type')
         class_name = i.get('class')
 
-        class_object = ExecutableRepository().doImportRaw('executables', class_type, class_name)
+        repo = ExecutableRepository()
+        repo.part_name = class_type
+
+        class_object = repo.doImport(class_name)
 
         return class_object.describe()
