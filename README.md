@@ -40,6 +40,8 @@ Todo:
 - [ ] Каждый метод репрезентации должен быть как то задокументирован и вынесен (?)
 - [ ] file_containment (?)
 
+- [ ] Data.Hyperlink
+
 #### Инциализация
 
 - [ ] Адаптация под bash
@@ -56,7 +58,6 @@ Todo:
 - [ ] Remove
 - [x] GetById
 - [ ] Edit
-~~ - [ ] ReorderGlobal~~
 
 #### Acts.Links
 
