@@ -21,6 +21,7 @@ body {
     font-family: -apple-system,BlinkMacSystemFont,Arial,sans-serif;
     background: var(--back);
     color: var(--text);
+    scrollbar-gutter: stable both-edges;
 }
 
 body, #app {
@@ -172,4 +173,9 @@ input[type='search'] {
 
 .horizontal_mini_tabs a.selected {
     background: var(--head-lighter-2);
+}
+
+.page-head {
+    background: var(--head);
+    padding: 10px 8px;
 }

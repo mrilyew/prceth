@@ -204,4 +204,7 @@ def list_conversation(i_list):
     return i_list
 
 def resolve_lang(translation_dict: dict, lang_code: str):
+    if translation_dict == None:
+        return None
+
     return translation_dict.get(lang_code)

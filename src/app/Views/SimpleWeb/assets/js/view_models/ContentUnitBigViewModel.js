@@ -1,10 +1,7 @@
 import {proc_strtr, escapeHtml} from "../utils/utils.js"
-import Component from "./Component.js"
 
-class ContentUnitBigViewModel extends Component {
-    tag_name = "content-unit-big"
-
-    render(data) {
+class ContentUnitBigViewModel {
+    template(data) {
         return u(`
             <a href="#cu?uuids=${data.id}" class="content_unit_item">
                 <div class="content_unit_thumb">

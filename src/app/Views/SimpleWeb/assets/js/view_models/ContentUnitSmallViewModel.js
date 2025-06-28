@@ -1,8 +1,6 @@
 import {proc_strtr, escapeHtml} from "../utils/utils.js"
 
 class ContentUnitSmallViewModel {
-    tag_name = "content-unit-small"
-
     template(data) {
         return u(`
             <a href="#cu?uuids=${data.id}" class="scroll_element">

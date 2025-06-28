@@ -4,7 +4,10 @@ from db.DbInsert import db_insert
 
 class Collection(Representation):
     category = "Abstract"
-    executable_cfg =  {
+    docs = {
+        "definition": "abstract_collection_definition",
+    }
+    executable_cfg = {
         'free_args': True
     }
 
@@ -12,11 +15,18 @@ class Collection(Representation):
     def declare(cls):
         params = {}
         params["name"] = StringArgument({
+            'docs': {
+                "definition": 'abstract_collection_name_param_description',
+            },
             'assertion': {
                 'not_null': True
             }
         })
-        params["description"] = StringArgument({})
+        params["description"] = StringArgument({
+            'docs': {
+                "definition": 'abstract_collection_description_param_description',
+            },
+        })
 
         return params
 

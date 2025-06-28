@@ -23,6 +23,11 @@ export const routes = [
         'class': (new ExecutableController),
         'method': 'main'
     },
+    {
+        'route': 'execute',
+        'class': (new ExecutableController),
+        'method': 'executePage'
+    },
 ]
 
 export default routes

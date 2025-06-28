@@ -1,4 +1,5 @@
 from resources.Consts import consts
+from resources.Descriptions import descriptions
 from utils.MainUtils import resolve_lang
 
 class Argument:
@@ -28,13 +29,21 @@ class Argument:
         if __docs == None:
             return {}
 
-        if __docs.get('definition') != None:
-            __fnl['definition'] = resolve_lang(__docs.get('definition'), __lang_code)
+        definition = __docs.get('definition')
+        if definition != None:
+            if type(definition) == str:
+                definition = descriptions.get(definition)
+
+            __fnl['definition'] = resolve_lang(definition, __lang_code)
 
         if __docs.get('values') != None:
             __fnl['values'] = {}
             for index, name in enumerate(__docs.get('values')):
-                __fnl['values'][name] = resolve_lang(__docs.get('values').get(name), __lang_code)
+                __val = __docs.get('values').get(name)
+                if type(__val) == str:
+                    __val = descriptions.get(__val)
+
+                __fnl['values'][name] = resolve_lang(__val, __lang_code)
 
         return __fnl
 

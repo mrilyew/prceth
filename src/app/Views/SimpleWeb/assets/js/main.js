@@ -7,8 +7,6 @@ export const app = new class {
     }
 
     renderPage() {
-        document.title = window.cfg['ui.name']
-
         u('#app').html(`
             <nav id="status-bar">
                 <a href="#about"><div id="home"></div></a>
@@ -22,6 +20,8 @@ export const app = new class {
     }
 
     setContent(content = '') {
+        document.title = window.cfg['ui.name']
+
         u('#app #page').html(content)
     }
 }
