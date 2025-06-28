@@ -1,4 +1,4 @@
-export const _app = new class {
+export const app = new class {
     navigation = new class {
         setTab(tab) {
             u('#status-bar a').removeClass('selected')
@@ -7,6 +7,8 @@ export const _app = new class {
     }
 
     renderPage() {
+        document.title = window.cfg['ui.name']
+
         u('#app').html(`
             <nav id="status-bar">
                 <a href="#about"><div id="home"></div></a>
@@ -24,12 +26,6 @@ export const _app = new class {
     }
 }
 
-_app.renderPage()
+app.renderPage()
 
-export class BaseController {
-    loader() {
-        _app.setContent('...')
-    }
-}
-
-export default _app
+export default app

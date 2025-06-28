@@ -1,28 +1,24 @@
-import {_app, BaseController} from "../main.js"
+import app from "../main.js"
+import BaseController from "./BaseController.js"
 import router from "../router.js"
 import api from "../api.js"
-import ContentUnitModel from "../models/ContentUnit.js"
-import { escapeHtml } from "../utils.js"
-
-const DEFAULT_COUNT = 100
+import ContentUnit from "../models/ContentUnit.js"
+import escapeHtml from "../utils/utils.js"
 
 export class ContentController extends BaseController {
     async main() {
         const items = await this.__items()
-        const _u = u(`
+        const insert_node = u(`
             <div>
                 <div id="container_body">
-                    <!--<div id="container_head">
-                        <b>${this.total_count} items</b>
-                    </div>-->
                     <div id="container_items"></div>
                 </div>
             </div>
         `)
 
-        this.__push(items, _u)
+        this.__push(items, insert_node)
 
-        _app.setContent(_u.html())
+        app.setContent(insert_node.html())
 
         u("#container_body").on("click", ".show_more", async (e) => {
             u(e.target).addClass('unclickable')
@@ -37,7 +33,7 @@ export class ContentController extends BaseController {
 
     __push(items, container) {
         items.forEach(itm => {
-            container.find("#container_items").append(itm.template())
+            container.find("#container_items").append(itm.render())
         })
 
         if (this.scrolled_count < this.total_count) {
@@ -48,29 +44,18 @@ export class ContentController extends BaseController {
     }
 
     async __items(offset = null) {
-        const items_resp = await api.act({
-            "i": "ContentUnits.Search",
-            "count": DEFAULT_COUNT,
-            "timestamp_after": offset,
-        })
-        const payload = items_resp.payload
-        const items = payload.items
-        const total_count = payload.total_count
+        const response = await ContentUnit.search(100, offset)
 
-        this.total_count = total_count
-        this.scrolled_count = (this.scrolled_count ?? 0) + items.length
+        this.total_count = response.total_count
+        this.scrolled_count = (this.scrolled_count ?? 0) + response.items.length
 
-        if (items[items.length - 1] != null) {
-            this.last_offset = items[items.length - 1].created
-        }
-
-        return ContentUnitModel.fromArray(items)
+        return response.items
     }
 
     async page() {
         const ids = router.url.getParam('uuids')
         const id_list = ids.split(',')
-        const units = await ContentUnitModel.fromIds(id_list)
+        const units = await ContentUnit.fromIds(id_list)
         const _u = u(`
             <div>
                 <div id="container_body">
@@ -85,7 +70,7 @@ export class ContentController extends BaseController {
             `)
         })
 
-        _app.setContent(_u.html())
+        app.setContent(_u.html())
     }
 }
 

@@ -1,49 +1,10 @@
-import {proc_strtr, escapeHtml} from "../utils.js"
 import api from "../api.js"
+import ContentUnitBigViewModel from "../view_models/ContentUnitBigViewModel.js"
+import ContentUnitSmallViewModel from "../view_models/ContentUnitSmallViewModel.js"
+import Model from "../models/Model.js"
 
-class ContentUnitBigListView {
-    template(data) {
-        return u(`
-            <a href="#cu?uuids=${data.id}" class="content_unit_item">
-                <div class="content_unit_thumb">
-                    <div class="content_unit_image"></div>
-                </div>
-                <div class="content_unit_info">
-                    <b>${proc_strtr(escapeHtml(data.display_name), 50)}</b>
-                    <div>
-                        <span>${proc_strtr(escapeHtml(data.description ?? 'no desc'), 50)}</span>
-                        <span>${escapeHtml(data.representation ?? '')}</span>
-                    </div>
-                </div>
-            </a>
-        `)
-    }
-}
-
-class ContentUnitMiniListView {
-    template(data) {
-        return u(`
-            <a href="#cu?uuids=${data.id}" class="content_unit_item_mini">
-                <b>${proc_strtr(escapeHtml(data.display_name), 50)}</b>
-            </a>
-        `)
-    }
-}
-
-export class ContentUnitModel {
-    constructor(data) {
-        this.data = data
-        this.render_class = ContentUnitMiniListView
-    }
-
-    static fromArray(arr) {
-        const f = []
-        arr.forEach(el => {
-            f.push(new ContentUnitModel(el))
-        })
-
-        return f
-    }
+export class ContentUnit extends Model {
+    render_class = ContentUnitSmallViewModel
 
     static async fromIds(ids) {
         const dl = await api.act({
@@ -52,16 +13,29 @@ export class ContentUnitModel {
         })
         const py = dl.payload
 
-        return ContentUnitModel.fromArray(py)
+        return ContentUnit.fromArray(py)
     }
 
-    template() {
-        const data = this.data
-        const _cl = new this.render_class()
+    static async search(count = 100, offset = null) {
+        const resp = await api.act({
+            "i": "ContentUnits.Search",
+            "count": count,
+            "timestamp_after": offset ?? "",
+        })
+        const payload = resp.payload
+        const items = payload.items
+        let last_offset = null
 
-        return _cl.template(data)
+        if (items[items.length - 1] != null) {
+            last_offset = items[items.length - 1].created
+        }
+
+        return {
+            "total_count": payload.total_count,
+            "last_offset": last_offset,
+            "items": ContentUnit.fromArray(items)
+        }
     }
-
 }
 
-export default ContentUnitModel
+export default ContentUnit

@@ -26,7 +26,7 @@ if config.get('web.debug') == False:
 
 @fl_app.route("/")
 def main_page():
-    return render_template("index.html")
+    return render_template("index.html", config=config)
 
 @fl_app.route("/api/act", methods=["POST"])
 async def run_act():
