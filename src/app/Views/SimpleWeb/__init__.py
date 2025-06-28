@@ -5,7 +5,7 @@ from repositories.ActsRepository import ActsRepository
 
 consts['context'] = 'flask'
 
-fl_app = Flask(__name__, template_folder='templates', static_folder='static')
+fl_app = Flask(__name__, template_folder='templates', static_folder='assets')
 fl_app.json.ensure_ascii = False
 
 if config.get('web.debug') == False:
@@ -23,6 +23,10 @@ if config.get('web.debug') == False:
         response.mimetype = "application/json"
 
         return response
+
+@fl_app.route("/")
+def main_page():
+    return render_template("index.html")
 
 @fl_app.route("/api/act", methods=["POST"])
 async def run_act():

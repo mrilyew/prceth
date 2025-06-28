@@ -84,8 +84,3 @@ Todo:
 #### ContentUnitRelation
 
 - [x] .is_revision
-
-#### Фронтенд???
-
-- [ ] Telegram-бот ???
-- [ ] Веб представление ???

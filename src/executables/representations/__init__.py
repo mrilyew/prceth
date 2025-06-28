@@ -17,8 +17,13 @@ class Representation(RecursiveDeclarable, Runnable, Documentable):
         args = cls.validate(i.copy())
 
         strategy.preExecute(args)
+        ress = await strategy.extract(i = args)
 
-        return await strategy.extract(i = args)
+        for el in ress:
+            el.unlisted = int(i.get('unlisted') == True)
+            el.representation = cls.full_name()
+
+        return ress
 
     @classmethod
     def rawListMethods(cls):

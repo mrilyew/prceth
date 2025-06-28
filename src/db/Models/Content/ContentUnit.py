@@ -1,4 +1,4 @@
-import os, time, json
+import os, json, datetime
 from utils.MainUtils import dump_json, parse_json
 from peewee import TextField, CharField, BooleanField, TimestampField
 from db.Models.Content.ContentModel import BaseModel
@@ -34,8 +34,8 @@ class ContentUnit(BaseModel):
     # author = TextField(null=True,default=consts.get('pc_fullname')) под вопросом
 
     # Dates
-    declared_created_at = TimestampField(default=time.time)
-    created_at = TimestampField(default=time.time)
+    declared_created_at = TimestampField(default=datetime.datetime.now)
+    created_at = TimestampField(default=datetime.datetime.now)
     edited_at = TimestampField(default=None,null=True)
 
     # Booleans
@@ -63,14 +63,16 @@ class ContentUnit(BaseModel):
 
         return loaded_content
 
-    def api_structure(self, sensitive=False):
+    def api_structure(self, return_content = True, sensitive=False):
         ret = {}
         ret['id'] = self.uuid
         ret['display_name'] = self.display_name
         ret['description'] = self.description
         ret['representation'] = self.representation
-        ret['content'] = self.formatted_data(recursive=True)
         # ret['tags'] = self.get_tags()
+
+        if return_content == True:
+            ret['content'] = self.formatted_data(recursive=True)
 
         if self.source != None:
             ret['source'] = parse_json(self.source)
@@ -78,20 +80,20 @@ class ContentUnit(BaseModel):
         try:
             # cuz after saving it doesnt converts to datetime we need to use this workaround
             if getattr(self.created_at, 'timestamp', None) != None:
-                ret["created"] = int(self.created_at.timestamp())
+                ret["created"] = float(self.created_at.timestamp())
             else:
-                ret["created"] = int(self.created_at)
+                ret["created"] = float(self.created_at)
 
             if self.edited_at != None:
                 if getattr(self.edited_at, 'timestamp', None) != None:
-                    ret["edited"] = int(self.edited_at.timestamp())
+                    ret["edited"] = float(self.edited_at.timestamp())
                 else:
-                    ret["edited"] = int(self.edited_at)
+                    ret["edited"] = float(self.edited_at)
 
             if getattr(self.declared_created_at, 'timestamp', None) != None:
-                ret["declared_created"] = int(self.declared_created_at.timestamp())
+                ret["declared_created"] = float(self.declared_created_at.timestamp())
             else:
-                ret["declared_created"] = int(self.declared_created_at)
+                ret["declared_created"] = float(self.declared_created_at)
         except Exception as _e:
             print(_e)
 

@@ -168,6 +168,7 @@ class Post(BaseVkItemId):
                 logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="Vk!Post", kind=logger.KIND_MESSAGE)
 
                 resl = await UnknownAttachmentRepresentation().extract({
+                    "unlisted": True,
                     "object": attachment,
                 })
 
