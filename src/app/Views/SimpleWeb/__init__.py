@@ -8,7 +8,7 @@ consts['context'] = 'flask'
 fl_app = Flask(__name__, template_folder='templates', static_folder='assets')
 fl_app.json.ensure_ascii = False
 
-if config.get('web.debug') == False:
+if True:
     @fl_app.errorhandler(Exception)
     def handle_exception(error):
         json_obj = {

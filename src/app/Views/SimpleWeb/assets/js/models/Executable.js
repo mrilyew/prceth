@@ -2,9 +2,16 @@ import api from "../api.js"
 import Model from "../models/Model.js"
 import ExecutableViewModel from "../view_models/ExecutableViewModel.js"
 import ExecutableArgumentViewModel from "../view_models/ExecutableArgumentViewModel.js"
+import subparams from "../utils/subparams.js"
 
 class ExecutableArgument extends Model {
     render_class = ExecutableArgumentViewModel
+
+    constructor(data) {
+        super(data)
+
+        this.argument_class = subparams[this.type]
+    }
 
     get type() {
         return this.data.type
@@ -25,9 +32,16 @@ class ExecutableArgument extends Model {
     get is_hidden() {
         return this.data.hidden == true
     }
+
+    render(args) {
+        const data = this.data
+        const _cl = new this.render_class()
+
+        return _cl.template(data, this.argument_class)
+    }
 }
 
-class Executable extends Model {
+export class Executable extends Model {
     render_class = ExecutableViewModel
 
     static async getList(class_type) {

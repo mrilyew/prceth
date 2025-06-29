@@ -51,6 +51,6 @@ class RandomContent(BaseAct):
             _col = ContentUnit.get(self.args.get("from_id"))
             assert _col != None, 'content_unit with this id does not exists'
 
-            __ = ContentUnit.select().where(ContentUnit.id << _col._linksSelectionIds()).limit(self.args.get('limit')).order_by(fn.Random())
+            __ = ContentUnit.select().where(ContentUnit.uuid << _col._linksSelectionIds()).limit(self.args.get('limit')).order_by(fn.Random())
 
         return __

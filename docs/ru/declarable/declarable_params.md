@@ -73,6 +73,13 @@ from declarable.ArgumentsTypes.[name]Argument import [name]Argument
 
 Длина, до которой будет обрезаться переданная строка.
 
+##### `is_long`
+
+Тип значения: _string_
+Только при: `type`=`StringArgument`
+
+Подразумевается ли что значение будет длинным.
+
 ##### `sensitive`
 
 Тип значения: _bool_

@@ -10,7 +10,7 @@
     --text: #0c0608;
 }
 
-a, h1 {
+a, h1, p {
     text-decoration: unset;
     margin: 0;
     color: var(--text);
@@ -18,19 +18,43 @@ a, h1 {
 
 body {
     margin: 0;
-    font-family: -apple-system,BlinkMacSystemFont,Arial,sans-serif;
+    font-family: tahoma;
     background: var(--back);
     color: var(--text);
     scrollbar-gutter: stable both-edges;
+    line-height: 1.2;
 }
 
 body, #app {
     min-height: 100vh;
+    position: relative;
 }
 
-input[type='search'] {
+input[type='search'],
+input[type='text'],
+input[type="number"] {
     width: 100%;
     padding: 2px 3px;
+    box-sizing: border-box;
+}
+
+textarea {
+    width: 100%;
+    padding: 2px 3px;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 120px;
+    max-height: 330px;
+}
+
+select {
+    padding: 3px 3px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type='button'] {
+    cursor: pointer;
 }
 
 .no_overflow {
@@ -58,14 +82,14 @@ input[type='search'] {
     color: var(--status-border);
 }
 
-#status-bar .tab:active {
-    background: var(--status-active);
-    color: var(--back);
-}
-
 #status-bar .tab.selected {
     background: var(--back);
+    color: var(--status-border);
     margin-top: 2px;
+}
+
+#status-bar .tab:hover {
+    background: var(--head-lighter);
 }
 
 #status-bar #home {
@@ -77,6 +101,8 @@ input[type='search'] {
 
 #container {
     margin: 0px 40px;
+    display: flex;
+    flex-direction: row;
 }
 
 #container #container_head {
@@ -91,7 +117,7 @@ input[type='search'] {
 }
 
 #container #container_search {
-    padding: 5px 5px;
+    padding: 15px 15px;
 }
 
 #container #container_items .content_unit_item {
@@ -140,7 +166,8 @@ input[type='search'] {
 }
 
 #page {
-    width: 50%;
+    min-width: 500px;
+    width: 40%;
     border: 1px solid var(--border-color);
     border-top: unset;
     border-bottom: unset;
@@ -177,5 +204,37 @@ input[type='search'] {
 
 .page-head {
     background: var(--head);
+}
+
+.page-head, .page-subhead {
     padding: 10px 8px;
+}
+
+#args .argument_listitem, .page-bottom {
+    padding: 8px 8px;
+}
+
+#args .argument_listitem {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.page-bottom #exec {
+    height: 40px;
+    width: 100%;
+}
+
+.argument_listitem .argument_about {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+#to_up {
+    width: 40px;
+    top: 40px;
+    position: fixed;
+    height: calc(100vh - 40px);
+    cursor: s-resize;
 }

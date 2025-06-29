@@ -13,10 +13,20 @@ export const app = new class {
                 <a data-tab="content" class="tab" href="#content">Content</a>
                 <a data-tab="exec" class="tab" href="#exec">Executables</a>
             </nav>
+            <div id="to_up"></div>
             <div id="container">
                 <div id="page"></div>
+                <div id="side"></div>
             </div>
         `)
+
+        u('#app').on('click', '#to_up', (e) => {
+            scrollTo(0, 0)
+        })
+    }
+
+    setSideContent(content = '') {
+        u('#app #side').html(content)
     }
 
     setContent(content = '') {

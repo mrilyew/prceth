@@ -4,10 +4,10 @@ descriptions["abstract_collection_definition"] = {
     "rus": "Создаёт ContentUnit с целью коллекции",
 }
 descriptions["abstract_collection_name_param_description"] = {
-    "eng": "Name of new collection",
+    "eng": "Name of the new collection",
     "rus": "Название создаваемой коллекции",
 }
 descriptions["abstract_collection_description_param_description"] = {
-    "eng": "Description of new collection",
+    "eng": "Description of the new collection",
     "rus": "Описание новой коллекции"
 }

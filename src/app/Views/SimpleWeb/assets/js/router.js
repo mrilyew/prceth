@@ -31,6 +31,7 @@ export const router = new class {
         let controller = route.class
 
         app.navigation.setTab(_hash)
+        app.setSideContent('')
         controller.loader()
         await controller[route.method]()
     }

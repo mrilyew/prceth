@@ -23,6 +23,7 @@ class Collection(Representation):
             }
         })
         params["description"] = StringArgument({
+            'is_long': True,
             'docs': {
                 "definition": 'abstract_collection_description_param_description',
             },

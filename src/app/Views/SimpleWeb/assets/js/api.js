@@ -16,6 +16,24 @@ export const api = new class {
 
         return await data.json()
     }
+
+    async executable(type, name, args) {
+        switch(type) {
+            case "representation":
+                args['i'] = "Executables.RunRepresentation"
+                args['representation'] = name
+                break
+            case "act":
+                args['i'] = name
+                break
+            case "extractor":
+                args['i'] = "Executables.RunExtractor"
+                args['extractor'] = name
+                break
+        }
+
+        return await this.act(args)
+    }
 }
 
 export default api

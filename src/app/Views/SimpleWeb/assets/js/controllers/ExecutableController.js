@@ -1,7 +1,9 @@
 import BaseController from "./BaseController.js"
 import router from "../router.js"
 import app from "../main.js"
+import api from "../api.js"
 import Executable from "../models/Executable.js"
+import subparams from "../utils/subparams.js"
 import escapeHtml from "../utils/utils.js"
 
 const upper_categories = ["act", "extractor", "representation"]
@@ -44,7 +46,7 @@ export class ExecutableController extends BaseController {
         __drawList(_ap.find("#container_items"), executables_list)
 
         app.setContent(_ap.html())
-
+        u('#container_search #search_bar').nodes[0].focus()
         u('#container_search').on('input', '#search_bar', (e) => {
             const query = e.target.value
             const itms = executables_list.filter(el => el.data.class_name.toLowerCase().includes(query))
@@ -66,10 +68,13 @@ export class ExecutableController extends BaseController {
                 <div class="page-head">
                     <b>${escapeHtml(full_name)}</b>
                 </div>
-                <div>
+                <div class="page-subhead">
                     <span>${escapeHtml(extr.docs.definition ?? "")}</span>
                 </div>
-                <div class="args"></div>
+                <div id="args"></div>
+                <div class="page-bottom">
+                    <input id="exec" type="button" value="Execute">
+                </div>
             </div>
         `)
 
@@ -78,9 +83,41 @@ export class ExecutableController extends BaseController {
                 return
             }
 
-            _ap.find(".args").append(arg.render())
+            _ap.find("#args").append(arg.render())
         })
+
         app.setContent(_ap.html())
+
+        function collectArguments(nodes) {
+            const vals = {}
+            nodes.forEach(nd => {
+                const val_node = nd.querySelector('.argument_value')
+                const __type = val_node.dataset.type
+                vals[nd.dataset.name] = subparams[__type].recieveValue(nd)
+            })
+
+            return vals
+        }
+
+        u(".page-bottom").on('click', '#exec', async (e) => {
+            scrollTo(0, 0)
+
+            const itms = u('#args .argument_listitem')
+            const args = collectArguments(itms.nodes)
+
+            u("#side").html("")
+
+            const res = await api.executable(type.slice(0, type.length - 1), `${category}.${name}`, args)
+            const jsonViewer = document.createElement("andypf-json-viewer")
+            jsonViewer.data = res
+            jsonViewer.expanded = true
+            jsonViewer.indent = 4
+            jsonViewer.expanded = 4
+            jsonViewer.showDataTypes = false
+            jsonViewer.showSize = false
+
+            u("#side").append(jsonViewer)
+        })
     }
 }
 

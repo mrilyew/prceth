@@ -14,7 +14,8 @@ class Saveable:
             await asyncio.gather(*__tasks, return_exceptions=False)
         else:
             try:
-                await method_name(item, __list)
+                for item in items:
+                    await method_name(item, __list)
             except Exception as _exc:
                 logger.logException(_exc, section=logger.SECTION_EXECUTABLES)
 
