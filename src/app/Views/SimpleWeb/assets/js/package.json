@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@andypf/json-viewer": "^2.1.10",
-    "umbrellajs": "^3.3.3"
-  }
-}
