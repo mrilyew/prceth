@@ -1,4 +1,4 @@
-from app.Views.SimpleWeb import fl_app
+from app.Views.Web import fl_app
 from app.App import config
 
 if __name__ == '__main__':
