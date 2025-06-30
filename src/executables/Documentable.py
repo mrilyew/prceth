@@ -4,12 +4,8 @@ from resources.Descriptions import descriptions
 
 class Documentable():
     docs = {
-        "name": {
-            "eng": "Not defined name"
-        },
-        "definition": {
-            "eng": "Not defined description"
-        }
+        "name": descriptions.get("no_name_defined"),
+        "definition": descriptions.get("no_description_defined"),
     }
 
     @classmethod

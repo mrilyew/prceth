@@ -15,6 +15,8 @@ class Argument:
 
         if ps.get('sensitive') == True:
             ps['default'] = None
+        else:
+            ps['default'] = self.default()
 
         return ps
 
@@ -29,7 +31,14 @@ class Argument:
         if __docs == None:
             return {}
 
+        name = __docs.get('name')
         definition = __docs.get('definition')
+        if name != None:
+            if type(name) == str:
+                name = descriptions.get(name)
+
+            __fnl['name'] = resolve_lang(name, __lang_code)
+
         if definition != None:
             if type(definition) == str:
                 definition = descriptions.get(definition)

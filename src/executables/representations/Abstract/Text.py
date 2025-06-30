@@ -10,6 +10,7 @@ class Text(Representation):
         params = {}
         params["text"] = StringArgument({
             "default": None,
+            "is_long": True,
         })
 
         return params

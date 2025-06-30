@@ -20,6 +20,9 @@ class Config():
         self.__load_path(self.path)
         self.__pass_declarable()
 
+        if file_name == "config.json":
+            consts['ui.lang'] = self.get("ui.lang")
+
     def __pass_declarable(self):
         from declarable.DeclarableArgs import DeclarableArgs
 

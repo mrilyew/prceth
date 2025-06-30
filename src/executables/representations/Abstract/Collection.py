@@ -16,6 +16,7 @@ class Collection(Representation):
         params = {}
         params["name"] = StringArgument({
             'docs': {
+                "name": 'abstract_collection_name_param_title',
                 "definition": 'abstract_collection_name_param_description',
             },
             'assertion': {
@@ -25,6 +26,7 @@ class Collection(Representation):
         params["description"] = StringArgument({
             'is_long': True,
             'docs': {
+                "name": 'abstract_collection_description_param_title',
                 "definition": 'abstract_collection_description_param_description',
             },
         })
