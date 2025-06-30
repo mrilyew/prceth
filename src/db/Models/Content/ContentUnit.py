@@ -1,6 +1,6 @@
 import os, json, datetime
 from utils.MainUtils import dump_json, parse_json
-from peewee import TextField, CharField, BooleanField, TimestampField
+from peewee import TextField, CharField, BooleanField, FloatField
 from db.Models.Content.ContentModel import BaseModel
 from functools import cached_property
 
@@ -34,9 +34,9 @@ class ContentUnit(BaseModel):
     # author = TextField(null=True,default=consts.get('pc_fullname')) под вопросом
 
     # Dates
-    declared_created_at = TimestampField(default=datetime.datetime.now)
-    created_at = TimestampField(default=datetime.datetime.now)
-    edited_at = TimestampField(default=None,null=True)
+    declared_created_at = FloatField()
+    created_at = FloatField()
+    edited_at = FloatField(default=None,null=True)
 
     # Booleans
     is_collection = BooleanField(index=True,default=0)
@@ -116,6 +116,11 @@ class ContentUnit(BaseModel):
             json_file.write(json.dumps(self.api_structure(sensitive=True), indent=2, ensure_ascii=False))
 
     def save(self, **kwargs):
+        self.created_at = float(datetime.datetime.now().timestamp())
+
+        if getattr(self, "declared_created_at", None) == None:
+            self.declared_created_at = float(datetime.datetime.now().timestamp())
+
         super().save(**kwargs)
 
         if self.link_queue != None:
