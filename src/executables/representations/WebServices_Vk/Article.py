@@ -5,8 +5,7 @@ from db.DbInsert import db_insert
 class Article(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_string = i.get('ids')
-            items_ids = items_ids_string.split(",")
+            items_ids = i.get('ids')
 
             response = await self.vkapi.call("articles.getByLink", {"links": (",".join(items_ids)), "extended": 1})
 

@@ -1,6 +1,6 @@
 from app.App import env
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument
+from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument, CsvArgument
 from utils.MainUtils import list_conversation
 from submodules.Uncanon.WebServices.VkApi import VkApi
 from resources.Exceptions import AbstractClassException
@@ -89,7 +89,7 @@ class BaseVkItemId(BaseVk):
     @classmethod
     def declare(cls):
         params = {}
-        params["ids"] = StringArgument({})
+        params["ids"] = CsvArgument({})
         params["object"] = ObjectArgument({
             "hidden": True,
         })

@@ -14,7 +14,7 @@ DefaultSettings = {
         "default": "127.0.0.1",
     }),
     "web.port": IntArgument({
-        "default": 7782,
+        "default": 26666,
     }),
     "web.max_speed": IntArgument({
         "default": 2000, # kbs

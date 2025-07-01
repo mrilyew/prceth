@@ -5,8 +5,7 @@ class Comment(Post):
 
     class Extractor(Post.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('ids')
-            items_ids = items_ids_str.split(",")
+            items_ids = i.get('ids')
             final_response = {
                 'items': [],
                 'profiles': [],

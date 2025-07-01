@@ -6,8 +6,7 @@ from utils.MainUtils import proc_strtr
 class Note(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            item_id = i.get('ids')
-            item_ids = item_id.split(',')
+            item_ids = i.get('ids')
             final_response = {
                 'items': []
             }

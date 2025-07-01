@@ -1,4 +1,5 @@
 import secrets, os, sys, random, json, mimetypes
+from resources.Descriptions import descriptions
 from contextlib import contextmanager
 from resources.Consts import consts
 from collections import defaultdict
@@ -208,3 +209,12 @@ def resolve_lang(translation_dict: dict, lang_code: str):
         return None
 
     return translation_dict.get(lang_code)
+
+def resolve_doc(i):
+    __lang_code = consts.get('ui.lang', 'eng')
+
+    out = i
+    if type(i) == str:
+        out = descriptions.get(i)
+
+    return resolve_lang(out, __lang_code)

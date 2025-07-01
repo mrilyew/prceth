@@ -33,15 +33,14 @@ class Photo(BaseVkItemId):
             "photo_sizes": 1,
         })
 
-        return await VkPhoto.extract({
+        return await Photo.extract({
             'object': photos,
             'download': download
         })
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('ids')
-            items_ids = items_ids_str.split(",")
+            items_ids = i.get('ids')
 
             response = await self.vkapi.call("photos.getById", {"photos": (",".join(items_ids)), "photo_sizes": 1, "extended": 1})
 

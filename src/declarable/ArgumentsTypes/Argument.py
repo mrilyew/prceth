@@ -1,6 +1,4 @@
-from resources.Consts import consts
-from resources.Descriptions import descriptions
-from utils.MainUtils import resolve_lang
+from utils.MainUtils import resolve_doc
 
 class Argument:
     def __init__(self, data):
@@ -24,7 +22,6 @@ class Argument:
         self.input_value = val
 
     def manual(self):
-        __lang_code = consts.get('ui.lang', 'eng')
         __fnl  = {}
         __docs = self.data.get('docs')
 
@@ -34,25 +31,17 @@ class Argument:
         name = __docs.get('name')
         definition = __docs.get('definition')
         if name != None:
-            if type(name) == str:
-                name = descriptions.get(name)
-
-            __fnl['name'] = resolve_lang(name, __lang_code)
+            __fnl['name'] = resolve_doc(name)
 
         if definition != None:
-            if type(definition) == str:
-                definition = descriptions.get(definition)
-
-            __fnl['definition'] = resolve_lang(definition, __lang_code)
+            __fnl['definition'] = resolve_doc(definition)
 
         if __docs.get('values') != None:
             __fnl['values'] = {}
             for index, name in enumerate(__docs.get('values')):
                 __val = __docs.get('values').get(name)
-                if type(__val) == str:
-                    __val = descriptions.get(__val)
 
-                __fnl['values'][name] = resolve_lang(__val, __lang_code)
+                __fnl['values'][name] = resolve_doc(__val)
 
         return __fnl
 

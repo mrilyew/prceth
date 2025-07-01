@@ -24,8 +24,7 @@ class Album(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            item_id_str = i.get('ids')
-            items_ids = item_id_str.split(",")
+            items_ids = i.get('ids')
 
             owner_id = None
             album_ids = []

@@ -59,7 +59,6 @@ class Identity(BaseVkItemId):
 
         async def __response(self, i = {}):
             ids = i.get('ids')
-            identities_ids = ids.split(",")
 
             user_ids, group_ids, users, groups = [[], [], [], []]
             __users_response, __groups_response = [None, None]

@@ -27,8 +27,7 @@ class Video(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('ids')
-            items_ids = items_ids_str.split(",")
+            items_ids = i.get('ids')
 
             response = await self.vkapi.call("video.get", {"videos": (",".join(items_ids)), "extended": 1})
 

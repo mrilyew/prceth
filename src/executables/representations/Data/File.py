@@ -8,14 +8,44 @@ import os, mimetypes
 
 class File(Representation):
     category = "Data"
+    docs = {
+        "definition": "data_file_definition",
+    }
+    executable_cfg = {
+        "variants": [
+            {
+                "name": "variant_by_path",
+                "list": ["path", "type"],
+            },
+            {
+                "name": "variant_by_text",
+                "list": ["text", "extension"],
+            },
+            {
+                "name": "variant_by_url",
+                "list": ["url"],
+            }
+        ]
+    }
 
     @classmethod
     def declare(cls):
         params = {}
         params["path"] = StringArgument({
+            "docs": {
+                "name": 'data_file_path',
+            },
             "default": None,
         })
         params["type"] = LimitedArgument({
+            "docs": {
+                "name": "data_file_type",
+                "values": {
+                    "copy": "data_file_type_copy",
+                    "move": "data_file_type_move",
+                    "link": "data_file_type_link",
+                }
+            },
             "values": ["copy", "move", "link"],
             "default": "copy",
             "assertion": {
@@ -25,9 +55,16 @@ class File(Representation):
             }
         })
         params["text"] = StringArgument({
+            "docs": {
+                "name": "data_file_text"
+            },
             "default": None,
+            "is_long": True,
         })
         params["extension"] = StringArgument({
+            "docs": {
+                "name": "data_file_extension"
+            },
             "default": "txt",
             "maxlength": 6,
             "assertion": {
@@ -37,6 +74,9 @@ class File(Representation):
             }
         })
         params["url"] = StringArgument({
+            "docs": {
+                "name": "data_file_url"
+            },
             "default": None,
         })
 

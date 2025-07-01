@@ -1,17 +1,13 @@
-from utils.MainUtils import resolve_lang
-from resources.Consts import consts
-from resources.Descriptions import descriptions
+from utils.MainUtils import resolve_doc
 
 class Documentable():
     docs = {
-        "name": descriptions.get("no_name_defined"),
-        "definition": descriptions.get("no_description_defined"),
+        "name": "no_name_defined",
+        "definition": "no_description_defined",
     }
 
     @classmethod
     def describe(cls):
-        __lang_code = consts.get('ui.lang', 'eng')
-
         class_full_name = cls.__module__
         class_full_name_spl = class_full_name.split('.')
         section = class_full_name_spl[-3]
@@ -37,16 +33,21 @@ class Documentable():
         if docs != None:
             __name = docs.get('name')
             __definition = docs.get('definition')
-            if __name != None:
-                if type(__name) == str:
-                    __name = descriptions.get(__name)
-            if __definition != None:
-                if type(__definition) == str:
-                    __definition = descriptions.get(__definition)
 
             ts["docs"] = {
-                "name": resolve_lang(__name, __lang_code),
-                "definition": resolve_lang(__definition, __lang_code)
+                "name": resolve_doc(__name),
+                "definition": resolve_doc(__definition)
             }
+
+        if cls.executable_cfg != None:
+            variants = cls.executable_cfg.get('variants')
+
+            if variants != None:
+                ts['variants'] = []
+                for variant in variants:
+                    _var = variant.copy()
+                    _var['name'] = resolve_doc(variant.get('name'))
+
+                    ts['variants'].append(_var)
 
         return ts
