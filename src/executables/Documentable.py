@@ -2,7 +2,6 @@ from utils.MainUtils import resolve_doc
 
 class Documentable():
     docs = {
-        "name": "no_name_defined",
         "definition": "no_description_defined",
     }
 

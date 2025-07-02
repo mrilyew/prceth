@@ -218,3 +218,12 @@ def resolve_doc(i):
         out = descriptions.get(i)
 
     return resolve_lang(out, __lang_code)
+
+def is_valid_json(i):
+    try:
+        json.loads(i)
+        return True
+    except json.JSONDecodeError:
+        return False
+    except TypeError:
+        return False

@@ -21,9 +21,6 @@ class RunExtractor(BaseAct):
         })
         params["append_ids"] = CsvArgument({
             'default': [],
-            'assertion': {
-                'not_null': True
-            }
         })
 
         return params

@@ -39,6 +39,10 @@ descriptions["abstract_collection_description_param_description"] = {
     "eng": "Description of the new collection",
     "rus": "Описание новой коллекции"
 }
+descriptions["data_file_name_of"] = {
+    "eng": "File",
+    "rus": "Файл"
+}
 descriptions["data_file_definition"] = {
     "eng": "Creates empty file",
     "rus": "Создаёт пустой или не совсем файл",

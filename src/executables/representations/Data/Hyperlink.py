@@ -1,5 +1,5 @@
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument
+from declarable.ArgumentsTypes import CsvArgument
 from db.DbInsert import db_insert
 
 class Hyperlink(Representation):
@@ -8,7 +8,7 @@ class Hyperlink(Representation):
     @classmethod
     def declare(cls):
         params = {}
-        params["url"] = StringArgument({
+        params["url"] = CsvArgument({
             "default": None,
         })
 
@@ -20,13 +20,17 @@ class Hyperlink(Representation):
                 return 'extractByUrl'
 
         async def extractByUrl(self, i = {}):
-            url = i.get('url')
+            urls = i.get('url')
+            outs = []
 
-            # TODO add opengraph parse
-            out = db_insert.contentFromJson({
-                'content': {
-                    "url": str(url),
-                },
-            })
+            for url in urls:
+                # TODO add opengraph parse
+                out = db_insert.contentFromJson({
+                    'content': {
+                        "url": str(url),
+                    },
+                })
 
-            return [out]
+                outs.append(out)
+
+            return outs

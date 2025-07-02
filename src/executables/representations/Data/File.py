@@ -3,13 +3,14 @@ from submodules.Files.FileManager import file_manager
 from pathlib import Path
 from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr, name_from_url
-from declarable.ArgumentsTypes import StringArgument, LimitedArgument
+from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument
 import os, mimetypes
 
 class File(Representation):
     category = "Data"
     docs = {
         "definition": "data_file_definition",
+        "name": "data_file_name_of",
     }
     executable_cfg = {
         "variants": [
@@ -73,7 +74,7 @@ class File(Representation):
                 ]
             }
         })
-        params["url"] = StringArgument({
+        params["url"] = CsvArgument({
             "docs": {
                 "name": "data_file_url"
             },
@@ -164,50 +165,54 @@ class File(Representation):
             from utils.WebUtils import is_generated_ext
             from submodules.Web.DownloadManager import download_manager
 
-            url = i.get('url')
-            name, ext = name_from_url(url)
+            urls = i.get('url')
+            out  = []
 
-            su = db_insert.storageUnit()
-            tmp_dir = su.temp_dir
-            tmp_save_path = Path(os.path.join(tmp_dir, "download.tmp"))
-            mime_ext = None
-            result_name = '.'.join([name, ext])
-            result_path = Path(os.path.join(tmp_dir, result_name))
+            for url in urls:
+                name, ext = name_from_url(url)
 
-            # Making HTTP request
+                su = db_insert.storageUnit()
+                tmp_dir = su.temp_dir
+                tmp_save_path = Path(os.path.join(tmp_dir, "download.tmp"))
+                mime_ext = None
+                result_name = '.'.join([name, ext])
+                result_path = Path(os.path.join(tmp_dir, result_name))
 
-            url_request = await download_manager.addDownload(end = url,dir = tmp_save_path)
-            content_type_header = url_request.headers.get('Content-Type', '').lower()
+                # Making HTTP request
 
-            if ext == '' or is_generated_ext(ext):
-                mime_ext = mimetypes.guess_extension(content_type_header)
-                if mime_ext:
-                    ext = mime_ext[1:]
-                else:
-                    ext = 'html'
+                url_request = await download_manager.addDownload(end = url,dir = tmp_save_path)
+                content_type_header = url_request.headers.get('Content-Type', '').lower()
 
-            tmp_save_path.rename(os.path.join(tmp_dir, result_path))
-            file_size = result_path.stat().st_size
+                if ext == '' or is_generated_ext(ext):
+                    mime_ext = mimetypes.guess_extension(content_type_header)
+                    if mime_ext:
+                        ext = mime_ext[1:]
+                    else:
+                        ext = 'html'
 
-            output_metadata = {
-                "mime": str(mime_ext),
-            }
+                tmp_save_path.rename(os.path.join(tmp_dir, result_path))
+                file_size = result_path.stat().st_size
 
-            su.write_data({
-                "extension": ext,
-                "upload_name": result_name,
-                "filesize": file_size,
-            })
-            out = db_insert.contentFromJson({
-                "links": [su],
-                "source": {
-                    'type': 'url',
-                    'content': url
-                },
-                "content": output_metadata,
-            })
+                output_metadata = {
+                    "mime": str(mime_ext),
+                }
 
-            return [out]
+                su.write_data({
+                    "extension": ext,
+                    "upload_name": result_name,
+                    "filesize": file_size,
+                })
+                out.append(db_insert.contentFromJson({
+                    "links": [su],
+                    "link_main": 0,
+                    "source": {
+                        'type': 'url',
+                        'content': url
+                    },
+                    "content": output_metadata,
+                }))
+
+            return out
 
     async def metadata(self, i = {}):
         return []
