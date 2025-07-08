@@ -19,7 +19,10 @@ class RunExtractor(BaseAct):
                 "not_null": True
             }
         })
-        params["append_ids"] = CsvArgument({
+        params["link"] = CsvArgument({
+            "docs": {
+                "name": 'run_representation_link_param_name',
+            },
             'default': [],
         })
 
@@ -27,7 +30,7 @@ class RunExtractor(BaseAct):
 
     async def execute(self, i = {}):
         extractor_name = i.get('extractor') # Extractor that will be using for export
-        append_ids = i.get('append_ids')
+        append_ids = i.get('link')
         extractor_class = (ExtractorsRepository()).getByName(extractor_name)
         results = []
         out = []

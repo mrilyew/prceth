@@ -20,6 +20,10 @@ class RunRepresentation(BaseAct):
             }
         })
         params["link"] = CsvArgument({
+            "base": "ContentUnit",
+            "docs": {
+                "name": 'run_representation_link_param_name',
+            },
             "default": []
         })
 

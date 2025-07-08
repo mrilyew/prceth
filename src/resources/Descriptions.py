@@ -79,3 +79,7 @@ descriptions["data_file_type_link"] = {
     "eng": "Link",
     "rus": "Ссылка",
 }
+descriptions["run_representation_link_param_name"] = {
+    "eng": "Link after execution",
+    "rus": "Привязать после исполнения",
+}
