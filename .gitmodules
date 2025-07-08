@@ -1,3 +1,4 @@
 [submodule "src/app/Views/Web"]
 	path = src/app/Views/Web
 	url = https://github.com/mrilyew/prceth-web
+	branch = master
