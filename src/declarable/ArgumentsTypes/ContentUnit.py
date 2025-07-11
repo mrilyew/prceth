@@ -7,7 +7,5 @@ class ContentUnitArgument(Argument):
 
         if self.input_value != None:
             item = ContentUnit.ids(self.input_value)
-            if item == None:
-                return None
 
             return item

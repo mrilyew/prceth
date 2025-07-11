@@ -1,5 +1,3 @@
-from utils.MainUtils import proc_strtr, parse_json
-
 class DeclarableArgs():
     '''
     Class thats represents declarative arguments.\n
@@ -24,11 +22,14 @@ class DeclarableArgs():
 
         "ignore" — Default value will be set on exception
 
-        is_free_settings: Values from passed args will be set
+
+        is_free_settings: there will be passed every arg if it missing in compare dict
+
+        rude_substitution: this will be just same dict on return
         '''
         self.comparing = comparing_options
         self.args = passed_options
-        self.exc_type = exc_type
+        self.impact = exc_type
         self.is_free_settings = is_free_settings
         self.substitution = rude_substitution
 
@@ -36,13 +37,14 @@ class DeclarableArgs():
         return self.comparing.get(param_name)
 
     def dict(self):
-        __dict = {}
+        output = {}
 
         if self.substitution == True:
+            # probaly just return the same dict?? lol
             for index, param_name in enumerate(self.args):
-                __dict[param_name] = self.args.get(param_name)
+                output[param_name] = self.args.get(param_name)
 
-            return __dict
+            return output
 
         __enumeration = self.comparing
         if self.is_free_settings:
@@ -52,26 +54,31 @@ class DeclarableArgs():
         for index, param_name in enumerate(__enumeration):
             param_object = self.recieveObjectByName(param_name)
             if param_object == None and self.is_free_settings == True:
-                __dict[param_name] = self.args.get(param_name)
+                output[param_name] = self.args.get(param_name)
                 continue
 
             param_object.passValue(self.args.get(param_name))
             param_object.data['name'] = param_name
+            is_unexist = param_object.data.get('save_none_values', False)
+            value = None
 
             try:
-                __unexist = param_object.data.get('save_none_values', False)
-                __value = param_object.val()
+                value = param_object.val()
+            except:
+                value = param_object.default()
 
-                param_object.assertions(__value)
+            try:
+                param_object.assertions(value)
+                param_object.special_assert(value)
 
-                if __value == None and __unexist == False:
+                if value == None and is_unexist == False:
                     continue
 
-                __dict[param_name] = __value
+                output[param_name] = value
             except Exception as _y:
-                if self.exc_type == "assert":
+                if self.impact == "assert":
                     raise _y
                 else:
-                    __dict[param_name] = param_object.default()
+                    output[param_name] = param_object.default()
 
-        return __dict
+        return output

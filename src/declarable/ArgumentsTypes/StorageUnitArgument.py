@@ -7,7 +7,5 @@ class StorageUnitArgument(Argument):
 
         if self.input_value != None:
             item = StorageUnit.ids(self.input_value)
-            if item == None:
-                return None
 
             return item

@@ -78,6 +78,7 @@ class File(Representation):
             "docs": {
                 "name": "data_file_url"
             },
+            "argument_type": "StringArgument",
             "default": None,
         })
 

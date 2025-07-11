@@ -26,3 +26,6 @@ class CsvArgument(Argument):
             return _def.split(",")
         else:
             return _def
+
+    def get_list_argument_type(self):
+        return self.data.get('argument_type')

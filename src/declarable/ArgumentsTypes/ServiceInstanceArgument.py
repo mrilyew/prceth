@@ -6,7 +6,5 @@ class ServiceInstanceArgument(Argument):
 
         if self.input_value != None:
             item = ServiceInstance.get(self.input_value)
-            if item == None:
-                return None
 
             return item
