@@ -19,3 +19,4 @@ charset-normalizer==3.3.2
 hachoir==3.3.0
 idna==3.10
 yt-dlp
+snowflake-id

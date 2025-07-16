@@ -1,4 +1,5 @@
 from executables.acts import BaseAct
+from db.Models.Content.ContentUnit import ContentUnit
 from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument
 from db.LinkManager import link_manager
@@ -38,7 +39,7 @@ class RunRepresentation(BaseAct):
 
         __ents = await representationClass.extract(i)
         __all_items = []
-        __link_to = db_find.fromStringDifferentTypes(links)
+        __link_to = ContentUnit.ids(links)
 
         for item in __ents:
             item.representation = representationClass.full_name()

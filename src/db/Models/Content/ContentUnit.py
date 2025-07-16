@@ -16,7 +16,7 @@ class ContentUnit(BaseModel):
     short_name = 'cu'
 
     # Identification
-    uuid = CharField(max_length=50, unique=True, primary_key=True) # UUID
+    uuid = CharField(max_length=50, unique=True, primary_key=True)
 
     # Data
     content = TextField(null=True, default=None) # JSON data

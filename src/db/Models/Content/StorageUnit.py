@@ -1,7 +1,7 @@
 import os, json
 from app.App import logger, storage
 from pathlib import Path
-from peewee import TextField, BigIntegerField, UUIDField, CharField
+from peewee import TextField, BigIntegerField, BooleanField, CharField
 from utils.MainUtils import extract_metadata_to_dict, get_random_hash
 from db.Models.Content.ContentModel import BaseModel
 from submodules.Files.FileManager import file_manager

@@ -1,6 +1,6 @@
 from peewee import Model
+from snowflake import SnowflakeGenerator
 from app.App import logger
-import uuid
 
 class BaseModel(Model):
     @classmethod
@@ -35,7 +35,8 @@ class BaseModel(Model):
         return self.uuid != None
 
     def save(self, **kwargs):
-        self.uuid = str(uuid.uuid4())
+        gen = SnowflakeGenerator(0)
+        self.uuid = str(next(gen))
 
         super().save(**kwargs)
 
