@@ -21,6 +21,7 @@ class Logger():
     SECTION_SAVEABLE = 'Saveable'
     SECTION_EXTRACTORS = 'Extractors'
     SECTION_ACTS = 'Acts'
+    SECTION_WEB = "Web"
 
     def __init__(self, config, storage, keep: bool = False):
         '''

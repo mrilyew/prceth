@@ -1,18 +1,20 @@
 from db.Models.Content.ContentUnit import ContentUnit
 from db.Models.Content.StorageUnit import StorageUnit
 from utils.MainUtils import dump_json
+import json
 
 class DbInsert():
     @staticmethod
-    def contentFromJson(json_input):
-        out = ContentUnit()
-
+    def contentFromJson(json_input, representation_class = None, thumbnail_params = {})->ContentUnit:
         display_name = json_input.get("display_name", json_input.get('name'))
         description = json_input.get('description')
         source = json_input.get('source')
         extractor_name = json_input.get("extractor")
-        representation_name = json_input.get("representation")
         declared_created_at = json_input.get("declared_created_at")
+        representation_class_name = None
+
+        if representation_class != None:
+            representation_class_name = representation_class.full_name()
 
         is_unlisted = json_input.get("unlisted", False)
         is_collection = json_input.get("is_collection", False)
@@ -21,16 +23,16 @@ class DbInsert():
 
         content = json_input.get("content")
         links_list = json_input.get("links")
-        links_main = json_input.get("links_main")
+        link_main = json_input.get("link_main") # index of main link
+
+        # Making out
+        out = ContentUnit()
 
         if content != None:
             out.content = dump_json(content)
 
-        if is_unlisted == True:
-            out.unlisted = 1
-
         out.extractor = extractor_name
-        out.representation = representation_name
+        out.representation = representation_class_name
 
         if display_name != None:
             out.display_name = display_name
@@ -52,28 +54,29 @@ class DbInsert():
         if is_collection == True:
             out.is_collection = True
 
-        '''
+        if is_unlisted == True:
+            out.unlisted = 1
+
+        # we can't link items be4 getting its id
+        if links_list != None:
+            for item in links_list:
+                out.link_queue.append(item)
+
+            if link_main != None:
+                _l = links_list[int(link_main)]
+                out.storage_unit = _l.uuid
+
+        # making thumbnail
         if is_make_thumbnail == True:
-            thmb = out.make_thumbnail({}, json_input.get('representation_class', None))
-            if thmb != None:
-                fnl = []
-                for t in thmb:
-                    fnl.append(t.data)
+            if getattr(representation_class, "Thumbnail", None) != None:
+                thumb_class = representation_class.Thumbnail(representation_class)
+                thumb_out = thumb_class.create(out, thumbnail_params)
 
-                out.thumbnail = dump_json(fnl)
-        '''
-
-        if links_list != None and links_main != None:
-            _l = links_list[int(links_main)]
-            out.storage_unit = _l.uuid
+                out.set_thumbnail(thumb_out)
 
         # Not saving cuz it may be sifted in future
         if is_save == True:
             out.save(force_insert=True)
-
-        if links_list != None:
-            for item in links_list:
-                out.link_queue.append(item)
 
         return out
 

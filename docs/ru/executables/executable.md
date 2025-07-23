@@ -5,7 +5,6 @@ Executable — класс, реализующий паттерн Command и вы
 - [`act`](act.md) — выполняет определённое действие и возвращает результат
 - [`extractor`](extractor.md) — собирает информацию и возвращает в формате [ContentUnit](../db/ContentUnit.md)
 - [`service`](service.md) — выполняется раз в определённое время
-- [`thumbnail`](thumbnail.md) — создаёт превью из файла
 
 #### Методы
 

@@ -18,7 +18,6 @@ class Storage:
         self.__items["binary"] = StorageItem(self.storage_dir, "binary")
         self.__items["logs"] = StorageItem(self.storage_dir, "logs")
         self.__items["dbs"] = StorageItem(self.storage_dir, "dbs")
-        self.__items["thumbnails"] = StorageItem(self.storage_dir, "thumbnails")
 
     def sub(self, storage_name):
         return self.__items.get(storage_name)

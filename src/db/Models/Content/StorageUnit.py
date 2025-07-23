@@ -138,19 +138,6 @@ class StorageUnit(BaseModel):
     async def export(self, dir_path, file_prefix = ""):
         self.save_to_dir(save_dir=dir_path, prefix=file_prefix)
 
-    def make_thumbnail(self, i = {}):
-        from thumbnails.Thumbnail import Thumbnail
-
-        __mime = self.mime
-        __class = Thumbnail.getByMime(__mime)
-        if __class == None:
-            return None
-
-        _cl = __class()
-
-        i.update({'path': self.path()})
-        return _cl.safeExecute(i)
-
     def api_structure(self):
         _ = {
             "id": self.uuid,
@@ -162,7 +149,8 @@ class StorageUnit(BaseModel):
             "dir": str(self.dir_path()),
             "main_file": str(self.path()), 
         }
-        _["relative_path"] = f"{_.get('upper_hash')}/{_.get('hash')}"
+        _["relative_dir_path"] = self.relative_dir_path()
+        _["relative_main_file_path"] = self.relative_main_file_path()
 
         return _
 
@@ -177,7 +165,7 @@ class StorageUnit(BaseModel):
 
         __path = os.path.join(__end_dir, str(self.hash_filename()))
 
-        return __path
+        return Path(__path)
 
     def hash_filename(self):
         if self.temp_dir != None:
@@ -195,3 +183,11 @@ class StorageUnit(BaseModel):
             __dir_path.mkdir(parents=True)
 
         return __dir_path
+
+    def relative_dir_path(self):
+        return f"{str(self.hash[0:2])}/{self.hash}"
+
+    def relative_main_file_path(self):
+        _p = self.relative_dir_path()
+
+        return f"{_p}/{self.hash_filename()}"

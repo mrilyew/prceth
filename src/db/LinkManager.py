@@ -80,6 +80,8 @@ class LinkManager:
 
         if revision == True:
             _links = _links.where(ContentUnitRelation.is_revision == 1)
+        elif revision == False:
+            _links = _links.where(ContentUnitRelation.is_revision == 0)
 
         return _links
 

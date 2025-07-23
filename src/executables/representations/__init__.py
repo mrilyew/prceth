@@ -3,6 +3,7 @@ from executables.RecursiveDeclarable import RecursiveDeclarable
 from executables.Documentable import Documentable
 from executables.Runnable import Runnable
 from executables.Saveable import Saveable
+from executables.thumbnails import ThumbnailMethod
 
 class Representation(RecursiveDeclarable, Runnable, Documentable):
     category = "base"
@@ -72,3 +73,6 @@ class Representation(RecursiveDeclarable, Runnable, Documentable):
             json_data['representation_class'] = self
 
             return json_data
+
+    class Thumbnail(ThumbnailMethod):
+        pass

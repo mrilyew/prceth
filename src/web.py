@@ -1,5 +1,13 @@
-from app.Views.Web import fl_app
-from app.App import config
+from app.Views.Web import make_app
+from tornado.ioloop import IOLoop
+from app.App import config, logger
+from datetime import datetime
+import tornado
+import asyncio
 
-if __name__ == '__main__':
-    fl_app.run(host=config.get("web.host"), port=config.get("web.port"),debug=config.get("web.debug") == True)
+app = make_app()
+app.listen(port=config.get("web.port"),address=config.get("web.host"))
+
+logger.log(message=f"Started at {datetime.now()}", kind=logger.KIND_MESSAGE, section=logger.SECTION_WEB)
+
+IOLoop.current().start()

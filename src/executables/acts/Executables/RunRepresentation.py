@@ -42,7 +42,6 @@ class RunRepresentation(BaseAct):
         __link_to = ContentUnit.ids(links)
 
         for item in __ents:
-            item.representation = representationClass.full_name()
             item.save(force_insert=True)
 
             for _item in __link_to:

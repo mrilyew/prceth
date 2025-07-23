@@ -51,6 +51,7 @@ Todo:
 - [ ] Дополнительные методы репрезентации помимо экстракта
 - [ ] "Универсальная" функция
 - [ ] file_containment (?)
+- [ ] Разделение data.file на mime.image, mime.video, mime.audio
 
 - [ ] Data.Hyperlink
 

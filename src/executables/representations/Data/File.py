@@ -19,10 +19,6 @@ class File(Representation):
                 "list": ["path", "type"],
             },
             {
-                "name": "variant_by_text",
-                "list": ["text", "extension"],
-            },
-            {
                 "name": "variant_by_url",
                 "list": ["url"],
             }
@@ -32,7 +28,8 @@ class File(Representation):
     @classmethod
     def declare(cls):
         params = {}
-        params["path"] = StringArgument({
+        params["path"] = CsvArgument({
+            "argument_type": "StringArgument",
             "docs": {
                 "name": 'data_file_path',
             },
@@ -55,25 +52,6 @@ class File(Representation):
                 ]
             }
         })
-        params["text"] = StringArgument({
-            "docs": {
-                "name": "data_file_text"
-            },
-            "default": None,
-            "is_long": True,
-        })
-        params["extension"] = StringArgument({
-            "docs": {
-                "name": "data_file_extension"
-            },
-            "default": "txt",
-            "maxlength": 6,
-            "assertion": {
-                "only_when": [
-                    {"text": {"operator": "!=", "value": None}}
-                ]
-            }
-        })
         params["url"] = CsvArgument({
             "docs": {
                 "name": "data_file_url"
@@ -93,53 +71,64 @@ class File(Representation):
             elif 'url' in i:
                 return 'extractByUrl'
 
+        async def process_item(self, item):
+            return item
+
         async def extractByPath(self, i = {}):
-            path = Path(i.get('path'))
+            pathes = i.get('path')
+            output = []
 
-            assert path.exists(), 'path does not exists'
-            assert path.is_dir() == False, 'path is dir'
+            for _path in pathes:
+                path = Path(_path)
+                move_type = i.get("type")
+                link = None
 
-            su = db_insert.storageUnit()
-            file_name = path.name
-            move_type = i.get("type")
-            move_to = Path(os.path.join(su.temp_dir, file_name))
-            link = None
+                assert path.exists(), 'path does not exists'
+                assert path.is_dir() == False, 'path is dir'
+                assert move_type in ['copy', 'move', 'link'], 'invalid type'
 
-            assert move_type in ['copy', 'move', 'link'], 'invalid type'
+                su = db_insert.storageUnit()
+                file_name = path.name
+                move_to = Path(os.path.join(su.temp_dir, file_name))
 
-            if move_type == 'copy':
-                file_manager.copyFile(path, move_to)
-            elif move_type == 'move':
-                file_manager.moveFile(path, move_to)
-            elif move_type == 'link':
-                link = path
-                #file_manager.symlinkFile(INPUT_PATH, MOVE_TO)
+                match(move_type):
+                    case "copy":
+                        file_manager.copyFile(path, move_to)
+                        su.set_main_file(move_to)
+                    case "move":
+                        file_manager.moveFile(path, move_to)
+                        su.set_main_file(move_to)
+                    case "link":
+                        su.set_link(link)
+                        #file_manager.symlinkFile(INPUT_PATH, MOVE_TO)
 
-            if link == None:
-                su.set_main_file(move_to)
-            else:
-                su.set_link(link)
+                out = db_insert.contentFromJson({
+                    "source": {
+                        'type': 'path',
+                        'content': str(path),
+                    },
+                    'content': {
+                        "export_as": str(move_type),
+                        "format": str(path.suffix[1:]),
+                    },
+                    'links': [su],
+                    'link_main': 0
+                }, self.outer)
 
-            out = db_insert.contentFromJson({
-                "source": {
-                    'type': 'path',
-                    'content': str(path),
-                },
-                'content': {
-                    "export_as": str(move_type),
-                },
-                'links': [su],
-                'link_main': 0
-            })
+                out = await self.process_item(out)
 
-            return [out]
+                output.append(out)
+
+            return output
 
         async def extractByContent(self, i = {}):
             text = i.get('text')
-            original_name = "blank"
             extension = i.get('extension')
-            full_name = '.'.join([original_name, extension])
+
             su = db_insert.storageUnit()
+
+            original_name = "blank"
+            full_name = '.'.join([original_name, extension])
             path = os.path.join(su.temp_dir, full_name)
 
             file_manager.createFile(path, text)
@@ -153,12 +142,13 @@ class File(Representation):
                 },
                 "content": {
                     "format": str(extension),
-                    "text": proc_strtr(text, 100),
                 },
                 "name": "blank.txt",
                 "links": [su],
                 "link_main": 0
-            })
+            }, self.outer)
+
+            out = await self.process_item(out)
 
             return [out]
 
@@ -167,53 +157,56 @@ class File(Representation):
             from submodules.Web.DownloadManager import download_manager
 
             urls = i.get('url')
-            out  = []
+            outs = []
 
             for url in urls:
                 name, ext = name_from_url(url)
 
                 su = db_insert.storageUnit()
-                tmp_dir = su.temp_dir
-                tmp_save_path = Path(os.path.join(tmp_dir, "download.tmp"))
                 mime_ext = None
+
+                tmp_dir = su.temp_dir
+                tmp_path = Path(os.path.join(tmp_dir, "download.tmp"))
                 result_name = '.'.join([name, ext])
                 result_path = Path(os.path.join(tmp_dir, result_name))
 
                 # Making HTTP request
 
-                url_request = await download_manager.addDownload(end = url,dir = tmp_save_path)
-                content_type_header = url_request.headers.get('Content-Type', '').lower()
+                url_request = await download_manager.addDownload(end = url,dir = tmp_path)
+
+                header_content_type = url_request.headers.get('Content-Type', '').lower()
 
                 if ext == '' or is_generated_ext(ext):
-                    mime_ext = mimetypes.guess_extension(content_type_header)
+                    mime_ext = mimetypes.guess_extension(header_content_type)
                     if mime_ext:
                         ext = mime_ext[1:]
                     else:
                         ext = 'html'
 
-                tmp_save_path.rename(os.path.join(tmp_dir, result_path))
+                tmp_path.rename(os.path.join(tmp_dir, result_path))
                 file_size = result_path.stat().st_size
-
-                output_metadata = {
-                    "mime": str(mime_ext),
-                }
 
                 su.write_data({
                     "extension": ext,
                     "upload_name": result_name,
                     "filesize": file_size,
                 })
-                out.append(db_insert.contentFromJson({
+
+                out = db_insert.contentFromJson({
                     "links": [su],
                     "link_main": 0,
                     "source": {
                         'type': 'url',
                         'content': url
                     },
-                    "content": output_metadata,
-                }))
+                    "content": {},
+                }, self.outer)
 
-            return out
+                out = await self.process_item(out)
+
+                outs.append(out)
+
+            return outs
 
     async def metadata(self, i = {}):
         return []

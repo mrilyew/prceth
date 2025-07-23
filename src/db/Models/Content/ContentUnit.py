@@ -1,8 +1,10 @@
-import os, json, datetime
+from db.Models.Content.ThumbnailState import ThumbnailState
 from utils.MainUtils import dump_json, parse_json
 from peewee import TextField, CharField, BooleanField, FloatField
 from db.Models.Content.ContentModel import BaseModel
+from db.Models.Content.StorageUnit import StorageUnit
 from functools import cached_property
+import os, json, datetime
 
 class ContentUnit(BaseModel):
     '''
@@ -51,7 +53,24 @@ class ContentUnit(BaseModel):
     def json_content(self):
         return parse_json(self.content)
 
-    # Recievation
+    @cached_property
+    def main_su(self):
+        if self.storage_unit != None:
+            su = StorageUnit.ids(self.storage_unit)
+
+            return su
+
+        return None
+
+    @cached_property
+    def linked_list(self):
+        from db.LinkManager import link_manager
+
+        list = link_manager.linksList(self)
+
+        return list
+
+    # Content
 
     def formatted_data(self, recursive = False, recurse_level = 0):
         from db.LinkManager import link_manager
@@ -62,6 +81,30 @@ class ContentUnit(BaseModel):
             loaded_content = link_manager.injectLinksToJsonFromInstance(self, recurse_level)
 
         return loaded_content
+
+    def update_data(self, new_data: dict):
+        cnt = self.json_content
+        cnt.update(new_data)
+
+        self.content = cnt
+
+    def set_thumbnail(self, thumbs):
+        thumbs_out = []
+        for __ in thumbs:
+            thumbs_out.append(__.state())
+
+        self.thumbnail = json.dumps(thumbs_out)
+
+    @cached_property
+    def thumbnail_list(self):
+        _th = self.thumbnail
+        _json = parse_json(self.thumbnail)
+        _list = []
+
+        for thmb in _json:
+            _list.append(ThumbnailState(thmb))
+
+        return _list
 
     def api_structure(self, return_content = True, sensitive=False):
         ret = {}
@@ -76,6 +119,20 @@ class ContentUnit(BaseModel):
 
         if self.source != None:
             ret['source'] = parse_json(self.source)
+
+        if self.thumbnail != None:
+            try:
+                # у меня абсолютно нет идей для названия переменных ((
+                thumbnail_internal_classes_from_db_list = self.thumbnail_list
+                thumbnail_api_response_list = []
+
+                for iterated_thumbnail in thumbnail_internal_classes_from_db_list:
+                    thumbnail_api_response_list.append(iterated_thumbnail.api_structure())
+
+                ret['thumbnail'] = thumbnail_api_response_list
+            except Exception as e:
+                print(e)
+                pass
 
         try:
             # cuz after saving it doesnt converts to datetime we need to use this workaround
@@ -101,15 +158,6 @@ class ContentUnit(BaseModel):
 
     def set_source(self, source_json: dict):
         self.source = dump_json(source_json)
-
-    def make_thumbnail(self, i = {}, representation = None):
-        if representation != None and getattr(representation, 'preview', None) != None:
-            return representation.preview({})
-
-        main_file = self.su
-
-        if main_file != None:
-            return main_file.make_thumbnail(i)
 
     def save_info_to_json(self, dir_path):
         with open(os.path.join(dir_path, f"data_{self.uuid}.json"), "w", encoding='utf8') as json_file:

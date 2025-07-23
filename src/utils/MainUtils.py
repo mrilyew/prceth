@@ -221,8 +221,9 @@ def resolve_doc(i):
 
 def is_valid_json(i):
     try:
-        json.loads(i)
-        return True
+        val = json.loads(i)
+
+        return val != None and type(val) != int
     except json.JSONDecodeError:
         return False
     except TypeError:

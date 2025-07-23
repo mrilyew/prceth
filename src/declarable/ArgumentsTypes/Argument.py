@@ -64,7 +64,7 @@ class Argument:
 
         if __assertion != None:
             if __assertion.get("not_null") == True:
-                assert got_value != None, f"{__name} not passed"
+                assert got_value != None, f"{__name} is null"
 
     def special_assert(self, inp):
         pass
