@@ -16,6 +16,16 @@
 
 Один из способов выполнения репрезентации. Должен возвращать список с ContentUnit.
 
+##### Превью
+
+Репрезентация может подразумевать создание превью.
+
+Способ создания превью должен быть в под классе Thumbnail, наследующим executables.thumbnails >> ThumbnailMethod. Само создание должно происходить в методе `create`, данный метод должен возвращать массив из ThumbnailState.
+
+##### Confirmation
+
+Метод, позволяющий получить заполненные параметры исходя из какого либо значения.
+
 ##### Декларированные параметры
 
 См. [Декларированные параметры](../declarable/declarable_params.md)
@@ -26,10 +36,10 @@
 
 #### Использование
 
-Для выполнения репрезентации используется акт Representations.Extract.
+Для выполнения репрезентации используется скрипт acts.Executables.RunRepresentation.
 
 ```
-python act.py --i Representations.Extract --representation {имя репрезентации}
+python act.py --i Executables.RunRepresentation --representation {имя репрезентации}
 ```
 
 ##### Рекомендации

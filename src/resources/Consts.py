@@ -19,3 +19,6 @@ consts["representations"] = Path(os.path.join(consts.get('cwd'), "representation
 
 # Config
 consts["config.hidden"] = 1
+
+# Args
+consts["forbidden_argument_names"] = ["i", "name", "confirm"]

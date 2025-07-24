@@ -223,7 +223,7 @@ def is_valid_json(i):
     try:
         val = json.loads(i)
 
-        return val != None and type(val) != int
+        return val != None and type(val) != int and type(val) != str
     except json.JSONDecodeError:
         return False
     except TypeError:

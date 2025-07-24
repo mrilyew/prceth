@@ -86,14 +86,14 @@ class ContentUnit(BaseModel):
         cnt = self.json_content
         cnt.update(new_data)
 
-        self.content = cnt
+        self.content = json.dumps(cnt, ensure_ascii=False)
 
     def set_thumbnail(self, thumbs):
         thumbs_out = []
         for __ in thumbs:
             thumbs_out.append(__.state())
 
-        self.thumbnail = json.dumps(thumbs_out)
+        self.thumbnail = json.dumps(thumbs_out, ensure_ascii=False)
 
     @cached_property
     def thumbnail_list(self):

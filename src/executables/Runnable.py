@@ -21,6 +21,10 @@ class Runnable:
         return cls.isAbstract() == False and cls.isHidden() == False
 
     @classmethod
+    def isConfirmable(cls):
+        return getattr(cls, "PreExecute", None)
+
+    @classmethod
     def full_name(cls):
         return cls.category + '.' + cls.__name__
 

@@ -35,7 +35,29 @@ class RunRepresentation(BaseAct):
         links = i.get('link')
 
         representationClass = RepresentationsRepository().getByName(representation_name)
+        assert representationClass != None, "representation not found"
         assert representationClass.canBeExecuted() == True, "representation cannot be executed"
+
+        if representationClass.isConfirmable() != None:
+            args = representationClass.validate(i.copy())
+            is_confirmed = int(i.get("confirm", "1")) == 1
+
+            if is_confirmed == False:
+                pre_execute = representationClass.PreExecute(representationClass)
+                new_args_response = await pre_execute.execute(args)
+                new_args = new_args_response.get("args")
+                new_args_api = {}
+
+                for new_arg in enumerate(new_args):
+                    arg_name = new_arg[1]
+                    arg = new_args.get(arg_name)
+
+                    if arg_name in pre_execute.args_list:
+                        continue
+
+                    new_args_api[arg_name] = arg.out()
+
+                return new_args_api
 
         __ents = await representationClass.extract(i)
         __all_items = []

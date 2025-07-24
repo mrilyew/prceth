@@ -33,3 +33,6 @@ class FatalError(Exception):
 
 class EndOfCycleException(Exception):
     pass
+
+class InvalidArgumentName(Exception):
+    pass

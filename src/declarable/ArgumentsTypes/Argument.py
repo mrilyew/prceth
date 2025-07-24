@@ -1,7 +1,12 @@
+from resources.Exceptions import InvalidArgumentName
 from utils.MainUtils import resolve_doc
+from resources.Consts import consts
 
 class Argument:
     def __init__(self, data):
+        if data.get('name') in consts.get('forbidden_argument_names'):
+            raise InvalidArgumentName(f"{data.get('name')} is invalid argument name")
+
         self.data = data
 
     def out(self):
@@ -47,6 +52,9 @@ class Argument:
 
     def default(self):
         return self.data.get('default', None)
+
+    def get(self, name, default = None):
+        return self.data.get(name, default)
 
     def value(self):
         return self.input_value
