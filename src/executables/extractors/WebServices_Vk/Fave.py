@@ -1,7 +1,7 @@
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.representations.WebServices_Vk import BaseVk
 from declarable.ArgumentsTypes import JsonArgument, IntArgument, LimitedArgument
-from submodules.Uncanon.WebServices.VkApi import VkApi
+from submodules.Trivia.WebServices.VkApi import VkApi
 from resources.Consts import consts
 
 class Fave(BaseIterableExtended):

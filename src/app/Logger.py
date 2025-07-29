@@ -2,12 +2,15 @@ from colorama import init as ColoramaInit
 from resources.Consts import consts
 from pathlib import Path
 from datetime import datetime
+from utils.Hookable import Hookable
 import os, traceback
 
-class Logger():
+class Logger(Hookable):
     '''
     Module for logging of messages and printing them to terminal
     '''
+
+    events = ["log"]
 
     KIND_SUCCESS = 'success'
     KIND_ERROR = 'error'
@@ -29,6 +32,8 @@ class Logger():
 
         keep: On True creates log file for app startup, on False create log file for current day.
         '''
+        super().__init__()
+
         ColoramaInit()
 
         self.per_startup_mode = keep
@@ -40,6 +45,46 @@ class Logger():
         __path = self.logs_storage.dir
         if __path.is_dir() == False:
             __path.mkdir()
+
+        self.add_hook("log", self.__console_hook)
+        self.add_hook("log", self.__write_to_file_hook)
+
+    def __console_hook(self, **kwargs):
+        components = kwargs.get("components")
+
+        section = components.get("section")
+        message = components.get("message")
+        kind = components["kind"]
+        date = datetime.fromtimestamp(components.get("time"))
+
+        write_message = f"{date.strftime("%Y-%m-%d %H:%M:%S")} [{section}] {message}\n"
+        write_message = write_message.replace("\\n", "\n")
+        write_colored_message = ""
+
+        if kind == self.KIND_ERROR:
+            write_colored_message = "\033[91m" + write_message + "\033[0m"
+        elif kind == self.KIND_SUCCESS:
+            write_colored_message = "\033[92m" + write_message + "\033[0m"
+        elif kind == self.KIND_DEPRECATED:
+            write_colored_message = "\033[93m" + write_message + "\033[0m"
+        else:
+            write_colored_message = write_message
+
+        print(write_colored_message, end='')
+
+    def __write_to_file_hook(self, **kwargs):
+        components = kwargs.get("components")
+
+        section = components.get("section")
+        message = components.get("message")
+        kind = components["kind"]
+        date = datetime.fromtimestamp(components.get("time"))
+
+        write_message = f"{date.strftime("%Y-%m-%d %H:%M:%S")} {section} {kind} >>> {message}\n"
+
+        if self.is_out_to_file:
+            self.log_stream.seek(0, os.SEEK_END)
+            self.log_stream.write(write_message)
 
     def __del__(self):
         try:
@@ -66,7 +111,7 @@ class Logger():
 
         self.path = Path(log_path)
 
-        # Checking if file exists. If no, creating.
+        # Checking if file exists, If no creating it
         if self.path.exists() == False:
             __temp_logger_stream = open(self.path, 'w', encoding='utf-8')
             __temp_logger_stream.close()
@@ -87,7 +132,7 @@ class Logger():
 
         kind: Type of message ("success", "message", "deprecated" or "error")
 
-        silent: If True, no message will be displayed in the console
+        silent: If True, message will not be displayed at the console
         '''
 
         for compare_section in self.skip_categories:
@@ -99,35 +144,13 @@ class Logger():
 
         self.__log_file_check()
 
-        now = datetime.now()
-
-        is_console = consts.get("context") == "cli"
-        is_silent = silent == True
-
-        current_time = now.strftime("%Y-%m-%d %H:%M:%S")
-
-        message = message.replace("\n", "\\n")
-        write_message = f"{current_time} [{section}] {message}\n"
-        if is_console == False:
-            write_message = f"{current_time} [{kind}] [{section}] {message}\n"
-
-        if self.is_out_to_file:
-            self.log_stream.seek(0, os.SEEK_END)
-            self.log_stream.write(write_message)
-
-        if is_silent == False:
-            write_message = write_message.replace("\\n", "\n")
-            write_colored_message = ""
-            if kind == self.KIND_ERROR:
-                write_colored_message = "\033[91m" + write_message + "\033[0m"
-            elif kind == self.KIND_SUCCESS:
-                write_colored_message = "\033[92m" + write_message + "\033[0m"
-            elif kind == self.KIND_DEPRECATED:
-                write_colored_message = "\033[93m" + write_message + "\033[0m"
-            else:
-                write_colored_message = write_message
-
-            print(write_colored_message, end='')
+        self.trigger_hooks("log", components={
+            "time": (datetime.now()).timestamp(),
+            "section": section,
+            "message": message,
+            "kind": kind,
+            "silent": silent
+        })
 
     def logException(self, input_exception, section: str = "App", silent: bool = False):
         __exp = traceback.format_exc()

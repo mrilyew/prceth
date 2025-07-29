@@ -1,7 +1,7 @@
 from declarable.ArgumentsTypes import IntArgument, StringArgument, CsvArgument, BooleanArgument
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.representations.WebServices_Vk.Post import Post
-from submodules.Uncanon.WebServices.VkApi import VkApi
+from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Wall(BaseIterableExtended):
     category = 'WebServices_Vk'

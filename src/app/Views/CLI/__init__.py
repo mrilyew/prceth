@@ -58,7 +58,7 @@ class CLI:
         else:
             interval = int(__input_interval)
 
-        logger.log(message=f"Started at {datetime.now()}", kind=logger.KIND_MESSAGE, section=logger.SECTION_SERVICES)
+        logger.log(message=f"Started service", kind=logger.KIND_MESSAGE, section=logger.SECTION_SERVICES)
 
         try:
             while True:

@@ -1,7 +1,7 @@
 from declarable.ArgumentsTypes import IntArgument, CsvArgument, LimitedArgument
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.representations.WebServices_Vk.Comment import Comment
-from submodules.Uncanon.WebServices.VkApi import VkApi
+from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Comments(BaseIterableExtended):
     category = 'WebServices_Vk'

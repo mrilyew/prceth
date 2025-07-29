@@ -1,7 +1,7 @@
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from declarable.ArgumentsTypes import IntArgument, CsvArgument
 from executables.representations.WebServices_Vk.Message import Message
-from submodules.Uncanon.WebServices.VkApi import VkApi
+from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Messages(BaseIterableExtended):
     category = 'WebServices_Vk'

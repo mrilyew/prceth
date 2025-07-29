@@ -2,21 +2,17 @@ from executables.Runnable import Runnable
 from executables.Documentable import Documentable
 from executables.Saveable import Saveable
 from executables.RecursiveDeclarable import RecursiveDeclarable
+from utils.Hookable import Hookable
 from app.App import logger
 
-class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
-    events = {
-        "beforeRun": [],
-        "success": [],
-        "afterSave": [],
-        "error": [],
-    }
-
+class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable, Hookable):
     def __init__(self):
+        super().__init__()
+
         def __onerror(exception):
             logger.logException(exception, section=logger.SECTION_EXECUTABLES)
 
-        self.events.get("error").append(__onerror)
+        self.add_hook("error", __onerror)
         #self.events.get("success").append(__onsuccess)
 
     # Execution
@@ -31,26 +27,3 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable):
         logger.log(message=f"Executed {self.full_name()}",section=logger.SECTION_EXECUTABLES,kind=logger.KIND_MESSAGE)
 
         return await self.execute(_args)
-
-    # Events
-
-    async def onError(self, exception: Exception):
-        for __closure in self.events.get("error"):
-            if __closure != None:
-                continue
-
-            await __closure(exception)
-
-    async def onAfterSave(self, results):
-        for __closure in self.events.get("afterSave"):
-            if __closure != None:
-                continue
-
-            await __closure(results)
-
-    async def onSuccess(self):
-        for __closure in self.events.get("success"):
-            if __closure != None:
-                continue
-
-            await __closure()

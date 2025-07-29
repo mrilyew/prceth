@@ -50,7 +50,7 @@ class RunExtractor(BaseAct):
         def __onerror(exc):
             logger.logException(exc, section=logger.SECTION_EXTRACTORS)
 
-        extractor.events['error'].append(__onerror)
+        extractor.add_hook("error", __onerror)
 
         try:
             await extractor.safeExecute(i)
@@ -59,7 +59,7 @@ class RunExtractor(BaseAct):
         except KeyboardInterrupt:
             pass
         except Exception as __ee:
-            await extractor.onError(__ee)
+            await extractor.trigger_hooks("error", __ee)
 
             raise __ee
 

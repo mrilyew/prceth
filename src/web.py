@@ -8,6 +8,6 @@ import asyncio
 app = make_app()
 app.listen(port=config.get("web.port"),address=config.get("web.host"))
 
-logger.log(message=f"Started at {datetime.now()}", kind=logger.KIND_MESSAGE, section=logger.SECTION_WEB)
+logger.log(message=f"Started tornado server", kind=logger.KIND_MESSAGE, section=logger.SECTION_WEB)
 
 IOLoop.current().start()

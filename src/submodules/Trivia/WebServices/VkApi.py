@@ -27,7 +27,7 @@ class VkApi():
             async with session.get(__end_url) as response:
                 __response = await response.json()
 
-        logger.log(f"Called VK API {__save_end_url}", section="Submodules.Uncanon!VkApi")
+        logger.log(f"Called VK API {__save_end_url}", section="Submodules.Trivia!VkApi")
 
         if __response.get("response") == None:
             raise VkApiException(message=__response.get("error").get("error_msg"))

@@ -1,7 +1,7 @@
 from declarable.ArgumentsTypes import IntArgument, BooleanArgument
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.representations.WebServices_Vk.Album import Album as VkAlbumRepresentation
-from submodules.Uncanon.WebServices.VkApi import VkApi
+from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Album(BaseIterableExtended):
     category = 'WebServices_Vk'

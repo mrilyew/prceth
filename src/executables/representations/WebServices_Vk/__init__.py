@@ -2,7 +2,7 @@ from app.App import env
 from executables.representations import Representation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument, CsvArgument
 from utils.MainUtils import list_conversation
-from submodules.Uncanon.WebServices.VkApi import VkApi
+from submodules.Trivia.WebServices.VkApi import VkApi
 from resources.Exceptions import AbstractClassException
 from resources.Consts import consts
 

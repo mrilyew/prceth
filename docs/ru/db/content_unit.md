@@ -4,7 +4,7 @@
 
 |Колонка|Тип|Описание|
 |--|--|--|
-|`id`|Integer, Auto increment|ID контента, задаётся автоматически|
+|`id`|Integer, Auto increment|ID записи (snowflake)|
 |`display_name`|Text|Имя, которое будет отображаться в списках. Изменяемое;|
 |`description`|Text|Описание|
 |`source`|JSON (Text)|Информация, откуда был получен ContentUnit, словарь с ключами `type` и `content`|
