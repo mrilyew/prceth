@@ -15,7 +15,7 @@ class File(Representation):
     executable_cfg = {
         "variants": [
             {
-                "name": "variant_by_path",
+                "name": "representations.data.file.variant.path",
                 "list": ["path", "type"],
             },
             {

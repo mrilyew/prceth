@@ -54,7 +54,7 @@ class Logger(Hookable):
 
         section = components.get("section")
         message = components.get("message")
-        kind = components["kind"]
+        kind = components.get("kind")
         date = datetime.fromtimestamp(components.get("time"))
 
         write_message = f"{date.strftime("%Y-%m-%d %H:%M:%S")} [{section}] {message}\n"
@@ -77,7 +77,7 @@ class Logger(Hookable):
 
         section = components.get("section")
         message = components.get("message")
-        kind = components["kind"]
+        kind = components.get("kind")
         date = datetime.fromtimestamp(components.get("time"))
 
         write_message = f"{date.strftime("%Y-%m-%d %H:%M:%S")} {section} {kind} >>> {message}\n"
@@ -137,10 +137,10 @@ class Logger(Hookable):
 
         for compare_section in self.skip_categories:
             if compare_section == section:
-                return
+                silent = True
 
             if compare_section.endswith('*') and section.find(compare_section.replace('*', '')) != -1:
-                return
+                silent = True
 
         self.__log_file_check()
 

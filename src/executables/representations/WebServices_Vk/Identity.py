@@ -63,7 +63,7 @@ class Identity(BaseVkItemId):
             user_ids, group_ids, users, groups = [[], [], [], []]
             __users_response, __groups_response = [None, None]
 
-            for _id in identities_ids:
+            for _id in ids:
                 __id = int(_id)
                 if __id > 0:
                     user_ids.append(__id)

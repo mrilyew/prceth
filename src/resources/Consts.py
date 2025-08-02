@@ -19,6 +19,7 @@ consts["representations"] = Path(os.path.join(consts.get('cwd'), "representation
 
 # Config
 consts["config.hidden"] = 1
+consts["config.hidden_values_spaces"] = ["db.", "web."]
 
 # Args
 consts["forbidden_argument_names"] = ["i", "name", "confirm"]

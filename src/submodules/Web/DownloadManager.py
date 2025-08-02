@@ -5,13 +5,13 @@ from pathlib import Path
 import asyncio, aiohttp, os, time
 
 class DownloadManager():
-    def __init__(self, max_concurrent_downloads=3, speed_limit_kbps=config.get("web.max_speed")):
+    def __init__(self, max_concurrent_downloads=3, speed_limit_kbps=config.get("net.max_speed")):
         self.queue = []
         self.max_concurrent_downloads = max_concurrent_downloads
         self.speed_limit_kbps = speed_limit_kbps
         self.semaphore = asyncio.Semaphore(self.max_concurrent_downloads)
         self.__headers = {
-            "User-Agent": config.get("web.useragent")
+            "User-Agent": config.get("net.useragent")
         }
         self.__timeout = config.get("net.timeout")
         self.__hooks = []

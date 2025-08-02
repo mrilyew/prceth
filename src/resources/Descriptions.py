@@ -1,5 +1,5 @@
 descriptions = {}
-descriptions["variant_by_path"] = {
+descriptions["representations.data.file.variant.path"] = {
     "eng": "Path",
     "rus": "Из файла",
 }
@@ -82,4 +82,60 @@ descriptions["data_file_type_link"] = {
 descriptions["run_representation_link_param_name"] = {
     "eng": "Link after execution",
     "rus": "Привязать после исполнения",
+}
+descriptions["config.ui.lang.name"] = {
+    "eng": "Language",
+    "rus": "Язык",
+}
+descriptions["config.ui.name.name"] = {
+    "eng": "Server name",
+    "rus": "Название сервера",
+}
+descriptions["config.net.useragent.name"] = {
+    "eng": "User-Agent",
+    "rus": "User-Agent",
+}
+descriptions["config.web.host.name"] = {
+    "eng": "Host name",
+    "rus": "Название хоста",
+}
+descriptions["config.web.port.name"] = {
+    "eng": "Port",
+    "rus": "Порт",
+}
+descriptions["config.net.max_speed.name"] = {
+    "eng": "Max speed",
+    "rus": "Ограничение соединения",
+}
+descriptions["config.net.max_speed.definition"] = {
+    "eng": "Max speed for web operations (in kb/s)",
+    "rus": "Максимальная скорость для веб-операций (в кб/с)",
+}
+descriptions["config.net.timeout.name"] = {
+    "eng": "Timeout",
+    "rus": "Таймаут",
+}
+descriptions["config.net.timeout.definition"] = {
+    "eng": "Timeout for web operations",
+    "rus": "Таймаут для веб операций",
+}
+descriptions["config.logger.skip_categories.name"] = {
+    "eng": "Ignored categories",
+    "rus": "Игнорируемые категории"
+}
+descriptions["config.logger.skip_categories.definition"] = {
+    "eng": "List of categories that will not be displayed from the logger",
+    "rus": "Список категорий, которые не будут отображаться из логгера"
+}
+descriptions["config.logger.skip_file.name"] = {
+    "eng": "Do not write logs into the file",
+    "rus": "Не записывать логи в файл"
+}
+descriptions["config.thumbnail.width.name"] = {
+    "eng": "Thumbnail width",
+    "rus": "Ширина превью"
+}
+descriptions["config.thumbnail.height.name"] = {
+    "eng": "Thumbnail height",
+    "rus": "Высота превью"
 }

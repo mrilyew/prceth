@@ -15,7 +15,7 @@ class YtDlpWrapper:
     
     def __init__(self, opts):
         # 'outtmpl': 'downloads/%(title)s.mp4',
-        self.ydl_opts = {'quiet': True, 'progress_hooks': [self.download_hook], "ratelimit": float(config.get("web.max_speed")) * 1024}
+        self.ydl_opts = {'quiet': True, 'progress_hooks': [self.download_hook], "ratelimit": float(config.get("net.max_speed")) * 1024}
         #self.ydl_opts["quiet"] = False
         self.ydl_opts.update(opts)
 
