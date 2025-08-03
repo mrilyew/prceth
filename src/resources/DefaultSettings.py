@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import StringArgument, IntArgument, BooleanArgument, LimitedArgument, ObjectArgument
+from declarable.ArgumentsTypes import StringArgument, IntArgument, BooleanArgument, LimitedArgument, CsvArgument
 
 DefaultSettings = {
     "ui.lang": StringArgument({
@@ -12,6 +12,12 @@ DefaultSettings = {
         "docs": {
             "name": "config.ui.name.name",
         },
+    }),
+    "web.config_editing.allow": BooleanArgument({ # Allow to edit config from web
+        "default": True,
+    }),
+    "web.env_editing.allow": BooleanArgument({ # Allow to edit env variables from web
+        "default": False,
     }),
     "web.host": StringArgument({
         "default": "127.0.0.1",
@@ -29,7 +35,11 @@ DefaultSettings = {
         "default": True,
     }),
     "storage.root_path": StringArgument({
-        "default": "?cwd?/storage" # cwd -> /storage
+        "default": "?cwd?/storage", # cwd -> /storage
+        "docs": {
+            "name": "config.storage.root_path.name",
+            "definition": "config.storage.root_path.definition",
+        },
     }),
     "db.content_db.type": LimitedArgument({
         "values": ['sqlite', 'mysql', 'postgresql'],
@@ -83,7 +93,7 @@ DefaultSettings = {
             "definition": "config.net.timeout.definition",
         },
     }),
-    "logger.skip_categories": ObjectArgument({
+    "logger.skip_categories": CsvArgument({
         "default": [],
         "docs": {
             "name": "config.logger.skip_categories.name",

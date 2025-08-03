@@ -9,20 +9,23 @@ class RecieveConfig(BaseAct):
         result = []
         tabu = consts.get("config.hidden_values_spaces")
 
+        assert config.get("web.config_editing.allow") == True, "editing is not allowed"
+
         for i in enumerate(config.compared_options):
             index = i[0]
             name = i[1]
             val = config.compared_options.get(name)
-            c = False
+            no = False
 
             for _name in tabu:
                 if name.startswith(_name):
-                    c = True
+                    no = True
 
-            if c == True:
+            if no == True:
                 continue
 
             val.data["name"] = name
+            val.data["current"] = config.options.get(name)
 
             result.append(val.out())
 

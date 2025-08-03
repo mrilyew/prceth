@@ -117,7 +117,7 @@ descriptions["config.net.timeout.name"] = {
 }
 descriptions["config.net.timeout.definition"] = {
     "eng": "Timeout for web operations",
-    "rus": "Таймаут для веб операций",
+    "rus": "Таймаут для веб-операций",
 }
 descriptions["config.logger.skip_categories.name"] = {
     "eng": "Ignored categories",
@@ -138,4 +138,12 @@ descriptions["config.thumbnail.width.name"] = {
 descriptions["config.thumbnail.height.name"] = {
     "eng": "Thumbnail height",
     "rus": "Высота превью"
+}
+descriptions["config.storage.root_path.name"] = {
+    "eng": "Storage location",
+    "rus": "Расположение хранилища"
+}
+descriptions["config.storage.root_path.definition"] = {
+    "eng": "Internal storage location. «?cwd?» is replaced with the startup directory. Edit with caution.",
+    "rus": "Расположение внутреннего хранилища. «?cwd?» заменяется на директорию запуска. Редактировать с осторожностью."
 }

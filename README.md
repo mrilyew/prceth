@@ -10,6 +10,7 @@ Todo:
 - [ ] Кэширование списка
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
 - [x] Игнорируемые параметры
+- [ ] Избавится от дублирования категории
 
 #### Логирование
 
@@ -20,7 +21,7 @@ Todo:
 
 - [ ] Acts.Export.Export (to .th zip)
 - [ ] Acts.Export.Import
-- [x] Acts.Export.CopyToDirectory
+- [ ] Acts.Export.CopyToDirectory
 - [ ] Подмена даты создания файла при экспорте (если возможно?)
 
 #### Contentunit
