@@ -108,7 +108,7 @@ descriptions["config.net.max_speed.name"] = {
     "rus": "Ограничение соединения",
 }
 descriptions["config.net.max_speed.definition"] = {
-    "eng": "Max speed for web operations (in kb/s)",
+    "eng": "Max speed for web operations (in Kbps)",
     "rus": "Максимальная скорость для веб-операций (в кб/с)",
 }
 descriptions["config.net.timeout.name"] = {

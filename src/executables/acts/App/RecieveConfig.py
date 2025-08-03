@@ -1,6 +1,6 @@
 from executables.acts import BaseAct
 from resources.Consts import consts
-from app.App import app, config
+from app.App import config
 
 class RecieveConfig(BaseAct):
     category = 'App'
