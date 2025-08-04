@@ -8,3 +8,4 @@ from declarable.ArgumentsTypes.ObjectArgument import ObjectArgument
 from declarable.ArgumentsTypes.ServiceInstanceArgument import ServiceInstanceArgument
 from declarable.ArgumentsTypes.StorageUnitArgument import StorageUnitArgument
 from declarable.ArgumentsTypes.StringArgument import StringArgument
+from declarable.ArgumentsTypes.ContentUnitArgument import ContentUnitArgument

@@ -4,6 +4,10 @@ from PIL import Image as PILImage
 
 class Image(File):
     category = "Mime"
+    docs = {
+        "name": "representations.mime.image.name",
+        "definition": "representations.mime.image.definition",
+    }
 
     class Extractor(File.Extractor):
         async def process_item(self, item):

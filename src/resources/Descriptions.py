@@ -43,6 +43,14 @@ descriptions["data_file_name_of"] = {
     "eng": "File",
     "rus": "Файл"
 }
+descriptions["representations.mime.image.name"] = {
+    "eng": "Image",
+    "rus": "Изображение",
+}
+descriptions["representations.mime.image.definition"] = {
+    "eng": "Image file",
+    "rus": "Файл изображения",
+}
 descriptions["data_file_definition"] = {
     "eng": "Creates empty file",
     "rus": "Создаёт пустой или не совсем файл",

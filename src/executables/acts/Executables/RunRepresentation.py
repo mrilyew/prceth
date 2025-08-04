@@ -1,7 +1,7 @@
 from executables.acts import BaseAct
 from db.Models.Content.ContentUnit import ContentUnit
 from repositories.RepresentationsRepository import RepresentationsRepository
-from declarable.ArgumentsTypes import StringArgument, CsvArgument
+from declarable.ArgumentsTypes import StringArgument, CsvArgument, ContentUnitArgument
 from db.LinkManager import link_manager
 from db.DbFind import db_find
 from app.App import logger
@@ -21,7 +21,7 @@ class RunRepresentation(BaseAct):
             }
         })
         params["link"] = CsvArgument({
-            "base": "ContentUnit",
+            "orig": ContentUnitArgument({}),
             "docs": {
                 "name": 'run_representation_link_param_name',
             },

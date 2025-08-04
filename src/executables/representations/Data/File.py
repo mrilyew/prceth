@@ -29,7 +29,7 @@ class File(Representation):
     def declare(cls):
         params = {}
         params["path"] = CsvArgument({
-            "argument_type": "StringArgument",
+            "orig": StringArgument({}),
             "docs": {
                 "name": 'data_file_path',
             },
@@ -56,7 +56,7 @@ class File(Representation):
             "docs": {
                 "name": "data_file_url"
             },
-            "argument_type": "StringArgument",
+            "orig": StringArgument({}),
             "default": None,
         })
 

@@ -1,7 +1,7 @@
 from submodules.Media.YtDlpWrapper import YtDlpWrapper
 from executables.representations import Representation
 from executables.Confirmable import Confirmable
-from declarable.ArgumentsTypes import CsvArgument
+from declarable.ArgumentsTypes import CsvArgument, StringArgument
 
 class Video(Representation):
     category = "WebServices_YouTube"
@@ -13,11 +13,11 @@ class Video(Representation):
     def declare(cls):
         params = {}
         params["url"] = CsvArgument({
-            "argument_type": "StringArgument",
+            "orig": StringArgument({}),
             "default": None,
         })
         params["ids"] = CsvArgument({
-            "argument_type": "StringArgument",
+            "orig": StringArgument({}),
             "default": [],
             "assertion": {
                 "not_null": True,

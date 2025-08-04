@@ -19,6 +19,13 @@ class CsvArgument(Argument):
         else:
             return val
 
+    def out(self):
+        orig_out = super().out()
+        if orig_out.get("orig") != None and type(orig_out.get("orig")) != str:
+            orig_out["orig"] = orig_out.get("orig").out()
+
+        return orig_out
+
     def default(self):
         _def = super().default()
 
