@@ -43,10 +43,12 @@ class Argument:
 
         if __docs.get('values') != None:
             __fnl['values'] = {}
-            for index, name in enumerate(__docs.get('values')):
+            for index, name in enumerate(__docs.get("values")):
                 __val = __docs.get('values').get(name)
+                __name = __val.get("name")
 
-                __fnl['values'][name] = resolve_doc(__val)
+                __fnl['values'][name] = {}
+                __fnl['values'][name]["name"] = resolve_doc(__name)
 
         return __fnl
 
@@ -74,5 +76,25 @@ class Argument:
             if __assertion.get("not_null") == True:
                 assert got_value != None, f"{__name} is null"
 
-    def special_assert(self, inp):
+    def special_assertions(self, inp):
         pass
+
+    def conditions_assertions(self, all_args):
+        __assertion = self.data.get("assertion")
+
+        if __assertion != None:
+            if __assertion.get("only_when") != None:
+                only_when = __assertion.get("only_when")
+
+                for condition in only_when:
+                    _en = list(enumerate(condition))
+                    key_name = _en[0][1]
+                    key_value = condition.get(key_name)
+
+                    operator = key_value.get("operator")
+
+                    match(operator):
+                        case "==":
+                            assert all_args.get(key_name) == key_value.get("value"), f"{key_name} caused assertion"
+                        case "!=":
+                            assert all_args.get(key_name) != key_value.get("value"), f"{key_name} caused assertion"

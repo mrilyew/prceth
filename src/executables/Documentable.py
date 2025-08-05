@@ -38,8 +38,10 @@ class Documentable():
                 "definition": resolve_doc(__definition)
             }
 
-        #if getattr(cls, "PreExecute", None) != None:
-        #    pre_exec = cls.PreExecute
+        if getattr(cls, "PreExecute", None) != None:
+            pre_exec = cls.PreExecute
+
+            ts["confirmation"] = pre_exec.args_list
 
         if getattr(cls, "executable_cfg", None) != None:
             variants = cls.executable_cfg.get('variants')

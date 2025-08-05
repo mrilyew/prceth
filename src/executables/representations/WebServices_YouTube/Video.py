@@ -15,6 +15,7 @@ class Video(Representation):
         params["url"] = CsvArgument({
             "orig": StringArgument({}),
             "default": None,
+            "fictitious": True,
         })
         params["ids"] = CsvArgument({
             "orig": StringArgument({}),

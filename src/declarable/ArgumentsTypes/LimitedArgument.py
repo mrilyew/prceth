@@ -9,7 +9,7 @@ class LimitedArgument(Argument):
 
         return inp
 
-    def special_assert(self, inp):
+    def special_assertions(self, inp):
         __allowed = self.data.get("values")
 
         assert inp in __allowed, f"not valid value, {self.data.get('name')}={self.input_value}"

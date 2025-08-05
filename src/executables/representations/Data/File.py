@@ -17,7 +17,6 @@ class File(Representation):
             {
                 "name": "representations.data.file.variant.path",
                 "list": ["path", "type"],
-                "not_null": ["path"]
             },
             {
                 "name": "variant_by_url",
@@ -35,23 +34,29 @@ class File(Representation):
                 "name": 'data_file_path',
             },
             "default": None,
+            "assertion": {
+                "only_when": [
+                    {"url": {"operator": "==", "value": None}}
+                ]
+            }
         })
         params["type"] = LimitedArgument({
             "docs": {
                 "name": "data_file_type",
                 "values": {
-                    "copy": "data_file_type_copy",
-                    "move": "data_file_type_move",
-                    "link": "data_file_type_link",
+                    "copy": {
+                        "name": "data_file_type_copy",
+                    },
+                    "move": {
+                        "name": "data_file_type_move"
+                    },
+                    "link": {
+                        "name": "data_file_type_link"
+                    },
                 }
             },
             "values": ["copy", "move", "link"],
             "default": "copy",
-            "assertion": {
-                "only_when": [
-                    {"path": {"operator": "!=", "value": None}}
-                ]
-            }
         })
         params["url"] = CsvArgument({
             "docs": {
@@ -59,6 +64,11 @@ class File(Representation):
             },
             "orig": StringArgument({}),
             "default": None,
+            "assertion": {
+                "only_when": [
+                    {"path": {"operator": "==", "value": None}}
+                ]
+            }
         })
 
         return params

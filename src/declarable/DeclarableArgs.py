@@ -69,7 +69,7 @@ class DeclarableArgs():
 
             try:
                 param_object.assertions(value)
-                param_object.special_assert(value)
+                param_object.special_assertions(value)
 
                 if value == None and is_unexist == False:
                     continue
@@ -80,5 +80,11 @@ class DeclarableArgs():
                     raise _y
                 else:
                     output[param_name] = param_object.default()
+
+        for index, param_name in enumerate(output):
+            param_object = self.recieveObjectByName(param_name)
+
+            if param_object != None:
+                param_object.conditions_assertions(output)
 
         return output

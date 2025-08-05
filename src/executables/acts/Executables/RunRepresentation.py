@@ -46,7 +46,7 @@ class RunRepresentation(BaseAct):
                 pre_execute = representationClass.PreExecute(representationClass)
                 new_args_response = await pre_execute.execute(args)
                 new_args = new_args_response.get("args")
-                new_args_api = {}
+                new_args_api = []
 
                 for new_arg in enumerate(new_args):
                     arg_name = new_arg[1]
@@ -55,9 +55,12 @@ class RunRepresentation(BaseAct):
                     if arg_name in pre_execute.args_list:
                         continue
 
-                    new_args_api[arg_name] = arg.out()
+                    new_object = arg.out()
+                    new_object["name"] = arg_name
 
-                return new_args_api
+                    new_args_api.append(new_object)
+
+                return {"tab": new_args_api}
 
         __ents = await representationClass.extract(i)
         __all_items = []

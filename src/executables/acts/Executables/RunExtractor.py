@@ -1,7 +1,7 @@
 from db.Models.Content.ContentUnit import ContentUnit
 from executables.acts import BaseAct
 from repositories.ExtractorsRepository import ExtractorsRepository
-from declarable.ArgumentsTypes import StringArgument, BooleanArgument, CsvArgument
+from declarable.ArgumentsTypes import StringArgument, ContentUnitArgument, CsvArgument
 from db.LinkManager import link_manager
 from app.App import logger
 
@@ -20,6 +20,7 @@ class RunExtractor(BaseAct):
             }
         })
         params["link"] = CsvArgument({
+            "orig": ContentUnitArgument({}),
             "docs": {
                 "name": 'run_representation_link_param_name',
             },
