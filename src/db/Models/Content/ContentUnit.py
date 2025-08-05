@@ -90,8 +90,10 @@ class ContentUnit(BaseModel):
 
     def set_thumbnail(self, thumbs):
         thumbs_out = []
-        for __ in thumbs:
-            thumbs_out.append(__.state())
+
+        if thumbs:
+            for __ in thumbs:
+                thumbs_out.append(__.state())
 
         self.thumbnail = json.dumps(thumbs_out, ensure_ascii=False)
 

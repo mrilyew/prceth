@@ -52,8 +52,8 @@ descriptions["representations.mime.image.definition"] = {
     "rus": "Файл изображения",
 }
 descriptions["data_file_definition"] = {
-    "eng": "Creates empty file",
-    "rus": "Создаёт пустой или не совсем файл",
+    "eng": "Copies or downloads file",
+    "rus": "Копирует или скачивает файл",
 }
 descriptions["data_file_path"] = {
     "eng": "Path to file",

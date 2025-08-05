@@ -17,6 +17,7 @@ class File(Representation):
             {
                 "name": "representations.data.file.variant.path",
                 "list": ["path", "type"],
+                "not_null": ["path"]
             },
             {
                 "name": "variant_by_url",

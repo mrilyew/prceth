@@ -95,6 +95,7 @@ DefaultSettings = {
     }),
     "logger.skip_categories": CsvArgument({
         "default": [],
+        "orig": StringArgument({}),
         "docs": {
             "name": "config.logger.skip_categories.name",
             "definition": "config.logger.skip_categories.definition",
