@@ -1,7 +1,7 @@
 import os, json
 from app.App import logger, storage
 from pathlib import Path
-from peewee import TextField, BigIntegerField, BooleanField, CharField
+from peewee import TextField, BigIntegerField, IntegerField, CharField
 from utils.MainUtils import extract_metadata_to_dict, get_random_hash
 from db.Models.Content.ContentModel import BaseModel
 from submodules.Files.FileManager import file_manager
@@ -17,7 +17,7 @@ class StorageUnit(BaseModel):
         table_name = 'storage_units'
 
     # Identification
-    uuid = CharField(max_length=50, unique=True, primary_key=True)
+    uuid = IntegerField(unique=True, primary_key=True)
     hash = TextField(null=True)
     attached_path = TextField(null=True)
 

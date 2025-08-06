@@ -1,6 +1,6 @@
 from db.Models.Content.ThumbnailState import ThumbnailState
 from utils.MainUtils import dump_json, parse_json
-from peewee import TextField, CharField, BooleanField, FloatField
+from peewee import TextField, CharField, BooleanField, FloatField, IntegerField
 from db.Models.Content.ContentModel import BaseModel
 from db.Models.Content.StorageUnit import StorageUnit
 from functools import cached_property
@@ -18,7 +18,7 @@ class ContentUnit(BaseModel):
     short_name = 'cu'
 
     # Identification
-    uuid = CharField(max_length=50, unique=True, primary_key=True)
+    uuid = IntegerField(unique=True, primary_key=True)
 
     # Data
     content = TextField(null=True, default=None) # JSON data

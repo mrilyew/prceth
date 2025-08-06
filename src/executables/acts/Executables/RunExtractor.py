@@ -60,7 +60,8 @@ class RunExtractor(BaseAct):
         except KeyboardInterrupt:
             pass
         except Exception as __ee:
-            await extractor.trigger_hooks("error", __ee)
+            if extractor != None:
+                await extractor.trigger_hooks("error", __ee)
 
             raise __ee
 
