@@ -5,7 +5,8 @@ from db.DbInsert import db_insert
 class Collection(Representation):
     category = "Abstract"
     docs = {
-        "definition": "abstract_collection_definition",
+        "name": "representations.abstract.collection.name",
+        "definition": "representations.abstract.collection.definition",
     }
     executable_cfg = {
         'free_args': True

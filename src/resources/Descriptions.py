@@ -27,9 +27,25 @@ descriptions["abstract_collection_description_param_title"] = {
     "eng": "Description",
     "rus": "Описание",
 }
-descriptions["abstract_collection_definition"] = {
+descriptions["representations.abstract.collection.name"] = {
+    "eng": "Collection",
+    "rus": "Коллекция"
+}
+descriptions["representations.abstract.collection.definition"] = {
     "eng": "Creates ContentUnit with collection type",
     "rus": "Создаёт ContentUnit с типом коллекции",
+}
+descriptions["representations.abstract.collection.name"] = {
+    "eng": "Collection",
+    "rus": "Коллекция"
+}
+descriptions["representations.abstract.scratch.name"] = {
+    "eng": "Scratch",
+    "rus": "Пустое",
+}
+descriptions["representations.abstract.scratch.definition"] = {
+    "eng": "Creates empty unit",
+    "rus": "Создаёт объект без содержания",
 }
 descriptions["abstract_collection_name_param_description"] = {
     "eng": "Name of the new collection",
@@ -54,6 +70,10 @@ descriptions["representations.mime.image.definition"] = {
 descriptions["data_file_definition"] = {
     "eng": "Copies or downloads file",
     "rus": "Копирует или скачивает файл",
+}
+descriptions["representations.abstract.text.name"] = {
+    "eng": "Text",
+    "rus": "Текст"
 }
 descriptions["data_file_path"] = {
     "eng": "Path to file",
@@ -154,4 +174,42 @@ descriptions["config.storage.root_path.name"] = {
 descriptions["config.storage.root_path.definition"] = {
     "eng": "Internal storage location. «?cwd?» is replaced with the startup directory. Edit with caution.",
     "rus": "Расположение внутреннего хранилища. «?cwd?» заменяется на директорию запуска. Редактировать с осторожностью."
+}
+descriptions["c.search.order.name"] = {
+    "eng": "Order",
+    "rus": "Порядок"
+}
+descriptions["c.search.query.name"] = {
+    "eng": "Query",
+    "rus": "Запрос"
+}
+descriptions["c.search.order.c_asc.name"] = {
+    "eng": "ID ↑"
+}
+descriptions["c.search.order.c_desc.name"] = {
+    "eng": "ID ↓"
+}
+descriptions["c.search.extractor.name"] = {
+    "eng": "By extractor",
+    "rus": "По экстрактору",
+}
+descriptions["c.search.representation.name"] = {
+    "eng": "By representation",
+    "rus": "По репрезентации",
+}
+descriptions["c.search.count.name"] = {
+    "eng": "Count",
+    "rus": "Количество"
+}
+descriptions["c.search.offset.name"] = {
+    "eng": "ID offset",
+    "rus": "Отступ по id"
+}
+descriptions["c.search.return_unlisted.name"] = {
+    "eng": "Return unlisted",
+    "rus": "Показать скрытое"
+}
+descriptions["c.search.collections_only.name"] = {
+    "eng": "Only collections",
+    "rus": "Только коллекции"
 }

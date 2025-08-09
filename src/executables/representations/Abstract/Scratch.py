@@ -3,6 +3,9 @@ from db.DbInsert import db_insert
 
 class Scratch(Representation):
     category = "Abstract"
+    docs = {
+        "name": "representations.abstract.scratch.name",
+    }
     executable_cfg =  {
         'free_args': True
     }

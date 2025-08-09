@@ -208,7 +208,7 @@ def resolve_lang(translation_dict: dict, lang_code: str):
     if translation_dict == None:
         return None
 
-    return translation_dict.get(lang_code)
+    return translation_dict.get(lang_code, translation_dict.get("eng"))
 
 def resolve_doc(i):
     __lang_code = consts.get('ui.lang', 'eng')

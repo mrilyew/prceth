@@ -32,7 +32,7 @@ class ContentUnit(BaseModel):
     source = TextField(null=True)
     # frontend_data = TextField(null=True) # Currently unused
     # tags = TextField(index=True,null=True) # это вообще отдельной таблицей должно
-    thumbnail = TextField(null=True) # Preview in json format
+    outer = TextField(null=True) # frontend data (with thumbnail)
     # author = TextField(null=True,default=consts.get('pc_fullname')) под вопросом
 
     # Dates
@@ -95,15 +95,18 @@ class ContentUnit(BaseModel):
             for __ in thumbs:
                 thumbs_out.append(__.state())
 
-        self.thumbnail = json.dumps(thumbs_out, ensure_ascii=False)
+        self.outer = json.dumps({"thumbnail": thumbs_out}, ensure_ascii=False)
 
     @cached_property
     def thumbnail_list(self):
-        _th = self.thumbnail
-        _json = parse_json(self.thumbnail)
+        _outer = parse_json(self.outer)
+        _thumb = _outer.get("thumbnail")
+        if _thumb == None:
+            return []
+
         _list = []
 
-        for thmb in _json:
+        for thmb in _thumb:
             _list.append(ThumbnailState(thmb))
 
         return _list
@@ -122,7 +125,7 @@ class ContentUnit(BaseModel):
         if self.source != None:
             ret['source'] = parse_json(self.source)
 
-        if self.thumbnail != None:
+        if self.outer != None:
             try:
                 # у меня абсолютно нет идей для названия переменных ((
                 thumbnail_internal_classes_from_db_list = self.thumbnail_list
