@@ -5,8 +5,6 @@ from submodules.Trivia.WebServices.VkApi import VkApi
 from resources.Consts import consts
 
 class Fave(BaseIterableExtended):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}

@@ -4,8 +4,6 @@ from resources.Consts import consts
 from app.App import config, env
 
 class UpdateConfig(BaseAct):
-    category = 'App'
-
     @classmethod
     def declare(cls):
         params = {}

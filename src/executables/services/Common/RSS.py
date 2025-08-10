@@ -3,8 +3,6 @@ from repositories.ExtractorsRepository import ExtractorsRepository
 from declarable.ArgumentsTypes import StringArgument
 
 class RSS(BaseDeclaredAtDependent):
-    category = 'Common'
-
     @classmethod
     def declare(cls):
         params = {}

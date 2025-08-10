@@ -4,8 +4,6 @@ from executables.representations.WebServices_Vk.Message import Message
 from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Messages(BaseIterableExtended):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}

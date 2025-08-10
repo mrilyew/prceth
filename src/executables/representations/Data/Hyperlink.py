@@ -3,7 +3,10 @@ from declarable.ArgumentsTypes import CsvArgument
 from db.DbInsert import db_insert
 
 class Hyperlink(Representation):
-    category = "Data"
+    docs = {
+        "definition": "representations.data.hyperlink.definition",
+        "name": "representations.data.hyperlink.name",
+    }
 
     @classmethod
     def declare(cls):

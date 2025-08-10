@@ -4,8 +4,6 @@ from executables.representations.WebServices_Vk.Album import Album as VkAlbumRep
 from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Album(BaseIterableExtended):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}

@@ -4,8 +4,6 @@ from executables.representations.WebServices_Vk.Photo import Photo
 from submodules.Trivia.WebServices.VkApi import VkApi
 
 class AllPhotos(BaseIterableExtended):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}

@@ -6,8 +6,6 @@ from app.App import logger
 import os
 
 class CopyToDirectory(BaseAct):
-    category = 'Export'
-
     @classmethod
     def declare(cls):
         params = {}

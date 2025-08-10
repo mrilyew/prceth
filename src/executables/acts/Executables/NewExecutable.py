@@ -5,7 +5,6 @@ from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgume
 import os
 
 class NewExecutable(BaseAct):
-    category = 'Executables'
     executable_cfg = {
         'free_args': True
     }

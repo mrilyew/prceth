@@ -6,7 +6,6 @@ from resources.Exceptions import FatalError
 from declarable.ArgumentsTypes import LimitedArgument, StringArgument, ObjectArgument
 
 class RegularExecution(BaseService):
-    category = 'Common'
     c_cached_executable = None
     pass_args = {}
 

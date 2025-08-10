@@ -3,8 +3,6 @@ from declarable.ArgumentsTypes import StringArgument, LimitedArgument
 from repositories.ExecutableRepository import ExecutableRepository
 
 class Describe(BaseAct):
-    category = 'Executables'
-
     @classmethod
     def declare(cls):
         params = {}

@@ -6,7 +6,6 @@ from executables.Saveable import Saveable
 from executables.thumbnails import ThumbnailMethod
 
 class Representation(RecursiveDeclarable, Runnable, Documentable):
-    category = "base"
     hydrated = None
 
     @classmethod

@@ -2,7 +2,6 @@ from executables.representations import Representation
 from db.DbInsert import db_insert
 
 class Scratch(Representation):
-    category = "Abstract"
     docs = {
         "name": "representations.abstract.scratch.name",
     }

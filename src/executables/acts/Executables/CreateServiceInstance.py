@@ -4,7 +4,6 @@ from db.Models.Instances.ServiceInstance import ServiceInstance
 from declarable.ArgumentsTypes import StringArgument, IntArgument
 
 class CreateServiceInstance(BaseAct):
-    category = 'Executables'
     executable_cfg = {
         'free_args': True
     }

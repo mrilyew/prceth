@@ -5,7 +5,6 @@ from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgume
 from db.LinkManager import link_manager
 
 class BaseDeclaredAtDependent(BaseService):
-    category = 'Base'
     pass_params = {}
     add_after = None
     colls_list = []

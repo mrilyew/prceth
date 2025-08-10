@@ -6,7 +6,6 @@ from db.LinkManager import link_manager
 from app.App import logger
 
 class RunExtractor(BaseAct):
-    category = 'Executables'
     executable_cfg = {
         'free_args': True
     }

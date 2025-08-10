@@ -4,8 +4,6 @@ from peewee import fn
 from declarable.ArgumentsTypes import IntArgument, BooleanArgument
 
 class RandomContent(BaseAct):
-    category = 'Random'
-
     @classmethod
     def declare(cls):
         params = {}

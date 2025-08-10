@@ -3,7 +3,6 @@ from declarable.ArgumentsTypes import StringArgument
 from db.DbInsert import db_insert
 
 class Collection(Representation):
-    category = "Abstract"
     docs = {
         "name": "representations.abstract.collection.name",
         "definition": "representations.abstract.collection.definition",

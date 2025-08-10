@@ -6,8 +6,6 @@ from declarable.ArgumentsTypes import StringArgument, BooleanArgument
 import aiohttp, xmltodict
 
 class RSSFeed(BaseExtractor):
-    category = 'Syndication'
-
     def declare():
         params = {}
         params["url"] = StringArgument({

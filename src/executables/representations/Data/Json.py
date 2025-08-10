@@ -4,7 +4,9 @@ from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 from db.DbInsert import db_insert
 
 class Json(Representation):
-    category = "Data"
+    docs = {
+        "name": "representations.data.json.name",
+    }
 
     @classmethod
     def declare(cls):

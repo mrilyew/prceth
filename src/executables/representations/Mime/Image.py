@@ -3,7 +3,6 @@ from executables.thumbnails.ImageMethod import ImageMethod
 from PIL import Image as PILImage
 
 class Image(File):
-    category = "Mime"
     docs = {
         "name": "representations.mime.image.name",
         "definition": "representations.mime.image.definition",

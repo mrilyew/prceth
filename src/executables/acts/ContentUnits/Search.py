@@ -5,8 +5,6 @@ from functools import reduce
 import operator
 
 class Search(BaseAct):
-    category = 'ContentUnits'
-
     @classmethod
     def declare(cls):
         params = {}

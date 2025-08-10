@@ -4,8 +4,6 @@ from executables.representations.WebServices_Vk.Post import Post
 from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Wall(BaseIterableExtended):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}

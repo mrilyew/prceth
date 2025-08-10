@@ -3,8 +3,6 @@ from repositories.ExtractorsRepository import ExtractorsRepository
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
 
 class RegularSifting(BaseDeclaredAtDependent):
-    category = 'Common'
-
     @classmethod
     def declare(cls):
         params = {}

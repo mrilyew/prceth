@@ -4,7 +4,6 @@ from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr
 
 class Text(Representation):
-    category = "Abstract"
     docs = {
         "name": "representations.abstract.text.name",
     }

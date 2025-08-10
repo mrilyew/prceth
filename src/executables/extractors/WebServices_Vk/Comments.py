@@ -4,8 +4,6 @@ from executables.representations.WebServices_Vk.Comment import Comment
 from submodules.Trivia.WebServices.VkApi import VkApi
 
 class Comments(BaseIterableExtended):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}

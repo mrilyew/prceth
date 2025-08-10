@@ -4,8 +4,6 @@ from declarable.ArgumentsTypes import IntArgument
 import asyncio
 
 class BaseIterable(BaseTimeoutable):
-    category = 'base'
-
     @classmethod
     def declare(cls):
         params = {}

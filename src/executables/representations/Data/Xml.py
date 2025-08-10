@@ -4,7 +4,9 @@ from db.DbInsert import db_insert
 import xmltodict
 
 class Xml(Representation):
-    category = "Data"
+    docs = {
+        "name": "representations.data.xml.name",
+    }
 
     @classmethod
     def declare(cls):

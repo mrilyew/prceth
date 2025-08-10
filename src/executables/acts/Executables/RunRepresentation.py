@@ -7,7 +7,6 @@ from db.DbFind import db_find
 from app.App import logger
 
 class RunRepresentation(BaseAct):
-    category = 'Representations'
     executable_cfg = {
         'free_args': True
     }

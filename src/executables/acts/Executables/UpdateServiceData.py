@@ -2,8 +2,6 @@ from executables.acts import BaseAct
 from declarable.ArgumentsTypes import ServiceInstanceArgument, JsonArgument
 
 class UpdateServiceData(BaseAct):
-    category = 'Representations'
-
     @classmethod
     def declare(cls):
         params = {}

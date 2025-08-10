@@ -7,7 +7,6 @@ from resources.Exceptions import AbstractClassException
 from resources.Consts import consts
 
 class BaseVk(Representation):
-    category = 'WebServices_Vk'
     executable_cfg = {
         "list": ["ids", "object"],
         "type": "or",

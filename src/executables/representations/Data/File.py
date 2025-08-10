@@ -7,10 +7,9 @@ from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgume
 import os, mimetypes
 
 class File(Representation):
-    category = "Data"
     docs = {
-        "definition": "data_file_definition",
-        "name": "data_file_name_of",
+        "definition": "representations.data.file.definition",
+        "name": "representations.data.file.name",
     }
     executable_cfg = {
         "variants": [

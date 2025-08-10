@@ -4,7 +4,6 @@ from executables.Confirmable import Confirmable
 from declarable.ArgumentsTypes import CsvArgument, StringArgument
 
 class Video(Representation):
-    category = "WebServices_YouTube"
     executable_cfg = {
         "variants": []
     }

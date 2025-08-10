@@ -3,8 +3,6 @@ from declarable.ArgumentsTypes import CsvArgument
 from db.Models.Content.ContentUnit import ContentUnit
 
 class GetById(BaseAct):
-    category = 'ContentUnits'
-
     @classmethod
     def declare(cls):
         params = {}

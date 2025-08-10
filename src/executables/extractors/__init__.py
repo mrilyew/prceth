@@ -4,6 +4,7 @@ from db.DbInsert import db_insert
 class BaseExtractor(Executable):
     add_after = []
     linked_dict = None
+    base_categories = ["template", "base", "extractors"]
 
     def link(self, linked_dict: dict):
         self.linked_dict = linked_dict

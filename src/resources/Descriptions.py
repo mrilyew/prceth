@@ -55,9 +55,23 @@ descriptions["abstract_collection_description_param_description"] = {
     "eng": "Description of the new collection",
     "rus": "Описание новой коллекции"
 }
-descriptions["data_file_name_of"] = {
+descriptions["representations.data.file.name"] = {
     "eng": "File",
     "rus": "Файл"
+}
+descriptions["representations.data.hyperlink.name"] = {
+    "eng": "Hyperlink",
+    "rus": "Ссылка"
+}
+descriptions["representations.data.hyperlink.definition"] = {
+    "eng": "Hyperlink to web-site",
+    "rus": "Ссылка на web-ресурс"
+}
+descriptions["representations.data.json.name"] = {
+    "eng": "JSON"
+}
+descriptions["representations.data.xml.name"] = {
+    "eng": "XML"
 }
 descriptions["representations.mime.image.name"] = {
     "eng": "Image",
@@ -67,7 +81,7 @@ descriptions["representations.mime.image.definition"] = {
     "eng": "Image file",
     "rus": "Файл изображения",
 }
-descriptions["data_file_definition"] = {
+descriptions["representations.data.file.definition"] = {
     "eng": "Copies or downloads file",
     "rus": "Копирует или скачивает файл",
 }

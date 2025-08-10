@@ -3,8 +3,6 @@ from resources.Consts import consts
 from app.App import config
 
 class RecieveConfig(BaseAct):
-    category = 'App'
-
     async def execute(self, args = {}):
         result = []
         tabu = consts.get("config.hidden_values_spaces")

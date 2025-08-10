@@ -7,7 +7,6 @@ from utils.MainUtils import extract_metadata_to_dict
 from declarable.ArgumentsTypes import StringArgument, BooleanArgument, StorageUnitArgument
 
 class ExtractMetadata(BaseAct):
-    category = 'Metadata'
     executable_cfg = {
         "list": ["path", "su_id"],
         "type": "or",

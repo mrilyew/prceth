@@ -4,8 +4,6 @@ from executables.representations.Data.File import File
 from app.App import logger
 
 class Stickers(BaseIterable):
-    category = 'WebServices_Vk'
-
     @classmethod
     def declare(cls):
         params = {}
