@@ -73,6 +73,7 @@ class Search(BaseAct):
         extractor = i.get("extractor")
         order = i.get("order")
         return_unlisted = i.get("return_unlisted")
+        collections_only = i.get("collections_only")
         offset = i.get("offset")
         query = i.get("query")
 
@@ -90,6 +91,9 @@ class Search(BaseAct):
 
         if return_unlisted == False:
             select_query = select_query.where(ContentUnit.unlisted == 0)
+
+        if collections_only == True:
+            select_query = select_query.where(ContentUnit.is_collection == 1)
 
         # direct search !
         if query != None:

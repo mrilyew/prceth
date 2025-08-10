@@ -213,3 +213,7 @@ descriptions["c.search.collections_only.name"] = {
     "eng": "Only collections",
     "rus": "Только коллекции"
 }
+descriptions["c.search.return_thumbnails.name"] = {
+    "eng": "Show thumbnails",
+    "rus": "Показывать превью"
+}

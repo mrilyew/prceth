@@ -1,7 +1,7 @@
 import os, json
 from app.App import logger, storage
 from pathlib import Path
-from peewee import TextField, BigIntegerField, IntegerField, CharField
+from peewee import TextField, BigIntegerField, IntegerField, BooleanField
 from utils.MainUtils import extract_metadata_to_dict, get_random_hash
 from db.Models.Content.ContentModel import BaseModel
 from submodules.Files.FileManager import file_manager
@@ -21,10 +21,10 @@ class StorageUnit(BaseModel):
     hash = TextField(null=True)
     attached_path = TextField(null=True)
 
-    # Meta
     upload_name = TextField(default='N/A') # Upload name (with extension)
     extension = TextField(default="json") # File extension
-    mime = TextField(null=True,default="n/a")
+    mime = TextField(null=True,default="N/A")
+    is_thumbnail = BooleanField(index=True,default=0)
 
     # Sizes
     filesize = BigIntegerField(default=0) # Size of main file
@@ -55,6 +55,9 @@ class StorageUnit(BaseModel):
         _mime = mimetypes.guess_type(self.path())
         self.mime = _mime[0]
 
+    def set_dir_filesize(self):
+        self.dir_filesize = file_manager.folder_size(self.temp_dir)
+
     def set_about(self):
         path = self.path_link
 
@@ -74,6 +77,9 @@ class StorageUnit(BaseModel):
         self.path_link = Path(link)
         self.link = str(link)
 
+    def mark_as_preview(self):
+        self.is_thumbnail = 1
+
     def write_data(self, json_data):
         self.extension = json_data.get("extension")
 
@@ -85,7 +91,9 @@ class StorageUnit(BaseModel):
         self.upload_name = json_data.get("upload_name")
         self.filesize = json_data.get("filesize")
         self.set_mime()
+        self.set_dir_filesize()
 
+        # broken function
         if json_data.get("link") != None:
             self.link = json_data.get("link")
 
@@ -144,6 +152,7 @@ class StorageUnit(BaseModel):
             "upload_name": self.upload_name,
             "extension": self.extension,
             "filesize": self.filesize,
+            "dir_filesize": self.dir_filesize,
             "hash": self.hash,
             "upper_hash": str(self.upper_hash_dir()),
             "dir": str(self.dir_path()),

@@ -42,6 +42,12 @@ class Search(BaseAct):
                 "name": "c.search.offset.name",
             },
         })
+        params["return_thumbnails"] = BooleanArgument({
+            "default": False,
+            "docs": {
+                "name": "c.search.return_thumbnails.name",
+            },
+        })
 
         return params
 
@@ -50,6 +56,7 @@ class Search(BaseAct):
         order = i.get("order")
         offset = i.get("offset")
         query = i.get("query")
+        return_thumbnails = i.get("return_thumbnails")
 
         assert count > 0, "count can't be negative"
 
@@ -57,6 +64,9 @@ class Search(BaseAct):
             assert offset > 0, "offset can't be negative"
 
         select_query = StorageUnit.select()
+
+        if return_thumbnails == False:
+            select_query = select_query.where(StorageUnit.is_thumbnail == 0)
 
         # direct search !
         if query != None:
@@ -80,12 +90,12 @@ class Search(BaseAct):
                 if offset != None:
                     select_query = select_query.where(StorageUnit.uuid < int(offset))
 
-                select_query = select_query.order_by(StorageUnit.created_at.desc())
+                select_query = select_query.order_by(StorageUnit.uuid.desc())
             case 'created_asc':
                 if offset != None:
                     select_query = select_query.where(StorageUnit.uuid > int(offset))
 
-                select_query = select_query.order_by(StorageUnit.created_at.asc())
+                select_query = select_query.order_by(StorageUnit.uuid.asc())
 
         if count != None:
             select_query = select_query.limit(count)
