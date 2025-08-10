@@ -117,6 +117,7 @@ class ContentUnit(BaseModel):
         ret['display_name'] = self.display_name
         ret['description'] = self.description
         ret['representation'] = self.representation
+        ret['extractor'] = self.extractor
         # ret['tags'] = self.get_tags()
 
         if return_content == True:
@@ -127,7 +128,7 @@ class ContentUnit(BaseModel):
 
         if self.outer != None:
             try:
-                ret['outer'] = self.outer
+                ret['outer'] = parse_json(self.outer)
 
                 # у меня абсолютно нет идей для названия переменных ((
                 thumbnail_internal_classes_from_db_list = self.thumbnail_list
