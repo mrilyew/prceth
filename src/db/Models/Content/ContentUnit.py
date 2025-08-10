@@ -113,7 +113,7 @@ class ContentUnit(BaseModel):
 
     def api_structure(self, return_content = True, sensitive=False):
         ret = {}
-        ret['id'] = self.uuid
+        ret['id'] = str(self.uuid) # Converting to str cuz js function JSON.parse cannot convert it
         ret['display_name'] = self.display_name
         ret['description'] = self.description
         ret['representation'] = self.representation
@@ -127,6 +127,8 @@ class ContentUnit(BaseModel):
 
         if self.outer != None:
             try:
+                ret['outer'] = self.outer
+
                 # у меня абсолютно нет идей для названия переменных ((
                 thumbnail_internal_classes_from_db_list = self.thumbnail_list
                 thumbnail_api_response_list = []

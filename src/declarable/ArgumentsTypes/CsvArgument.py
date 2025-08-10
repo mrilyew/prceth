@@ -5,19 +5,33 @@ import json
 class CsvArgument(Argument):
     def value(self):
         val = self.input_value
+        intrerm_val = []
+        end_vals = []
 
-        if type(val) != list:
+        if type(val) == list:
+            intrerm_val = val
+
+        if type(val) == str:
             is_json = is_valid_json(val)
 
             if is_json == False:
-                return val.split(",")
+                intrerm_val = val.split(",")
             else:
                 _json = json.loads(val)
 
                 if type(_json) == list:
-                    return _json
-        else:
-            return val
+                    intrerm_val = _json
+
+        for val in intrerm_val:
+            if self.data.get("orig") != None:
+                p = self.data.get("orig")
+                p.passValue(val)
+
+                end_vals.append(p.val())
+            else:
+                end_vals.append(val)
+
+        return end_vals
 
     def out(self):
         orig_out = super().out()

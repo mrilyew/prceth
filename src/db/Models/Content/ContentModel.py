@@ -5,27 +5,22 @@ from app.App import logger
 class BaseModel(Model):
     @classmethod
     def ids(cls, id):
-        if type(id) == str:
+        _type = type(id)
+
+        if _type == str:
             _query = cls.select().where(cls.uuid == id)
-            if getattr(cls, "deleted", None) != None:
-                _query = _query.where(cls.deleted == 0)
 
             return _query.first()
-        else:
-            try:
-                __arr = []
-                _query = cls.select().where(cls.uuid << id)
-                if getattr(cls, "deleted", None) != None:
-                    _query = _query.where(cls.deleted == 0)
 
-                for _e in _query:
-                    __arr.append(_e)
+        if _type == list:
+            res = []
+            _query = cls.select().where(cls.uuid.in_(id))
 
-                return __arr
-            except Exception as exc:
-                logger.logException(exc, section = 'DB', silent = False)
+            print(_query)
+            for _e in _query:
+                res.append(_e)
 
-                return []
+            return res
 
     @property
     def id(self)->str:

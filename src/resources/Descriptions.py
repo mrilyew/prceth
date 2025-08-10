@@ -41,7 +41,7 @@ descriptions["representations.abstract.collection.name"] = {
 }
 descriptions["representations.abstract.scratch.name"] = {
     "eng": "Scratch",
-    "rus": "Пустое",
+    "rus": "Без содержимого",
 }
 descriptions["representations.abstract.scratch.definition"] = {
     "eng": "Creates empty unit",
