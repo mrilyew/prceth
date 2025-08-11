@@ -1,5 +1,5 @@
 from executables.acts import BaseAct
-from declarable.ArgumentsTypes import IntArgument, FloatArgument, StringArgument, LimitedArgument, BooleanArgument
+from declarable.ArgumentsTypes import IntArgument, CsvArgument, ContentUnitArgument, StringArgument, LimitedArgument, BooleanArgument
 from db.Models.Content.ContentUnit import ContentUnit
 from functools import reduce
 import operator
@@ -62,6 +62,13 @@ class Search(BaseAct):
                 "name": "c.search.collections_only.name",
             },
         })
+        params["link"] = CsvArgument({
+            "orig": ContentUnitArgument({}),
+            "default": None,
+            "docs": {
+                "name": "c.search.link.name",
+            },
+        })
 
         return params
 
@@ -74,6 +81,7 @@ class Search(BaseAct):
         collections_only = i.get("collections_only")
         offset = i.get("offset")
         query = i.get("query")
+        search_in = i.get("link")
 
         assert count > 0, "count can't be negative"
 
@@ -92,6 +100,16 @@ class Search(BaseAct):
 
         if collections_only == True:
             select_query = select_query.where(ContentUnit.is_collection == 1)
+
+        if search_in != None:
+            assert len(search_in) > 0, "no links not found"
+
+            _ids = []
+
+            for item in search_in:
+                _ids.append(item.uuid)
+
+            select_query = select_query.where(ContentUnit.uuid.in_(_ids))
 
         # direct search !
         if query != None:

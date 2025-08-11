@@ -231,3 +231,7 @@ descriptions["c.search.return_thumbnails.name"] = {
     "eng": "Show thumbnails",
     "rus": "Показывать превью"
 }
+descriptions["c.search.link.name"] = {
+    "eng": "Linked",
+    "rus": "Привязано к"
+}
