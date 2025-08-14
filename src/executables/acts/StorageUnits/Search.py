@@ -1,5 +1,5 @@
 from executables.acts import BaseAct
-from declarable.ArgumentsTypes import IntArgument, FloatArgument, StringArgument, LimitedArgument, BooleanArgument
+from declarable.ArgumentsTypes import ContentUnitArgument, IntArgument, CsvArgument, StringArgument, LimitedArgument, BooleanArgument
 from db.Models.Content.StorageUnit import StorageUnit
 from functools import reduce
 import operator
@@ -46,6 +46,13 @@ class Search(BaseAct):
                 "name": "c.search.return_thumbnails.name",
             },
         })
+        params["link"] = CsvArgument({
+            "orig": ContentUnitArgument({}),
+            "default": None,
+            "docs": {
+                "name": "c.search.link.name",
+            },
+        })
 
         return params
 
@@ -55,6 +62,7 @@ class Search(BaseAct):
         offset = i.get("offset")
         query = i.get("query")
         return_thumbnails = i.get("return_thumbnails")
+        search_in = i.get("link")
 
         assert count > 0, "count can't be negative"
 
@@ -66,7 +74,6 @@ class Search(BaseAct):
         if return_thumbnails == False:
             select_query = select_query.where(StorageUnit.is_thumbnail == 0)
 
-        # direct search !
         if query != None:
             conditions = []
             columns = ["upload_name", "metadata"]
@@ -78,6 +85,21 @@ class Search(BaseAct):
 
             if conditions:
                 select_query = select_query.where(reduce(operator.or_, conditions))
+
+        if search_in != None and len(search_in) > 0:
+            _ids = []
+
+            for item in search_in:
+                if item:
+                    _linked = item.linked_list
+
+                    for _link in _linked:
+                        if _link.short_name == "su":
+                            _ids.append(_link.uuid)
+
+            assert len(_ids) > 0, "invalid links"
+
+            select_query = select_query.where(ContentUnit.uuid.in_(_ids))
 
         items_count = select_query.count()
 

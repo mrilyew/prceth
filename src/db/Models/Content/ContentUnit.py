@@ -113,6 +113,7 @@ class ContentUnit(BaseModel):
 
     def api_structure(self, return_content = True, sensitive=False):
         ret = {}
+        ret['class_name'] = "ContentUnit"
         ret['id'] = str(self.uuid) # Converting to str cuz js function JSON.parse cannot convert it
         ret['display_name'] = self.display_name
         ret['description'] = self.description

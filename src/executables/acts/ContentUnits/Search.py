@@ -101,13 +101,18 @@ class Search(BaseAct):
         if collections_only == True:
             select_query = select_query.where(ContentUnit.is_collection == 1)
 
-        if search_in != None:
-            assert len(search_in) > 0, "no links not found"
-
+        if search_in != None and len(search_in) > 0:
             _ids = []
 
             for item in search_in:
-                _ids.append(item.uuid)
+                if item:
+                    _linked = item.linked_list
+
+                    for _link in _linked:
+                        if _link.short_name == "cu":
+                            _ids.append(_link.uuid)
+
+            assert len(_ids) > 0, "there is no linked"
 
             select_query = select_query.where(ContentUnit.uuid.in_(_ids))
 

@@ -147,21 +147,21 @@ class StorageUnit(BaseModel):
         self.save_to_dir(save_dir=dir_path, prefix=file_prefix)
 
     def api_structure(self):
-        _ = {
-            "id": self.uuid,
-            "upload_name": self.upload_name,
-            "extension": self.extension,
-            "filesize": self.filesize,
-            "dir_filesize": self.dir_filesize,
-            "hash": self.hash,
-            "upper_hash": str(self.upper_hash_dir()),
-            "dir": str(self.dir_path()),
-            "main_file": str(self.path()), 
-        }
-        _["relative_dir_path"] = self.relative_dir_path()
-        _["relative_main_file_path"] = self.relative_main_file_path()
+        ret = {}
+        ret['class_name'] = "StorageUnit"
+        ret["id"] = self.uuid
+        ret["upload_name"] = self.upload_name
+        ret["extension"] = self.extension
+        ret["filesize"] = self.filesize
+        ret["dir_filesize"] = self.dir_filesize
+        ret["hash"] = self.hash
+        ret["upper_hash"] = str(self.upper_hash_dir())
+        ret["dir"] = str(self.dir_path())
+        ret["main_file"] = str(self.path())
+        ret["relative_dir_path"] = self.relative_dir_path()
+        ret["relative_main_file_path"] = self.relative_main_file_path()
 
-        return _
+        return ret
 
     def path(self):
         if getattr(self, "attached_path", None) != None:
