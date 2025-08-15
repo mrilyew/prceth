@@ -19,6 +19,9 @@ DefaultSettings = {
     "web.env_editing.allow": BooleanArgument({ # Allow to edit env variables from web
         "default": False,
     }),
+    "web.logs_watching.allow": BooleanArgument({
+        "default": True,
+    }),
     "web.host": StringArgument({
         "default": "127.0.0.1",
         "docs": {

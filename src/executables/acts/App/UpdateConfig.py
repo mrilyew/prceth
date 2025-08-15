@@ -27,9 +27,11 @@ class UpdateConfig(BaseAct):
         assert values != None, "new values not passed"
 
         if act_type == "config":
-            assert config.get("web.config_editing.allow") == True, "editing is not allowed"
+            if consts.get("context") == "web":
+                assert config.get("web.config_editing.allow") == True, "editing is not allowed"
         elif act_type == "env":
-            assert config.get("web.env_editing.allow") == True, "env editing is not allowed"
+            if consts.get("context") == "web":
+                assert config.get("web.env_editing.allow") == True, "env editing is not allowed"
 
         for i in enumerate(values):
             index = i[0]
