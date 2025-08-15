@@ -1,5 +1,6 @@
 from colorama import init as ColoramaInit
 from resources.Consts import consts
+from utils.MainUtils import parse_json, dump_json
 from pathlib import Path
 from datetime import datetime
 from utils.Hookable import Hookable
@@ -24,9 +25,11 @@ class Logger(Hookable):
     SECTION_SAVEABLE = 'Saveable'
     SECTION_EXTRACTORS = 'Extractors'
     SECTION_ACTS = 'Acts'
-    SECTION_WEB = "Web"
+    SECTION_WEB = 'Web'
 
-    def __init__(self, config, storage, keep: bool = False):
+    current_json = None
+
+    def __init__(self, config, storage, keep: bool = True):
         '''
         Params:
 
@@ -73,18 +76,25 @@ class Logger(Hookable):
         print(write_colored_message, end='')
 
     def __write_to_file_hook(self, **kwargs):
+        if self.is_out_to_file == False:
+            return False
+
         components = kwargs.get("components")
 
-        section = components.get("section")
-        message = components.get("message")
-        kind = components.get("kind")
-        date = datetime.fromtimestamp(components.get("time"))
+        if getattr(self, "current_json", None) == None:
+            _json_text = self.log_stream.read()
 
-        write_message = f"{date.strftime("%Y-%m-%d %H:%M:%S")} {section} {kind} >>> {message}\n"
+            try:
+                self.current_json = parse_json(_json_text)
+            except:
+                self.current_json = []
 
-        if self.is_out_to_file:
-            self.log_stream.seek(0, os.SEEK_END)
-            self.log_stream.write(write_message)
+        self.current_json.append(components)
+
+        self.log_stream.truncate(0)
+        self.log_stream.seek(0)
+        self.log_stream.write(dump_json(self.current_json, indent=4))
+        self.log_stream.flush()
 
     def __del__(self):
         try:
@@ -104,10 +114,10 @@ class Logger(Hookable):
 
         # appends current time to file name
         if self.per_startup_mode:
-            log_path = f"{self.logs_storage.dir}/{now.strftime('%Y-%m-%d_%H-%M-%S')}.log"
+            log_path = f"{self.logs_storage.dir}/{now.strftime('%Y-%m-%d_%H-%M-%S')}.json"
         # creates log files per day
         else:
-            log_path = f"{self.logs_storage.dir}/{now.strftime('%Y-%m-%d')}.log"
+            log_path = f"{self.logs_storage.dir}/{now.strftime('%Y-%m-%d')}.json"
 
         self.path = Path(log_path)
 
@@ -117,6 +127,7 @@ class Logger(Hookable):
             __temp_logger_stream.close()
 
         self.log_stream = open(str(self.path), 'r+', encoding='utf-8')
+        self.file = True
 
         return True
 
