@@ -217,6 +217,7 @@ def resolve_doc(i):
     if type(i) == str:
         out = descriptions.get(i)
 
+    return out
     return resolve_lang(out, __lang_code)
 
 def is_valid_json(i):
