@@ -1,10 +1,12 @@
 from db.Models.Content.ThumbnailState import ThumbnailState
+from resources.Exceptions import AlreadyLinkedException
 from utils.MainUtils import dump_json, parse_json
 from peewee import TextField, CharField, BooleanField, FloatField, IntegerField
 from db.Models.Content.ContentModel import BaseModel
 from db.Models.Content.StorageUnit import StorageUnit
 from functools import cached_property
 import os, json, datetime
+from app.App import logger
 
 class ContentUnit(BaseModel):
     '''
@@ -64,8 +66,9 @@ class ContentUnit(BaseModel):
 
     @cached_property
     def linked_list(self):
-        from db.LinkManager import link_manager
+        from db.LinkManager import LinkManager
 
+        link_manager = LinkManager(self)
         list = link_manager.linksList(self)
 
         return list
@@ -73,12 +76,12 @@ class ContentUnit(BaseModel):
     # Content
 
     def formatted_data(self, recursive = False, recurse_level = 0):
-        from db.LinkManager import link_manager
+        from db.LinkManager import LinkManager
 
         loaded_content = self.json_content
 
         if recursive == True and recurse_level < 3:
-            loaded_content = link_manager.injectLinksToJsonFromInstance(self, recurse_level)
+            loaded_content = LinkManager.injectLinksToJsonFromInstance(self, recurse_level)
 
         return loaded_content
 
@@ -181,13 +184,15 @@ class ContentUnit(BaseModel):
         super().save(**kwargs)
 
         if self.link_queue != None:
-            from db.LinkManager import link_manager
+            from db.LinkManager import LinkManager
+
+            link_manager = LinkManager(self)
 
             for item in self.link_queue:
                 if item == None:
                     continue
 
                 try:
-                    link_manager.link(self, item)
-                except AssertionError:
-                    pass
+                    link_manager.link(item)
+                except AssertionError | AlreadyLinkedException as _e:
+                    logger.log(message=f"Failed to link: {_e.message}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)

@@ -36,3 +36,6 @@ class EndOfCycleException(Exception):
 
 class InvalidArgumentName(Exception):
     pass
+
+class AlreadyLinkedException(Exception):
+    pass

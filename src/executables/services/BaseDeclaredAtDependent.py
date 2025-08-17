@@ -2,7 +2,7 @@ from executables.services import BaseService
 from app.App import logger
 from db.Models.Content.ContentUnit import ContentUnit
 from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgument
-from db.LinkManager import link_manager
+from db.LinkManager import LinkManager
 
 class BaseDeclaredAtDependent(BaseService):
     pass_params = {}
@@ -74,5 +74,7 @@ class BaseDeclaredAtDependent(BaseService):
 
         for item in list_items:
             for ext in self.add_after:
+                link_manager = LinkManager(ext)
+
                 if ext != None:
-                    link_manager.link(ext, item)
+                    link_manager.link(item)

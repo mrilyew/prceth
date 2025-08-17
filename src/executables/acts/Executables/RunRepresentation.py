@@ -2,7 +2,7 @@ from executables.acts import BaseAct
 from db.Models.Content.ContentUnit import ContentUnit
 from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument, ContentUnitArgument
-from db.LinkManager import link_manager
+from db.LinkManager import LinkManager
 from db.DbFind import db_find
 from app.App import logger
 
@@ -69,6 +69,8 @@ class RunRepresentation(BaseAct):
             item.save(force_insert=True)
 
             for _item in __link_to:
+                link_manager = LinkManager(item)
+
                 try:
                     link_manager.link(item, _item)
                 except AssertionError as _e:

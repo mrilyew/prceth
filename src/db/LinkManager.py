@@ -2,16 +2,28 @@ from db.Models.Content.StorageUnit import StorageUnit
 from db.Models.Content.ContentUnit import ContentUnit
 from db.Models.Relations.ContentUnitRelation import ContentUnitRelation
 from app.App import logger
+from resources.Exceptions import AlreadyLinkedException
 
 class LinkManager:
-    @staticmethod
-    def link(parent: ContentUnit, child, revision: bool = False)->bool:
-        assert parent != None and child != None, 'Not found item to link'
-        assert parent.uuid != None and child.uuid != None, "Can't link: Items probaly not saved"
-        assert parent.uuid != child.uuid, "Can't link to themselves"
+    ever_linked = []
+
+    def __init__(self, parent):
+        self.parent = parent
+
+    def __check_if_already_linked_somewhere(self, child):
+        for linked_id in self.ever_linked:
+            if f"{child.short_name}_{child.uuid}" == linked_id:
+                raise AlreadyLinkedException(f"{child.short_name}_{child.uuid} already linked somewhere")
+
+    def link(self, child, revision: bool = False)->bool:
+        assert self.parent != None and child != None, 'Not found item to link'
+        assert self.parent.uuid != None and child.uuid != None, "Can't link: Items probaly not saved"
+        assert self.parent.uuid != child.uuid, "Can't link to themselves"
+
+        self.__check_if_already_linked_somewhere(child)
 
         _link = ContentUnitRelation()
-        _link.parent = parent.uuid
+        _link.parent = self.parent.uuid
         _link.child_type = child.__class__.__name__
         _link.child = child.uuid
 
@@ -20,15 +32,19 @@ class LinkManager:
 
         _link.save()
 
-        logger.log(message=f"Linked {parent.short_name}_{parent.uuid}<->{child.short_name}_{child.uuid}", section=logger.SECTION_LINKAGE, kind = logger.KIND_SUCCESS)
+        # We could to append the actual entity,
+        # but i think it will take up a lot of memory so just appending ids
+
+        self.ever_linked.append(f"{child.short_name}_{child.uuid}")
+
+        logger.log(message=f"Linked {self.parent.short_name}_{self.parent.uuid}<->{child.short_name}_{child.uuid}", section=logger.SECTION_LINKAGE, kind = logger.KIND_SUCCESS)
 
         return True
 
-    @staticmethod
-    def unlink(parent, child, revision: bool = False)->bool:
-        assert parent != None and child != None, 'Not found item to unlink'
+    def unlink(self, child, revision: bool = False)->bool:
+        assert self.parent != None and child != None, 'Not found item to unlink'
 
-        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == parent.uuid).where(ContentUnitRelation.child == child.uuid).where(ContentUnitRelation.child_type == child.__class__.__name__)
+        _link = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.parent.uuid).where(ContentUnitRelation.child == child.uuid).where(ContentUnitRelation.child_type == child.__class__.__name__)
         if revision == True:
             _link = _link.where(ContentUnitRelation.is_revision == 1)
 
@@ -37,21 +53,19 @@ class LinkManager:
 
         _link.delete()
 
-        logger.log(message=f"Unlinked {parent.short_name}_{parent.uuid}<->{child.short_name}_{child.uuid}", section=logger.SECTION_LINKAGE, kind = logger.KIND_SUCCESS)
+        logger.log(message=f"Unlinked {self.parent.short_name}_{self.parent.uuid}<->{child.short_name}_{child.uuid}", section=logger.SECTION_LINKAGE, kind = logger.KIND_SUCCESS)
 
     # Better not to use
-    @staticmethod
-    def linksListId(parent, by_class = None, revision: bool = False):
-        selection = LinkManager._linksSelection(parent, by_class, revision)
+    def linksListId(self, by_class = None, revision: bool = False):
+        selection = LinkManager._linksSelection(self.parent, by_class, revision)
         ids = []
         for unit in selection:
             ids.append(unit.child)
 
         return ids
 
-    @staticmethod
-    def linksList(parent, by_class = None, revision: bool = False):
-        selection = LinkManager._linksSelection(parent, by_class, revision)
+    def linksList(self, by_class = None, revision: bool = False):
+        selection = LinkManager._linksSelection(self.parent, by_class, revision)
 
         c_s = []
         s_s = []
@@ -73,9 +87,8 @@ class LinkManager:
 
         return ret
 
-    @staticmethod
-    def _linksSelection(parent, by_class = None, revision: bool = False):
-        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == parent.uuid)
+    def _linksSelection(self, by_class = None, revision: bool = False):
+        _links = ContentUnitRelation().select().where(ContentUnitRelation.parent == self.parent.uuid)
         if by_class != None:
             _links = _links.where(ContentUnitRelation.child_type == by_class.self_name)
 
@@ -118,5 +131,3 @@ class LinkManager:
     @classmethod
     def injectLinksToJsonFromInstance(cls, i, recurse_level = 0):
         return cls.injectLinksToJson(i.json_content, cls.linksList(i), recurse_level)
-
-link_manager = LinkManager()
