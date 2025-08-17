@@ -1,7 +1,7 @@
 from app.App import app, logger
 from resources.Consts import consts
-from repositories.ActsRepository import ActsRepository
 from utils.MainUtils import dump_json, parse_json
+from executables.acts.Executables.RunAct import RunAct
 from db.Models.Instances.ServiceInstance import ServiceInstance
 from repositories.ServicesRepository import ServicesRepository
 from resources.Exceptions import FatalError, EndOfCycleException
@@ -13,19 +13,13 @@ consts['context'] = 'cli'
 class CLI:
     async def act(self):
         assert "i" in app.argv, "pass the name of act as --i"
-        __is_print = 'silent' not in app.argv
+        is_silent = 'silent' in app.argv
 
-        __act_name_input = app.argv.get("i")
-        act_class = ActsRepository().getByName(plugin_name=__act_name_input)
+        act = RunAct()
+        output = await act.safeExecute(app.argv)
 
-        assert act_class != None, "act not found"
-
-        act = act_class()
-
-        act_response = await act.safeExecute(app.argv)
-
-        if __is_print:
-            print(dump_json(act_response, indent=4))
+        if is_silent == False:
+            print(dump_json(output, indent=4))
 
     async def service(self):
         assert "i" in app.argv, "service_instance id (--i) not passed"

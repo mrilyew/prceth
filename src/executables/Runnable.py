@@ -37,7 +37,7 @@ class Runnable:
     @classmethod
     def canBeUsedAt(cls, at):
         return at in cls.available
-        
+
     @classmethod
     def isConfirmable(cls):
         return getattr(cls, "PreExecute", None)
