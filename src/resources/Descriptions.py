@@ -235,3 +235,11 @@ descriptions["c.search.link.name"] = {
     "eng": "Linked",
     "rus": "Привязано к"
 }
+descriptions["acts.export.export.items.name"] = {
+    "eng": "Items",
+    "rus": "Элементы"
+}
+descriptions["acts.export.export.type.name"] = {
+    "eng": "Export type",
+    "rus": "Тип экспорта"
+}

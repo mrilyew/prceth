@@ -64,7 +64,9 @@ class DbInsert():
 
             if link_main != None:
                 _l = links_list[int(link_main)]
-                out.storage_unit = _l.uuid
+
+                if _l != None:
+                    out.storage_unit = _l.uuid
 
         # making thumbnail
         if is_make_thumbnail == True:

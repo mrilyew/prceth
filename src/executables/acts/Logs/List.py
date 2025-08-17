@@ -9,11 +9,15 @@ class List(BaseAct):
         params = {}
 
         return params
-    
-    async def execute(self, args = {}):
-        if consts.get("context") == "web":
-            assert config.get("web.logs_watching.allow") == True, "not allowed"
 
+    @classmethod
+    def canBeUsedAt(cls, at):
+        if at == "web":
+            return config.get("web.logs_watching.allow")
+
+        return super().canBeUsedAt(at)
+
+    async def execute(self, args = {}):
         logs_storage = logger.logs_storage
         dir_storage = logs_storage.dir
 

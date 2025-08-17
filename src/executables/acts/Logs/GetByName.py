@@ -10,18 +10,25 @@ class GetByName(BaseAct):
         params = {}
         params["file"] = StringArgument({
             "default": None,
+            "assertion": {
+                "not_null": True
+            }
         })
 
         return params
-    
+
+    @classmethod
+    def canBeUsedAt(cls, at):
+        if at == "web":
+            return config.get("web.logs_watching.allow")
+
+        return super().canBeUsedAt(at)
+
     async def execute(self, args = {}):
         _file = args.get("file")
 
         if ".json" not in _file:
             _file = _file + ".json"
-
-        if consts.get("context") == "web":
-            assert config.get("web.logs_watching.allow") == True, "not allowed"
 
         logs_storage = logger.logs_storage
         dir_storage = logs_storage.dir

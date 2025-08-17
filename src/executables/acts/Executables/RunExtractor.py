@@ -4,6 +4,7 @@ from repositories.ExtractorsRepository import ExtractorsRepository
 from declarable.ArgumentsTypes import StringArgument, ContentUnitArgument, CsvArgument
 from db.LinkManager import link_manager
 from app.App import logger
+import asyncio
 
 class RunExtractor(BaseAct):
     executable_cfg = {

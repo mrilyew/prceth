@@ -152,8 +152,14 @@ class Post(BaseVkItemId):
             attachments_info = self.args.get('attachments_info')
             attachments_file = self.args.get('attachments_file')
 
-            should_download_json = attachments_info[0] == "*" or att_type in attachments_info
-            should_download_file = attachments_file[0] == "*" or att_type in attachments_file
+            should_download_json = False
+            should_download_file = False
+
+            if len(attachments_info) > 0:
+                should_download_json = attachments_info[0] == "*" or att_type in attachments_info
+
+            if len(attachments_file) > 0:
+                should_download_file = attachments_file[0] == "*" or att_type in attachments_file
 
             if should_download_json == False:
                 return None
