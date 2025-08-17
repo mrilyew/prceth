@@ -10,6 +10,8 @@ from db.DbInsert import db_insert
 import os
 
 class Audio(BaseVkItemId):
+    required_modules = ["yt-dlp"]
+
     @classmethod
     def declare(cls):
         params = {}

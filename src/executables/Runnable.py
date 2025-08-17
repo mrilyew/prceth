@@ -1,3 +1,5 @@
+from importlib.metadata import distributions
+
 class classproperty(property):
     def __get__(self, owner_self, owner_cls):
         return self.fget(owner_cls)
@@ -6,6 +8,7 @@ class Runnable:
     buffer = {}
     base_categories = ["template", "base"]
     available = ['web', 'cli']
+    required_modules = []
 
     @classproperty
     def category(self)->str:
@@ -38,6 +41,17 @@ class Runnable:
     @classmethod
     def isConfirmable(cls):
         return getattr(cls, "PreExecute", None)
+
+    @classmethod
+    def isModulesInstalled(cls):
+        all_installed = {dist.metadata["Name"].lower() for dist in distributions()}
+        satisf_libs = []
+
+        for required_module in cls.required_modules:
+            if required_module in all_installed:
+                satisf_libs.append(required_module)
+
+        return len(satisf_libs) == len(cls.required_modules)
 
     @classmethod
     def full_name(cls):

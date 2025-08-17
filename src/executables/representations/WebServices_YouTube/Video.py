@@ -4,6 +4,7 @@ from executables.Confirmable import Confirmable
 from declarable.ArgumentsTypes import CsvArgument, StringArgument
 
 class Video(Representation):
+    required_modules = ["yt-dlp"]
     executable_cfg = {
         "variants": []
     }

@@ -4,10 +4,7 @@ xmltodict
 pycryptodomex
 peewee==3.17.6
 requests==2.32.3
-selenium==4.28.1
 urllib3==2.2.3
-beautifulsoup4==4.12.3 
-fake-useragent==2.0.3
 json5==0.10.0
 colorama
 pymysql
@@ -18,5 +15,4 @@ certifi==2024.8.30
 charset-normalizer==3.3.2
 hachoir==3.3.0
 idna==3.10
-yt-dlp
 snowflake-id
