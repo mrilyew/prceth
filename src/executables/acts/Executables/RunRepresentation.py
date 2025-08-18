@@ -18,7 +18,7 @@ class RunRepresentation(BaseAct):
                 "not_null": True,
             }
         })
-        params["link"] = CsvArgument({
+        params["link_after"] = CsvArgument({
             "orig": ContentUnitArgument({}),
             "docs": {
                 "name": 'run_representation_link_param_name',
@@ -62,18 +62,22 @@ class RunRepresentation(BaseAct):
 
         __ents = await representationClass.extract(i)
         __all_items = []
-        __link_to = ContentUnit.ids(links)
+        __link_to = []
+
+        if links != None and len(links) > 0:
+            __link_to = ContentUnit.ids(links)
 
         for item in __ents:
             item.save(force_insert=True)
 
-            for _item in __link_to:
-                link_manager = LinkManager(item)
+            if __link_to != None and type(__link_to) == list:
+                for _item in __link_to:
+                    link_manager = LinkManager(item)
 
-                try:
-                    link_manager.link(item, _item)
-                except AssertionError as _e:
-                    logger.logException(_e, section=logger.SECTION_LINKAGE)
+                    try:
+                        link_manager.link(item, _item)
+                    except AssertionError as _e:
+                        logger.logException(_e, section=logger.SECTION_LINKAGE)
 
             __all_items.append(item.api_structure())
 

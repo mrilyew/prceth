@@ -4,7 +4,7 @@ from db.Models.Content.ContentUnit import ContentUnit
 from db.Models.Relations.ContentUnitRelation import ContentUnitRelation
 from db.Models.Content.StorageUnit import StorageUnit
 from peewee import Model, SqliteDatabase
-from db.LinkManager import link_manager
+from db.LinkManager import LinkManager
 from app.App import storage
 
 class ArchiveExport:

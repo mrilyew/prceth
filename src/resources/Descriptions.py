@@ -121,7 +121,7 @@ descriptions["representations.data.file.type.link.name"] = {
     "eng": "Link",
     "rus": "Ссылка",
 }
-descriptions["run_representation_link_param_name"] = {
+descriptions["acts.run.link.name"] = {
     "eng": "Link after execution",
     "rus": "Привязать после исполнения",
 }

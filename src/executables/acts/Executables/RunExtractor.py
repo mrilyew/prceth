@@ -19,10 +19,10 @@ class RunExtractor(BaseAct):
                 "not_null": True
             }
         })
-        params["link"] = CsvArgument({
+        params["link_after"] = CsvArgument({
             "orig": ContentUnitArgument({}),
             "docs": {
-                "name": 'run_representation_link_param_name',
+                "name": "acts.run.link.name",
             },
             'default': [],
         })
@@ -31,7 +31,7 @@ class RunExtractor(BaseAct):
 
     async def execute(self, i = {}):
         extractor_name = i.get('extractor') # Extractor that will be using for export
-        append_ids = i.get('link')
+        append_ids = i.get('link_after')
         extractor_class = (ExtractorsRepository()).getByName(extractor_name)
         results = []
         out = []
@@ -44,9 +44,9 @@ class RunExtractor(BaseAct):
 
         for _rel in relations:
             if _rel.is_collection == True:
-                extractor.add_after.append(_rel)
+                extractor.link_after_add(_rel)
 
-        extractor.link(results)
+        extractor.subscribe(results)
 
         def __onerror(exc):
             logger.logException(exc, section=logger.SECTION_EXTRACTORS)
@@ -61,25 +61,29 @@ class RunExtractor(BaseAct):
             pass
         except Exception as __ee:
             if extractor != None:
+                print(getattr(extractor, "trigger_hooks", None))
                 await extractor.trigger_hooks("error", __ee)
 
             raise __ee
 
         assert len(results) > 0, "nothing exported"
 
-        for __res in results:
-            __res.save(force_insert=True)
+        for item in results:
+            if item.is_saved() == False:
+                item.save(force_insert=True)
 
-            for ext in extractor.add_after:
+            for ext in extractor.link_after:
                 if ext.is_saved() == False:
                     ext.save(force_insert=True)
 
                 try:
                     link_manager = LinkManager(ext)
-                    link_manager.link(__res)
+                    link_manager.link(item)
                 except AssertionError as _e:
                     logger.logException(_e, section=logger.SECTION_LINKAGE)
 
-            out.append(__res.api_structure())
+            out.append(item.api_structure())
 
-        return out
+        return {
+            "items": out
+        }

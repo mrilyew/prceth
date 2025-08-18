@@ -55,13 +55,12 @@ class BaseIterableExtended(BaseTimeoutable, BaseExtractor):
         max_iteration = i.get('max_iteration')
         _strategy = self.__class__.ExecuteStrategy(i)
 
-
         if getattr(_strategy, '_get_collection', None) != None:
             cols = await _strategy._get_collection()
             _strategy.params['collections'] = cols
 
             for col in cols:
-                self.add_after.append(col)
+                self.link_after_add(col)
 
         await _strategy.set_count()
 

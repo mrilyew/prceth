@@ -59,6 +59,7 @@ Todo:
 - [ ] file_containment (?)
 - [x] Разделение data.file на mime.image, mime.video, mime.audio
 - [ ] Полное разделение репрезентации (?) Разделить на файлы способы выполнения, поддиректория для локализаций
+- [ ] Сделать репрезентацию наследованием как executable, так и contentunit
 
 - [ ] Data.Hyperlink
 - [ ] Data.File from storageunit

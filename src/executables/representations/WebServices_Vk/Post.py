@@ -96,6 +96,8 @@ class Post(BaseVkItemId):
                         "type": attachment.get('type'),
                         f"{attachment.get('type')}": attachment_item.sign()
                     })
+
+                    logger.log(f"Got attachment with type \"{attachment.get('type')}\" (cu_{attachment_item.uuid})")
                 except Exception as e:
                     logger.logException(e, "Vk", silent=False, prefix="Error processing attachment: ")
 
@@ -103,8 +105,8 @@ class Post(BaseVkItemId):
                 for key, repost in enumerate(reposts):
                     try:
                         repost_item = await self.format_repost(key, repost, out)
-
-                        assert repost_item != None
+                        if attachment_item == False:
+                            continue
 
                         item['relative_copy_history'].append(repost_item.sign())
                     except Exception as exc:
@@ -170,7 +172,7 @@ class Post(BaseVkItemId):
 
                 _item = output[0]
                 _item.unlisted = True
-                _item.save(force_insert=True)
+                _item.save()
 
                 orig.add_link(_item)
             else:
@@ -202,7 +204,7 @@ class Post(BaseVkItemId):
             logger.log(message=f"Found repost {key}",section="Vk",kind=logger.KIND_MESSAGE)
 
             repost_thing = Post()
-            vals = await repost_thing.extract({
+            output = await repost_thing.extract({
                 "object": repost,
                 "api_url": self.args.get("api_url"),
                 "vk_path": self.args.get("vk_path"),
@@ -211,8 +213,12 @@ class Post(BaseVkItemId):
                 "download_reposts": False,
             })
 
-            _item = vals[0]
+            _item = output[0]
+            print(_item.link_queue)
             _item.unlisted = True
             _item.save()
 
             orig.add_link(_item)
+            print(_item.link_queue)
+
+            return _item

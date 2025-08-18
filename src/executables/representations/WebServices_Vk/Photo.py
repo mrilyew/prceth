@@ -96,6 +96,6 @@ class Photo(BaseVkItemId):
 
                     logger.log(message=f"Downloaded photo {item_id} (su_{main_su.uuid})",section="Vk",kind=logger.KIND_SUCCESS)
                 except Exception as _ea:
-                    logger.log(_ea,section="Vk",kind=logger.KIND_ERROR,prefix="Error downloading photo: ")
+                    logger.logException(_ea,section="Vk",prefix="Error downloading photo: ")
 
             list_to_add.append(out)

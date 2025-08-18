@@ -47,7 +47,7 @@ class ContentUnit(BaseModel):
     unlisted = BooleanField(index=True,default=0)
     deleted = BooleanField(index=True,default=0)
 
-    link_queue = []
+    link_queue = None
     via_representation = None
     via_extractor = None
 
@@ -93,7 +93,30 @@ class ContentUnit(BaseModel):
     # it will be saved later
 
     def add_link(self, item):
+        if self.link_queue is None:
+            self.link_queue = []
         self.link_queue.append(item)
+
+    def write_link_queue(self):
+        from db.LinkManager import LinkManager
+
+        link_manager = LinkManager(self)
+
+        print(self.display_name)
+        print(self.uuid)
+        print(self.link_queue)
+        for item in self.link_queue:
+            if item == None:
+                continue
+
+            try:
+                link_manager.link(item)
+            except AssertionError as _e:
+                logger.log(message=f"Failed to link: {str(_e)}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)
+            except AlreadyLinkedException as _e:
+                logger.log(message=f"Failed to link: {str(_e)}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)
+
+        self.link_queue = None
 
     def set_common_link(self, item):
         self.storage_unit = item.uuid
@@ -221,17 +244,4 @@ class ContentUnit(BaseModel):
         super().save(**kwargs)
 
         if self.link_queue != None:
-            from db.LinkManager import LinkManager
-
-            link_manager = LinkManager(self)
-
-            for item in self.link_queue:
-                if item == None:
-                    continue
-
-                try:
-                    link_manager.link(item)
-                except AssertionError as _e:
-                    logger.log(message=f"Failed to link: {str(_e)}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)
-                except AlreadyLinkedException as _e:
-                    logger.log(message=f"Failed to link: {str(_e)}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)
+            self.write_link_queue()
