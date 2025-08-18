@@ -16,7 +16,6 @@ class BaseModel(Model):
             res = []
             _query = cls.select().where(cls.uuid.in_(id))
 
-            print(_query)
             for _e in _query:
                 res.append(_e)
 

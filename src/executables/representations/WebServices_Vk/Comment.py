@@ -5,27 +5,25 @@ class Comment(Post):
 
     class Extractor(Post.Extractor):
         async def __response(self, i = {}):
-            items_ids = i.get('ids')
-            final_response = {
+            ids = i.get('ids')
+            output = {
                 'items': [],
                 'profiles': [],
                 'groups': [],
             }
 
-            assert len(items_ids) < 5, 'bro too many'
-
-            for id in items_ids:
-                spl = id.split('_')
-                response = await self.vkapi.call("wall.getComment", {"owner_id": spl[0], "comment_id": spl[1], "extended": 1})
+            for in_id in ids:
+                id_list = in_id.split('_')
+                response = await self.vkapi.call("wall.getComment", {"owner_id": id_list[0], "comment_id": id_list[1], "extended": 1})
 
                 if type(response) == dict and 'items' in response:
                     for __item in response.get('items'):
-                        final_response['items'].append(__item)
+                        output['items'].append(__item)
 
                     for __item in response.get('profiles'):
-                        final_response['profiles'].append(__item)
+                        output['profiles'].append(__item)
 
                     for __item in response.get('groups'):
-                        final_response['groups'].append(__item)
+                        output['groups'].append(__item)
 
-            return final_response
+            return output

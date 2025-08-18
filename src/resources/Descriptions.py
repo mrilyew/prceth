@@ -89,11 +89,11 @@ descriptions["representations.abstract.text.name"] = {
     "eng": "Text",
     "rus": "Текст"
 }
-descriptions["data_file_path"] = {
+descriptions["representations.data.file.path.name"] = {
     "eng": "Path to file",
     "rus": "Путь к файлу"
 }
-descriptions["data_file_type"] = {
+descriptions["representations.data.file.type.name"] = {
     "eng": "Type",
     "rus": "Тип"
 }
@@ -105,25 +105,28 @@ descriptions["data_file_extension"] = {
     "eng": "Extension",
     "rus": "Сохраняемое расширение",
 }
-descriptions["data_file_url"] = {
+descriptions["representations.data.file.url.name"] = {
     "eng": "URL",
     "rus": "URL",
 }
-descriptions["data_file_type_copy"] = {
+descriptions["representations.data.file.type.copy.name"] = {
     "eng": "Copy",
     "rus": "Копирование",
 }
-descriptions["data_file_type_move"] = {
+descriptions["representations.data.file.type.move.name"] = {
     "eng": "Move",
     "rus": "Перемещение",
 }
-descriptions["data_file_type_link"] = {
+descriptions["representations.data.file.type.link.name"] = {
     "eng": "Link",
     "rus": "Ссылка",
 }
 descriptions["run_representation_link_param_name"] = {
     "eng": "Link after execution",
     "rus": "Привязать после исполнения",
+}
+descriptions["representations.data.file.storage_unit.name"] = {
+    "eng": "Storage Unit ID"
 }
 descriptions["config.ui.lang.name"] = {
     "eng": "Language",

@@ -43,7 +43,7 @@ class Comments(BaseIterableExtended):
         def __init__(self, i = {}):
             super().__init__(i)
 
-            self.params['vkapi'] = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
+            self.params['vkapi'] = VkApi(token=i.get("access_token"),endpoint=i.get("api_url"))
             self.params['attachments_info'] = i.get('attachments_info')
             self.params['attachments_file'] = i.get('attachments_file')
             self.params['_method'] = ''

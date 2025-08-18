@@ -48,15 +48,20 @@ class ContentUnit(BaseModel):
     deleted = BooleanField(index=True,default=0)
 
     link_queue = []
+    via_representation = None
+    via_extractor = None
 
     # Properties
 
     @cached_property
     def json_content(self):
+        if self.content == None:
+            return {}
+
         return parse_json(self.content)
 
     @cached_property
-    def main_su(self):
+    def common_link(self):
         if self.storage_unit != None:
             su = StorageUnit.ids(self.storage_unit)
 
@@ -79,11 +84,19 @@ class ContentUnit(BaseModel):
         from db.LinkManager import LinkManager
 
         loaded_content = self.json_content
-
         if recursive == True and recurse_level < 3:
-            loaded_content = LinkManager.injectLinksToJsonFromInstance(self, recurse_level)
+            link_manager = LinkManager(self)
+            loaded_content = link_manager.injectLinksToJsonFromInstance(recurse_level)
 
         return loaded_content
+
+    # it will be saved later
+
+    def add_link(self, item):
+        self.link_queue.append(item)
+
+    def set_common_link(self, item):
+        self.storage_unit = item.uuid
 
     def update_data(self, new_data: dict):
         cnt = self.json_content
@@ -98,7 +111,11 @@ class ContentUnit(BaseModel):
             for __ in thumbs:
                 thumbs_out.append(__.state())
 
-        self.outer = json.dumps({"thumbnail": thumbs_out}, ensure_ascii=False)
+        write_this = {}
+        if len(thumbs_out) > 0:
+            write_this["thumbnail"] = thumbs_out
+
+        self.outer = json.dumps(write_this, ensure_ascii=False)
 
     @cached_property
     def thumbnail_list(self):
@@ -176,7 +193,27 @@ class ContentUnit(BaseModel):
             json_file.write(json.dumps(self.api_structure(sensitive=True), indent=2, ensure_ascii=False))
 
     def save(self, **kwargs):
+        kwargs["force_insert"] = True
+
         self.created_at = float(datetime.datetime.now().timestamp())
+
+        if getattr(self, "content", None) != None and type(self.content) != str:
+            self.content = dump_json(self.content)
+
+        if getattr(self, "source", None) != None and type(self.source) != str:
+            self.source = dump_json(self.source)
+
+        if getattr(self, "via_representation", None) != None:
+            self.representation = self.via_representation.full_name()
+
+            if True:
+                thumb_class = self.via_representation.Thumbnail(self.via_representation)
+                thumb_out = thumb_class.create(self, {})
+
+                self.set_thumbnail(thumb_out)
+
+        if getattr(self, "via_extractor", None) != None:
+            self.extractor = self.via_extractor.full_name()
 
         if getattr(self, "declared_created_at", None) == None:
             self.declared_created_at = float(datetime.datetime.now().timestamp())
@@ -194,5 +231,7 @@ class ContentUnit(BaseModel):
 
                 try:
                     link_manager.link(item)
-                except AssertionError | AlreadyLinkedException as _e:
-                    logger.log(message=f"Failed to link: {_e.message}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)
+                except AssertionError as _e:
+                    logger.log(message=f"Failed to link: {str(_e)}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)
+                except AlreadyLinkedException as _e:
+                    logger.log(message=f"Failed to link: {str(_e)}", section=logger.SECTION_LINKAGE, kind = logger.KIND_ERROR)

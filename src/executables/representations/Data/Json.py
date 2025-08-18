@@ -1,7 +1,6 @@
 from executables.representations import Representation
 from utils.MainUtils import parse_json, list_conversation
 from declarable.ArgumentsTypes import StringArgument, ObjectArgument
-from db.DbInsert import db_insert
 
 class Json(Representation):
     docs = {
@@ -11,9 +10,11 @@ class Json(Representation):
     @classmethod
     def declare(cls):
         params = {}
+        # мб не трогать
         params["object"] = ObjectArgument({
             "type": "object",
         })
+        # todo make it csv
         params["text"] = StringArgument({})
 
         return params
@@ -23,22 +24,22 @@ class Json(Representation):
             json_text = i.get('text')
             __obj = parse_json(json_text)
 
-            out = db_insert.contentFromJson({
-                'content': __obj,
-            })
+            out = self.ContentUnit()
+            out.content = __obj
 
             return [out]
 
         async def extractByObject(self, i = {}):
             json_object = list_conversation(i.get('object'))
-            out = []
+            outs = []
             
             for i in json_object:
-                out.append(db_insert.contentFromJson({
-                    'content': i,
-                }))
+                out = self.ContentUnit()
+                out.content = i
 
-            return out
+                outs.append(out)
+
+            return outs
 
         def extractWheel(self, i = {}):
             if 'object' in i:

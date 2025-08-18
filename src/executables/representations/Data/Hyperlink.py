@@ -1,6 +1,5 @@
 from executables.representations import Representation
 from declarable.ArgumentsTypes import CsvArgument
-from db.DbInsert import db_insert
 
 class Hyperlink(Representation):
     docs = {
@@ -27,12 +26,11 @@ class Hyperlink(Representation):
             outs = []
 
             for url in urls:
+                out = self.ContentUnit()
+                out.content = {
+                    'url': str(url),
+                }
                 # TODO add opengraph parse
-                out = db_insert.contentFromJson({
-                    'content': {
-                        "url": str(url),
-                    },
-                })
 
                 outs.append(out)
 

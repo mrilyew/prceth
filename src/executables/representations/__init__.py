@@ -21,7 +21,7 @@ class Representation(RecursiveDeclarable, Runnable, Documentable):
 
         for el in ress:
             el.unlisted = int(i.get('unlisted') == True)
-            el.representation = cls.full_name()
+            # el.representation = cls.full_name()
 
         return ress
 
@@ -67,11 +67,10 @@ class Representation(RecursiveDeclarable, Runnable, Documentable):
 
             return __res
 
-        def self_insert(self, json_data: dict):
-            json_data['representation'] = self.outer.full_name()
-            json_data['representation_class'] = self
+        def self_insert(self, item):
+            item.via_representation = self.outer
 
-            return json_data
+            return item
 
     class Thumbnail(ThumbnailMethod):
         pass

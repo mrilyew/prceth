@@ -163,7 +163,7 @@ class Logger(Hookable):
             "silent": silent
         })
 
-    def logException(self, input_exception, section: str = "App", silent: bool = False):
+    def logException(self, input_exception, section: str = "App", silent: bool = False, prefix = ""):
         __exp = traceback.format_exc()
 
-        self.log(section=section, message=type(input_exception).__name__ + " " + __exp, kind=self.KIND_ERROR, silent=silent)
+        self.log(section=section, message=prefix + type(input_exception).__name__ + " " + __exp, kind=self.KIND_ERROR, silent=silent)

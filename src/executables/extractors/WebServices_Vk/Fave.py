@@ -24,7 +24,7 @@ class Fave(BaseIterableExtended):
         def __init__(self, i = {}):
             super().__init__(i)
 
-            self.params['vkapi'] = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
+            self.params['vkapi'] = VkApi(token=i.get("access_token"),endpoint=i.get("api_url"))
             self.params['appends'] = i.get('appends')
             self.params['_class'] = None
             self.params['_method'] = ''

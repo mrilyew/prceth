@@ -2,7 +2,6 @@ from executables.representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
 from utils.MainUtils import valid_name
-from db.DbInsert import db_insert
 from app.App import logger
 from pathlib import Path
 import os
@@ -19,51 +18,42 @@ class Doc(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids = i.get('ids')
-
-            response = await self.vkapi.call("docs.getById", {"docs": (",".join(items_ids)), "extended": 1})
-
-            return response
+            return await self.vkapi.call("docs.getById", {"docs": (",".join(i.get('ids'))), "extended": 1})
 
         async def item(self, item, link_entities):
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
+            item_title = item.get("title")
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
             private_url = item.get("private_url")
-            is_do_unlisted = self.args.get("unlisted") == 1
-
-            logger.log(message=f"Recieved document {item_id}",section="Vk!Doc",kind=logger.KIND_MESSAGE)
-
-            main_su = None
-            item_ext = item.get("ext")
-            item_title = item.get("title")
-            file_name = valid_name(item_title + "." + item_ext)
-            item_url = item.get("url")
             item_filesize = item.get("size", 0)
+            item_url = item.get("url")
+            item_ext = item.get("ext")
+
+            out = self.ContentUnit()
+            out.display_name = item_title
+            out.source = {
+                'type': 'vk',
+                'vk_type': 'doc',
+                'content': item_id
+            }
+            out.unlisted = self.args.get("unlisted") == 1
+            out.declared_created_at = item.get("date")
+            out.content = item
+
+            logger.log(message=f"Recieved document {item_id}",section="Vk",kind=logger.KIND_MESSAGE)
 
             if self.args.get("download") == True:
-                main_su = db_insert.storageUnit()
-                temp_dir = main_su.temp_dir
-                save_path = Path(os.path.join(temp_dir, file_name))
+                su = self.StorageUnit()
+                save_path = Path(os.path.join(su.temp_dir, valid_name(item_title + "." + item_ext)))
 
                 await download_manager.addDownload(end=item_url,dir=save_path)
 
-                main_su.set_main_file(save_path)
+                su.set_main_file(save_path)
 
-                logger.log(message=f"Download file for doc {item_id}",section="Vk!Doc",kind=logger.KIND_SUCCESS)
+                out.add_link(su)
+                out.set_common_link(su)
 
-            cu = db_insert.contentFromJson({
-                "links": [main_su],
-                "link_main": 0,
-                "name": item_title,
-                "source": {
-                    'type': 'vk',
-                    'vk_type': 'doc',
-                    'content': item_id
-                },
-                "content": item,
-                "unlisted": is_do_unlisted,
-                "declared_created_at": item.get("date"),
-            })
+                logger.log(message=f"Download file for doc {item_id}",section="Vk",kind=logger.KIND_SUCCESS)
 
-            link_entities.append(cu)
+            link_entities.append(out)

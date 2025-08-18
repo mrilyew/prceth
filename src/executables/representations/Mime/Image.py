@@ -11,9 +11,9 @@ class Image(File):
     class Extractor(File.Extractor):
         async def process_item(self, item):
             new_data = {}
-            su = item.main_su
+            common_link = item.common_link
 
-            with PILImage.open(str(su.path())) as img:
+            with PILImage.open(str(common_link.path())) as img:
                 new_data = {
                     "width": img.size[0],
                     "height": img.size[1],

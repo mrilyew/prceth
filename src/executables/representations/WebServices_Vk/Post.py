@@ -3,7 +3,6 @@ from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArg
 from repositories.RepresentationsRepository import RepresentationsRepository
 from utils.MainUtils import proc_strtr
 from app.App import logger
-from db.DbInsert import db_insert
 
 class Post(BaseVkItemId):
     vk_type = 'post'
@@ -50,104 +49,97 @@ class Post(BaseVkItemId):
             self.buffer['attachments_file'] = i.get("attachments_file")
 
         async def __response(self, i = {}):
-            items_ids = i.get('ids')
-
-            response = await self.vkapi.call("wall.getById", {"posts": (",".join(items_ids)), "extended": 1})
-
-            return response
+            return await self.vkapi.call("wall.getById", {"posts": (",".join(i.get('ids'))), "extended": 1})
 
         async def item(self, item, list_to_add):
             '''
             Converts VK Api Post object to readable format
             '''
 
-            attachments_list = item.get('attachments', [])
-            reposts_list = item.get('copy_history', [])
-
-            is_do_unlisted = self.args.get("unlisted") == 1
-            do_download_attachments = True
-            do_download_reposts = self.args.get('download_reposts') == True
-
-            item["relative_attachments"] = []
-            item["relative_copy_history"] = []
-
-            self.outer._insertVkLink(item, self.args.get('vk_path'))
-
-            item_id = f"{item.get('owner_id')}_{item.get('id')}"
-            if self.outer.vk_type == "message":
-                item_id = f"{item.get('peer_id', item.get('from_id'))}_{item.get('id')}"
-
+            # deleting useless
             item.pop("track_code", None)
             item.pop("hash", None)
 
-            logger.log(message=f"Recieved {self.outer.vk_type} {item_id}",section="Vk!Post",kind="message")
+            # definings
 
-            links = []
+            self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            for key, attachment in enumerate(attachments_list):
-                try:
-                    attachment_item = await self.format_attachment(key, attachment, links)
+            attachments = item.get('attachments', [])
+            reposts = item.get('copy_history', [])
+            item["relative_attachments"] = []
+            item["relative_copy_history"] = []
 
-                    if attachment_item != None:
-                        item['relative_attachments'].append({
-                            "type": attachment.get('type'),
-                            f"{attachment.get('type')}": attachment_item.sign()
-                        })
-                except ModuleNotFoundError:
-                    pass
-                except Exception as exc:
-                    logger.logException(exc, "Vk!Post", silent=False)
+            do_download_attachments = True
+            do_download_reposts = self.args.get('download_reposts') == True
 
-            if reposts_list != None and do_download_reposts:
-                for key, repost in enumerate(reposts_list):
-                    try:
-                        repost_item = await self.format_repost(key, repost, links)
+            # content unit parts
 
-                        if repost_item != None:
-                            item['relative_copy_history'].append(repost_item.sign())
-                    except ModuleNotFoundError:
-                        pass
-                    except Exception as exc:
-                        logger.logException(exc, "Vk!Post", silent=False)
+            item_id = f"{item.get('owner_id')}_{item.get('id')}"
+            name = f"{self.outer.vk_type.title()} {str(item_id)}"
+            if self.outer.vk_type == "message":
+                item_id = f"{item.get('peer_id', item.get('from_id'))}_{item.get('id')}"
 
-            _name = f"{self.outer.vk_type.title()} {str(item_id)}"
             if item.get('text') != None and type(item.get('text')) == str and len(item.get('text')) > 0:
-                _name = proc_strtr(item.get('text'), 100)
+                name = proc_strtr(item.get('text'), 100)
+
+            logger.log(message=f"Recieved {self.outer.vk_type} {item_id}",section="Vk",kind=logger.KIND_MESSAGE)
+
+            out = self.ContentUnit()
+
+            for key, attachment in enumerate(attachments):
+                try:
+                    attachment_item = await self.format_attachment(key, attachment, out)
+                    if attachment_item == False:
+                        continue
+
+                    item['relative_attachments'].append({
+                        "type": attachment.get('type'),
+                        f"{attachment.get('type')}": attachment_item.sign()
+                    })
+                except Exception as e:
+                    logger.logException(e, "Vk", silent=False, prefix="Error processing attachment: ")
+
+            if reposts != None and do_download_reposts:
+                for key, repost in enumerate(reposts):
+                    try:
+                        repost_item = await self.format_repost(key, repost, out)
+
+                        assert repost_item != None
+
+                        item['relative_copy_history'].append(repost_item.sign())
+                    except Exception as exc:
+                        logger.logException(exc, "Vk", prefix="Error processing attachment: ")
 
             owner_keys = ['from_id', 'owner_id', 'copy_owner_id']
             for key in owner_keys:
                 if item.get(key) != None and self.buffer.get('profiles') != None:
                     self.outer._insertOwner(item, key, self.buffer.get('profiles'), self.buffer.get('groups'))
 
-            _item_cu = db_insert.contentFromJson({
-                "source": {
-                    'type': 'vk',
-                    'vk_type': self.outer.vk_type,
-                    'content': item_id
-                },
-                "name": _name, # TODO:
-                "content": item,
-                "links": links,
-                "unlisted": is_do_unlisted,
-                "declared_created_at": item.get("date"),
-            })
+            out.source = {
+                'type': 'vk',
+                'vk_type': self.outer.vk_type,
+                'content': item_id
+            }
+            out.display_name = name
+            out.content = item
+            out.unlisted = self.args.get("unlisted") == 1
+            out.declared_created_at = item.get("date")
 
-            list_to_add.append(_item_cu)
+            list_to_add.append(out)
 
-        async def format_attachment(self, key, attachment, linked_dict):
+        async def format_attachment(self, key, attachment, orig):
             '''
             Converts attachment dict to ContentUnit
             '''
 
             att_type = attachment.get("type")
-            att_class_name = att_type
-            att_object = attachment.get(att_type)
+            class_name = att_type
+            if att_type == "wall":
+                class_name = "post"
 
+            att_object = attachment.get(att_type)
             if att_object == None:
                 return None
-
-            if att_type == "wall":
-                att_class_name = "post"
 
             attachments_info = self.args.get('attachments_info')
             attachments_file = self.args.get('attachments_file')
@@ -162,56 +154,55 @@ class Post(BaseVkItemId):
                 should_download_file = attachments_file[0] == "*" or att_type in attachments_file
 
             if should_download_json == False:
-                return None
+                return False
 
-            attachment_object = None
-            attachment_name = f"WebServices_Vk.{att_class_name.title()}"
+            attachment_name = f"WebServices_Vk.{class_name.title()}"
             attachment_representation = RepresentationsRepository().getByName(attachment_name)
+
             if attachment_representation == None:
                 from representations.Data.Json import Json as UnknownAttachmentRepresentation
 
-                logger.log(message="Recieved unknown attachment: " + str(att_class_name), section="Vk!Post", kind=logger.KIND_MESSAGE)
+                logger.log(message="Recieved unknown attachment: " + str(class_name), section="Vk", kind=logger.KIND_MESSAGE)
 
-                resl = await UnknownAttachmentRepresentation().extract({
-                    "unlisted": True,
+                output = await UnknownAttachmentRepresentation().extract({
                     "object": attachment,
                 })
 
-                attachment_object = resl[0]
-                attachment_object.save(force_insert=True)
+                _item = output[0]
+                _item.unlisted = True
+                _item.save(force_insert=True)
 
-                linked_dict.append(attachment_object)
+                orig.add_link(_item)
             else:
                 attachment_id = f"{att_object.get('owner_id')}_{att_object.get('id')}"
                 att_class = attachment_representation()
 
-                logger.log(message=f"Recieved attachment {str(att_class_name)} {attachment_id}",section="Vk!Post",kind=logger.KIND_MESSAGE)
+                logger.log(message=f"Recieved attachment {str(class_name)} {attachment_id}",section="Vk",kind=logger.KIND_MESSAGE)
 
-                resl = await att_class.extract({
-                    "unlisted": True,
+                output = await att_class.extract({
                     "object": att_object,
                     "api_url": self.args.get("api_url"),
                     "vk_path": self.args.get("vk_path"),
                     "download": should_download_file,
                 })
 
-                attachment_object = resl[0]
-                attachment_object.save(force_insert=True)
+                _item = output[0]
+                _item.unlisted = True
+                _item.save()
 
-                linked_dict.append(attachment_object)
+                orig.add_link(_item)
 
-            return attachment_object
+            return _item
 
-        async def format_repost(self, key, repost, linked_dict):
+        async def format_repost(self, key, repost, orig):
             repost_id = f"{repost.get('owner_id')}_{repost.get('id')}"
             if repost == None:
-                return None
+                return repost # epic
 
-            logger.log(message=f"Found repost {key}",section="Vk!Post",kind=logger.KIND_MESSAGE)
+            logger.log(message=f"Found repost {key}",section="Vk",kind=logger.KIND_MESSAGE)
 
             repost_thing = Post()
             vals = await repost_thing.extract({
-                "unlisted": True,
                 "object": repost,
                 "api_url": self.args.get("api_url"),
                 "vk_path": self.args.get("vk_path"),
@@ -220,7 +211,8 @@ class Post(BaseVkItemId):
                 "download_reposts": False,
             })
 
-            vk_post = vals[0]
-            linked_dict.append(vk_post)
+            _item = vals[0]
+            _item.unlisted = True
+            _item.save()
 
-            return vk_post
+            orig.add_link(_item)

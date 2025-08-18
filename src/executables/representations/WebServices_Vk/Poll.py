@@ -1,6 +1,5 @@
 from executables.representations.WebServices_Vk import BaseVkItemId
 from declarable.ArgumentsTypes import BooleanArgument
-from db.DbInsert import db_insert
 from pathlib import Path
 from app.App import logger
 from submodules.Web.DownloadManager import download_manager
@@ -10,7 +9,7 @@ class Poll(BaseVkItemId):
     @classmethod
     def declare(cls):
         params = {}
-        params["download"] = BooleanArgument({
+        params["download_bg"] = BooleanArgument({
             "default": True
         })
 
@@ -18,66 +17,61 @@ class Poll(BaseVkItemId):
 
     class Extractor(BaseVkItemId.Extractor):
         async def __response(self, i = {}):
-            items_ids_str = i.get('ids')
-            item_ids = items_ids_str.split(',')
-            final_response = {
+            output = {
                 'items': [],
                 'profiles': [],
                 'groups': []
             }
 
-            assert len(item_ids) < 3, 'bro too many'
+            for _id in i.get('ids').split(","):
+                ids = _id.split('_')
+                response = await self.vkapi.call("polls.getById", {"owner_id": ids[0], "poll_id": ids[1], "extended": 1})
 
-            for id in item_ids:
-                spl = id.split('_')
-                response = await self.vkapi.call("polls.getById", {"owner_id": spl[0], "poll_id": spl[1], "extended": 1})
-
-                final_response.update(response)
+                output.update(response)
 
             return response
 
         async def item(self, item, list_to_add):
             download_bg = self.args.get("download_bg")
-            is_do_unlisted = self.args.get("unlisted") == 1
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
 
             self.outer._insertVkLink(item, self.args.get('vk_path'))
 
-            logger.log(message=f"Recieved poll {item_id}",section="Vk!Poll",kind=logger.KIND_MESSAGE)
+            out = self.ContentUnit()
+            out.display_name = item.get("question")
+            out.declared_created_at = item.get("date")
+            out.source = {
+                'type': 'vk',
+                'vk_type': 'poll',
+                'content': item_id
+            }
+            out.content = item
+            out.unlisted = self.args.get("unlisted") == 1
+
+            logger.log(message=f"Recieved poll {item_id}",section="Vk",kind=logger.KIND_MESSAGE)
 
             if download_bg == True:
-                bg_su = db_insert.storageUnit()
-                bg_name = f"poll{item_id}.jpg"
-                temp_dir = bg_su.temp_dir
+                bg_su = self.StorageUnit()
+                poll_bg = item.get("photo")
 
                 try:
-                    if item.get("photo") != None:
-                        photo_sizes = sorted(item.get("photo").get("images"), key=lambda x: (x['width'] is not None, x['width']), reverse=True)
-                        optimal_size = photo_sizes[0]
-                        save_path = Path(os.path.join(temp_dir, bg_name))
+                    assert poll_bg != None
 
-                        await download_manager.addDownload(end=optimal_size.get("url"),dir=save_path)
+                    photo_sizes = sorted(poll_bg.get("images"), key=lambda x: (x['width'] is not None, x['width']), reverse=True)
+                    optimal_size = photo_sizes[0]
+                    assert optimal_size != None
 
-                        bg_su.set_main_path(save_path)
+                    save_path = Path(os.path.join(bg_su.temp_dir, f"poll{item_id}.jpg"))
 
-                        item["relative_photo"] = bg_su.sign()
+                    await download_manager.addDownload(end=optimal_size.get("url"),dir=save_path)
 
-                        logger.log(message=f"Downloaded poll {item_id} background",section="Vk!Poll",kind=logger.KIND_SUCCESS)
-                except FileNotFoundError as _ea:
-                    logger.log(message=f"Photo's file cannot be found. Probaly broken file? Exception: {str(_ea)}",section="Vk!Poll",kind=logger.KIND_ERROR)
+                    bg_su.set_main_path(save_path)
+                    out.add_link(bg_su)
 
-            cu = db_insert.contentFromJson({
-                "source": {
-                    'type': 'vk',
-                    'vk_type': 'poll',
-                    'content': item_id
-                },
-                "content": item,
-                "unlisted": is_do_unlisted,
-                "declared_created_at": item.get("date"),
-                "name": item.get("question"),
-                "links": [bg_su],
-                "link_main": 0,
-            })
+                    item["relative_photo"] = bg_su.sign()
 
-            list_to_add.append(cu)
+                    logger.log(message=f"Downloaded poll {item_id} background",section="Vk",kind=logger.KIND_SUCCESS)
+                except Exception as _e:
+                    logger.logException(_e,section="Vk",prefix="Error downloading poll bg: ")
+
+            list_to_add.append(out)

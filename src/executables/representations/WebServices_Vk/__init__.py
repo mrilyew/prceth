@@ -21,7 +21,7 @@ class BaseVk(Representation):
     @classmethod
     def declareVk(cls):
         params = {}
-        params["api_token"] = StringArgument({
+        params["access_token"] = StringArgument({
             "sensitive": True,
             "default": env.get("vk.access_token", None),
             "env_property": "vk.access_token",
@@ -82,13 +82,15 @@ class BaseVk(Representation):
 
     class Extractor(Representation.ExtractStrategy):
         def preExecute(self, i = {}):
-            self.vkapi = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
+            self.vkapi = VkApi(token=i.get("access_token"),endpoint=i.get("api_url"))
 
 class BaseVkItemId(BaseVk):
     @classmethod
     def declare(cls):
         params = {}
-        params["ids"] = CsvArgument({})
+        params["ids"] = CsvArgument({
+            "orig": StringArgument({})
+        })
         params["object"] = ObjectArgument({
             "hidden": True,
         })

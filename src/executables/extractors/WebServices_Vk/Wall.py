@@ -32,7 +32,7 @@ class Wall(BaseIterableExtended):
         def __init__(self, i = {}):
             super().__init__(i)
 
-            self.params['vkapi'] = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
+            self.params['vkapi'] = VkApi(token=i.get("access_token"),endpoint=i.get("api_url"))
             self.params['owner_id'] = i.get('owner_id')
             self.params['filter'] = i.get('filter')
             self.params['attachments_info'] = i.get('attachments_info')

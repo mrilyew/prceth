@@ -5,8 +5,4 @@ class Message(Post):
 
     class Extractor(Post.Extractor):
         async def __response(self, i = {}):
-            items_ids = i.get('ids')
-
-            response = await self.vkapi.call("messages.getById", {"message_ids": (",".join(items_ids)), "extended": 1})
-
-            return response
+            return await self.vkapi.call("messages.getById", {"message_ids": (",".join(i.get('ids'))), "extended": 1})

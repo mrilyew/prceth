@@ -1,7 +1,6 @@
 from db.Models.Content.ThumbnailState import ThumbnailState
 from db.Models.Content.ContentModel import BaseModel
 from executables.thumbnails import ThumbnailMethod
-from db.DbInsert import db_insert
 from PIL import Image as PILImage
 from app.App import config
 from pathlib import Path
@@ -13,7 +12,7 @@ class ImageMethod(ThumbnailMethod):
         if item.short_name == "su":
             su = item
         else:
-            su = item.main_su
+            su = item.common_link
 
         sizes = (params.get('width', config.get("thumbnail.width")), params.get('height', config.get("thumbnail.height")))
 
@@ -28,7 +27,7 @@ class ImageMethod(ThumbnailMethod):
                 img, 
                 (img_width, img_height)
             )
-            new_su = db_insert.storageUnit()
+            new_su = self.StorageUnit()
             new_prev = Path(os.path.join(new_su.temp_dir, f"{su.uuid}.jpg"))
             new_img.save(new_prev)
 

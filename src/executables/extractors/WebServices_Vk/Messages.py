@@ -26,7 +26,7 @@ class Messages(BaseIterableExtended):
         def __init__(self, i = {}):
             super().__init__(i)
 
-            self.params['vkapi'] = VkApi(token=i.get("api_token"),endpoint=i.get("api_url"))
+            self.params['vkapi'] = VkApi(token=i.get("access_token"),endpoint=i.get("api_url"))
             self.params['_method'] = 'messages.getHistory'
             self.params['_execute'] = {
                 'peer_id': i.get('peer_id'),

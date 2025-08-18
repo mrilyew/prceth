@@ -42,16 +42,17 @@ class RSSFeed(BaseExtractor):
                 pass
 
             if i.get('create_collection') == True:
-                self.add_after.append(self.collectionable({
-                    'name': channel.get('title', 'Untitled'),
-                    'description': channel.get('description'),
-                    'content': channel,
-                    'declared_created_at': rss_date_parse(channel.get("pubDate")),
-                    'source': {
-                        'type': 'url',
-                        'content': channel.get('link')
-                    }
-                }))
+                collection = self.ContentUnit()
+                collection.display_name = channel.get('title', 'Untitled')
+                collection.description = channel.get('description')
+                collection.content = channel
+                collection.declared_created_at = rss_date_parse(channel.get("pubDate"))
+                collection.source = {
+                    'type': 'url',
+                    'content': channel.get('link')
+                }
+                collection.is_collection = True
+                self.add_after.append(collection)
 
         out = await JsonRepresentation.extract({
             'object': items

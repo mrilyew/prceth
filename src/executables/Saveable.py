@@ -1,5 +1,7 @@
 from app.App import logger
 import asyncio
+from db.Models.Content.ContentUnit import ContentUnit
+from db.Models.Content.StorageUnit import StorageUnit
 
 class Saveable:
     async def gatherList(self, items, method_name, is_gather = True):
@@ -21,9 +23,24 @@ class Saveable:
 
         return __list
 
-    def self_insert(self, json_data: dict)->dict:
+
+    # signed
+
+    def ContentUnit(self):
+        out = ContentUnit()
+        #out = self.self_insert(out)
+        self.self_insert(out)
+
+        return out
+
+    def StorageUnit(self):
+        out = StorageUnit()
+
+        return out
+
+    def self_insert(self, item):
         '''
-        You can append 'extractor' or 'representation' key there
+        You can append needed keys here
         '''
 
-        return json_data
+        return item

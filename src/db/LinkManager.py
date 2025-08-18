@@ -57,7 +57,7 @@ class LinkManager:
 
     # Better not to use
     def linksListId(self, by_class = None, revision: bool = False):
-        selection = LinkManager._linksSelection(self.parent, by_class, revision)
+        selection = self._linksSelection(by_class, revision)
         ids = []
         for unit in selection:
             ids.append(unit.child)
@@ -65,7 +65,7 @@ class LinkManager:
         return ids
 
     def linksList(self, by_class = None, revision: bool = False):
-        selection = LinkManager._linksSelection(self.parent, by_class, revision)
+        selection = self._linksSelection(by_class, revision)
 
         c_s = []
         s_s = []
@@ -99,35 +99,37 @@ class LinkManager:
 
         return _links
 
-    @classmethod
-    def injectLinksToJson(cls, json_input, linked_list, recurse_level = 0):
-        if isinstance(json_input, dict):
-            return {key: cls.injectLinksToJson(value, linked_list) for key, value in json_input.items()}
-        elif isinstance(json_input, list):
-            return [cls.injectLinksToJson(item, linked_list) for item in json_input]
-        elif isinstance(json_input, str):
+    def injectLinksToJson(self, to_check, linked_list, recurse_level = 0):
+        if isinstance(to_check, dict):
+            return {key: self.injectLinksToJson(value, linked_list) for key, value in to_check.items()}
+        elif isinstance(to_check, list):
+            return [self.injectLinksToJson(item, linked_list) for item in to_check]
+        elif isinstance(to_check, str):
             try:
-                if json_input.startswith("__$|cu_"):
-                    got_id = json_input.replace("__$|cu_", "")
+                if to_check.startswith("__$|cu_"):
+                    got_id = to_check.replace("__$|cu_", "")
+                    got_id = int(got_id)
+
                     for linked in linked_list:
                         if linked.uuid == got_id and linked.self_name == "ContentUnit":
                             return linked.formatted_data(recursive=True,recurse_level=recurse_level+1)
-                        else:
-                            return json_input
-                elif json_input.startswith("__$|su_"):
-                    got_id = json_input.replace("__$|su_", "")
+
+                    return to_check
+                elif to_check.startswith("__$|su_"):
+                    got_id = to_check.replace("__$|su_", "")
+                    got_id = int(got_id)
                     for linked in linked_list:
                         if linked.uuid == got_id and linked.self_name == "StorageUnit":
                             return linked.formatted_data(recursive=True,recurse_level=recurse_level+1)
-                        else:
-                            return json_input
-                else:
-                    return json_input
-            except Exception as __e:
-                return json_input
-        else:
-            return json_input
 
-    @classmethod
-    def injectLinksToJsonFromInstance(cls, i, recurse_level = 0):
-        return cls.injectLinksToJson(i.json_content, cls.linksList(i), recurse_level)
+                    return to_check
+                else:
+                    return to_check
+            except Exception as __e:
+                logger.logException(__e, section="Linkage")
+                return to_check
+        else:
+            return to_check
+
+    def injectLinksToJsonFromInstance(self, recurse_level = 0):
+        return self.injectLinksToJson(self.parent.json_content, self.linksList(), recurse_level)

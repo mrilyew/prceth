@@ -1,4 +1,6 @@
-class ThumbnailMethod():
+from executables.Saveable import Saveable
+
+class ThumbnailMethod(Saveable):
     def __init__(self, outer):
         self.outer = outer
 

@@ -1,6 +1,5 @@
 from executables.representations import Representation
 from declarable.ArgumentsTypes import StringArgument, CsvArgument
-from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr
 
 class Text(Representation):
@@ -26,20 +25,18 @@ class Text(Representation):
     class Extractor(Representation.ExtractStrategy):
         async def extractByDefault(self, i = {}):
             texts = i.get('text')
-            out_arr = []
+            output = []
 
             for text in texts:
-                name = proc_strtr(text, 100)
+                out = self.ContentUnit()
+                out.display_name = proc_strtr(text, 100)
+                out.content = {
+                    'text': text
+                }
 
-                out = db_insert.contentFromJson({
-                    'name': name,
-                    'content': {
-                        'text': text
-                    },
-                })
-                out_arr.append(out)
+                output.append(out)
 
-            return out_arr
+            return output
 
         def extractWheel(self, i = {}):
             if 'text' in i:

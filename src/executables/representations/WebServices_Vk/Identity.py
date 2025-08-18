@@ -1,10 +1,8 @@
 from executables.representations.WebServices_Vk import BaseVkItemId
 from submodules.Web.DownloadManager import download_manager
 from declarable.ArgumentsTypes import BooleanArgument
-from resources.Exceptions import NotFoundException
 from utils.MainUtils import proc_strtr
 from resources.Consts import consts
-from db.DbInsert import db_insert
 from pathlib import Path
 from app.App import logger
 import os
@@ -25,79 +23,72 @@ class Identity(BaseVkItemId):
     class Extractor(BaseVkItemId.Extractor):
         async def __download_avatar(self, json):
             url = json.get("photo_id")
-            if url == None:
-                raise NotFoundException("ava not found")
 
-            su = db_insert.storageUnit()
-            save_name = "avatar.jpg"
-            save_path = Path(os.path.join(su.temp_dir, save_name))
+            assert url != None
+
+            main_su = self.StorageUnit()
+            save_path = Path(os.path.join(main_su.temp_dir, "avatar.jpg"))
 
             await download_manager.addDownload(dir=save_path,end=url)
 
-            su.set_main_file(save_path)
+            main_su.set_main_file(save_path)
 
-            return su
+            return main_su
 
         async def __download_cover(self, json):
             cover = json.get("cover")
-            if cover == None or cover.get('images') == None or len(cover.get("images")) < 1:
-                raise NotFoundException("cover not found")
 
-            su = db_insert.storageUnit()
-            save_name = "cover.jpg"
-            save_path = Path(os.path.join(su.temp_dir, save_name))
+            assert cover != None and cover.get("images") != None and len(cover.get("images")) > 0
+
+            main_su = self.StorageUnit()
+            save_path = Path(os.path.join(main_su.temp_dir, "cover.jpg"))
 
             images = cover.get("images")
             images_ = sorted(images, key=lambda x: (x['width'] is not None, x['width']), reverse=True)
             image = images_[0]
 
+            assert image != None
+
             await download_manager.addDownload(dir=save_path,end=image.get("url"))
 
-            su.set_main_file(save_path)
+            main_su.set_main_file(save_path)
 
-            return su
+            return main_su
 
         async def __response(self, i = {}):
-            ids = i.get('ids')
+            user_ids, group_ids = [[], []]
+            output = []
 
-            user_ids, group_ids, users, groups = [[], [], [], []]
-            __users_response, __groups_response = [None, None]
-
-            for _id in ids:
-                __id = int(_id)
-                if __id > 0:
-                    user_ids.append(__id)
+            for _id in i.get('ids'):
+                _id = int(_id)
+                if _id > 0:
+                    user_ids.append(_id)
                 else:
-                    group_ids.append(abs(__id))
+                    group_ids.append(abs(_id))
 
-            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}", section='Vk!Identity', kind=logger.KIND_SUCCESS)
+            logger.log(message=f"Got ids +{','.join(str(x) for x in user_ids)}, -{','.join(str(x) for x in group_ids)}", section='Vk', kind=logger.KIND_SUCCESS)
 
             if len(user_ids) > 0:
-                __users_response = await self.vkapi.call("users.get", {"user_ids": ",".join(str(x) for x in user_ids), "fields": ",".join(consts["vk.user_fields"])})
+                users = await self.vkapi.call("users.get", {"user_ids": ",".join(str(x) for x in user_ids), "fields": ",".join(consts["vk.user_fields"])})
+
+                for user in users:
+                    output.append(user)
+
             if len(group_ids) > 0:
-                __groups_response = await self.vkapi.call("groups.getById", {"group_ids": ",".join(str(x) for x in group_ids), "fields": ",".join(consts["vk.group_fields"])})
+                groups = await self.vkapi.call("groups.getById", {"group_ids": ",".join(str(x) for x in group_ids), "fields": ",".join(consts["vk.group_fields"])})
 
-            if __users_response != None:
-                for user in __users_response:
-                    user["vkapi_type"] = "user"
-                    users.append(user)
-
-            if __groups_response != None:
-                if 'groups' in __groups_response:
-                    for club in __groups_response.get("groups"):
-                        club["vkapi_type"] = "club"
-                        groups.append(club)
+                if 'groups' in groups:
+                    for club in groups.get("groups"):
+                        output.append(club)
                 else:
-                    for club in __groups_response:
-                        club["vkapi_type"] = "club"
-                        groups.append(club)
+                    for club in groups:
+                        output.append(club)
 
-            return users + groups
+            return output
 
         async def item(self, item, list_to_add):
             name = ""
             declared_date = None
-            links = []
 
             if 'first_name' in item:
                 item['vkapi_type'] = 'user'
@@ -110,40 +101,34 @@ class Identity(BaseVkItemId):
             else:
                 name = f"{item.get('name')}"
 
+            out = self.ContentUnit()
+            out.display_name = proc_strtr(name, 200)
+            out.content = item
+            out.source = {
+                'type': 'vk',
+                'vk_type': item.get("vkapi_type"),
+                'content': item.get('id')
+            }
+            out.declared_created_at = declared_date
+
             if self.args.get("download_avatar") == True:
                 try:
-                    if item.get('photo_id') != None:
-                        ava = await self.__download_avatar(item)
-                        item["relative_photo"] = ava.sign()
+                    ava = await self.__download_avatar(item)
+                    item["relative_photo"] = ava.sign()
 
-                        links.append(ava)
+                    out.add_link(ava)
                 except Exception as _e:
-                    logger.log(message='Avatar not found, not downloading', section='Vk!Identity', kind=logger.KIND_ERROR)
+                    logger.logException(_e,section="Vk",prefix="Could not download avatar: ")
 
             if self.args.get("download_cover") == True:
                 try:
-                    if item.get('cover') != None and item.get('cover').get('images') != None:
-                        cov = await self.__download_cover(item)
-                        item["relative_cover"] = cov.sign()
+                    cov = await self.__download_cover(item)
+                    item["relative_cover"] = cov.sign()
 
-                        links.append(cov)
-                except NotFoundException:
-                    logger.log(message='Cover not found, not downloading', section='Vk!Identity', kind=logger.KIND_ERROR)
+                    out.add_link(cov)
                 except Exception as _e:
-                    logger.logException(_e,section="Vk!Identity")
+                    logger.logException(_e,section="Vk",prefix="Could not download cover: ")
 
-            logger.log(f"Got id {item.get("vkapi_type")}{item.get('id')}",section="Vk!Identity",kind=logger.KIND_SUCCESS)
+            logger.log(f"Got id {item.get("vkapi_type")}{item.get('id')}",section="Vk",kind=logger.KIND_SUCCESS)
 
-            cu = db_insert.contentFromJson({
-                "source": {
-                    'type': 'vk',
-                    'vk_type': item.get("vkapi_type"),
-                    'content': item.get('id')
-                },
-                "name": proc_strtr(name, 200),
-                "content": item,
-                "declared_created_at": declared_date,
-                "links": links,
-            })
-
-            list_to_add.append(cu)
+            list_to_add.append(out)

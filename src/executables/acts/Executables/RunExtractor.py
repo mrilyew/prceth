@@ -74,13 +74,11 @@ class RunExtractor(BaseAct):
                 if ext.is_saved() == False:
                     ext.save(force_insert=True)
 
-                link_manager = LinkManager(ext)
-
-                if ext != None:
-                    try:
-                        link_manager.link(__res)
-                    except AssertionError as _e:
-                        logger.logException(_e, section=logger.SECTION_LINKAGE)
+                try:
+                    link_manager = LinkManager(ext)
+                    link_manager.link(__res)
+                except AssertionError as _e:
+                    logger.logException(_e, section=logger.SECTION_LINKAGE)
 
             out.append(__res.api_structure())
 

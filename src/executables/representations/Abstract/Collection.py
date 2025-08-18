@@ -1,6 +1,6 @@
 from executables.representations import Representation
 from declarable.ArgumentsTypes import StringArgument
-from db.DbInsert import db_insert
+from db.Models.Content.ContentUnit import ContentUnit
 
 class Collection(Representation):
     docs = {
@@ -35,12 +35,11 @@ class Collection(Representation):
 
     class Extractor(Representation.ExtractStrategy):
         async def extractByDefault(self, i = {}):
-            out = db_insert.contentFromJson({
-                'content': {},
-                'display_name': i.get('name'),
-                'description': i.get('description'),
-                'is_collection': True,
-            })
+            out = self.ContentUnit()
+            out.content = {}
+            out.display_name = i.get('name')
+            out.description = i.get('description')
+            out.is_collection = True
 
             return [out]
 

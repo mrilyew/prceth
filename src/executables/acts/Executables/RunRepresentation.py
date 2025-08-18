@@ -3,7 +3,6 @@ from db.Models.Content.ContentUnit import ContentUnit
 from repositories.RepresentationsRepository import RepresentationsRepository
 from declarable.ArgumentsTypes import StringArgument, CsvArgument, ContentUnitArgument
 from db.LinkManager import LinkManager
-from db.DbFind import db_find
 from app.App import logger
 
 class RunRepresentation(BaseAct):

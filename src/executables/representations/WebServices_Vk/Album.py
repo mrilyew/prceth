@@ -1,7 +1,6 @@
 from executables.representations.WebServices_Vk import BaseVkItemId
 from executables.representations.WebServices_Vk.Photo import Photo
 from app.App import logger
-from db.DbInsert import db_insert
 
 class Album(BaseVkItemId):
     async def getPhotos(self, vkapi, offset, count, rev = False, download = False):
@@ -48,25 +47,22 @@ class Album(BaseVkItemId):
             return response
 
         async def item(self, item, list_to_add):
-            is_do_unlisted = self.args.get("unlisted") == 1
+            self.outer._insertVkLink(out.content, self.args.get('vk_path'))
+
             item_id = f"{item.get('owner_id')}_{item.get('id')}"
-            name = item.get('title')
 
-            self.outer._insertVkLink(item, self.args.get('vk_path'))
+            out = self.ContentUnit()
+            out.display_name = item.get('title')
+            out.description = item.get("description")
+            out.source = {
+                'type': 'vk',
+                'vk_type': "album",
+                'content': item_id
+            }
+            out.content = item
+            out.unlisted = self.args.get("unlisted") == 1
+            out.declared_created_at = item.get("date")
 
-            logger.log(message=f"Recieved album {item_id}",section="Vk!Album",kind=logger.KIND_MESSAGE)
+            logger.log(message=f"Recieved album {item_id}",section="Vk",kind=logger.KIND_MESSAGE)
 
-            alb = db_insert.contentFromJson({
-                "source": {
-                    'type': 'vk',
-                    'vk_type': "album",
-                    'content': item_id
-                },
-                "content": item,
-                "unlisted": is_do_unlisted,
-                "name": name,
-                "description": item.get("description"),
-                "declared_created_at": item.get("date"),
-            })
-
-            list_to_add.append(alb)
+            list_to_add.append(out)

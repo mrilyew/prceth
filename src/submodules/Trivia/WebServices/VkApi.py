@@ -30,6 +30,9 @@ class VkApi():
         logger.log(f"Called VK API {__save_end_url}", section="Submodules.Trivia!VkApi")
 
         if __response.get("response") == None:
-            raise VkApiException(message=__response.get("error").get("error_msg"))
+            if __response.get("error"):
+                raise VkApiException(message=__response.get("error").get("error_msg"))
+            else:
+                raise VkApiException(message=__response.get("error_msg"))
 
         return __response.get("response")

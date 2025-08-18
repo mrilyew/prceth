@@ -1,9 +1,8 @@
 from executables.representations import Representation
 from submodules.Files.FileManager import file_manager
 from pathlib import Path
-from db.DbInsert import db_insert
 from utils.MainUtils import proc_strtr, name_from_url
-from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument
+from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument, StorageUnitArgument
 import os, mimetypes
 
 class File(Representation):
@@ -30,7 +29,7 @@ class File(Representation):
         params["path"] = CsvArgument({
             "orig": StringArgument({}),
             "docs": {
-                "name": 'data_file_path',
+                "name": 'representations.data.file.path.name',
             },
             "default": None,
             "assertion": {
@@ -41,16 +40,16 @@ class File(Representation):
         })
         params["type"] = LimitedArgument({
             "docs": {
-                "name": "data_file_type",
+                "name": "representations.data.file.type.name",
                 "values": {
                     "copy": {
-                        "name": "data_file_type_copy",
+                        "name": "representations.data.file.type.copy.name",
                     },
                     "move": {
-                        "name": "data_file_type_move"
+                        "name": "representations.data.file.type.move.name"
                     },
                     "link": {
-                        "name": "data_file_type_link"
+                        "name": "representations.data.file.type.link.name"
                     },
                 }
             },
@@ -59,7 +58,7 @@ class File(Representation):
         })
         params["url"] = CsvArgument({
             "docs": {
-                "name": "data_file_url"
+                "name": "representations.data.file.url.name"
             },
             "orig": StringArgument({}),
             "default": None,
@@ -69,6 +68,13 @@ class File(Representation):
                 ]
             }
         })
+        params["storage_unit"] = CsvArgument({
+            "orig": StorageUnitArgument({}),
+            "docs": {
+                "name": "representations.data.file.storage_unit.name"
+            },
+            "default": None,
+        })
 
         return params
 
@@ -76,6 +82,8 @@ class File(Representation):
         def extractWheel(self, i = {}):
             if 'path' in i:
                 return 'extractByPath'
+            elif 'storage_unit' in i:
+                return 'extractByStorageUnit'
             elif 'text' in i:
                 return 'extractByContent'
             elif 'url' in i:
@@ -86,7 +94,7 @@ class File(Representation):
 
         async def extractByPath(self, i = {}):
             pathes = i.get('path')
-            output = []
+            outs = []
 
             for _path in pathes:
                 path = Path(_path)
@@ -97,7 +105,9 @@ class File(Representation):
                 assert path.is_dir() == False, 'path is dir'
                 assert move_type in ['copy', 'move', 'link'], 'invalid type'
 
-                su = db_insert.storageUnit()
+                out = self.ContentUnit()
+                su = self.StorageUnit()
+
                 file_name = path.name
                 move_to = Path(os.path.join(su.temp_dir, file_name))
 
@@ -112,52 +122,46 @@ class File(Representation):
                         su.set_link(link)
                         #file_manager.symlinkFile(INPUT_PATH, MOVE_TO)
 
-                out = db_insert.contentFromJson({
-                    "source": {
-                        'type': 'path',
-                        'content': str(path),
-                    },
-                    'content': {
-                        "export_as": str(move_type),
-                        "format": str(path.suffix[1:]),
-                    },
-                    'links': [su],
-                    'link_main': 0
-                }, self.outer)
-
+                out.add_link(su)
+                out.set_common_link(su)
+                out.content = {
+                    "export_as": str(move_type),
+                    "format": str(path.suffix[1:]),
+                }
+                out.source = {
+                    "type": "path",
+                    "content": str(path)
+                }
                 out = await self.process_item(out)
 
-                output.append(out)
+                outs.append(out)
 
-            return output
+            return outs
 
         async def extractByContent(self, i = {}):
             text = i.get('text')
             extension = i.get('extension')
 
-            su = db_insert.storageUnit()
+            out = self.ContentUnit()
+            su = self.StorageUnit()
 
             original_name = "blank"
             full_name = '.'.join([original_name, extension])
             path = os.path.join(su.temp_dir, full_name)
 
             file_manager.createFile(path, text)
-
             su.set_main_file(path)
 
-            out = db_insert.contentFromJson({
-                "source": {
-                    'type': 'api',
-                    'content': 'blank'
-                },
-                "content": {
-                    "format": str(extension),
-                },
-                "name": "blank.txt",
-                "links": [su],
-                "link_main": 0
-            }, self.outer)
-
+            out.source = {
+                "type": "api",
+                "content": original_name
+            }
+            out.content = {
+                "format": str(extension),
+            }
+            out.display_name = full_name
+            out.add_link(su)
+            out.set_common_link(su)
             out = await self.process_item(out)
 
             return [out]
@@ -172,8 +176,8 @@ class File(Representation):
             for url in urls:
                 name, ext = name_from_url(url)
 
-                su = db_insert.storageUnit()
-                mime_ext = None
+                out = self.ContentUnit()
+                su = self.StorageUnit()
 
                 tmp_dir = su.temp_dir
                 tmp_path = Path(os.path.join(tmp_dir, "download.tmp"))
@@ -185,7 +189,7 @@ class File(Representation):
                 url_request = await download_manager.addDownload(end = url,dir = tmp_path)
 
                 header_content_type = url_request.headers.get('Content-Type', '').lower()
-
+                mime_ext = None
                 if ext == '' or is_generated_ext(ext):
                     mime_ext = mimetypes.guess_extension(header_content_type)
                     if mime_ext:
@@ -194,24 +198,35 @@ class File(Representation):
                         ext = 'html'
 
                 tmp_path.rename(os.path.join(tmp_dir, result_path))
-                file_size = result_path.stat().st_size
 
                 su.write_data({
                     "extension": ext,
                     "upload_name": result_name,
-                    "filesize": file_size,
+                    "filesize": result_path.stat().st_size,
                 })
 
-                out = db_insert.contentFromJson({
-                    "links": [su],
-                    "link_main": 0,
-                    "source": {
-                        'type': 'url',
-                        'content': url
-                    },
-                    "content": {},
-                }, self.outer)
+                out.add_link(su)
+                out.set_common_link(su)
+                out.source = {
+                    'type': 'url',
+                    'content': url
+                }
+                out.content = {}
+                out = await self.process_item(out)
 
+                outs.append(out)
+
+            return outs
+
+        async def extractByStorageUnit(self, i = {}):
+            su = i.get('storage_unit')
+            outs = []
+
+            for item in su:
+                out = self.ContentUnit()
+
+                out.add_link(item)
+                out.set_common_link(item)
                 out = await self.process_item(out)
 
                 outs.append(out)
