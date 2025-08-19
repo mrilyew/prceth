@@ -2,7 +2,7 @@ import os, json
 from app.App import logger, storage
 from pathlib import Path
 from peewee import TextField, BigIntegerField, IntegerField, BooleanField
-from utils.MainUtils import extract_metadata_to_dict, get_random_hash
+from utils.MainUtils import dump_json, parse_json, get_random_hash
 from db.Models.Content.ContentModel import BaseModel
 from submodules.Files.FileManager import file_manager
 import shutil, mimetypes
@@ -28,10 +28,20 @@ class StorageUnit(BaseModel):
 
     # Sizes
     filesize = BigIntegerField(default=0) # Size of main file
-    dir_filesize = BigIntegerField(default=0) # Size of dir
 
-    # Metadata
+    # Probaly
+    lists = TextField(default="")
     metadata = TextField(default="")
+
+    @property
+    def dir_filesize(self):
+        maps = parse_json(self.lists)
+        common_filesize = 0
+
+        for file in maps:
+            common_filesize += file.get("size")
+
+        return common_filesize
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -48,6 +58,7 @@ class StorageUnit(BaseModel):
         self.hash = get_random_hash(32)
 
     def flush(self):
+        self.walk()
         self.save(force_insert=True)
         self.move_temp_dir()
 
@@ -55,8 +66,20 @@ class StorageUnit(BaseModel):
         _mime = mimetypes.guess_type(self.path())
         self.mime = _mime[0]
 
-    def set_dir_filesize(self):
-        self.dir_filesize = file_manager.folder_size(self.temp_dir)
+    def walk(self):
+        _p = Path(self.temp_dir)
+        _files = _p.rglob('*')
+        _map = []
+
+        for file in _files:
+            if file.is_file():
+                _map.append({
+                    'path': str(file.relative_to(_p)),
+                    'size': file.stat().st_size,
+                    'name': file.name
+                })
+
+        self.lists = dump_json(_map)
 
     def set_about(self):
         path = self.path_link
@@ -91,7 +114,6 @@ class StorageUnit(BaseModel):
         self.upload_name = json_data.get("upload_name")
         self.filesize = json_data.get("filesize")
         self.set_mime()
-        self.set_dir_filesize()
 
         # broken function
         if json_data.get("link") != None:
@@ -101,11 +123,7 @@ class StorageUnit(BaseModel):
         if json_data.get("take_metadata", False) == True:
             self.fillMeta()'''
 
-        if json_data.get('__flush__model__to__db__', True) == True:
-            self.save(force_insert=True)
-
-        if json_data.get('__move__from__temp__', True) == True:
-            self.move_temp_dir()
+        self.flush()
 
     def move_temp_dir(self):
         '''
@@ -149,7 +167,7 @@ class StorageUnit(BaseModel):
     def api_structure(self):
         ret = {}
         ret['class_name'] = "StorageUnit"
-        ret["id"] = self.uuid
+        ret["id"] = str(self.uuid)
         ret["upload_name"] = self.upload_name
         ret["extension"] = self.extension
         ret["filesize"] = self.filesize

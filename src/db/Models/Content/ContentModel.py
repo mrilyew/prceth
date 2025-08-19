@@ -7,8 +7,8 @@ class BaseModel(Model):
     def ids(cls, id):
         _type = type(id)
 
-        if _type == str:
-            _query = cls.select().where(cls.uuid == id)
+        if _type == str or _type == int:
+            _query = cls.select().where(cls.uuid == int(id))
 
             return _query.first()
 

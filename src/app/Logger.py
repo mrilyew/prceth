@@ -4,7 +4,7 @@ from utils.MainUtils import parse_json, dump_json
 from pathlib import Path
 from datetime import datetime
 from utils.Hookable import Hookable
-import os, traceback
+import traceback
 
 class Logger(Hookable):
     '''
@@ -155,7 +155,7 @@ class Logger(Hookable):
 
         self.__log_file_check()
 
-        self.trigger_hooks("log", components={
+        self.trigger("log", components={
             "time": (datetime.now()).timestamp(),
             "section": section,
             "message": message,

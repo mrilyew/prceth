@@ -42,7 +42,7 @@ Executable — класс, реализующий паттерн Command. Хра
 
 #### Запуск
 
-Зависимости находятся в `requirements.txt`, для веб сервера `tornado-requirements.txt`
+Зависимости находятся в `requirements.txt`
 
 Для входа в venv:
 

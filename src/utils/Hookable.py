@@ -1,3 +1,5 @@
+import asyncio
+
 class Hookable:
     events = []
 
@@ -19,9 +21,15 @@ class Hookable:
         except Exception:
             pass
 
-    def trigger_hooks(self, category, *args, **kwargs):
+    def trigger(self, *args, **kwargs):
+        asyncio.ensure_future(self.trigger_hooks(*args, **kwargs))
+
+    async def trigger_hooks(self, category, *args, **kwargs):
         if self._hooks.get(category) == None:
             self._hooks[category] = []
 
         for hook in self._hooks.get(category):
-            hook(*args, **kwargs)
+            try:
+                await hook(*args, **kwargs)
+            except:
+                pass
