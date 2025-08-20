@@ -3,9 +3,7 @@
 env/
 venv/
 storage/*
-src/executables/*/Custom/*
-src/executables/*/Secret/*
-src/representations/*/Custom/*
-src/representations/*/Secret/*
+src/executables/list/*/Custom/*
+src/executables/list/*/Secret/*
 *node_modules*
 src/web/static/js/package-lock.json

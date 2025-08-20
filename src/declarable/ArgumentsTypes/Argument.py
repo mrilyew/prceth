@@ -36,10 +36,10 @@ class Argument:
         name = __docs.get('name')
         definition = __docs.get('definition')
         if name != None:
-            __fnl['name'] = resolve_doc(name)
+            __fnl['name'] = name
 
         if definition != None:
-            __fnl['definition'] = resolve_doc(definition)
+            __fnl['definition'] = definition
 
         if __docs.get('values') != None:
             __fnl['values'] = {}
@@ -48,7 +48,7 @@ class Argument:
                 __name = __val.get("name")
 
                 __fnl['values'][name] = {}
-                __fnl['values'][name]["name"] = resolve_doc(__name)
+                __fnl['values'][name]["name"] = __name
 
         return __fnl
 

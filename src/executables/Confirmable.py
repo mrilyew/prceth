@@ -1,3 +1,5 @@
+from typing import Dict
+
 class Confirmable():
     class PreExecute():
         args_list = []
@@ -6,7 +8,7 @@ class Confirmable():
             self.outer = outer
             self.outer_args = outer.declare_recursive()
 
-        async def execute(self, i = {})->list:
+        async def execute(self, i: dict = {}) -> Dict["list", "dict"]:
             '''
             Should return list with argument classes
             '''

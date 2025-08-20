@@ -22,7 +22,7 @@ class Hookable:
             pass
 
     def trigger(self, *args, **kwargs):
-        asyncio.ensure_future(self.trigger_hooks(*args, **kwargs))
+        asyncio.create_task(self.trigger_hooks(*args, **kwargs))
 
     async def trigger_hooks(self, category, *args, **kwargs):
         if self._hooks.get(category) == None:

@@ -1,6 +1,7 @@
 from executables.Executable import Executable
 
-class BaseExtractor(Executable):
+class Extractor(Executable):
+    self_name = "Extractor"
     link_after = []
     linked_dict = None
     base_categories = ["template", "base", "extractors"]

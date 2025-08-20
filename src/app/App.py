@@ -19,4 +19,15 @@ class App():
         self.argv = parse_args()
         self.loop = asyncio.get_event_loop()
 
+    def cache_lists(self):
+        from executables.acts import Act
+        from executables.extractors import Extractor
+        from executables.representations import Representation
+        from executables.services import Service
+
+        Act.findAll()
+        Extractor.findAll()
+        Representation.findAll()
+        Service.findAll()
+
 app = App()

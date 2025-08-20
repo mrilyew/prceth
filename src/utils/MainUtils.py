@@ -211,6 +211,8 @@ def list_conversation(i_list):
 def resolve_lang(translation_dict: dict, lang_code: str):
     if translation_dict == None:
         return None
+    if type(translation_dict) == str:
+        return {"en_US": translation_dict}
 
     return translation_dict.get(lang_code, translation_dict.get("eng"))
 
@@ -218,10 +220,7 @@ def resolve_doc(i):
     __lang_code = consts.get('ui.lang', 'eng')
 
     out = i
-    if type(i) == str:
-        out = descriptions.get(i)
 
-    return out
     return resolve_lang(out, __lang_code)
 
 def is_valid_json(i):

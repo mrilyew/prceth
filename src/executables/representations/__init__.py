@@ -3,10 +3,12 @@ from executables.RecursiveDeclarable import RecursiveDeclarable
 from executables.Documentable import Documentable
 from executables.Runnable import Runnable
 from executables.Saveable import Saveable
+from executables.Findable import Findable
 from executables.thumbnails import ThumbnailMethod
 
-class Representation(RecursiveDeclarable, Runnable, Documentable):
+class Representation(RecursiveDeclarable, Runnable, Documentable, Findable):
     hydrated = None
+    self_name = "Representation"
 
     @classmethod
     async def extract(cls, i: dict = {})->dict:

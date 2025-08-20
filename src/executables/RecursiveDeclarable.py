@@ -7,14 +7,19 @@ class RecursiveDeclarable:
         '''
         Define consts, temp variables etc
         '''
+
         pass
 
     @classmethod
-    def validate(cls, args: dict)->dict:
+    def validate(cls, args: dict) -> dict:
+        '''
+        Validates arguments at input. Checks with class declarations
+        '''
+
         return ArgsValidator().validate(cls.declare_recursive(), args, cls.executable_cfg)
 
     @classmethod
-    def declare(cls):
+    def declare(cls) -> dict:
         '''
         Method that defines dictionary of current executable args
         '''
@@ -27,15 +32,16 @@ class RecursiveDeclarable:
         '''
         Brings all params from parent classes to one dict
         '''
-        ignore_list = cls.executable_cfg.get('ignore', [])
+        ignore_list = cls.executable_cfg.get('ignore', []) # params that will be ignored from current level
         output_params = {}
 
         for __sub_class in cls.__mro__:
-            if hasattr(__sub_class, "declare") == False:
-                continue
-
             if hasattr(__sub_class, "define") == True:
                 __sub_class.define()
+
+            # does not have declare function
+            if hasattr(__sub_class, "declare") == False:
+                continue
 
             intermediate_dict = {}
             current_level_declaration = __sub_class.declare()

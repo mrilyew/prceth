@@ -50,8 +50,12 @@ class Documentable():
                 ts['variants'] = []
                 for variant in variants:
                     _var = variant.copy()
-                    _var['name'] = resolve_doc(variant.get('name'))
+                    _var['name'] = variant.get('name')
 
                     ts['variants'].append(_var)
 
         return ts
+
+    @classmethod
+    def resolve_key(cls, key):
+        return resolve_doc(key)

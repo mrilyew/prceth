@@ -1,9 +1,9 @@
 from app.App import app, logger
 from resources.Consts import consts
 from utils.MainUtils import dump_json, parse_json
-from executables.acts.Executables.RunAct import RunAct
+from executables.list.Executables.ActsRun import Implementation as RunAct
 from db.Models.Instances.ServiceInstance import ServiceInstance
-from repositories.ServicesRepository import ServicesRepository
+from executables.services import Service
 from resources.Exceptions import FatalError, EndOfCycleException
 from datetime import datetime
 import asyncio
@@ -34,7 +34,7 @@ class CLI:
 
         __service_name = __service_settings.service_name
 
-        __service_res = ServicesRepository().getByName(__service_name)
+        __service_res = Service.findByName(__service_name)
         __data = parse_json(__service_settings.data)
 
         if join_argv == True:

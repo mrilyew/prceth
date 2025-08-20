@@ -27,7 +27,6 @@ class Saveable:
 
     def ContentUnit(self):
         out = ContentUnit()
-        #out = self.self_insert(out)
         self.self_insert(out)
 
         return out

@@ -17,6 +17,13 @@ class Runnable:
 
         return _[-2]
 
+    @classproperty
+    def category_with_name(self)->str:
+        class_full_name = self.__module__
+        _ = class_full_name.split('.')
+
+        return _[-2] + "." + _[-1]
+
     # Comparisons
 
     @classmethod
@@ -55,7 +62,7 @@ class Runnable:
 
     @classmethod
     def full_name(cls):
-        return cls.category + '.' + cls.__name__
+        return cls.category_with_name
 
     def preExecute(self, i = {}):
         pass

@@ -1,11 +1,12 @@
 from executables.Runnable import Runnable
 from executables.Documentable import Documentable
 from executables.Saveable import Saveable
+from executables.Findable import Findable
 from executables.RecursiveDeclarable import RecursiveDeclarable
 from utils.Hookable import Hookable
 from app.App import logger
 
-class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable, Hookable):
+class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable, Hookable, Findable):
     def __init__(self):
         super().__init__()
 

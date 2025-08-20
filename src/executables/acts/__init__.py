@@ -1,4 +1,4 @@
 from executables.Executable import Executable
 
-class BaseAct(Executable):
-    pass
+class Act(Executable):
+    self_name = "Act"

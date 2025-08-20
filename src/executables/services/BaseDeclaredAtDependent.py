@@ -1,10 +1,10 @@
-from executables.services import BaseService
+from executables.services import Service
 from app.App import logger
 from db.Models.Content.ContentUnit import ContentUnit
 from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgument
 from db.LinkManager import LinkManager
 
-class BaseDeclaredAtDependent(BaseService):
+class BaseDeclaredAtDependent(Service):
     pass_params = {}
     add_after = None
     colls_list = []

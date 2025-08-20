@@ -3,8 +3,9 @@ from resources.Exceptions import EndOfCycleException
 from declarable.ArgsValidator import ArgsValidator
 from executables.Executable import Executable
 
-class BaseService(Executable):
+class Service(Executable):
     name = 'base'
+    self_name = "Service"
     config = {}
     interval = 10
     current_iterator = 0

@@ -1,0 +1,65 @@
+from resources.Cached import cached
+from resources.Consts import consts
+from typing import List, Type
+from pathlib import Path
+import importlib
+
+class Findable():
+    self_name = "Executable"
+
+    @classmethod
+    def findByNameRaw(cls, name)->Type["Findable"]:
+        folder = "executables"
+
+        __module_name = f'{folder}.list.{name}'
+        __module = importlib.import_module(__module_name)
+        __class = getattr(__module, "Implementation", None)
+        if __class == None:
+            return None
+
+        if __class.self_name != cls.self_name:
+            return None
+
+        return __class
+
+    @classmethod
+    def findByName(cls, name)->Type["Findable"]:
+        __module = None
+
+        try:
+            __module = cls.findByNameRaw(name)
+        except Exception as e:
+            print(e)
+            return None
+
+        if getattr(__module, 'canBeExecuted', None) == None or __module.canBeExecuted() == False:
+            return None
+
+        return __module
+
+    @classmethod
+    def findAll(cls)->List[Type["Findable"]]:
+        self_name_but_correct = cls.self_name.lower() + "s"
+        output = []
+        if cached.get(f'{self_name_but_correct}_list') != None:
+            return cached.get(f'{self_name_but_correct}_list')
+
+        exec_dir = consts.get('executables')
+        __base_path = Path(f"{exec_dir}\\{self_name_but_correct}")
+        __plugins = Path(__base_path).rglob('*__init__.py')
+        for plugin_file in __plugins:
+            plugin_name = plugin_file.name
+            if plugin_name in ['', '__pycache__', 'Base.py']:
+                continue
+
+            relative_path = plugin_file.relative_to(__base_path)
+            module_name = str(relative_path.with_suffix("")).replace("\\", ".").replace("/", ".")
+
+            if plugin_name.endswith('.py'):
+                __module = cls.findByName(module_name)
+                if __module != None:
+                    output.append(__module)
+
+        cached[f'{self_name_but_correct}_list'] = output
+
+        return output
