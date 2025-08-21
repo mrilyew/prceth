@@ -5,6 +5,13 @@ from declarable.ArgumentsTypes import StringArgument, CsvArgument, ContentUnitAr
 from db.LinkManager import LinkManager
 from app.App import logger
 
+keys = {
+    "name": {
+        "en_US": "Link to",
+        "ru_RU": "Привязать к",
+    }
+}
+
 class Implementation(Act):
     executable_cfg = {
         'free_args': True
@@ -21,7 +28,7 @@ class Implementation(Act):
         params["link_after"] = CsvArgument({
             "orig": ContentUnitArgument({}),
             "docs": {
-                "name": 'run_representation_link_param_name',
+                "name": Act.resolve_key(keys.get("name")),
             },
             "default": []
         })
@@ -32,16 +39,16 @@ class Implementation(Act):
         representation_name = i.get('representation')
         links = i.get('link')
 
-        representationClass = Representation.findByName(representation_name)
-        assert representationClass != None, "representation not found"
-        assert representationClass.canBeExecuted() == True, "representation cannot be executed"
+        representation_class = Representation.findByName(representation_name)
+        assert representation_class != None, "representation not found"
+        assert representation_class.canBeExecuted() == True, "representation cannot be executed"
 
-        if representationClass.isConfirmable() != None:
-            args = representationClass.validate(i.copy())
+        if representation_class.isConfirmable() != None:
+            args = representation_class.validate(i.copy())
             is_confirmed = int(i.get("confirm", "1")) == 1
 
             if is_confirmed == False:
-                pre_execute = representationClass.PreExecute(representationClass)
+                pre_execute = representation_class.PreExecute(representation_class)
                 new_args_response = await pre_execute.execute(args)
                 new_args = new_args_response.get("args")
                 new_args_api = []
@@ -60,7 +67,7 @@ class Implementation(Act):
 
                 return {"tab": new_args_api}
 
-        __ents = await representationClass.extract(i)
+        __ents = await representation_class.extract(i)
         __all_items = []
         __link_to = []
 

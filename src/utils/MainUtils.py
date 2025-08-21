@@ -1,5 +1,4 @@
 import secrets, os, sys, random, json, mimetypes
-from resources.Descriptions import descriptions
 from contextlib import contextmanager
 from resources.Consts import consts
 from collections import defaultdict

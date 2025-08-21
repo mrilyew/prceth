@@ -48,8 +48,8 @@ descriptions["representations.abstract.scratch.definition"] = {
     "rus": "Создаёт объект без содержания",
 }
 descriptions["abstract_collection_name_param_description"] = {
-    "eng": "Name of the new collection",
-    "rus": "Название создаваемой коллекции",
+    "eng": "",
+    "rus": "",
 }
 descriptions["abstract_collection_description_param_description"] = {
     "eng": "Description of the new collection",
