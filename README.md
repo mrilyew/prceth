@@ -11,10 +11,9 @@ Todo:
 - [x] Разделить Executable на Runnable, Documentable, Saveable, RecursiveDeclarable
 - [x] Игнорируемые параметры
 - [x] Избавится от дублирования категории
-- [ ] Задавать executable_cfg.variants из declare() (?)
 - [x] Не преобразовывать ключи локализации
 - [x] Класс должен иметь список модулей для установки
-- [ ] Избавится от extractors
+- [x] Избавится от extractors
 
 #### Логирование
 

@@ -9,3 +9,4 @@ from declarable.ArgumentsTypes.ServiceInstanceArgument import ServiceInstanceArg
 from declarable.ArgumentsTypes.StorageUnitArgument import StorageUnitArgument
 from declarable.ArgumentsTypes.StringArgument import StringArgument
 from declarable.ArgumentsTypes.ContentUnitArgument import ContentUnitArgument
+from declarable.ArgumentsTypes.ActArgument import ActArgument

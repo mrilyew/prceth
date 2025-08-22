@@ -1,8 +1,5 @@
+from utils.ClassProperty import classproperty
 from importlib.metadata import distributions
-
-class classproperty(property):
-    def __get__(self, owner_self, owner_cls):
-        return self.fget(owner_cls)
 
 class Runnable:
     buffer = {}

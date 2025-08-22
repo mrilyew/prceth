@@ -21,13 +21,13 @@ class VkApi():
                 __save_end_url += f"&{param[0]}={param[1]}"
             else:
                 __save_end_url += f"&access_token=X"
-        
+
         __response = None
         async with aiohttp.ClientSession() as session:
             async with session.get(__end_url) as response:
                 __response = await response.json()
 
-        logger.log(f"Called VK API {__save_end_url}", section="Submodules.Trivia!VkApi")
+        logger.log(f"Called VK API {__save_end_url}", section="Trivia!VkApi")
 
         if __response.get("response") == None:
             if __response.get("error"):

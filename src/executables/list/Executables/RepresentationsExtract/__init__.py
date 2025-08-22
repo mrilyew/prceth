@@ -28,7 +28,7 @@ class Implementation(Act):
         params["link_after"] = CsvArgument({
             "orig": ContentUnitArgument({}),
             "docs": {
-                "name": Act.resolve_key(keys.get("name")),
+                "name": keys.get("name"),
             },
             "default": []
         })

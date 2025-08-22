@@ -1,7 +1,6 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import StringArgument, BooleanArgument
+from declarable.ArgumentsTypes import StringArgument, BooleanArgument, ActArgument
 from resources.Consts import consts
-from executables.acts import Act
 
 # internal usage only!
 
@@ -14,7 +13,7 @@ class Implementation(Act):
     @classmethod
     def declare(cls):
         params = {}
-        params["i"] = StringArgument({
+        params["i"] = ActArgument({
             "assertion": {
                 "not_null": True
             }
@@ -26,11 +25,8 @@ class Implementation(Act):
         return params
 
     async def execute(self, i = {}):
-        act_name = i.get("i")
+        act_class = i.get("i")
         ignore_requirements = i.get("ignore_requirements")
-        act_class = Act.findByName(act_name)
-
-        assert act_class != None, "act not found"
 
         if consts.get("context") != "cli":
             assert act_class.canBeUsedAt(consts.get("context"))

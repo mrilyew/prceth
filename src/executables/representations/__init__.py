@@ -1,15 +1,32 @@
 from resources.Exceptions import AbstractClassException, SuitableExtractMethodNotFound
-from executables.RecursiveDeclarable import RecursiveDeclarable
+from db.Models.Content.ContentUnit import ContentUnit
 from executables.Documentable import Documentable
 from executables.Runnable import Runnable
 from executables.Saveable import Saveable
 from executables.Findable import Findable
 from executables.thumbnails import ThumbnailMethod
+from executables.acts import BaseAct
+from executables.extractors import BaseExtractor
+from utils.ClassProperty import classproperty
 import importlib, pkgutil
 
-class Representation(RecursiveDeclarable, Runnable, Documentable, Findable):
-    hydrated = None
+class Representation(Runnable, Documentable, Findable):
     self_name = "Representation"
+    cached_lists = {}
+
+    @classproperty
+    def extractors(cls):
+        if cls.cached_lists.get("Extractors") == None:
+            cls.cached_lists["Extractors"] = cls.get_submodules("Extractors")
+
+        return cls.cached_lists.get("Extractors")
+
+    @classproperty
+    def acts(cls):
+        if cls.cached_lists.get("Acts") == None:
+            cls.cached_lists["Acts"] = cls.get_submodules("Acts")
+
+        return cls.cached_lists.get("Acts")
 
     @classmethod
     def get_submodules(cls, dir_name):
@@ -34,14 +51,6 @@ class Representation(RecursiveDeclarable, Runnable, Documentable, Findable):
         return extractors_list
 
     @classmethod
-    def get_extractors(cls):
-        return cls.get_submodules("Extractors")
-
-    @classmethod
-    def get_acts(cls):
-        return cls.get_submodules("Acts")
-
-    @classmethod
     def sum_arguments(cls, extractors):
         _sum = {}
         for extractor_name, extractor_item in extractors.items():
@@ -55,8 +64,12 @@ class Representation(RecursiveDeclarable, Runnable, Documentable, Findable):
             return cls.extractor_wheel(args)
 
         # dumb way
-        all_extractors = cls.get_extractors()
-        all_arguments = cls.sum_arguments(all_extractors)
+        all_extractors = cls.extractors
+        for extractor_name, extractor_item in all_extractors.items():
+            decls = extractor_item.declare_recursive()
+
+            if decls:
+                pass
 
     @classmethod
     def get_variants(cls):
@@ -79,15 +92,14 @@ class Representation(RecursiveDeclarable, Runnable, Documentable, Findable):
 
         return ress
 
-    def hydrate(self, item):
-        self.hydrated = item
-
-        return self
-
-    class AbstractAct(Runnable, Saveable, RecursiveDeclarable):
+    class ContentUnit(ContentUnit):
         pass
 
-    class AbstractExtractor(Runnable, Saveable, RecursiveDeclarable):
+    class AbstractAct(BaseAct):
+        def __init__(self, outer):
+            self.outer = outer
+
+    class AbstractExtractor(BaseExtractor):
         buffer = {}
         args = {}
 
