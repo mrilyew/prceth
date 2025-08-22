@@ -1,5 +1,5 @@
 from executables.list.WebServices_Vk import BaseVkItemId
-from declarable.ArgumentsTypes import BooleanArgument
+from declarable.Arguments import BooleanArgument
 from pathlib import Path
 from app.App import logger
 from submodules.Web.DownloadManager import download_manager

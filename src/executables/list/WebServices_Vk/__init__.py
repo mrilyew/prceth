@@ -1,6 +1,6 @@
 from app.App import env
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument, BooleanArgument, CsvArgument
+from declarable.Arguments import StringArgument, ObjectArgument, BooleanArgument, CsvArgument
 from utils.MainUtils import list_conversation
 from submodules.Trivia.WebServices.VkApi import VkApi
 from resources.Exceptions import AbstractClassException
@@ -81,7 +81,7 @@ class BaseVk(Representation):
         item[column_name.replace('_id', '')] = cls._find_owner(item.get(column_name), profiles, groups)
 
     class Extractor(Representation.ExtractStrategy):
-        def preExecute(self, i = {}):
+        def before_execute(self, i = {}):
             self.vkapi = VkApi(token=i.get("access_token"),endpoint=i.get("api_url"))
 
 class BaseVkItemId(BaseVk):

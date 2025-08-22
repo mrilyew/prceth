@@ -23,7 +23,9 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable, Hookable
 
     async def safeExecute(self, args: dict):
         _args = self.__class__.validate(args)
-        self.preExecute(_args)
+
+        if getattr(self, "before_execute", None) != None:
+            self.before_execute(_args)
 
         logger.log(message=f"Executed {self.full_name()}",section=logger.SECTION_EXECUTABLES,kind=logger.KIND_MESSAGE)
 

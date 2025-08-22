@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import StringArgument
+from declarable.Arguments import StringArgument
 from utils.MainUtils import parse_json
 from executables.acts import Act
 from resources.Consts import consts

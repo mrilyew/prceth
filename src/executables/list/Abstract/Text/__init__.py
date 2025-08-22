@@ -1,5 +1,5 @@
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument, CsvArgument
+from declarable.Arguments import StringArgument, CsvArgument
 from utils.MainUtils import proc_strtr
 
 class Implementation(Representation):

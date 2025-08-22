@@ -1,7 +1,7 @@
 from executables.acts import Act
 from executables.services import Service
 from db.Models.Instances.ServiceInstance import ServiceInstance
-from declarable.ArgumentsTypes import StringArgument, IntArgument
+from declarable.Arguments import StringArgument, IntArgument
 
 class Implementation(Act):
     executable_cfg = {

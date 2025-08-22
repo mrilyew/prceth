@@ -1,6 +1,6 @@
 from executables.services.BaseDeclaredAtDependent import BaseDeclaredAtDependent
 from executables.extractors import Extractor
-from declarable.ArgumentsTypes import StringArgument
+from declarable.Arguments import StringArgument
 
 class Implementation(BaseDeclaredAtDependent):
     @classmethod

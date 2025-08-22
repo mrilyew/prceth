@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import ServiceInstanceArgument, JsonArgument
+from declarable.Arguments import ServiceInstanceArgument, JsonArgument
 
 class Implementation(Act):
     @classmethod

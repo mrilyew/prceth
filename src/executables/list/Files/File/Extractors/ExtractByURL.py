@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import CsvArgument, StringArgument
+from declarable.Arguments import CsvArgument, StringArgument
 from submodules.Web.DownloadManager import download_manager
 from executables.representations import Representation
 from utils.WebUtils import is_generated_ext

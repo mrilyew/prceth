@@ -1,7 +1,16 @@
+from declarable.ExecutableConfig import ExecutableConfig
 from declarable.ArgsValidator import ArgsValidator
+from utils.ClassProperty import classproperty
 
 class RecursiveDeclarable:
     executable_cfg =  {}
+
+    @classproperty
+    def executable_configuration(cls):
+        if type(cls.executable_cfg) == dict:
+            return ExecutableConfig(cls.executable_cfg)
+
+        return cls.executable_cfg
 
     def define():
         '''
@@ -16,7 +25,7 @@ class RecursiveDeclarable:
         Validates arguments at input. Checks with class declarations
         '''
 
-        return ArgsValidator().validate(cls.declare_recursive(), args, cls.executable_cfg)
+        return ArgsValidator().validate(cls.declare_recursive(), args, cls.executable_configuration)
 
     @classmethod
     def declare(cls) -> dict:
@@ -32,7 +41,7 @@ class RecursiveDeclarable:
         '''
         Brings all params from parent classes to one dict
         '''
-        ignore_list = cls.executable_cfg.get('ignore', []) # params that will be ignored from current level
+        ignore_list = cls.executable_configuration.ignores() # params that will be ignored from current level
         output_params = {}
 
         for __sub_class in cls.__mro__:

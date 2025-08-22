@@ -3,7 +3,7 @@ from executables.acts import Act
 from executables.extractors import Extractor
 from app.App import logger
 from resources.Exceptions import FatalError
-from declarable.ArgumentsTypes import LimitedArgument, StringArgument, ObjectArgument
+from declarable.Arguments import LimitedArgument, StringArgument, ObjectArgument
 
 class Implementation(Service):
     c_cached_executable = None

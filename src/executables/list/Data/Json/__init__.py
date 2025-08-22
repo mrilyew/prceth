@@ -1,6 +1,6 @@
 from executables.representations import Representation
 from utils.MainUtils import parse_json, list_conversation
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument
+from declarable.Arguments import StringArgument, ObjectArgument
 
 class Implementation(Representation):
     docs = {

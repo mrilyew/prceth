@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import CsvArgument, StorageUnitArgument
+from declarable.Arguments import CsvArgument, StorageUnitArgument
 from executables.representations import Representation
 
 class Method(Representation.AbstractExtractor):

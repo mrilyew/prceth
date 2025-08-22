@@ -1,6 +1,6 @@
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.list.WebServices_Vk import BaseVk
-from declarable.ArgumentsTypes import JsonArgument, IntArgument, LimitedArgument
+from declarable.Arguments import JsonArgument, IntArgument, LimitedArgument
 from submodules.Trivia.WebServices.VkApi import VkApi
 from resources.Consts import consts
 

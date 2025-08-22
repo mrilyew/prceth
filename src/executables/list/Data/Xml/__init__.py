@@ -1,5 +1,5 @@
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument, ObjectArgument
+from declarable.Arguments import StringArgument, ObjectArgument
 import xmltodict
 
 class Implementation(Representation):

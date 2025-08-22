@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import LimitedArgument
+from declarable.Arguments import LimitedArgument
 from executables.representations import Representation
 from executables.extractors import Extractor
 from executables.acts import Act

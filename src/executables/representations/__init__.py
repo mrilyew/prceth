@@ -81,16 +81,12 @@ class Representation(Runnable, Documentable, Findable):
         assert extract_strategy != None, "couldn't find correct extractor"
 
         extract_strategy_instance = extract_strategy(cls)
-        args = cls.validate(i.copy())
+        args = extract_strategy_instance.validate(i.copy())
 
-        extract_strategy_instance.preExecute(args)
-        ress = await extract_strategy_instance.extract(i = args)
+        extract_strategy_instance.before_execute(args)
+        results = await extract_strategy_instance.extract(i = args)
 
-        for el in ress:
-            el.unlisted = int(i.get('unlisted') == True)
-            # el.representation = cls.full_name()
-
-        return ress
+        return results
 
     class ContentUnit(ContentUnit):
         pass

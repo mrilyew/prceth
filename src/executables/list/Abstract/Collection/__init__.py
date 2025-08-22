@@ -1,5 +1,5 @@
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument
+from declarable.Arguments import StringArgument
 from db.Models.Content.ContentUnit import ContentUnit
 
 class Implementation(Representation):

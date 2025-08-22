@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import StringArgument, LimitedArgument
+from declarable.Arguments import StringArgument, LimitedArgument
 from executables.list.Executables.ExecutableList import Implementation as ListImplementation
 
 class Implementation(ListImplementation):

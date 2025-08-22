@@ -1,5 +1,5 @@
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
-from declarable.ArgumentsTypes import IntArgument, CsvArgument
+from declarable.Arguments import IntArgument, CsvArgument
 from executables.list.WebServices_Vk.Message import Message
 from submodules.Trivia.WebServices.VkApi import VkApi
 

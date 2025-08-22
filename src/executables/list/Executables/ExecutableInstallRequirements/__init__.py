@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import ActArgument
+from declarable.Arguments import ActArgument
 
 class Implementation(Act):
     @classmethod

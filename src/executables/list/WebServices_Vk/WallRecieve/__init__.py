@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import IntArgument, StringArgument, CsvArgument, BooleanArgument
+from declarable.Arguments import IntArgument, StringArgument, CsvArgument, BooleanArgument
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.list.WebServices_Vk import Post
 from submodules.Trivia.WebServices.VkApi import VkApi

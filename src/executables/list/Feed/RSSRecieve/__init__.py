@@ -2,7 +2,7 @@ from executables.extractors import Extractor
 from app.App import logger
 from utils.MediaUtils import rss_date_parse
 from executables.list.Data.Json import Implementation as JsonRepresentation
-from declarable.ArgumentsTypes import StringArgument, BooleanArgument
+from declarable.Arguments import StringArgument, BooleanArgument
 import aiohttp, xmltodict
 
 class Implementation(Extractor):

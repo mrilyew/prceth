@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument
+from declarable.Arguments import StringArgument, LimitedArgument, CsvArgument
 from executables.representations import Representation
 from submodules.Files.FileManager import file_manager
 from pathlib import Path

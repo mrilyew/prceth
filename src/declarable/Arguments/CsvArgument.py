@@ -1,10 +1,10 @@
-from declarable.ArgumentsTypes.Argument import Argument
+from declarable.Arguments.Argument import Argument
 from utils.MainUtils import is_valid_json
 import json
 
 class CsvArgument(Argument):
     def value(self):
-        val = self.input_value
+        val = self.passed_value
         intrerm_val = []
         end_vals = []
 
@@ -23,9 +23,9 @@ class CsvArgument(Argument):
                     intrerm_val = _json
 
         for val in intrerm_val:
-            if self.data.get("orig") != None:
-                p = self.data.get("orig")
-                p.passValue(val)
+            if self.configuration.get("orig") != None:
+                p = self.configuration.get("orig")
+                p.input_value(val)
 
                 end_vals.append(p.val())
             else:
@@ -33,8 +33,8 @@ class CsvArgument(Argument):
 
         return end_vals
 
-    def out(self):
-        orig_out = super().out()
+    def describe(self):
+        orig_out = super().describe()
         if orig_out.get("orig") != None and type(orig_out.get("orig")) != str:
             orig_out["orig"] = orig_out.get("orig").out()
 
@@ -49,4 +49,4 @@ class CsvArgument(Argument):
             return _def
 
     def get_list_argument_type(self):
-        return self.data.get('argument_type')
+        return self.configuration.get('argument_type')

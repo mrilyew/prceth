@@ -24,11 +24,9 @@ class Config():
             consts['ui.lang'] = self.get("ui.lang")
 
     def __pass_declarable(self):
-        from declarable.DeclarableArgs import DeclarableArgs
+        from declarable.ArgsComparer import ArgsComparer
 
-        is_free_settings = self.compared_options == None
-
-        self.declared_settings = DeclarableArgs(self.compared_options, self.passed_options, "pass", is_free_settings, is_free_settings)
+        self.declared_settings = ArgsComparer(self.compared_options, self.passed_options, "pass", True, self.compared_options == None)
         self.options = self.declared_settings.dict()
 
     def __load_path(self, path):

@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import IntArgument, CsvArgument, ContentUnitArgument, StringArgument, LimitedArgument, BooleanArgument
+from declarable.Arguments import IntArgument, CsvArgument, ContentUnitArgument, StringArgument, LimitedArgument, BooleanArgument
 from db.Models.Content.ContentUnit import ContentUnit
 from functools import reduce
 import operator

@@ -1,6 +1,6 @@
 from executables.list.WebServices_Vk import BaseVkItemId
 from executables.representations import Representation
-from declarable.ArgumentsTypes import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
+from declarable.Arguments import ObjectArgument, StringArgument, BooleanArgument, CsvArgument
 from utils.MainUtils import proc_strtr
 from app.App import logger
 

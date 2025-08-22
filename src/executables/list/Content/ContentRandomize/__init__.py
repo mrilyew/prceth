@@ -1,7 +1,7 @@
 from executables.acts import Act
 from db.Models.Content.ContentUnit import ContentUnit
 from peewee import fn
-from declarable.ArgumentsTypes import IntArgument, BooleanArgument
+from declarable.Arguments import IntArgument, BooleanArgument
 
 class Implementation(Act):
     @classmethod

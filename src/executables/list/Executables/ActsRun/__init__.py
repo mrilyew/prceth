@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import StringArgument, BooleanArgument, ActArgument
+from declarable.Arguments import StringArgument, BooleanArgument, ActArgument
 from resources.Consts import consts
 
 # internal usage only!

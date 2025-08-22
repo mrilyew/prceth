@@ -49,7 +49,7 @@ from declarable.ArgumentsTypes.{name}Argument import {name}Argument
 
 #### Вызов в коде
 
-За сведение переданных аргументов и задокументированных отвечает класс DeclarableArgs, за дополнительное сравнение — ArgsValidator с методом validate().
+За сведение переданных аргументов и задокументированных отвечает класс ArgsComparer, за дополнительное сравнение — ArgsValidator с методом validate().
 
 #### Конфиг для проверки параметров
 

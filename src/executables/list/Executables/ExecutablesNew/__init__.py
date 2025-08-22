@@ -1,7 +1,7 @@
 from executables.acts import Act
 from resources.Consts import consts
 from pathlib import Path
-from declarable.ArgumentsTypes import StringArgument, LimitedArgument, CsvArgument
+from declarable.Arguments import StringArgument, LimitedArgument, CsvArgument
 import os
 
 class Implementation(Act):

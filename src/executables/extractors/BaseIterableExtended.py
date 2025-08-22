@@ -1,6 +1,6 @@
 from executables.extractors import Extractor
 from executables.extractors.BaseTimeoutable import BaseTimeoutable
-from declarable.ArgumentsTypes import IntArgument
+from declarable.Arguments import IntArgument
 from resources.Exceptions import AbstractClassException
 from app.App import logger
 import math, asyncio

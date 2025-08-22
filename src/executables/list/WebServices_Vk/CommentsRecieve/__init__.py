@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import IntArgument, CsvArgument, LimitedArgument
+from declarable.Arguments import IntArgument, CsvArgument, LimitedArgument
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.list.WebServices_Vk.Comment import Comment
 from submodules.Trivia.WebServices.VkApi import VkApi

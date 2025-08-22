@@ -1,7 +1,7 @@
 from submodules.Media.YtDlpWrapper import YtDlpWrapper
 from executables.representations import Representation
 from executables.Confirmable import Confirmable
-from declarable.ArgumentsTypes import CsvArgument, StringArgument
+from declarable.Arguments import CsvArgument, StringArgument
 
 class Implementation(Representation):
     required_modules = ["yt-dlp"]

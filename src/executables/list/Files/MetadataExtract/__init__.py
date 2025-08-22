@@ -4,7 +4,7 @@ from hachoir.core import config as HachoirConfig
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 from utils.MainUtils import extract_metadata_to_dict
-from declarable.ArgumentsTypes import StringArgument, BooleanArgument, StorageUnitArgument
+from declarable.Arguments import StringArgument, BooleanArgument, StorageUnitArgument
 
 class Implementation(Act):
     executable_cfg = {

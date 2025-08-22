@@ -1,5 +1,5 @@
 from executables.representations.WebServices_Vk import BaseVkItemId
-from declarable.ArgumentsTypes import StringArgument, BooleanArgument
+from declarable.Arguments import StringArgument, BooleanArgument
 from app.App import logger
 from pathlib import Path
 from utils.MainUtils import valid_name

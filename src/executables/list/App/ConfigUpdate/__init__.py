@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import ObjectArgument, LimitedArgument
+from declarable.Arguments import ObjectArgument, LimitedArgument
 from executables.acts import Act
 from resources.Consts import consts
 from app.App import config, env

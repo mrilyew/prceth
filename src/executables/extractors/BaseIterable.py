@@ -1,6 +1,6 @@
 from app.App import logger
 from executables.extractors.BaseTimeoutable import BaseTimeoutable
-from declarable.ArgumentsTypes import IntArgument
+from declarable.Arguments import IntArgument
 import asyncio
 
 class BaseIterable(BaseTimeoutable):

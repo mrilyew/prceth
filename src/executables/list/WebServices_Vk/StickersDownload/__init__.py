@@ -1,5 +1,5 @@
 from executables.extractors.BaseIterable import BaseIterable
-from declarable.ArgumentsTypes import IntArgument, LimitedArgument
+from declarable.Arguments import IntArgument, LimitedArgument
 from executables.list.Files.File import File
 from app.App import logger
 

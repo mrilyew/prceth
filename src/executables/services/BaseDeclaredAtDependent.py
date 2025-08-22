@@ -1,7 +1,7 @@
 from executables.services import Service
 from app.App import logger
 from db.Models.Content.ContentUnit import ContentUnit
-from declarable.ArgumentsTypes import CsvArgument, StringArgument, BooleanArgument
+from declarable.Arguments import CsvArgument, StringArgument, BooleanArgument
 from db.LinkManager import LinkManager
 
 class BaseDeclaredAtDependent(Service):

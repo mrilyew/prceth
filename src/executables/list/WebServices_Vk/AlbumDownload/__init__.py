@@ -1,4 +1,4 @@
-from declarable.ArgumentsTypes import IntArgument, BooleanArgument
+from declarable.Arguments import IntArgument, BooleanArgument
 from executables.extractors.BaseIterableExtended import BaseIterableExtended
 from executables.list.WebServices_Vk.Album import Album as VkAlbumRepresentation
 from submodules.Trivia.WebServices.VkApi import VkApi

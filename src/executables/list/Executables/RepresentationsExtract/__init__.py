@@ -1,7 +1,7 @@
 from executables.acts import Act
 from db.Models.Content.ContentUnit import ContentUnit
 from executables.representations import Representation
-from declarable.ArgumentsTypes import StringArgument, CsvArgument, ContentUnitArgument
+from declarable.Arguments import StringArgument, CsvArgument, ContentUnitArgument
 from db.LinkManager import LinkManager
 from app.App import logger
 

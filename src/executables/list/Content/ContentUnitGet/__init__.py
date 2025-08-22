@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import CsvArgument, IntArgument
+from declarable.Arguments import CsvArgument, IntArgument
 from db.Models.Content.ContentUnit import ContentUnit
 
 class Implementation(Act):

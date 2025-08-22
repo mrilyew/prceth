@@ -1,6 +1,6 @@
 from executables.list.WebServices_Vk import BaseVkItemId
 from resources.Exceptions import LibNotInstalledException
-from declarable.ArgumentsTypes import BooleanArgument
+from declarable.Arguments import BooleanArgument
 from submodules.Web.DownloadManager import download_manager
 from pathlib import Path
 from app.App import logger

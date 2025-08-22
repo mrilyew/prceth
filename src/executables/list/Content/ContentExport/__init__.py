@@ -1,5 +1,5 @@
 from executables.acts import Act
-from declarable.ArgumentsTypes import LimitedArgument, JsonArgument, StringArgument
+from declarable.Arguments import LimitedArgument, JsonArgument, StringArgument
 from db.Export.ArchiveExport import ArchiveExport
 
 class Implementation(Act):

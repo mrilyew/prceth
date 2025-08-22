@@ -1,5 +1,5 @@
 from executables.representations import Representation
-from declarable.ArgumentsTypes import CsvArgument
+from declarable.Arguments import CsvArgument
 
 class Implementation(Representation):
     docs = {
