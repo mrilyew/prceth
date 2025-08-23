@@ -4,20 +4,19 @@ import json
 
 class CsvArgument(Argument):
     def value(self):
-        val = self.passed_value
         intrerm_val = []
         end_vals = []
 
-        if type(val) == list:
-            intrerm_val = val
+        if type(self.passed_value) == list:
+            intrerm_val = self.passed_value
 
-        if type(val) == str:
-            is_json = is_valid_json(val)
+        if type(self.passed_value) == str:
+            is_json = is_valid_json(self.passed_value)
 
             if is_json == False:
-                intrerm_val = val.split(",")
+                intrerm_val = self.passed_value.split(",")
             else:
-                _json = json.loads(val)
+                _json = json.loads(self.passed_value)
 
                 if type(_json) == list:
                     intrerm_val = _json
@@ -36,7 +35,7 @@ class CsvArgument(Argument):
     def describe(self):
         orig_out = super().describe()
         if orig_out.get("orig") != None and type(orig_out.get("orig")) != str:
-            orig_out["orig"] = orig_out.get("orig").out()
+            orig_out["orig"] = orig_out.get("orig").describe()
 
         return orig_out
 

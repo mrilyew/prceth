@@ -16,10 +16,5 @@ class Extractor(Executable):
     def link_after_add(self, item):
         self.link_after.append(item)
 
-    def self_insert(self, item):
-        item.via_extractor = self
-
-        return item
-
 class BaseExtractor(Runnable, Documentable, Saveable, RecursiveDeclarable):
     self_name = "Extractor"

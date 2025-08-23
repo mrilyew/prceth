@@ -45,7 +45,7 @@ class Implementation(BaseIterableExtended):
 
             self.params['album_entity'] = VkAlbumRepresentation().hydrate(self.params.get('collections')[0])
 
-            return self.params.get('collections')[0].json_content.get('size')
+            return self.params.get('collections')[0].content_json.get('size')
 
         async def iterate(self, time):
             offset = self.params.get('per_page') * time

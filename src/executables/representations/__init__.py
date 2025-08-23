@@ -2,9 +2,9 @@ from resources.Exceptions import AbstractClassException, SuitableExtractMethodNo
 from db.Models.Content.ContentUnit import ContentUnit
 from executables.Documentable import Documentable
 from executables.Runnable import Runnable
-from executables.Saveable import Saveable
 from executables.Findable import Findable
 from executables.thumbnails import ThumbnailMethod
+from declarable.ArgsComparer import ArgsComparer
 from executables.acts import BaseAct
 from executables.extractors import BaseExtractor
 from utils.ClassProperty import classproperty
@@ -67,9 +67,10 @@ class Representation(Runnable, Documentable, Findable):
         all_extractors = cls.extractors
         for extractor_name, extractor_item in all_extractors.items():
             decls = extractor_item.declare_recursive()
+            decl = ArgsComparer(decls, args)
 
-            if decls:
-                pass
+            if decl.diff():
+                return extractor_item
 
     @classmethod
     def get_variants(cls):
@@ -78,17 +79,15 @@ class Representation(Runnable, Documentable, Findable):
     @classmethod
     async def extract(cls, i: dict = {})->dict:
         extract_strategy = cls.find_suitable_extractor(i)
-        assert extract_strategy != None, "couldn't find correct extractor"
+        assert extract_strategy != None, "cant find correct extractor"
 
         extract_strategy_instance = extract_strategy(cls)
-        args = extract_strategy_instance.validate(i.copy())
 
-        extract_strategy_instance.before_execute(args)
-        results = await extract_strategy_instance.extract(i = args)
+        results = await extract_strategy_instance.safeExecute(i.copy())
 
         return results
 
-    class ContentUnit(ContentUnit):
+    #class ContentUnit(ContentUnit):
         pass
 
     class AbstractAct(BaseAct):
@@ -106,9 +105,7 @@ class Representation(Runnable, Documentable, Findable):
             raise AbstractClassException("no action")
 
         def self_insert(self, item):
-            item.via_representation = self.outer
-
-            return item
+            item.mark_representation(self)
 
     class Thumbnail(ThumbnailMethod):
         pass

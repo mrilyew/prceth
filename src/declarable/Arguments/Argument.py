@@ -34,25 +34,22 @@ class Argument:
 
         return ps
 
-    def val(self):
+    def val(self, default_sub = True):
         got = None
         if self.passed_value != None:
-            got = self.value()
+            try:
+                got = self.value()
+            except Exception as e:
+                print(e)
+                if default_sub == True:
+                    got = self.default()
         else:
-            got = self.default()
+            if default_sub == True:
+                got = self.default()
+
+        self.recieved_value = got
 
         return got
-
-    def final_val(self):
-        value = None
-        try:
-            value = self.val()
-        except Exception as e:
-            value = self.default()
-
-        self.recieved_value = value
-
-        return value
 
     def assertions(self):
         assertions_list = self.configuration.get("assertion")
@@ -67,10 +64,8 @@ class Argument:
         this_name = self.configuration.get('name')
         assert self.recieved_value != None, f"{this_name} is null"
 
-    def assertion_only_when(self, item):
-        only_when = item.get("only_when")
-
-        for condition in only_when:
+    def _assertion_only_when(self, item):
+        for condition in item:
             _en = list(enumerate(condition))
             key_name = _en[0][1]
             key_value = condition.get(key_name)

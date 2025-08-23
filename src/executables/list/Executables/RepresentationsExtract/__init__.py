@@ -75,7 +75,7 @@ class Implementation(Act):
             __link_to = ContentUnit.ids(links)
 
         for item in __ents:
-            item.save(force_insert=True)
+            item.save()
 
             if __link_to != None and type(__link_to) == list:
                 for _item in __link_to:

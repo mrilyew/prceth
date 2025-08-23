@@ -4,6 +4,29 @@ from submodules.Files.FileManager import file_manager
 from pathlib import Path
 import os
 
+keys = {
+    "path.name": {
+        "en_US": "Path to file",
+        "ru_RU": "Путь к файлу"
+    },
+    "type.name": {
+        "en_US": "Text",
+        "ru_RU": "Текст"
+    },
+    "type.copy.name": {
+        "en_US": "Copy",
+        "ru_RU": "Копирование",
+    },
+    "type.move.name": {
+        "en_US": "Move",
+        "ru_RU": "Перемещение",
+    },
+    "type.link.name": {
+        "en_US": "Link",
+        "ru_RU": "Ссылка",
+    }
+}
+
 class Method(Representation.AbstractExtractor):
     @classmethod
     def declare(cls):
@@ -11,27 +34,22 @@ class Method(Representation.AbstractExtractor):
         params["path"] = CsvArgument({
             "orig": StringArgument({}),
             "docs": {
-                "name": 'representations.data.file.path.name',
+                "name": keys.get("path.name"),
             },
             "default": None,
-            "assertion": {
-                "only_when": [
-                    {"url": {"operator": "==", "value": None}}
-                ]
-            }
         })
         params["type"] = LimitedArgument({
             "docs": {
-                "name": "representations.data.file.type.name",
+                "name": keys.get("type.name"),
                 "values": {
                     "copy": {
-                        "name": "representations.data.file.type.copy.name",
+                        "name": keys.get("type.copy.name")
                     },
                     "move": {
-                        "name": "representations.data.file.type.move.name"
+                        "name": keys.get("type.move.name")
                     },
                     "link": {
-                        "name": "representations.data.file.type.link.name"
+                        "name": keys.get("type.link.name")
                     },
                 }
             },
@@ -73,6 +91,7 @@ class Method(Representation.AbstractExtractor):
 
             out.add_link(su)
             out.set_common_link(su)
+            out.display_name = file_name
             out.content = {
                 "export_as": str(move_type),
                 "format": str(path.suffix[1:]),
@@ -81,7 +100,7 @@ class Method(Representation.AbstractExtractor):
                 "type": "path",
                 "content": str(path)
             }
-            out = await self.process_item(out)
+            out = await self.outer.process_item(out)
 
             outs.append(out)
 

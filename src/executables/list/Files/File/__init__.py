@@ -13,11 +13,12 @@ keys = {
 
 class Implementation(Representation):
     docs = {
-        "name": Representation.resolve_key(keys.get("name")),
-        "definition": Representation.resolve_key(keys.get("definition")),
+        "name": keys.get("name"),
+        "definition": keys.get("definition"),
     }
 
-    async def process_item(self, item):
+    @staticmethod
+    async def process_item(item):
         return item
 
     async def metadata(self, i = {}):

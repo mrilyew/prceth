@@ -61,8 +61,8 @@ class Implementation(Extractor):
         for i in out:
             i.extractor = self.full_name()
 
-            __name = i.json_content.get("title", "Untitled")
-            __date = rss_date_parse(i.json_content.get("pubDate"))
+            __name = i.content_json.get("title", "Untitled")
+            __date = rss_date_parse(i.content_json.get("pubDate"))
 
             i.display_name = str(__name)
             i.declared_created_at = __date.timestamp()

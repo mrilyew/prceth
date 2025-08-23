@@ -15,18 +15,3 @@ class Executable(Runnable, Documentable, Saveable, RecursiveDeclarable, Hookable
 
         self.add_hook("error", __onerror)
         #self.events.get("success").append(__onsuccess)
-
-    # Execution
-
-    async def execute(self, args):
-        pass
-
-    async def safeExecute(self, args: dict):
-        _args = self.__class__.validate(args)
-
-        if getattr(self, "before_execute", None) != None:
-            self.before_execute(_args)
-
-        logger.log(message=f"Executed {self.full_name()}",section=logger.SECTION_EXECUTABLES,kind=logger.KIND_MESSAGE)
-
-        return await self.execute(_args)

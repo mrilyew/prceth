@@ -4,7 +4,7 @@ from app.App import logger
 
 class Implementation(BaseVkItemId):
     async def getPhotos(self, vkapi, offset, count, rev = False, download = False):
-        hd = self.hydrated.json_content
+        hd = self.hydrated.content_json
 
         photos = await vkapi.call('photos.get', {
             "owner_id": hd.get('owner_id'),

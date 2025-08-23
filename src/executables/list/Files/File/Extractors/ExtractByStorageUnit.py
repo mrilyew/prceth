@@ -1,6 +1,12 @@
 from declarable.Arguments import CsvArgument, StorageUnitArgument
 from executables.representations import Representation
 
+keys = {
+    "storage_unit.name": {
+        "en_US": "Storage unit ID"
+    }
+}
+
 class Method(Representation.AbstractExtractor):
     @classmethod
     def declare(cls):
@@ -8,9 +14,11 @@ class Method(Representation.AbstractExtractor):
         params["storage_unit"] = CsvArgument({
             "orig": StorageUnitArgument({}),
             "docs": {
-                "name": "representations.data.file.storage_unit.name"
+                "name": keys.get("storage_unit.name")
             },
-            "default": None,
+            "assertion": {
+                "not_null": True
+            }
         })
 
         return params
@@ -20,11 +28,14 @@ class Method(Representation.AbstractExtractor):
         outs = []
 
         for item in su:
+            if item == None:
+                continue
+
             out = self.ContentUnit()
 
             out.add_link(item)
             out.set_common_link(item)
-            out = await self.process_item(out)
+            out = await self.outer.process_item(out)
 
             outs.append(out)
 

@@ -117,7 +117,7 @@ class LinkManager:
 
                     for linked in linked_list:
                         if linked.uuid == got_id and linked.self_name == "ContentUnit":
-                            return linked.formatted_data(recursive=True,recurse_level=recurse_level+1)
+                            return linked.data_with_linked_replacements(recursive=True,recurse_level=recurse_level+1)
 
                     return to_check
                 elif to_check.startswith("__$|su_"):
@@ -125,7 +125,7 @@ class LinkManager:
                     got_id = int(got_id)
                     for linked in linked_list:
                         if linked.uuid == got_id and linked.self_name == "StorageUnit":
-                            return linked.formatted_data(recursive=True,recurse_level=recurse_level+1)
+                            return linked.data_with_linked_replacements(recursive=True,recurse_level=recurse_level+1)
 
                     return to_check
                 else:
@@ -137,4 +137,4 @@ class LinkManager:
             return to_check
 
     def injectLinksToJsonFromInstance(self, recurse_level = 0):
-        return self.injectLinksToJson(self.parent.json_content, self.linksList(), recurse_level)
+        return self.injectLinksToJson(self.parent.content_json, self.linksList(), recurse_level)

@@ -6,21 +6,22 @@ from utils.MainUtils import name_from_url
 from pathlib import Path
 import mimetypes, os
 
+keys = {
+    "url.name": {
+        "en_US": "URL"
+    }
+}
+
 class Method(Representation.AbstractExtractor):
     @classmethod
     def declare(cls):
         params = {}
         params["url"] = CsvArgument({
             "docs": {
-                "name": "representations.data.file.url.name"
+                "name": keys.get("url.name")
             },
             "orig": StringArgument({}),
             "default": None,
-            "assertion": {
-                "only_when": [
-                    {"path": {"operator": "==", "value": None}}
-                ]
-            }
         })
 
         return params
@@ -63,12 +64,13 @@ class Method(Representation.AbstractExtractor):
 
             out.add_link(su)
             out.set_common_link(su)
+            out.display_name = result_name
             out.source = {
                 'type': 'url',
                 'content': url
             }
             out.content = {}
-            out = await self.process_item(out)
+            out = await self.outer.process_item(out)
 
             outs.append(out)
 
