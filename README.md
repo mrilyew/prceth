@@ -2,7 +2,7 @@ Pretty ridiculous content extraction tool :h
 
 Todo:
 
-#### Экзекьютеблы
+#### Скрипты
 
 - [x] Pre-execute если ничего не передано (?)
 - [x] Хуки выполнения

@@ -8,8 +8,8 @@ from app.Views.CLI import cli
 from app.App import app
 
 app.argv = {
-    'i': 'Executables.RunRepresentation',
-    'representation': 'Data.File',
+    'i': 'Executables.RepresentationsExtract',
+    'representation': 'Abstract.Text',
     'text': '123456',
 }
 

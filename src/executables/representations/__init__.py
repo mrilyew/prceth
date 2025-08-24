@@ -16,11 +16,11 @@ class Representation(Runnable, Documentable, Findable):
 
     @classproperty
     def extractors(cls):
-        return cls.cached_lists.get("Extractors")
+        return cls.get_submodules("Extractors")
 
     @classproperty
     def acts(cls):
-        return cls.cached_lists.get("Acts")
+        return cls.get_submodules("Acts")
 
     @classmethod
     def get_submodule(cls, dir_name, submodule):
