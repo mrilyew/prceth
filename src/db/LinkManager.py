@@ -60,7 +60,6 @@ class LinkManager:
 
         logger.log(message=f"Unlinked {self.parent.short_name}_{self.parent.uuid}<->{child.short_name}_{child.uuid}", section=logger.SECTION_LINKAGE, kind = logger.KIND_SUCCESS)
 
-    # Better not to use
     def linksListId(self, by_class = None, revision: bool = False):
         selection = self._linksSelection(by_class, revision)
         ids = []

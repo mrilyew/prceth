@@ -3,7 +3,12 @@ from resources.Consts import consts
 from app.App import config, env
 
 class Implementation(Act):
-    async def execute(self, args = {}):
-        assert config.get("web.env_editing.allow") == True, "env editing is not allowed"
+    @classmethod
+    def canBeUsedAt(cls, at):
+        if at == "web":
+            return config.get("web.env_editing.allow")
 
+        return super().canBeUsedAt(at)
+
+    async def execute(self, args = {}):
         return env.options

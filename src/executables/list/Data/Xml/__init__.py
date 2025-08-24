@@ -2,17 +2,16 @@ from executables.representations import Representation
 from declarable.Arguments import StringArgument, ObjectArgument
 import xmltodict
 
+keys = {
+    "xml.name": {
+        "en_US": "Xml"
+    }
+}
+
 class Implementation(Representation):
     docs = {
-        "name": "representations.data.xml.name",
+        "name": keys.get("xml.name"),
     }
-
-    @classmethod
-    def declare(cls):
-        params = {}
-        params["text"] = StringArgument({})
-
-        return params
 
     class Extractor(Representation.ExtractStrategy):
         async def extractByText(self, i = {}):

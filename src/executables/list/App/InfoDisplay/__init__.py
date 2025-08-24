@@ -10,7 +10,7 @@ keys = {
 
 class Implementation(Act):
     docs = {
-        'name': Act.resolve_key(keys.get("name"))
+        'name': keys.get("name")
     }
 
     async def execute(self, args = {}):

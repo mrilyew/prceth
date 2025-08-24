@@ -1,7 +1,7 @@
 from declarable.Arguments import ObjectArgument, LimitedArgument
 from executables.acts import Act
 from resources.Consts import consts
-from app.App import config
+from app.App import config, env
 
 class Implementation(Act):
     @classmethod
@@ -18,13 +18,12 @@ class Implementation(Act):
     @classmethod
     def canBeUsedAt(cls, at):
         if at == "web":
-            return config.get("web.config_editing.allow")
+            return config.get("web.env_editing.allow")
 
         return super().canBeUsedAt(at)
 
     async def execute(self, args = {}):
         values = args.get("values")
-        tabu = consts.get("config.hidden_values_spaces")
 
         assert values != None, "new values not passed"
 
@@ -32,14 +31,10 @@ class Implementation(Act):
             val = values.get(name)
             no = False
 
-            for _name in tabu:
-                if name.startswith(_name):
-                    no = True
-
-            if no == True or val == None:
+            if val == None:
                 continue
 
-            config.set(name, val)
+            env.set(name, val)
 
         return {
             "success": True

@@ -4,6 +4,13 @@ from db.Models.Content.StorageUnit import StorageUnit
 from functools import reduce
 import operator
 
+keys = {
+    "order.name": {
+        "en_US": "Order",
+        "ru_RU": "Порядок"
+    }
+}
+
 class Implementation(Act):
     @classmethod
     def declare(cls):
@@ -13,7 +20,7 @@ class Implementation(Act):
         })
         params["order"] = LimitedArgument({
             "docs": {
-                "name": "c.search.order.name",
+                "name": keys.get("order.name"),
                 "values": {
                     "created_asc": {
                         "name": "c.search.order.c_asc.name",
@@ -35,23 +42,16 @@ class Implementation(Act):
                 "not_null": True,
             }
         })
-        params["offset"] = IntArgument({
-            "docs": {
-                "name": "c.search.offset.name",
-            },
-        })
+        params["offset"] = IntArgument({})
         params["return_thumbnails"] = BooleanArgument({
             "default": False,
-            "docs": {
-                "name": "c.search.return_thumbnails.name",
-            },
         })
         params["link"] = CsvArgument({
             "orig": ContentUnitArgument({}),
             "default": None,
-            "docs": {
-                "name": "c.search.link.name",
-            },
+        })
+        params["ids"] = CsvArgument({
+            "orig": IntArgument({}),
         })
 
         return params
@@ -63,6 +63,7 @@ class Implementation(Act):
         query = i.get("query")
         return_thumbnails = i.get("return_thumbnails")
         search_in = i.get("link")
+        in_ids = i.get("ids")
 
         assert count > 0, "count can't be negative"
 
@@ -70,6 +71,8 @@ class Implementation(Act):
             assert offset > 0, "offset can't be negative"
 
         select_query = StorageUnit.select()
+        if in_ids != None:
+            select_query = select_query.where(StorageUnit.uuid.in_(in_ids))
 
         if return_thumbnails == False:
             select_query = select_query.where(StorageUnit.is_thumbnail == 0)
@@ -99,7 +102,7 @@ class Implementation(Act):
 
             assert len(_ids) > 0, "invalid links"
 
-            select_query = select_query.where(ContentUnit.uuid.in_(_ids))
+            select_query = select_query.where(StorageUnit.uuid.in_(_ids))
 
         items_count = select_query.count()
 

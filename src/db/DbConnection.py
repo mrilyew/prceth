@@ -4,57 +4,21 @@ from peewee import SqliteDatabase, MySQLDatabase, PostgresqlDatabase
 class DbConnection:
     conf = {}
 
+    def __resolve_str(self, i_str):
+        conn_list = i_str.split(":///", 1)
+        conn_type = conn_list[0]
+        db = None
+
+        match(conn_type):
+            case "sqlite":
+                connection_path = replace_src(replace_cwd(conn_list[1]))
+                db = SqliteDatabase(connection_path)
+
+        return db
+
     def attachDb(self, config, env):
-        __t_content_db = config.get("db.content_db.type", "sqlite")
-        __t_instance_db = config.get("db.instance_db.type", "sqlite")
-        db_content, db_instance = [None, None]
-
-        conf = {
-            'user': env.get('db.server_db.user'),
-            'password': env.get('db.server_db.password'),
-            'host': env.get('db.server_db.host'),
-            'port': env.get('db.server_db.port')
-        }
-
-        match(__t_content_db):
-            case "sqlite":
-                database_path = replace_src(replace_cwd(config.get("db.sqlite.content_db.name")))
-                db_content = SqliteDatabase(database_path)
-            case "mysql" | "postgresql":
-                __class = MySQLDatabase
-                if __t_content_db == 'postgresql':
-                    __class = PostgresqlDatabase
-
-                assert conf.get('user') != None and conf.get('password') != None and conf.get('host') != None and conf.get('host') != None
-
-                db_content = __class(config.get("db.server_db.content_db.name"),
-                    user=conf.get('user'),
-                    password=conf.get('password'),
-                    host=conf.get('host'),
-                    port=conf.get('port')
-                )
-
-        match(__t_instance_db):
-            case "sqlite":
-                instance_database_path = replace_src(replace_cwd(config.get("db.sqlite.instance_db.name")))
-
-                db_instance = SqliteDatabase(instance_database_path)
-            case "mysql" | "postgresql":
-                __class = MySQLDatabase
-                if __t_instance_db == 'postgresql':
-                    __class = PostgresqlDatabase
-
-                assert conf.get('user') != None and conf.get('password') != None and conf.get('host') != None and conf.get('host') != None
-
-                db_instance = __class(config.get("db.server_db.instance_db.name"),
-                    user=conf.get('user'),
-                    password=conf.get('password'),
-                    host=conf.get('host'),
-                    port=conf.get('port')
-                )
-
-        self.__setDb(db_content)
-        self.__setInstanceDb(db_instance)
+        self.__setDb(self.__resolve_str(config.get("db.content.connection")))
+        self.__setInstanceDb(self.__resolve_str(config.get("db.instance.connection")))
 
     def __setDb(self, db):
         self.db = db

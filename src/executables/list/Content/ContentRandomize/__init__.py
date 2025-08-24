@@ -1,7 +1,8 @@
 from executables.acts import Act
 from db.Models.Content.ContentUnit import ContentUnit
-from peewee import fn
+from db.LinkManager import LinkManager
 from declarable.Arguments import IntArgument, BooleanArgument
+from peewee import fn
 
 class Implementation(Act):
     @classmethod
@@ -26,29 +27,29 @@ class Implementation(Act):
         return params
 
     async def execute(self, i = {}):
-        self.args = i
+        return {"items": await self._returnItems(i)}
 
-        return {"items": await self._returnItems()}
-
-    async def _returnItems(self):
-        items = await self._recieveItems()
+    async def _returnItems(self, i):
+        items = await self._recieveItems(i)
         fnl = []
         for item in items:
-            if self.args.get("raw_models") == True:
+            if i.get("raw_models") == True:
                 fnl.append(item)
             else:
                 fnl.append(item.api_structure())
 
         return fnl
 
-    async def _recieveItems(self):
+    async def _recieveItems(self, i):
         __ = None
-        if self.args.get("from_id") == None:
-            __ = ContentUnit.select().where(ContentUnit.deleted == 0).order_by(fn.Random()).limit(self.args.get('limit'))
+        if i.get("from_id") == None:
+            __ = ContentUnit.select().where(ContentUnit.is_unlisted == 0).order_by(fn.Random()).limit(i.get('limit'))
         else:
-            _col = ContentUnit.get(self.args.get("from_id"))
+
+            _col = ContentUnit.get(i.get("from_id"))
+            link_manager = LinkManager(_col)
             assert _col != None, 'content_unit with this id does not exists'
 
-            __ = ContentUnit.select().where(ContentUnit.uuid << _col._linksSelectionIds()).limit(self.args.get('limit')).order_by(fn.Random())
+            __ = ContentUnit.select().where(ContentUnit.uuid.in_(link_manager.linksListId())).limit(i.get('limit')).order_by(fn.Random())
 
         return __

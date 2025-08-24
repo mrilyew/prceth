@@ -8,7 +8,7 @@ class Findable():
     self_name = "Executable"
 
     @classmethod
-    def findByNameRaw(cls, category, title)->Type["Findable"]:
+    def findByNameRaw(cls, category, title, sub = None, any = False)->Type["Findable"]:
         folder = "executables"
 
         __module_name = f'{folder}.list.{category}.{title}'
@@ -17,13 +17,16 @@ class Findable():
         if __class == None:
             return None
 
-        if __class.self_name != cls.self_name:
+        if sub != None:
+            __class = __class.get_submodule("Acts", sub)
+
+        if any == False and __class.self_name != cls.self_name:
             return None
 
         return __class
 
     @classmethod
-    def findByName(cls, name)->Type["Findable"]:
+    def findByName(cls, name, any = False)->Type["Findable"]:
         __module = None
         _name_parts = name.split(".")
         _category = _name_parts[0]
@@ -33,7 +36,7 @@ class Findable():
             _sub = _name_parts[2]
 
         try:
-            __module = cls.findByNameRaw(_category, _title)
+            __module = cls.findByNameRaw(_category, _title, _sub, any)
         except Exception as e:
             return None
 

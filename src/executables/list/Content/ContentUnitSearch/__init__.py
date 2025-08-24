@@ -2,7 +2,15 @@ from executables.acts import Act
 from declarable.Arguments import IntArgument, CsvArgument, ContentUnitArgument, StringArgument, LimitedArgument, BooleanArgument
 from db.Models.Content.ContentUnit import ContentUnit
 from functools import reduce
+from peewee import fn
 import operator
+
+keys = {
+    "order.name": {
+        "en_US": "Order",
+        "ru_RU": "Порядок"
+    }
+}
 
 class Implementation(Act):
     @classmethod
@@ -13,23 +21,22 @@ class Implementation(Act):
         })
         params["representation"] = StringArgument({
             "docs": {
-                "name": "c.search.representation.name",
-            }
-        })
-        params["extractor"] = StringArgument({
-            "docs": {
-                "name": "c.search.extractor.name",
+                "name": keys.get("order.name"),
             }
         })
         params["order"] = LimitedArgument({
             "docs": {
-                "name": "c.search.order.name",
+                "name": keys.get("order.name"),
                 "values": {
                     "created_asc": {
-                        "name": "c.search.order.c_asc.name",
+                        "name": {
+                            "en_US": "ID ↑"
+                        },
                     },
                     "created_desc": {
-                        "name": "c.search.order.c_desc.name"
+                        "name": {
+                            "en_US": "ID ↓"
+                        }
                     },
                 }
             },
@@ -37,37 +44,24 @@ class Implementation(Act):
             'default': 'created_desc',
         })
         params["count"] = IntArgument({
-            "docs": {
-                "name": "c.search.count.name",
-            },
             "default": 100,
             "assertion": {
                 "not_null": True,
             }
         })
-        params["offset"] = IntArgument({
-            "docs": {
-                "name": "c.search.offset.name",
-            },
-        })
+        params["offset"] = IntArgument({})
         params["return_unlisted"] = BooleanArgument({
             "default": False,
-            "docs": {
-                "name": "c.search.return_unlisted.name",
-            },
         })
         params["collections_only"] = BooleanArgument({
             "default": False,
-            "docs": {
-                "name": "c.search.collections_only.name",
-            },
         })
         params["link"] = CsvArgument({
             "orig": ContentUnitArgument({}),
             "default": None,
-            "docs": {
-                "name": "c.search.link.name",
-            },
+        })
+        params["ids"] = CsvArgument({
+            "orig": IntArgument({}),
         })
 
         return params
@@ -75,28 +69,28 @@ class Implementation(Act):
     async def execute(self, i = {}):
         count = i.get("count")
         representation = i.get("representation")
-        extractor = i.get("extractor")
         order = i.get("order")
         return_unlisted = i.get("return_unlisted")
         collections_only = i.get("collections_only")
         offset = i.get("offset")
         query = i.get("query")
         search_in = i.get("link")
+        in_ids = i.get("ids")
 
         assert count > 0, "count can't be negative"
 
         if offset != None:
             assert offset > 0, "offset can't be negative"
 
-        select_query = ContentUnit.select().where(ContentUnit.deleted == 0)
-        if representation != None:
-            select_query = select_query.where(ContentUnit.representation == representation)
+        select_query = ContentUnit.select()
+        if in_ids != None:
+            select_query = select_query.where(ContentUnit.uuid.in_(in_ids))
 
-        if extractor != None:
-            select_query = select_query.where(ContentUnit.extractor == extractor)
+        if representation != None:
+            select_query = ContentUnit.json_search(select_query, ContentUnit.saved, "$.representation", representation)
 
         if return_unlisted == False:
-            select_query = select_query.where(ContentUnit.unlisted == 0)
+            select_query = select_query.where(ContentUnit.is_unlisted == 0)
 
         if collections_only == True:
             select_query = select_query.where(ContentUnit.is_collection == 1)

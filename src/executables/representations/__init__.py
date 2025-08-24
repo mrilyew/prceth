@@ -16,20 +16,26 @@ class Representation(Runnable, Documentable, Findable):
 
     @classproperty
     def extractors(cls):
-        if cls.cached_lists.get("Extractors") == None:
-            cls.cached_lists["Extractors"] = cls.get_submodules("Extractors")
-
         return cls.cached_lists.get("Extractors")
 
     @classproperty
     def acts(cls):
-        if cls.cached_lists.get("Acts") == None:
-            cls.cached_lists["Acts"] = cls.get_submodules("Acts")
-
         return cls.cached_lists.get("Acts")
 
     @classmethod
+    def get_submodule(cls, dir_name, submodule):
+        _s = cls.get_submodules(dir_name)
+
+        return _s[submodule]
+
+    @classmethod
     def get_submodules(cls, dir_name):
+        if cls.cached_lists.get(dir_name) != None:
+            return cls.cached_lists[dir_name]
+
+        if getattr(cls, "inherit_submodules", False) == True:
+            return cls.__mro__[1].get_submodules(dir_name)
+
         dirs = cls.__module__ + "." + dir_name
         extractors = importlib.import_module(dirs)
         extractors_list = {}
@@ -48,10 +54,27 @@ class Representation(Runnable, Documentable, Findable):
                 __out.append(getattr(cls, __method))
         '''
 
+        cls.cached_lists[dir_name] = extractors_list
+
         return extractors_list
 
     @classmethod
+    def declare_recursive(cls):
+        return cls.sum_arguments(cls.extractors)
+
+    @classmethod
     def sum_arguments(cls, extractors):
+        _sum = {}
+        for extractor_name, extractor_item in extractors.items():
+            rec = extractor_item.declare_recursive()
+
+            for name, item in rec.items():
+                _sum[name] = item
+
+        return _sum
+
+    @classmethod
+    def divide_arguments(cls, extractors):
         _sum = {}
         for extractor_name, extractor_item in extractors.items():
             _sum[extractor_name] = extractor_item.declare_recursive()
@@ -91,6 +114,8 @@ class Representation(Runnable, Documentable, Findable):
         pass
 
     class AbstractAct(BaseAct):
+        outer = None
+
         def __init__(self, outer):
             self.outer = outer
 

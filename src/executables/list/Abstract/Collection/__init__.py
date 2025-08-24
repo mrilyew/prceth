@@ -1,47 +1,16 @@
 from executables.representations import Representation
-from declarable.Arguments import StringArgument
-from db.Models.Content.ContentUnit import ContentUnit
+
+keys = {
+    "collection.name": {
+        "en_US": "Collection",
+        "ru_RU": "Коллекция"
+    },
+}
 
 class Implementation(Representation):
     docs = {
-        "name": "representations.abstract.collection.name",
-        "definition": "representations.abstract.collection.definition",
+        "name": keys.get("collection.name"),
     }
     executable_cfg = {
         'free_args': True
     }
-
-    @classmethod
-    def declare(cls):
-        params = {}
-        params["name"] = StringArgument({
-            'docs': {
-                "name": 'abstract_collection_name_param_title',
-                "definition": 'abstract_collection_name_param_description',
-            },
-            'assertion': {
-                'not_null': True
-            }
-        })
-        params["description"] = StringArgument({
-            'is_long': True,
-            'docs': {
-                "name": 'abstract_collection_description_param_title',
-                "definition": 'abstract_collection_description_param_description',
-            },
-        })
-
-        return params
-
-    class Extractor(Representation.ExtractStrategy):
-        async def extractByDefault(self, i = {}):
-            out = self.ContentUnit()
-            out.content = {}
-            out.display_name = i.get('name')
-            out.description = i.get('description')
-            out.is_collection = True
-
-            return [out]
-
-        def extractWheel(self, i = {}):
-            return 'extractByDefault'

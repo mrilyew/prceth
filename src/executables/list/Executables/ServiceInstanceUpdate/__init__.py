@@ -22,8 +22,6 @@ class Implementation(Act):
         service = i.get('service')
         data = i.get('data')
 
-        assert service != None, 'invalid service'
-
         service.updateData(data)
         service.save()
 

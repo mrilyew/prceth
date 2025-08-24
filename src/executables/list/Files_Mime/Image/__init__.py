@@ -1,27 +1,33 @@
-from executables.list.Files.File import File
+from executables.list.Files.File import Implementation
 from executables.thumbnails.ImageMethod import ImageMethod
 from PIL import Image as PILImage
 
-class Implementation(File):
-    docs = {
-        "name": "representations.mime.image.name",
-        "definition": "representations.mime.image.definition",
+keys = {
+    "image.name": {
+        "en_US": "Image",
+        "ru_RU": "Изображение"
     }
+}
 
-    class Extractor(File.Extractor):
-        async def process_item(self, item):
-            new_data = {}
-            common_link = item.common_link
+class Implementation(Implementation):
+    docs = {
+        "name": keys.get("image.name"),
+    }
+    inherit_submodules = True
 
-            with PILImage.open(str(common_link.path())) as img:
-                new_data = {
-                    "width": img.size[0],
-                    "height": img.size[1],
-                }
+    async def process_item(item):
+        new_data = {}
+        common_link = item.common_link
 
-            item.update_data(new_data)
+        with PILImage.open(str(common_link.path())) as img:
+            new_data = {
+                "width": img.size[0],
+                "height": img.size[1],
+            }
 
-            return item
+        item.update_data(new_data)
+
+        return item
 
     class Thumbnail(ImageMethod):
         pass

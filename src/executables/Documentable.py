@@ -1,5 +1,3 @@
-from utils.MainUtils import resolve_doc
-
 class Documentable():
     docs = {
         "definition": "no_description_defined",
@@ -7,55 +5,27 @@ class Documentable():
 
     @classmethod
     def describe(cls):
-        class_full_name = cls.__module__
-        class_full_name_spl = class_full_name.split('.')
-        section = class_full_name_spl[-3]
-        category = class_full_name_spl[-2]
-        name = class_full_name_spl[-1]
+        module_name = cls.__module__.split('.')
+        category = module_name[-2]
+        name = module_name[-1]
 
         ts = {
-            'class_name': class_full_name,
-            'sub': section,
             'category': category,
             'name': name,
-            'docs': {},
+            'docs': cls.docs,
             'args': [],
         }
 
-        docs = cls.docs
         _args = cls.declare_recursive()
-        for _id, _name in enumerate(_args):
-            _p = _args.get(_name).out()
+        for _name, _item in _args.items():
+            _p = _args.get(_name).describe()
+
             _p['name'] = _name
             ts['args'].append(_p)
-
-        if docs != None:
-            __name = docs.get('name')
-            __definition = docs.get('definition')
-
-            ts["docs"] = {
-                "name": resolve_doc(__name),
-                "definition": resolve_doc(__definition)
-            }
 
         if getattr(cls, "PreExecute", None) != None:
             pre_exec = cls.PreExecute
 
             ts["confirmation"] = pre_exec.args_list
 
-        if getattr(cls, "executable_cfg", None) != None:
-            variants = cls.executable_cfg.get('variants')
-
-            if variants != None:
-                ts['variants'] = []
-                for variant in variants:
-                    _var = variant.copy()
-                    _var['name'] = variant.get('name')
-
-                    ts['variants'].append(_var)
-
         return ts
-
-    @classmethod
-    def resolve_key(cls, key):
-        return resolve_doc(key)

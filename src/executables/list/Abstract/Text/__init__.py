@@ -1,43 +1,13 @@
 from executables.representations import Representation
-from declarable.Arguments import StringArgument, CsvArgument
-from utils.MainUtils import proc_strtr
+
+keys = {
+    "text.name": {
+        "en_US": "Text",
+        "ru_RU": "Текст"
+    }
+}
 
 class Implementation(Representation):
     docs = {
-        "name": "representations.abstract.text.name",
+        "name": keys.get("text.name"),
     }
-
-    @classmethod
-    def declare(cls):
-        params = {}
-        params["text"] = CsvArgument({
-            "orig": StringArgument({
-                "is_long": True,
-            }),
-            "default": None,
-            "assertion": {
-                "not_null": True,
-            }
-        })
-
-        return params
-
-    class Extractor(Representation.ExtractStrategy):
-        async def extractByDefault(self, i = {}):
-            texts = i.get('text')
-            output = []
-
-            for text in texts:
-                out = self.ContentUnit()
-                out.display_name = proc_strtr(text, 100)
-                out.content = {
-                    'text': text
-                }
-
-                output.append(out)
-
-            return output
-
-        def extractWheel(self, i = {}):
-            if 'text' in i:
-                return 'extractByDefault'

@@ -1,16 +1,13 @@
-from app.App import logger
-from executables.acts import Act
+from executables.representations import Representation
 from hachoir.core import config as HachoirConfig
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 from utils.MainUtils import extract_metadata_to_dict
 from declarable.Arguments import StringArgument, BooleanArgument, StorageUnitArgument
+from app.App import logger
 
-class Implementation(Act):
-    executable_cfg = {
-        "list": ["path", "su_id"],
-        "type": "or",
-    }
+class Method(Representation.AbstractAct):
+    required_modules = ["hachoir"]
 
     @classmethod
     def declare(cls):

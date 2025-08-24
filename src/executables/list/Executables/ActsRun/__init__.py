@@ -34,7 +34,12 @@ class Implementation(Act):
         if ignore_requirements == False:
             assert act_class.isModulesInstalled()
 
-        act = act_class()
+        act = None
+        if getattr(act_class, "outer", None) != None:
+            act = act_class()
+        else:
+            act = act_class()
+
         act_response = await act.safeExecute(i)
 
         return act_response

@@ -1,6 +1,7 @@
 from peewee import Model
 from snowflake import SnowflakeGenerator
 from app.App import logger
+from playhouse.sqlite_ext import fn
 
 class BaseModel(Model):
     @classmethod
@@ -36,3 +37,7 @@ class BaseModel(Model):
 
     def sign(self)->str:
         return f"__$|{self.short_name}_{self.uuid}"
+
+    @classmethod
+    def json_search(cls, query, property, key, value):
+        return query.where(fn.json_extract(property, key) == value)

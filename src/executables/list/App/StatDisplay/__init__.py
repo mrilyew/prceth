@@ -1,10 +1,9 @@
 from executables.acts import Act
-from app.App import app
 from db.Models.Content.ContentUnit import ContentUnit
 
 class Implementation(Act):
-    async def execute(self, args = {}):
-        content_units = ContentUnit.select().where(ContentUnit.deleted == 0)
+    async def execute(self, i = {}):
+        content_units = ContentUnit.select()
 
         return {
             "content_units": {

@@ -201,7 +201,7 @@ class ContentUnit(BaseModel):
                 for iterated_thumbnail in thumbnail_internal_classes_from_db_list:
                     thumbnail_api_response_list.append(iterated_thumbnail.api_structure())
 
-                payload['thumbnail'] = thumbnail_api_response_list
+                payload['outer']['thumbnail'] = thumbnail_api_response_list
             except Exception as e:
                 print(e)
                 pass

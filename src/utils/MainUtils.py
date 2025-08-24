@@ -185,7 +185,7 @@ def override_db(__classes = [], __db = None):
 
 def valid_name(text):
     '''
-    Creates saveable name (removes forbidden characters in NTFS)
+    Creates saveable name (removes forbidden ntfs characters)
     '''
     safe_filename = re.sub(r'[\\/*?:"<>| ]', '_', text)
     safe_filename = re.sub(r'_+', '_', safe_filename)

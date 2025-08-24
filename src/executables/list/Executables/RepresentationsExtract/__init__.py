@@ -53,10 +53,8 @@ class Implementation(Act):
                 new_args = new_args_response.get("args")
                 new_args_api = []
 
-                for new_arg in enumerate(new_args):
-                    arg_name = new_arg[1]
+                for arg_name, arg_item in new_args.items():
                     arg = new_args.get(arg_name)
-
                     if arg_name in pre_execute.args_list:
                         continue
 

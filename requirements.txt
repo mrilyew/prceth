@@ -5,14 +5,12 @@ jinja2
 
 peewee==3.17.6
 pymysql
-psycopg2
 snowflake-id
 
 requests==2.32.3
 urllib3==2.2.3
 
 pillow<11.0
-hachoir==3.3.0
 idna==3.10
 
 certifi==2024.8.30

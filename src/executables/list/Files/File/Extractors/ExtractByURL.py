@@ -54,6 +54,8 @@ class Method(Representation.AbstractExtractor):
                 else:
                     ext = 'html'
 
+            result_name = '.'.join([name, ext])
+            result_path = Path(os.path.join(tmp_dir, result_name))
             tmp_path.rename(os.path.join(tmp_dir, result_path))
 
             su.write_data({

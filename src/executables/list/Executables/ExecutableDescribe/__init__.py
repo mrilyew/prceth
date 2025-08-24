@@ -1,11 +1,11 @@
-from declarable.Arguments import StringArgument, LimitedArgument
-from executables.list.Executables.ExecutableList import Implementation as ListImplementation
+from executables.acts import Act
+from declarable.Arguments import ExecutableArgument
 
-class Implementation(ListImplementation):
+class Implementation(Act):
     @classmethod
     def declare(cls):
         params = {}
-        params["class"] = StringArgument({
+        params["class"] = ExecutableArgument({
             "assertion": {
                 "not_null": True,
             }
@@ -14,12 +14,4 @@ class Implementation(ListImplementation):
         return params
 
     async def execute(self, i = {}):
-        class_type = i.get('class_type')
-        class_name = i.get('class')
-
-        repo = self._classes[class_type]
-        result = repo.findByName(class_name)
-
-        assert result != None, "not found class"
-
-        return result.describe()
+        return i.get('class').describe()

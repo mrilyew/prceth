@@ -110,37 +110,11 @@ DefaultSettings = {
             "definition": keys.get("storage.root_path.definition"),
         },
     }),
-    "db.content_db.type": LimitedArgument({
-        "values": ['sqlite', 'mysql', 'postgresql'],
-        "default": "sqlite",
+    "db.content.connection": StringArgument({
+        "default": "sqlite:///?cwd?/storage/dbs/content.db"
     }),
-    "db.instance_db.type": LimitedArgument({
-        "values": ['sqlite', 'mysql', 'postgresql'],
-        "default": "sqlite",
-    }),
-    "db.sqlite.content_db.name": StringArgument({
-        "default": "?cwd?/storage/dbs/content.db"
-    }),
-    "db.sqlite.instance_db.name": StringArgument({
-        "default": "?cwd?/storage/dbs/instance.db"
-    }),
-    "db.server_db.content_db.name": StringArgument({
-        "default": "th_content"
-    }),
-    "db.server_db.instance_db.name": StringArgument({
-        "default": "th_instance"
-    }),
-    "db.server_db.user": StringArgument({
-        "default": None,
-    }),
-    "db.server_db.password": StringArgument({
-        "default": None,
-    }),
-    "db.server_db.host": StringArgument({
-        "default": '127.0.0.1',
-    }),
-    "db.server_db.port": IntArgument({
-        "default": 3306,
+    "db.instance.connection": StringArgument({
+        "default": "sqlite:///?cwd?/storage/dbs/instance.db"
     }),
     "net.max_speed": IntArgument({
         "default": 2000, # kbs
@@ -176,7 +150,6 @@ DefaultSettings = {
             "name": keys.get("logger.skip_file.name"),
         },
     }),
-    # Thumbnails
     "thumbnail.width": IntArgument({
         "default": 200,
         "docs": {
