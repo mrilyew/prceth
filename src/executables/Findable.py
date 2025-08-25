@@ -6,6 +6,7 @@ import importlib
 
 class Findable():
     self_name = "Executable"
+    cached_lists = {}
 
     @classmethod
     def findByNameRaw(cls, category, title, sub = None, any = False)->Type["Findable"]:
