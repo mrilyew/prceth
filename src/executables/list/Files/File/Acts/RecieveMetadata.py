@@ -34,7 +34,7 @@ class Method(Representation.AbstractAct):
         if input_path != None:
             final_path = input_path
         else:
-            assert input_file != None, "invalid storage_unit"
+            assert input_file != None, "invalid su_id"
 
             final_path = input_file.path()
 
@@ -51,7 +51,7 @@ class Method(Representation.AbstractAct):
                 if _metadata == None:
                     raise ValueError
 
-                if i.get('convert_to_dict'):
+                if i.get('convert_to_dict') == True:
                     return extract_metadata_to_dict(_metadata.exportPlaintext())
                 else:
                     return _metadata.exportPlaintext()

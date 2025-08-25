@@ -12,19 +12,29 @@ class Findable():
     def findByNameRaw(cls, category, title, sub = None, any = False)->Type["Findable"]:
         folder = "executables"
 
-        __module_name = f'{folder}.list.{category}.{title}'
-        __module = importlib.import_module(__module_name)
-        __class = getattr(__module, "Implementation", None)
-        if __class == None:
+        try:
+            module_name = f'{folder}.list.{category}.{title}'
+            module = importlib.import_module(module_name)
+            if module == None:
+                return None
+
+            class_object = getattr(module, "Implementation", None)
+            sub_object = None
+
+            assert class_object != None
+
+            if sub != None:
+                sub_object = class_object.get_submodule("Acts", sub)
+            else:
+                if any == False:
+                    assert class_object.self_name != cls.self_name
+
+            if sub_object != None:
+                return sub_object(class_object)
+
+            return class_object()
+        except AssertionError:
             return None
-
-        if sub != None:
-            __class = __class.get_submodule("Acts", sub)
-
-        if any == False and __class.self_name != cls.self_name:
-            return None
-
-        return __class
 
     @classmethod
     def findByName(cls, name, any = False)->Type["Findable"]:
